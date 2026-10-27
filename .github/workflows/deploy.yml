@@ -40,11 +40,11 @@ jobs:
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
         run: |
-          npx void secret put ENCRYPTION_KEY="$ENCRYPTION_KEY" || true
-          npx void secret put SESSION_SECRET="$SESSION_SECRET" || true
-          if ! npx void deploy; then
-            echo "void deploy fallback: building with vite and deploying via wrangler..."
+          npx void deploy --platform cloudflare || {
+            echo "Falling back to vite build + wrangler deploy..."
             npx vite build
             cd dist/ssr
             npx wrangler deploy
-          fi
+          }
+          echo "$ENCRYPTION_KEY" | npx wrangler secret put ENCRYPTION_KEY --name edgerelay || true
+          echo "$SESSION_SECRET" | npx wrangler secret put SESSION_SECRET --name edgerelay || true
