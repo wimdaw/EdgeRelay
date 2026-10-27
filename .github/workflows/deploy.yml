@@ -25,13 +25,13 @@ jobs:
       - name: Build Console (Frontend)
         run: |
           cd console
-          npm ci || npm install
+          npm install --legacy-peer-deps
           npm run build
           cd ..
 
       - name: Install Root Dependencies
         run: |
-          npm ci || npm install
+          npm install --legacy-peer-deps
 
       - name: Deploy to Cloudflare Workers
         env:
