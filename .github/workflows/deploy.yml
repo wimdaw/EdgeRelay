@@ -33,18 +33,15 @@ jobs:
         run: |
           npm install --legacy-peer-deps
 
-      - name: Deploy to Cloudflare Workers
+      - name: Build Backend & Deploy to Cloudflare Workers
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
         run: |
-          npx void deploy --platform cloudflare || {
-            echo "Falling back to vite build + wrangler deploy..."
-            npx vite build
-            cd dist/ssr
-            npx wrangler deploy
-          }
-          echo "$ENCRYPTION_KEY" | npx wrangler secret put ENCRYPTION_KEY --name edgerelay || true
-          echo "$SESSION_SECRET" | npx wrangler secret put SESSION_SECRET --name edgerelay || true
+          printf "ENCRYPTION_KEY=%s\nSESSION_SECRET=%s\n" "$ENCRYPTION_KEY" "$SESSION_SECRET" > .secrets.env
+          npx vite build
+          cp .secrets.env dist/ssr/.secrets.env
+          cd dist/ssr
+          npx wrangler deploy --secrets-file .secrets.env
