@@ -42,6 +42,28 @@ jobs:
         run: |
           printf "ENCRYPTION_KEY=%s\nSESSION_SECRET=%s\n" "$ENCRYPTION_KEY" "$SESSION_SECRET" > .secrets.env
           npx vite build
+          node -e '
+            const fs = require("fs");
+            const p = "dist/ssr/wrangler.json";
+            const cfg = JSON.parse(fs.readFileSync(p, "utf8"));
+            if (cfg.d1_databases) {
+              cfg.d1_databases.forEach(d => {
+                if (d.binding === "DB") {
+                  d.database_name = "ai-gateway-mvp-db";
+                  d.database_id = "33588f0d-1638-46cf-942c-25d146669930";
+                }
+              });
+            }
+            if (cfg.kv_namespaces) {
+              cfg.kv_namespaces.forEach(k => {
+                if (k.binding === "KV") {
+                  k.id = "846871a31f4c4f0fb18c569861860130";
+                }
+              });
+            }
+            fs.writeFileSync(p, JSON.stringify(cfg, null, 2));
+            console.log("Injected production D1 and KV into dist/ssr/wrangler.json:", JSON.stringify(cfg, null, 2));
+          '
           cp .secrets.env dist/ssr/.secrets.env
           cd dist/ssr
           npx wrangler deploy --secrets-file .secrets.env
