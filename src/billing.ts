@@ -101,6 +101,12 @@ export async function settle(
   bal.frozen = Math.max(0, bal.frozen - args.heldAmount);
   await updateBalance(c.env, args.scope, bal);
 
+  // 扣费后若余额归零或为负，自动降级为普通用户 (user)
+  if (bal.available <= 0 && args.userId) {
+    const { syncUserVipStatus } = await import("./storage/db");
+    syncUserVipStatus(c.env, args.userId, bal.available).catch(() => {});
+  }
+
   // 1. 记 capture
   await appendLedgerEntry(c.env, {
     id: uuid(),

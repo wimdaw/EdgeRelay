@@ -17,7 +17,7 @@ const NAV = [
   // 网站治理专属超级管理员
   { to: "/dashboard/providers", label: "供应商", icon: Server, roles: ["superadmin"] },
   { to: "/dashboard/pricing", label: "定价", icon: Coins, roles: ["superadmin"] },
-  { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ["superadmin"] },
+  { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ["superadmin", "admin"] },
   { to: "/dashboard/announcements", label: "公告", icon: Megaphone, roles: ["superadmin"] },
   { to: "/dashboard/settings", label: "设置", icon: SettingsIcon, roles: ["superadmin"] },
   { to: "/dashboard/audit", label: "审计日志", icon: ShieldCheck, roles: ["superadmin", "auditor"] },

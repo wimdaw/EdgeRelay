@@ -127,6 +127,56 @@ export async function listAllUsers(env: any): Promise<UserRecord[]> {
   return users;
 }
 
+export async function deleteUser(env: any, id: string): Promise<boolean> {
+  const store = getBlobStore(env);
+  const cur = await getUserById(env, id);
+  if (!cur) return false;
+
+  // 1. 从用户总索引中移除
+  const allIds: string[] = (await store.get("idx:users:all", { type: "json", consistency: "strong" })) || [];
+  const filtered = allIds.filter((x) => x !== id);
+  await store.setJSON("idx:users:all", filtered);
+
+  // 2. 删除邮箱索引与用户主记录
+  const norm = cur.email.trim().toLowerCase();
+  await store.delete(`idx:user:email:${encodeURIComponent(norm)}`);
+  await store.delete(`user:${id}`);
+
+  // 3. 撤销该用户全部生效的 API Key
+  try {
+    const keys = await listApiKeys(env, id);
+    for (const k of keys) {
+      await updateApiKey(env, k.keyHash, { status: "revoked", revokedAt: Math.floor(Date.now() / 1000) });
+    }
+  } catch {}
+
+  return true;
+}
+
+/**
+ * 判定并同步普通用户与 VIP 状态：
+ * 只要是普通用户体系（user 或 vip），余额大于 0 自动晋升为 vip；余额归零或为负自动降级为 user
+ * 管理员、超级管理员等职能角色保持其身份不变
+ */
+export async function syncUserVipStatus(env: any, userId: string, availableBalance?: number): Promise<string> {
+  const user = await getUserById(env, userId);
+  if (!user) return "user";
+  if (user.role !== "user" && user.role !== "vip") {
+    return user.role;
+  }
+  let bal = availableBalance;
+  if (bal === undefined) {
+    const b = await getOrCreateBalance(env, `user:${userId}`);
+    bal = b.available;
+  }
+  const nextRole: "user" | "vip" = bal > 0 ? "vip" : "user";
+  if (user.role !== nextRole) {
+    user.role = nextRole;
+    await updateUser(env, userId, { role: nextRole });
+  }
+  return nextRole;
+}
+
 // ==========================================
 // 3. 用户会话 (Sessions)
 // ==========================================

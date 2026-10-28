@@ -2,7 +2,8 @@
  * 管理后台统一路由 /api/admin/*
  */
 import { Hono } from "hono";
-import type { Env, HandlerCtx, PlatformSettings } from "../types";
+import type { Env, HandlerCtx, PlatformSettings, UserRole } from "../types";
+import { ROLE_HIERARCHY } from "../types";
 import { requireAdminStepUp, requireUser, requireRole, clientIp } from "../auth";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
 import { uuid, encryptSecret, sha256Hex } from "../crypto";
@@ -73,9 +74,31 @@ adminRouter.post("/actions", async (c) => {
     } else if (action === "list_pricing") {
       requireRole(user, ["superadmin", "finance", "auditor"]);
     } else if (READ_ACTIONS.has(action)) {
-      requireRole(user, ["superadmin", "auditor"]);
+      requireRole(user, ["superadmin", "admin", "auditor"]);
     } else {
       admin = await requireAdminStepUp(hCtx, typeof p.password === "string" ? p.password : undefined);
+
+      // 网站根级管理配置仅限超级管理员 (superadmin)
+      const SUPERADMIN_ONLY_ACTIONS = new Set([
+        "upsert_provider",
+        "delete_provider",
+        "upsert_provider_key",
+        "delete_provider_key",
+        "toggle_provider",
+        "upsert_model",
+        "delete_model",
+        "import_models",
+        "set_pricing",
+        "set_settings",
+        "set_smtp",
+        "upsert_site_logo",
+        "generate_redeem_codes",
+        "delete_redeem_code",
+        "save_announcements",
+      ]);
+      if (SUPERADMIN_ONLY_ACTIONS.has(action)) {
+        requireRole(admin, ["superadmin"]);
+      }
     }
 
     const done = async (result: unknown, targetType?: string, targetId?: string) => {
@@ -113,28 +136,61 @@ adminRouter.post("/actions", async (c) => {
         return json({ ok: true, users: safe });
       }
       case "set_role": {
-        const role = String(p.role);
+        const role = String(p.role) as UserRole;
         if (!["user", "vip", "admin", "superadmin", "finance", "auditor"].includes(role)) {
           throw new ApiError(400, ErrorCode.BAD_REQUEST, "非法角色");
         }
         const target = await getUserById(env, String(p.userId));
-        if (target?.email.toLowerCase() === "hackerxiaow@gmail.com" && role !== "superadmin") {
+        if (!target) throw new ApiError(404, ErrorCode.NOT_FOUND, "目标用户不存在");
+        if (target.email.toLowerCase() === "hackerxiaow@gmail.com" && role !== "superadmin") {
           throw new ApiError(403, ErrorCode.FORBIDDEN, "创始人超级管理员账号不可被降权");
         }
-        await updateUser(env, String(p.userId), { role: role as any });
+        // 权限上下继承：只能修改权限等级比自身低的用户
+        const actorLvl = ROLE_HIERARCHY[admin.role as UserRole] || 0;
+        const targetLvl = ROLE_HIERARCHY[target.role as UserRole] || 0;
+        if (actorLvl <= targetLvl && target.id !== admin.id) {
+          throw new ApiError(403, ErrorCode.FORBIDDEN, "无权调整同级或更高权限用户的角色");
+        }
+        // 管理员任命保护：管理员必须由超级管理员在后台添加/任命，不支持直接升级
+        if ((role === "admin" || role === "superadmin") && admin.role !== "superadmin") {
+          throw new ApiError(403, ErrorCode.FORBIDDEN, "只有超级管理员可在后台任命管理员");
+        }
+        await updateUser(env, String(p.userId), { role });
         return done(null, "user", String(p.userId));
       }
       case "ban_user": {
         const target = await getUserById(env, String(p.userId));
-        if (target?.role === "superadmin" || target?.email.toLowerCase() === "hackerxiaow@gmail.com") {
-          throw new ApiError(403, ErrorCode.FORBIDDEN, "超级管理员账号不可被封禁");
+        if (!target) throw new ApiError(404, ErrorCode.NOT_FOUND, "用户不存在");
+        const actorLvl = ROLE_HIERARCHY[admin.role as UserRole] || 0;
+        const targetLvl = ROLE_HIERARCHY[target.role as UserRole] || 0;
+        if (actorLvl <= targetLvl) {
+          throw new ApiError(403, ErrorCode.FORBIDDEN, "无权封禁同级或更高权限的用户");
         }
         await updateUser(env, String(p.userId), { status: "banned" });
         return done(null, "user", String(p.userId));
       }
       case "unban_user": {
+        const target = await getUserById(env, String(p.userId));
+        if (!target) throw new ApiError(404, ErrorCode.NOT_FOUND, "用户不存在");
+        const actorLvl = ROLE_HIERARCHY[admin.role as UserRole] || 0;
+        const targetLvl = ROLE_HIERARCHY[target.role as UserRole] || 0;
+        if (actorLvl <= targetLvl) {
+          throw new ApiError(403, ErrorCode.FORBIDDEN, "无权解封同级或更高权限的用户");
+        }
         await updateUser(env, String(p.userId), { status: "active" });
         return done(null, "user", String(p.userId));
+      }
+      case "delete_user": {
+        const target = await getUserById(env, String(p.userId));
+        if (!target) throw new ApiError(404, ErrorCode.NOT_FOUND, "用户不存在");
+        const actorLvl = ROLE_HIERARCHY[admin.role as UserRole] || 0;
+        const targetLvl = ROLE_HIERARCHY[target.role as UserRole] || 0;
+        if (actorLvl <= targetLvl) {
+          throw new ApiError(403, ErrorCode.FORBIDDEN, "无权删除同级或更高权限的用户");
+        }
+        const { deleteUser } = await import("../storage/db");
+        await deleteUser(env, target.id);
+        return done(null, "user", target.id);
       }
 
       /* ---- Key 管理 ---- */
@@ -578,17 +634,46 @@ adminRouter.post("/actions", async (c) => {
         const scope = String(p.scope);
         const amount = Number(p.amount);
         if (!Number.isFinite(amount) || amount === 0) throw new ApiError(400, ErrorCode.BAD_REQUEST, "金额不合法");
-        const memo = (p.memo as string) || `管理员 ${admin.email} 手动充值加款`;
-        await topup(hCtx, scope, amount, memo);
 
-        // 若勾选了自动升级 VIP，且充值金额 > 0，且当前用户角色为普通用户 (user)，自动提升为 VIP 账号
-        if (p.autoVip && scope.startsWith("user:") && amount > 0) {
+        let targetUser = null;
+        if (scope.startsWith("user:")) {
           const targetUserId = scope.slice(5);
-          const targetUser = await getUserById(env, targetUserId);
-          if (targetUser && targetUser.role === "user") {
-            await updateUser(env, targetUserId, { role: "vip" });
+          targetUser = await getUserById(env, targetUserId);
+          if (!targetUser) throw new ApiError(404, ErrorCode.NOT_FOUND, "目标用户不存在");
+
+          // 权限上下继承：只能给权限比自己低的用户充值
+          const actorLvl = ROLE_HIERARCHY[admin.role as UserRole] || 0;
+          const targetLvl = ROLE_HIERARCHY[targetUser.role as UserRole] || 0;
+          if (actorLvl <= targetLvl && targetUser.id !== admin.id) {
+            throw new ApiError(403, ErrorCode.FORBIDDEN, "只能给比自身权限等级低的用户充值加款");
           }
         }
+
+        // 扣除操作者自身的余额（普通管理员实扣，超级管理员无限额度但照常扣费流水）
+        if (amount > 0 && admin.id) {
+          const { getOrCreateBalance } = await import("../storage/db");
+          const actorBal = await getOrCreateBalance(env, `user:${admin.id}`);
+          if (admin.role !== "superadmin" && actorBal.available < amount) {
+            throw new ApiError(
+              402,
+              ErrorCode.INSUFFICIENT_BALANCE,
+              `您的账户可用余额不足 (当前 ¥${actorBal.available.toFixed(2)})，无法为下级用户充值 ¥${amount.toFixed(2)}`
+            );
+          }
+          // 从当前管理员账户转出扣除
+          await topup(hCtx, `user:${admin.id}`, -amount, `给下级用户 [${targetUser?.email || scope}] 充值转账扣减`);
+        }
+
+        // 记账加款到目标用户
+        const memo = (p.memo as string) || `由管理员 [${admin.email}] 充值加款到账`;
+        await topup(hCtx, scope, amount, memo);
+
+        // 动态 VIP 规则：普通用户只要余额 > 0 自动晋升为 VIP，归 0 降级为 user
+        if (targetUser) {
+          const { syncUserVipStatus } = await import("../storage/db");
+          await syncUserVipStatus(env, targetUser.id);
+        }
+
         return done(null, "balance", scope);
       }
 

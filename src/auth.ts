@@ -55,10 +55,17 @@ export async function getSessionUser(c: HandlerCtx): Promise<SessionUser | null>
   const user = await getUserById(c.env, session.userId);
   if (!user || user.status !== "active") return null;
 
+  // 余额动态判定：普通用户与 VIP 依据余额是否大于 0 自动升降级
+  let currentRole = user.role;
+  if (currentRole === "user" || currentRole === "vip") {
+    const { syncUserVipStatus } = await import("./storage/db");
+    currentRole = (await syncUserVipStatus(c.env, user.id)) as SessionUser["role"];
+  }
+
   return {
     id: user.id,
     email: user.email,
-    role: user.role,
+    role: currentRole,
     status: user.status,
   };
 }
@@ -76,7 +83,7 @@ export function requireRole(u: SessionUser, roles: SessionUser["role"][]): void 
 /** 管理接口二次验证：需要已登录且通过 step-up（支持就地核验管理员密码，或 10 分钟凭证有效） */
 export async function requireAdminStepUp(c: HandlerCtx, providedPassword?: string): Promise<SessionUser> {
   const u = await requireUser(c);
-  requireRole(u, ["superadmin"]);
+  requireRole(u, ["superadmin", "admin"]);
   const settings = await getSettings(c.env);
   if (settings.stepUpDisabled) return u;
 
@@ -157,7 +164,11 @@ export async function authenticateApiKey(c: HandlerCtx): Promise<AuthedKey> {
   }
 
   const user = await getUserById(c.env, row.userId);
-  const userRole = (user?.role as AuthedKey["userRole"]) || "user";
+  let userRole = (user?.role as AuthedKey["userRole"]) || "user";
+  if (userRole === "user" || userRole === "vip") {
+    const { syncUserVipStatus } = await import("./storage/db");
+    userRole = (await syncUserVipStatus(c.env, row.userId)) as AuthedKey["userRole"];
+  }
 
   return {
     keyId: row.id,

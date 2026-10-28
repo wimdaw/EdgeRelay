@@ -137,11 +137,22 @@ export type AuthedKey = {
   limits: RateLimits;
 };
 
+export type UserRole = "user" | "vip" | "admin" | "superadmin" | "finance" | "auditor";
+
+export const ROLE_HIERARCHY: Record<UserRole, number> = {
+  superadmin: 100,
+  admin: 50,
+  finance: 30,
+  auditor: 20,
+  vip: 10,
+  user: 1,
+};
+
 export interface UserRecord {
   id: string;
   email: string;
   passwordHash: string;
-  role: "user" | "vip" | "admin" | "superadmin" | "finance" | "auditor";
+  role: UserRole;
   status: "active" | "suspended" | "banned";
   nickname?: string;
   bio?: string;

@@ -73,17 +73,11 @@ billingRouter.post("/redeem", async (c) => {
     // 1. 记账加款
     await topup(hCtx, `user:${user.id}`, result.amount, `使用卡密 [${codeStr}] 兑换充值`);
 
-    // 2. 若卡密设置了自动升级 VIP，且当前用户角色为普通用户 (user)，自动升级为 VIP
-    const currentUser = await getUserById(c.env, user.id);
-    let role = currentUser?.role || user.role;
-    let upgraded = false;
-    if (result.autoVip && role === "user") {
-      await updateUser(c.env, user.id, { role: "vip" });
-      role = "vip";
-      upgraded = true;
-    }
-
+    // 2. 余额大于 0 自动晋升为 VIP 账号
     const bal = await getBalance(c.env, `user:${user.id}`);
+    const { syncUserVipStatus } = await import("../storage/db");
+    const role = await syncUserVipStatus(c.env, user.id, bal.available);
+    const upgraded = role === "vip" && user.role === "user";
 
     const { audit } = await import("../audit");
     const { clientIp } = await import("../auth");

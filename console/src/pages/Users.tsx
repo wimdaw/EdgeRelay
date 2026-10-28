@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
-import { Check, Coins, Copy, CreditCard, KeyRound, Plus, Sparkles, Trash2, Users as UsersIcon } from "lucide-react";
-import { adminAction, type UserRow, type Flag, type Appeal } from "../lib/api";
+import { Check, Coins, Copy, KeyRound, Plus, Trash2 } from "lucide-react";
+import { useOutletContext } from "react-router-dom";
+import { adminAction, type Me, type UserRow, type Flag, type Appeal } from "../lib/api";
 import { Button, Card, DataTable, Dialog, Field, Input, Select, StatusTag, useConfirm, useToast, type Col } from "../components/ui";
 import { fmtTime } from "../lib/utils";
 
-const ROLE_MAP: Record<string, { label: string; color: string; desc: string }> = {
-  user: { label: "普通用户", color: "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20", desc: "仅限免费模型池，免充值不扣费" },
-  vip: { label: "VIP 账号", color: "bg-amber-500/10 text-amber-500 font-semibold border border-amber-500/20", desc: "解锁全量付费模型，按量扣除余额" },
-  admin: { label: "管理员", color: "bg-brand/10 text-brand font-semibold border border-brand/20", desc: "最高治理权限，全模型按量扣费" },
-  finance: { label: "财务人员", color: "bg-purple-500/10 text-purple-400 border border-purple-500/20", desc: "财务与账单核对权限" },
-  auditor: { label: "审计员", color: "bg-blue-500/10 text-blue-400 border border-blue-500/20", desc: "审计日志只读权限" },
+const ROLE_MAP: Record<string, { label: string; color: string; desc: string; lvl: number }> = {
+  superadmin: { label: "超级管理员", color: "bg-red-500/10 text-red-500 font-bold border border-red-500/30", desc: "最高站长权限，全站管理，额度无限真实扣费", lvl: 100 },
+  admin: { label: "管理员", color: "bg-brand/10 text-brand font-semibold border border-brand/20", desc: "可调用全量模型，可管理下级用户并转账充值", lvl: 50 },
+  finance: { label: "财务人员", color: "bg-purple-500/10 text-purple-400 border border-purple-500/20", desc: "财务与账单核对权限", lvl: 30 },
+  auditor: { label: "审计员", color: "bg-blue-500/10 text-blue-400 border border-blue-500/20", desc: "审计日志只读权限", lvl: 20 },
+  vip: { label: "VIP 账号", color: "bg-amber-500/10 text-amber-500 font-semibold border border-amber-500/20", desc: "余额大于 0 自动获得，解锁全量付费模型并按量扣费", lvl: 10 },
+  user: { label: "普通用户", color: "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20", desc: "余额归零状态，仅限免费模型池，免充值不扣费", lvl: 1 },
 };
 
 type RedeemCodeItem = {
@@ -26,6 +28,9 @@ type RedeemCodeItem = {
 };
 
 export default function Users() {
+  const { me } = useOutletContext<{ me: Me }>();
+  const isSuperadmin = me?.user.role === "superadmin";
+
   const [tab, setTab] = useState<"users" | "codes" | "flags" | "appeals">("users");
   const [users, setUsers] = useState<UserRow[] | null>(null);
   const [codes, setCodes] = useState<RedeemCodeItem[] | null>(null);
@@ -33,12 +38,11 @@ export default function Users() {
   const [appeals, setAppeals] = useState<Appeal[] | null>(null);
   const [invite, setInvite] = useState<{ open: boolean; email: string; role: string }>({ open: false, email: "", role: "member" });
   const [roleDlg, setRoleDlg] = useState<{ open: boolean; user: UserRow | null; role: string }>({ open: false, user: null, role: "user" });
-  const [topupDlg, setTopupDlg] = useState<{ open: boolean; user: UserRow | null; amount: string; autoVip: boolean; memo: string; password: string }>({
+  const [topupDlg, setTopupDlg] = useState<{ open: boolean; user: UserRow | null; amount: string; memo: string; password: string }>({
     open: false,
     user: null,
     amount: "50",
-    autoVip: true,
-    memo: "管理员手动充值加款",
+    memo: "管理员转账充值",
     password: "",
   });
   const [genDlg, setGenDlg] = useState({ open: false, amount: "50", count: "10", autoVip: true, note: "", password: "" });
@@ -70,8 +74,7 @@ export default function Users() {
       open: true,
       user: u,
       amount: "50",
-      autoVip: u.role === "user",
-      memo: "管理员手动充值加款",
+      memo: `管理员转账充值`,
       password: "",
     });
   };
@@ -79,20 +82,30 @@ export default function Users() {
   const submitTopup = async () => {
     if (!topupDlg.user) return;
     const amt = parseFloat(topupDlg.amount);
-    if (isNaN(amt) || amt === 0) return toast("请输入有效的充值金额", "err");
+    if (isNaN(amt) || amt <= 0) return toast("请输入大于 0 的充值金额", "err");
     if (!topupDlg.password.trim()) return toast("请输入管理员密码确认充值操作", "err");
     try {
       await adminAction("topup", {
         scope: `user:${topupDlg.user.id}`,
         amount: amt,
-        autoVip: topupDlg.autoVip,
         memo: topupDlg.memo.trim() || undefined,
         password: topupDlg.password.trim(),
       });
-      toast(`充值成功！已为「${topupDlg.user.email}」${amt > 0 ? "充值" : "扣减"} ¥${Math.abs(amt).toFixed(2)}${topupDlg.autoVip && topupDlg.user.role === "user" ? "，并已自动升级为 VIP 账号" : ""}`);
-      setTopupDlg({ open: false, user: null, amount: "50", autoVip: true, memo: "", password: "" });
+      toast(`转账充值成功！已为「${topupDlg.user.email}」充值 ¥${amt.toFixed(2)}${!isSuperadmin ? "（已扣除您等额余额）" : ""}`);
+      setTopupDlg({ open: false, user: null, amount: "50", memo: "", password: "" });
       loadUsers();
     } catch (e) { toast((e as Error).message, "err"); }
+  };
+
+  const deleteUser = async (u: UserRow) => {
+    if (!(await confirm(`危险操作：确认永久删除用户「${u.email}」？该用户的个人账户、数据与全部 API Key 将被物理销毁且无法恢复！`))) return;
+    try {
+      await adminAction("delete_user", { userId: u.id });
+      toast(`已彻底删除用户「${u.email}」`);
+      loadUsers();
+    } catch (e) {
+      toast((e as Error).message, "err");
+    }
   };
 
   const copyStr = async (text: string, label: string) => {
@@ -144,12 +157,17 @@ export default function Users() {
       label: "账号等级",
       render: (r) => {
         const item = ROLE_MAP[r.role] || { label: r.role, color: "bg-surface2 text-muted", desc: "" };
+        const actorLvl = ROLE_MAP[me?.user.role ?? "user"]?.lvl ?? 1;
+        const targetLvl = ROLE_MAP[r.role]?.lvl ?? 1;
+        const canEditRole = isSuperadmin || (actorLvl > targetLvl && r.id !== me?.user.id);
+
         return (
           <button
             type="button"
-            onClick={() => setRoleDlg({ open: true, user: r, role: r.role })}
-            className={`rounded-full px-2.5 py-0.5 text-[11px] transition-all hover:scale-105 cursor-pointer ${item.color}`}
-            title="点击修改用户角色等级与权限"
+            disabled={!canEditRole}
+            onClick={() => canEditRole && setRoleDlg({ open: true, user: r, role: r.role })}
+            className={`rounded-full px-2.5 py-0.5 text-[11px] transition-all ${canEditRole ? "hover:scale-105 cursor-pointer" : "cursor-default opacity-85"} ${item.color}`}
+            title={canEditRole ? "点击修改用户角色等级与权限" : "同级或高权限账号不可直接修改角色"}
           >
             {item.label}
           </button>
@@ -168,17 +186,29 @@ export default function Users() {
     },
     { key: "status", label: "状态", render: (r) => <StatusTag value={r.status} /> },
     { key: "created", label: "注册时间", sortVal: (r) => r.created_at, render: (r) => <span className="text-xs text-muted">{fmtTime(r.created_at)}</span> },
-    { key: "ops", label: "操作", render: (r) => (
-      <span className="flex items-center gap-1.5 shrink-0">
-        <Button variant="soft" className="!h-7 !px-2 text-xs !text-emerald-500 font-medium" onClick={() => openTopup(r)}>
-          <Coins size={12} className="mr-0.5" />充值
-        </Button>
-        <Button variant="soft" className="!h-7 !px-2 text-xs" onClick={() => setRoleDlg({ open: true, user: r, role: r.role })}>调整角色</Button>
-        {r.status === "active"
-          ? <Button variant="ghost" className="!h-7 !px-2 text-xs !text-err" onClick={async (e) => { e.stopPropagation(); if (await confirm(`封禁 ${r.email}？将同时撤销其全部 Key 并强制下线。`)) { await adminAction("ban_user", { userId: r.id }); toast("已封禁"); loadUsers(); } }}>封禁</Button>
-          : <Button variant="ghost" className="!h-7 !px-2 text-xs" onClick={async (e) => { e.stopPropagation(); await adminAction("unban_user", { userId: r.id }); toast("已解封"); loadUsers(); }}>解封</Button>}
-      </span>
-    ) },
+    { key: "ops", label: "操作", render: (r) => {
+      const actorLvl = ROLE_MAP[me?.user.role ?? "user"]?.lvl ?? 1;
+      const targetLvl = ROLE_MAP[r.role]?.lvl ?? 1;
+      const isSelf = r.id === me?.user.id;
+      const canManage = isSuperadmin || (actorLvl > targetLvl && !isSelf);
+
+      if (!canManage) {
+        return <span className="text-xs text-muted/60">—</span>;
+      }
+
+      return (
+        <span className="flex items-center gap-1.5 shrink-0">
+          <Button variant="soft" className="!h-7 !px-2 text-xs !text-emerald-500 font-medium" onClick={() => openTopup(r)}>
+            <Coins size={12} className="mr-0.5" />充值
+          </Button>
+          <Button variant="soft" className="!h-7 !px-2 text-xs" onClick={() => setRoleDlg({ open: true, user: r, role: r.role })}>调整角色</Button>
+          {r.status === "active"
+            ? <Button variant="ghost" className="!h-7 !px-2 text-xs !text-err" onClick={async (e) => { e.stopPropagation(); if (await confirm(`封禁 ${r.email}？将同时撤销其全部 Key 并强制下线。`)) { await adminAction("ban_user", { userId: r.id }); toast("已封禁"); loadUsers(); } }}>封禁</Button>
+            : <Button variant="ghost" className="!h-7 !px-2 text-xs" onClick={async (e) => { e.stopPropagation(); await adminAction("unban_user", { userId: r.id }); toast("已解封"); loadUsers(); }}>解封</Button>}
+          <Button variant="ghost" className="!h-7 !px-1.5 text-xs !text-err" onClick={() => deleteUser(r)} title="物理删除该用户"><Trash2 size={12} /></Button>
+        </span>
+      );
+    } },
   ];
 
   const codeCols: Col<RedeemCodeItem>[] = [
@@ -205,8 +235,8 @@ export default function Users() {
     },
     {
       key: "autoVip",
-      label: "等级权益",
-      render: (r) => r.autoVip ? <span className="rounded bg-amber-500/10 text-amber-500 text-[10px] font-semibold px-2 py-0.5">自动升级 VIP</span> : <span className="text-[11px] text-muted">仅加余额</span>,
+      label: "权益属性",
+      render: (r) => <span className="rounded bg-amber-500/10 text-amber-500 text-[10px] font-semibold px-2 py-0.5">余额大于0自动VIP</span>,
     },
     {
       key: "status",
@@ -254,11 +284,15 @@ export default function Users() {
     },
   ];
 
+  const TABS = isSuperadmin
+    ? ([["users", "用户与权限"], ["codes", "卡密管理"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const)
+    : ([["users", "用户与权限"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit" role="tablist">
-        {([["users", "用户与权限"], ["codes", "卡密管理"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const).map(([k, l]) => (
-          <button key={k} role="tab" aria-selected={tab === k} onClick={() => { setTab(k); (k === "flags" ? loadFlags : k === "appeals" ? loadAppeals : k === "codes" ? loadCodes : loadUsers)(); }}
+        {TABS.map(([k, l]) => (
+          <button key={k} role="tab" aria-selected={tab === k} onClick={() => { setTab(k as any); (k === "flags" ? loadFlags : k === "appeals" ? loadAppeals : k === "codes" ? loadCodes : loadUsers)(); }}
             className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{l}</button>
         ))}
       </div>
@@ -267,18 +301,22 @@ export default function Users() {
         <Card className="p-4 sm:p-5 flex flex-col gap-3.5">
           {/* 用户等级与权限说明条 */}
           <div className="rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted space-y-1.5">
-            <div className="font-semibold text-ink text-[13px] mb-1">用户体系与调用计费分级规则：</div>
+            <div className="font-semibold text-ink text-[13px] mb-1">👑 权限继承与动态会员等级规则（superadmin &gt; admin &gt; vip &gt; user）：</div>
             <div className="flex items-start gap-2">
-              <span className="shrink-0 rounded bg-zinc-500/10 text-zinc-400 px-1.5 py-0.5 text-[10px] font-bold">普通用户 (user)</span>
-              <span>默认注册用户级别。<b>完全免费使用所有 0 元免费模型池</b>（免充值、不扣费）；若调用付费高级模型，网关自动拦截并提示升级。</span>
+              <span className="shrink-0 rounded bg-red-500/10 text-red-500 px-1.5 py-0.5 text-[10px] font-bold">超级管理员 (superadmin)</span>
+              <span>最高站长权限，独占全站设置与渠道治理；<b>余额额度无限（照常按量扣费记账）</b>；可管理/充值/封禁/删除所有下级账号。</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="shrink-0 rounded bg-brand/10 text-brand px-1.5 py-0.5 text-[10px] font-bold">管理员 (admin)</span>
+              <span>拥有全模型调用权限；可在权限范围内管理下级并<b>实打实扣除自身余额为下级转账充值</b>；仅限超级管理员后台任命。</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="shrink-0 rounded bg-amber-500/10 text-amber-500 px-1.5 py-0.5 text-[10px] font-bold">VIP 账号 (vip)</span>
-              <span><b>解锁全站所有大模型</b>。调用付费模型根据真实输入输出 Token 扣除账户余额；调用免费模型依然 0 元免扣费。</span>
+              <span><b>只要可用余额 &gt; 0 自动晋升为 VIP</b>；解锁全量付费大模型并按真实 Token 扣除账户余额。</span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="shrink-0 rounded bg-brand/10 text-brand px-1.5 py-0.5 text-[10px] font-bold">系统管理员 (admin)</span>
-              <span>拥有控制台所有治理与配置权限，解锁调用全量大模型，同样参与真实 Token 计费扣费以保证数据透明。</span>
+              <span className="shrink-0 rounded bg-zinc-500/10 text-zinc-400 px-1.5 py-0.5 text-[10px] font-bold">普通用户 (user)</span>
+              <span><b>只要可用余额等于 0 自动降级为普通用户</b>；仅可免费使用 0 元模型池（免充值免扣费），付费模型拦截引导充值。</span>
             </div>
           </div>
 
@@ -291,7 +329,7 @@ export default function Users() {
         </Card>
       )}
 
-      {tab === "codes" && (
+      {tab === "codes" && isSuperadmin && (
         <div className="flex flex-col gap-4">
           {/* 统计指标卡片 */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -376,16 +414,17 @@ export default function Users() {
       )}
 
       {/* 充值加款弹窗 */}
-      <Dialog open={topupDlg.open} onClose={() => setTopupDlg({ open: false, user: null, amount: "50", autoVip: true, memo: "", password: "" })} title={`为用户充值加款 — ${topupDlg.user?.email ?? ""}`} width={460}>
+      <Dialog open={topupDlg.open} onClose={() => setTopupDlg({ open: false, user: null, amount: "50", memo: "", password: "" })} title={`为用户充值加款 — ${topupDlg.user?.email ?? ""}`} width={460}>
         <div className="space-y-4">
           <div className="flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs">
-            <span className="text-muted">当前用户余额</span>
+            <span className="text-muted">目标用户当前余额</span>
             <span className="font-mono text-sm font-bold text-emerald-500">¥{(topupDlg.user?.balance ?? 0).toFixed(2)}</span>
           </div>
 
-          <Field label="充值加款金额 (元)" hint="支持输入正数加款或负数扣减">
+          <Field label="充值加款金额 (元)">
             <Input
               type="number"
+              min="0.01"
               step="0.01"
               value={topupDlg.amount}
               onChange={(e) => setTopupDlg({ ...topupDlg, amount: e.target.value })}
@@ -393,39 +432,38 @@ export default function Users() {
             />
           </Field>
 
+          {/* 转账扣费规则说明 */}
+          <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-2.5 text-xs text-amber-600 dark:text-amber-400 space-y-1">
+            <div className="font-semibold">💡 转账扣款与自动 VIP 晋升机制：</div>
+            <div>
+              {isSuperadmin
+                ? "超级管理员拥有无限调用额度，为下级充值将照常记入系统转账扣减流水。"
+                : `本次充值将从您的账户余额中实打实扣除 ¥${topupDlg.amount || "0"}（您当前可用余额为 ¥${(me?.balance.available ?? 0).toFixed(2)}）。`}
+            </div>
+            <div>用户充值后只要可用余额大于 0，系统将自动晋升其为 VIP 账号！</div>
+          </div>
+
           <Field label="充值备注 (可选)">
             <Input
               value={topupDlg.memo}
               onChange={(e) => setTopupDlg({ ...topupDlg, memo: e.target.value })}
-              placeholder="管理员手动充值加款"
+              placeholder="管理员手动转账充值"
             />
           </Field>
 
-          <div className="flex items-center gap-2 pt-0.5">
-            <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
-              <input
-                type="checkbox"
-                className="h-4 w-4 accent-[#F38020]"
-                checked={topupDlg.autoVip}
-                onChange={(e) => setTopupDlg({ ...topupDlg, autoVip: e.target.checked })}
-              />
-              充值后若为普通用户，自动升级为 VIP 账号
-            </label>
-          </div>
-
-          <Field label="管理员密码确认" hint="账户加款属于高危财务操作，需核验管理员密码">
+          <Field label="管理员密码确认" hint="账户加款属于高危财务操作，需核验密码">
             <Input
               type="password"
               value={topupDlg.password}
               onChange={(e) => setTopupDlg({ ...topupDlg, password: e.target.value })}
-              placeholder="请输入当前管理员密码"
+              placeholder="请输入当前操作者的密码"
               autoComplete="current-password"
             />
           </Field>
 
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line">
-            <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setTopupDlg({ open: false, user: null, amount: "50", autoVip: true, memo: "", password: "" })}>取消</Button>
-            <Button className="flex-1 sm:flex-initial" onClick={submitTopup}>确认充值加款</Button>
+            <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setTopupDlg({ open: false, user: null, amount: "50", memo: "", password: "" })}>取消</Button>
+            <Button className="flex-1 sm:flex-initial" onClick={submitTopup}>确认转账充值</Button>
           </div>
         </div>
       </Dialog>
@@ -463,15 +501,9 @@ export default function Users() {
               </Field>
             </div>
             <div className="col-span-1 sm:col-span-2">
-              <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 accent-[#F38020]"
-                  checked={genDlg.autoVip}
-                  onChange={(e) => setGenDlg({ ...genDlg, autoVip: e.target.checked })}
-                />
-                用户兑换时若为普通用户，自动升级为 VIP 账号
-              </label>
+              <p className="text-xs text-muted">
+                💡 用户兑换后账户余额 &gt; 0 将自动获得 VIP 身份；超级管理员生成的卡密为系统铸币加款。
+              </p>
             </div>
             <div className="col-span-1 sm:col-span-2">
               <Field label="管理员密码确认" hint="生成有效货币卡密属于财务敏感操作，需核验管理员密码">
@@ -515,18 +547,19 @@ export default function Users() {
         <div className="space-y-4">
           <Field label="账号角色等级">
             <Select value={roleDlg.role} onChange={(e) => setRoleDlg({ ...roleDlg, role: e.target.value })}>
-              <option value="user">普通用户 (user) — 仅限免费模型池，免扣费</option>
+              {isSuperadmin && <option value="superadmin">超级管理员 (superadmin) — 最高站长权限，全站管理</option>}
+              {isSuperadmin && <option value="admin">管理员 (admin) — 拥有下级用户管理与转账充值权限</option>}
               <option value="vip">VIP 账号 (vip) — 解锁全量付费大模型，按量扣费</option>
-              <option value="admin">管理员 (admin) — 最高系统权限，全模型按量扣费</option>
-              <option value="finance">财务人员 (finance)</option>
-              <option value="auditor">审计员 (auditor)</option>
+              <option value="user">普通用户 (user) — 仅限免费模型池，免充值不扣费</option>
+              {isSuperadmin && <option value="finance">财务人员 (finance)</option>}
+              {isSuperadmin && <option value="auditor">审计员 (auditor)</option>}
             </Select>
           </Field>
 
           <div className="rounded-xl border border-line bg-surface2/60 p-3 text-xs text-muted space-y-1.5">
-            <div>• <b>普通用户</b>：免充值畅享所有 0 元模型（OpenCode、Kilo、Duck.ai 等）；调用付费模型会自动拦截并引导升级。</div>
-            <div>• <b>VIP 账号</b>：可自由调用全站所有模型；付费模型按实际 Token 用量扣除账户余额。</div>
-            <div>• <b>管理员</b>：拥有后台控制台配置权限，调用全量大模型同样真实扣费。</div>
+            <div>• <b>管理员任命要求</b>：管理员必须由超级管理员在后台添加/任命，不支持直接升级。</div>
+            <div>• <b>自动 VIP 机制</b>：普通用户只要余额 &gt; 0 自动晋升为 VIP；余额等于 0 自动降为普通用户。</div>
+            <div>• <b>权限层级继承</b>：只允许管理与充值权限严格低于自身的下级用户。</div>
           </div>
 
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line">
