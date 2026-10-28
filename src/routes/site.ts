@@ -15,7 +15,7 @@ export const siteRouter = new Hono<{ Bindings: Env }>();
 siteRouter.get("/site", async (c) => {
   const s = await getSettings(c.env);
   return json({
-    siteName: s.siteName ?? "EdgeRelay",
+    siteName: s.siteName ?? "Relay",
     siteDescription: s.siteDescription ?? "部署在 EdgeOne 边缘的 AI API 网关",
     siteLogoUrl: s.siteLogoUrl ?? "/logo.png",
     siteHomepage: s.siteHomepage ?? "",
@@ -37,7 +37,7 @@ siteRouter.get("/announcements", async (c) => {
     announcements: [
       {
         id: "anno_welcome",
-        title: "欢迎使用 EdgeRelay AI API 边缘网关",
+        title: "欢迎使用 Relay AI API 边缘网关",
         content: "系统已成功迁移并运行于腾讯云 EdgeOne Pages + Blob 强一致性数据库。",
         popup: 0,
         createdAt: Math.floor(Date.now() / 1000),

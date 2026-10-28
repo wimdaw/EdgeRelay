@@ -23,11 +23,11 @@ function esc(s: string): string {
 /** 注入动态 SEO 元数据到 SPA index.html */
 async function renderSpaHtml(env: Env): Promise<string> {
   const s = await getSettings(env);
-  const siteName = s.siteName ?? "EdgeRelay";
+  const siteName = s.siteName ?? "Relay";
   const desc = s.siteDescription ?? "";
   const logo = s.siteLogoUrl ?? "/logo.png";
 
-  const rawHtml = EMBEDDED_ASSETS["/index.html"]?.content || "<!DOCTYPE html><html><head><title>EdgeRelay</title></head><body><div id='root'></div></body></html>";
+  const rawHtml = EMBEDDED_ASSETS["/index.html"]?.content || "<!DOCTYPE html><html><head><title>Relay</title></head><body><div id='root'></div></body></html>";
   let html = rawHtml;
 
   // 把站点信息同步注入首屏 HTML，前端首次渲染直接使用，

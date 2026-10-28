@@ -21,7 +21,8 @@ function scanDir(dir) {
       scanDir(full);
     } else {
       const rel = relative(publicDir, full).replace(/\\/g, "/");
-      const urlPath = "/" + rel;
+      // 首页模板以 _index.template.html 存储，云函数内仍按 /index.html 提供
+      const urlPath = rel === "_index.template.html" ? "/index.html" : "/" + rel;
       const isBinary = f.endsWith(".png") || f.endsWith(".jpg") || f.endsWith(".ico");
       let type = "text/plain; charset=utf-8";
       if (f.endsWith(".html")) type = "text/html; charset=utf-8";

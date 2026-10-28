@@ -85,7 +85,7 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   auditLogRetentionDays: 180,
   stepUpDisabled: false,
   persistentSession: false,
-  siteName: "EdgeRelay",
+  siteName: "Relay",
   siteDescription: "部署在 EdgeOne 边缘的 AI API 网关，用统一 OpenAI 兼容接口接入、路由和派发多家大模型服务。",
   siteLogoUrl: "/logo.png",
   siteHomepage: "",

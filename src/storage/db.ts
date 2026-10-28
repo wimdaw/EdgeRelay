@@ -557,7 +557,7 @@ export async function getAnnouncements(env: any): Promise<AnnouncementRecord[]> 
   return (await store.get("announcements:all", { type: "json", consistency: "strong" })) || [
     {
       id: "anno_welcome",
-      title: "欢迎使用 EdgeRelay AI API 边缘网关",
+      title: "欢迎使用 Relay AI API 边缘网关",
       content: "系统已成功迁移并运行于腾讯云 EdgeOne Pages + Blob 强一致性数据库。",
       popup: 0,
       enabled: 1,

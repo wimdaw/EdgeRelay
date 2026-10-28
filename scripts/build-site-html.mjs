@@ -1,16 +1,34 @@
 /**
  * scripts/build-site-html.mjs
- * 构建时读取线上站点设置，烘焙进 public/index.html。
- * EdgeOne 会优先托管 public/index.html，静态首页首屏必须直接是正确品牌，
- * 否则会先显示默认站点名，再等 /api/site 返回后切换，产生闪烁。
+ * 构建时读取线上站点设置，烘焙进前端 HTML 模板。
+ *
+ * EdgeOne 会优先托管 public/index.html；为了让首页每次都走云函数的
+ * no-store 动态渲染（避免部署后仍命中旧 HTML 导致品牌闪烁），构建完成后
+ * 把模板改名为 _index.template.html，由 build-assets.mjs 映射为 /index.html
+ * 内嵌进云函数。public/ 下不再保留 index.html，根路径自然落到函数。
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const htmlPath = join(root, "public", "index.html");
+const sourcePath = join(root, "public", "index.html");
+const fallbackPath = join(root, "public", "_index.template.html");
+const templatePath = fallbackPath;
 const siteUrl = process.env.SITE_INFO_URL || "https://relay.own.cloudns.nz/api/site";
+
+const DEFAULT_SITE = {
+  siteName: "Relay",
+  siteDescription: "部署在 EdgeOne 边缘的 AI API 网关，用统一 OpenAI 兼容接口接入、路由和派发多家大模型服务。",
+  siteLogoUrl: "/logo.png",
+  siteHomepage: "",
+  heroBadge: "跑在 EdgeOne 全球边缘节点",
+  heroTitle: "部署在 EdgeOne 边缘的合规 AI API 网关",
+  heroSubtitle: "用统一 OpenAI 兼容接口，接入、路由和治理多家大模型服务。合法授权上游、透明计费、哈希链审计——面向开发者与企业的正规聚合分发平台。",
+  supportEmail: "hackerxiaow@gmail.com",
+  oauth: { github: false, google: false },
+  smtpEnabled: true,
+};
 
 function esc(s) {
   return String(s ?? "")
@@ -20,20 +38,27 @@ function esc(s) {
     .replace(/"/g, "&quot;");
 }
 
-let site;
+let site = DEFAULT_SITE;
 try {
   const res = await fetch(siteUrl, { signal: AbortSignal.timeout(8000) });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  site = await res.json();
-  if (!site?.siteName) throw new Error("invalid site payload");
+  const fetched = await res.json();
+  if (!fetched?.siteName) throw new Error("invalid site payload");
+  site = { ...DEFAULT_SITE, ...fetched };
+  console.log(`[build-site-html] 已读取线上站点信息：${site.siteName}`);
 } catch (e) {
-  console.warn(`[build-site-html] 获取线上站点信息失败，保留当前 HTML：${e.message}`);
-  process.exit(0);
+  console.warn(`[build-site-html] 获取线上站点信息失败，使用 Relay 默认品牌：${e.message}`);
 }
 
-let html = readFileSync(htmlPath, "utf8");
-const name = site.siteName;
-const desc = site.siteDescription || "";
+const inputPath = existsSync(sourcePath) ? sourcePath : templatePath;
+if (!existsSync(inputPath)) {
+  console.error(`[build-site-html] 找不到前端 HTML：${inputPath}`);
+  process.exit(1);
+}
+
+let html = readFileSync(inputPath, "utf8");
+const name = site.siteName || "Relay";
+const desc = site.siteDescription || DEFAULT_SITE.siteDescription;
 const logo = site.siteLogoUrl || "/logo.png";
 
 html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(name)} — AI API 网关控制台</title>`);
@@ -51,5 +76,7 @@ const initialJson = JSON.stringify(site)
   .replace(/\u2029/g, "\\u2029");
 html = html.replace(/<\/head>/i, `<script>window.__EDGERELAY_SITE__=${initialJson};</script>\n</head>`);
 
-writeFileSync(htmlPath, html, "utf8");
-console.log(`[build-site-html] 已注入站点信息：${name}`);
+writeFileSync(templatePath, html, "utf8");
+// 关键：不把 index.html 留在静态目录，根路径强制走云函数动态渲染 + no-store
+rmSync(sourcePath, { force: true });
+console.log(`[build-site-html] 已生成动态首页模板（${name}），静态 index.html 已移除`);
