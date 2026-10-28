@@ -51,7 +51,8 @@ chatRouter.post("/", async (c) => {
     }
     const publicModel = body.model;
 
-    if (key.modelWhitelist && !key.modelWhitelist.includes(publicModel)) {
+    const subModelName = publicModel.includes("/") ? publicModel.slice(publicModel.indexOf("/") + 1) : publicModel;
+    if (key.modelWhitelist && !key.modelWhitelist.includes(publicModel) && !key.modelWhitelist.includes(subModelName)) {
       throw new ApiError(403, ErrorCode.MODEL_NOT_ALLOWED, `该 Key 无权调用模型 ${publicModel}`);
     }
 

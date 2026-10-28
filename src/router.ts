@@ -108,7 +108,19 @@ export async function requireRoutes(env: any, publicName: string): Promise<Upstr
 /** 列出对外可见的模型（OpenAI /v1/models 格式） */
 export async function listPublicModels(env: any): Promise<{ id: string; created: number; owned_by: string }[]> {
   const models = await getModels(env);
-  const names = Array.from(new Set(models.filter((m) => m.enabled === 1).map((m) => m.publicName)));
+  const providers = await getProviders(env);
+  const providerMap = new Map(providers.map((p) => [p.id, p]));
+  const activeModels = models.filter((m) => m.enabled === 1);
+  const names = new Set<string>();
+
+  for (const m of activeModels) {
+    names.add(m.publicName);
+    const p = providerMap.get(m.providerId);
+    if (p?.slug && !m.publicName.startsWith(`${p.slug}/`)) {
+      names.add(`${p.slug}/${m.publicName}`);
+    }
+  }
+
   const created = Math.floor(Date.parse("2026-01-01") / 1000);
-  return names.map((name) => ({ id: name, created, owned_by: "gateway" }));
+  return Array.from(names).map((name) => ({ id: name, created, owned_by: "gateway" }));
 }
