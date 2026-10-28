@@ -229,6 +229,20 @@ adminRouter.post("/actions", async (c) => {
         const prov = providers.find((x) => x.id === providerId || x.slug === providerId);
         const slug = prov?.slug || prov?.kind || providerId;
         if (slug === "opencode") {
+          // 对齐 ai-gateway-edgeone 原理：请求 OpenCode /models 端点并通过 filterOpenCodeModels 严格筛选免费层模型
+          // 免费模型特征：以 -free 结尾，或特定白名单（如 big-pickle）
+          try {
+            const { fetchOpenCodeModels, resolveOpenCodeUrls, resolveOpenCodeRelay } = await import("../opencode");
+            const mirrors = resolveOpenCodeUrls(env);
+            const relay = resolveOpenCodeRelay(env);
+            const res = await fetchOpenCodeModels(prov?.baseUrl || "https://opencode.ai/zen/v1", [], mirrors, undefined, relay);
+            if (res.success && res.data?.data && Array.isArray(res.data.data)) {
+              const freeList = res.data.data
+                .map((m: any) => m.id)
+                .filter((id: string) => typeof id === "string" && (id === "big-pickle" || id.endsWith("-free")));
+              if (freeList.length) return json({ ok: true, models: freeList });
+            }
+          } catch {}
           return json({
             ok: true,
             models: [

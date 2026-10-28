@@ -255,20 +255,31 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
     }
 
     let models = (await store.get("models:all", { type: "json", consistency: "strong" })) || [];
+    
+    // 严格按规范清洗：OpenCode 仅保留官方免费层模型（全部带 -free 结尾，特例为 big-pickle）
+    // 移除不带 -free 的别名项
+    const rawLen = models.length;
+    models = models.filter((m: any) => {
+      const pId = m.providerId || "";
+      if (pId === "opencode" || pId === "p_opencode") {
+        return m.publicName === "big-pickle" || m.publicName.endsWith("-free");
+      }
+      return true;
+    });
+    let mChanged = models.length !== rawLen;
+
     const existingNames = new Set(models.map((m: any) => m.publicName));
     const newModels: ModelRouteRecord[] = [
-      // OpenCode models
-      { id: "m_oc_mimo", publicName: "mimo-v2.6-flash", providerId: "opencode", upstreamModel: "mimo-v2.6-flash-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      // OpenCode 官方免费层模型（9 个）
       { id: "m_oc_mimo_f", publicName: "mimo-v2.6-flash-free", providerId: "opencode", upstreamModel: "mimo-v2.6-flash-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_ds41", publicName: "deepseek-v4.1-flash", providerId: "opencode", upstreamModel: "deepseek-v4.1-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
       { id: "m_oc_ds41_f", publicName: "deepseek-v4.1-flash-free", providerId: "opencode", upstreamModel: "deepseek-v4.1-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_oc_flint", publicName: "flint-40b", providerId: "opencode", upstreamModel: "flint-40b-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_nemo_vl", publicName: "nemotron-3.5-super-vl", providerId: "opencode", upstreamModel: "nemotron-3.5-super-vl-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_nemo_lt", publicName: "nemotron-3.5-lightning", providerId: "opencode", upstreamModel: "nemotron-3.5-lightning-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_glm53", publicName: "glm-5.3-flash", providerId: "opencode", upstreamModel: "glm-5.3-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_oc_flint_f", publicName: "flint-40b-free", providerId: "opencode", upstreamModel: "flint-40b-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_nemo_vl_f", publicName: "nemotron-3.5-super-vl-free", providerId: "opencode", upstreamModel: "nemotron-3.5-super-vl-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_nemo_lt_f", publicName: "nemotron-3.5-lightning-free", providerId: "opencode", upstreamModel: "nemotron-3.5-lightning-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_glm53_f", publicName: "glm-5.3-flash-free", providerId: "opencode", upstreamModel: "glm-5.3-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
       { id: "m_oc_pickle", publicName: "big-pickle", providerId: "opencode", upstreamModel: "big-pickle", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_beam", publicName: "beam", providerId: "opencode", upstreamModel: "beam-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_jev", publicName: "jev-1.13", providerId: "opencode", upstreamModel: "jev-1.13-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_beam_f", publicName: "beam-free", providerId: "opencode", upstreamModel: "beam-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_jev_f", publicName: "jev-1.13-free", providerId: "opencode", upstreamModel: "jev-1.13-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
       // Duck.ai models
       { id: "m_dk_luna", publicName: "gpt-6-luna", providerId: "duckai", upstreamModel: "gpt-6-luna", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
       { id: "m_dk_mini", publicName: "gpt-5.4-mini", providerId: "duckai", upstreamModel: "gpt-5.4-mini", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
@@ -279,7 +290,6 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
       { id: "m_dk_oss120b_s", publicName: "gpt-oss-120b", providerId: "duckai", upstreamModel: "tinfoil/gpt-oss-120b", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
       { id: "m_dk_gemma31b_s", publicName: "gemma4-31b", providerId: "duckai", upstreamModel: "tinfoil/gemma4-31b", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
     ];
-    let mChanged = false;
     for (const nm of newModels) {
       if (!existingNames.has(nm.publicName)) {
         models.push(nm);
@@ -293,6 +303,14 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
 
     let pricing = (await store.get("pricing:all", { type: "json", consistency: "strong" })) || {};
     let prChanged = false;
+    // 清理废弃模型的 pricing 键
+    const validPublicNames = new Set(models.map((m: any) => m.publicName));
+    for (const k of Object.keys(pricing)) {
+      if (!validPublicNames.has(k)) {
+        delete pricing[k];
+        prChanged = true;
+      }
+    }
     for (const nm of newModels) {
       if (!pricing[nm.publicName]) {
         pricing[nm.publicName] = {

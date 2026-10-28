@@ -134,31 +134,62 @@ export default function Providers() {
         <Button onClick={openNew}><Plus size={14} />添加供应商</Button>
       </div>
 
-      {rows === null ? <div className="grid gap-4 md:grid-cols-2">{[...Array(4)].map((_, i) => <div key={i} className="skeleton h-28" />)}</div> : rows.length === 0 ? (
+      {rows === null ? (
+        <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-36 rounded-xl2" />)}
+        </div>
+      ) : rows.length === 0 ? (
         <Card><EmptyState icon={<Server size={32} />} title="还没有上游供应商" hint="添加你持有授权的供应商并录入密钥，即可一键导入模型列表。" action={<Button className="mt-2" onClick={openNew}>添加供应商</Button>} /></Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {rows.map((p) => (
-            <Card key={p.id} className="p-5">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl2 bg-brand/10 text-lg font-bold text-brand">{p.name[0]}</div>
-                  <div className="min-w-0"><div className="truncate text-sm font-semibold">{p.name}</div><code className="text-[11px] text-muted">{p.slug}</code></div>
+            <Card key={p.id} className="p-4 flex flex-col justify-between">
+              <div>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-sm font-bold text-brand">{p.name[0]}</div>
+                    <div className="min-w-0">
+                      <div className="truncate text-xs font-semibold leading-tight">{p.name}</div>
+                      <code className="text-[10px] text-muted">{p.slug}</code>
+                    </div>
+                  </div>
+                  <StatusTag value={p.status} />
                 </div>
-                <StatusTag value={p.status} />
+                <dl className="mt-3 space-y-1.5 text-[11px] text-muted">
+                  <div className="flex min-w-0 justify-between gap-2">
+                    <span className="shrink-0 text-muted">端点</span>
+                    <code className="truncate text-ink max-w-[140px]" title={p.base_url}>{p.base_url}</code>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>密钥</span>
+                    <span className="text-ink truncate">
+                      {p.slug === 'opencode' || p.slug === 'duckai' ? (
+                        <span className="text-emerald-500 font-medium">免 Key</span>
+                      ) : (
+                        <>{p.key_count} 个{p.key_count === 0 && <span className="ml-1 text-warn">（未录）</span>}</>
+                      )}
+                    </span>
+                  </div>
+                  {p.authorization_expires_at && (
+                    <div className="flex justify-between">
+                      <span>授权到期</span>
+                      <span className="text-ink">{new Date(p.authorization_expires_at * 1000).toLocaleDateString("zh-CN")}</span>
+                    </div>
+                  )}
+                </dl>
               </div>
-              <dl className="mt-4 space-y-1.5 text-xs text-muted">
-                <div className="flex min-w-0 justify-between gap-3"><span className="shrink-0">Base URL</span><code className="truncate text-ink" title={p.base_url}>{p.base_url}</code></div>
-                <div className="flex justify-between"><span>上游密钥</span><span className="text-ink">{p.slug === 'opencode' || p.slug === 'duckai' ? <span className="text-emerald-500 font-medium">免 Key（公用/免费通道）</span> : <>{p.key_count} 个{p.key_count === 0 && <span className="ml-1 text-warn">（未录入）</span>}</>}</span></div>
-                {p.authorization_expires_at && <div className="flex justify-between"><span>授权到期</span><span className="text-ink">{new Date(p.authorization_expires_at * 1000).toLocaleDateString("zh-CN")}</span></div>}
-              </dl>
-              <div className="mt-4 flex gap-2">
-                <Button variant="soft" className="flex-1" onClick={() => fetchModels(p.id, p.name)}><RefreshCw size={13} className="mr-1" />导入模型</Button>
+
+              <div className="mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5">
+                <Button variant="soft" className="flex-1 !h-7 !px-2 text-xs" onClick={() => fetchModels(p.id, p.name)} title="从上游导入模型">
+                  <RefreshCw size={12} className="mr-1" />导入
+                </Button>
                 {p.slug !== "opencode" && p.slug !== "duckai" && (
-                  <Button variant="soft" onClick={() => { setKeyDlg(p); setKeyVal(""); }}>录入密钥</Button>
+                  <Button variant="soft" className="!h-7 !px-2 text-xs" onClick={() => { setKeyDlg(p); setKeyVal(""); }} title="录入新密钥">
+                    密钥
+                  </Button>
                 )}
-                <Button variant="ghost" onClick={() => openEdit(p)}>编辑</Button>
-                <Button variant="ghost" className="!text-err" onClick={() => del(p)} aria-label={`删除 ${p.name}`}><Trash2 size={14} /></Button>
+                <Button variant="ghost" className="!h-7 !px-2 text-xs" onClick={() => openEdit(p)}>编辑</Button>
+                <Button variant="ghost" className="!h-7 !px-1.5 text-xs !text-err" onClick={() => del(p)} aria-label={`删除 ${p.name}`}><Trash2 size={13} /></Button>
               </div>
             </Card>
           ))}

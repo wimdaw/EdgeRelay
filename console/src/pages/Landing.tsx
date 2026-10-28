@@ -14,7 +14,7 @@ const MODEL_FAMILIES = [
   { provider: "Anthropic", models: ["Claude 系列"], desc: "长上下文与高质量写作" },
   { provider: "Google", models: ["Gemini 系列"], desc: "多模态理解与超长上下文" },
   { provider: "DeepSeek", models: ["DeepSeek-V3", "DeepSeek-R1"], desc: "高性价比中文与推理模型" },
-  { provider: "OpenCode", models: ["Mimo V2.6", "DeepSeek V4.1", "GLM 5.3", "Nemotron 3.5"], desc: "免费高可用推理模型，开箱即用" },
+  { provider: "OpenCode", models: ["mimo-v2.6-flash-free", "deepseek-v4.1-flash-free", "glm-5.3-flash-free", "big-pickle"], desc: "免费高可用推理模型（全部带 -free 尾缀），开箱即用" },
   { provider: "Duck.ai", models: ["GPT-6 Luna", "GPT-5.4 mini", "Claude Haiku 4.5", "Mistral Small 4"], desc: "DuckDuckGo 私密免费 AI 聊天" },
   { provider: "Meta", models: ["Llama 系列"], desc: "开源模型与灵活部署" },
   { provider: "Mistral", models: ["Mistral 系列"], desc: "轻量高效与多语言场景" },
