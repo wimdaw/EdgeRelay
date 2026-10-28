@@ -238,6 +238,21 @@ export interface BalanceRecord {
   updatedAt: number;
 }
 
+export interface RedeemCodeRecord {
+  id: string;
+  code: string;
+  amount: number;
+  currency: string;
+  autoVip: boolean;
+  status: "unused" | "used" | "revoked";
+  usedByUserId?: string | null;
+  usedByEmail?: string | null;
+  usedAt?: number | null;
+  createdAt: number;
+  createdById?: string | null;
+  note?: string | null;
+}
+
 export interface LedgerEntryRecord {
   id: string;
   scope: string;

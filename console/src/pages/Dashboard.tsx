@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Activity, Coins, ShieldQuestion, Zap } from "lucide-react";
 import { api, type Me, type Stats, type TrendPoint, type UsageLog } from "../lib/api";
-import { Card, Skeleton, StatusTag, DataTable, type Col } from "../components/ui";
+import { Button, Card, DataTable, Dialog, Field, Input, Skeleton, StatusTag, useToast, type Col } from "../components/ui";
 import { fmtInt, fmtMoney, fmtTime } from "../lib/utils";
 import { useOutletContext } from "react-router-dom";
 
@@ -17,6 +17,27 @@ export default function Dashboard() {
   const [trend, setTrend] = useState<TrendPoint[] | null>(null);
   const [range, setRange] = useState(7);
   const [recent, setRecent] = useState<UsageLog[] | null>(null);
+  const [balance, setBalance] = useState(me.balance.available);
+  const [redeemOpen, setRedeemOpen] = useState(false);
+  const [redeemCode, setRedeemCode] = useState("");
+  const [redeeming, setRedeeming] = useState(false);
+  const toast = useToast();
+
+  const handleRedeem = async () => {
+    if (!redeemCode.trim()) return toast("请输入卡密兑换码", "err");
+    setRedeeming(true);
+    try {
+      const res = await api<{ ok: boolean; amount: number; balance: number; currency: string; message: string }>("/api/billing/redeem", "POST", { code: redeemCode.trim() });
+      toast(res.message || `成功充值 ¥${res.amount.toFixed(2)}！`);
+      setBalance(res.balance);
+      setRedeemCode("");
+      setRedeemOpen(false);
+    } catch (e) {
+      toast((e as Error).message, "err");
+    } finally {
+      setRedeeming(false);
+    }
+  };
 
   // 管理员看全局数据，普通用户看自己的数据
   useEffect(() => { api<Stats>(isAdmin ? "/api/admin/stats" : "/api/usage/summary").then(setStats).catch(() => setStats(null)); }, [isAdmin]);
@@ -32,7 +53,7 @@ export default function Dashboard() {
     { label: "我的请求数（24h）", value: stats ? fmtInt(stats.requests) : "", icon: Zap, color: "text-brand bg-brand/10" },
     { label: "我的 Token 消耗（24h）", value: stats ? fmtInt(stats.promptTokens + stats.completionTokens) : "", icon: Coins, color: "text-info bg-info/10" },
     { label: "我的成功率（24h）", value: stats ? `${((1 - stats.errorRate) * 100).toFixed(2)}%` : "", icon: Activity, color: "text-ok bg-ok/10" },
-    { label: "当前余额", value: fmtMoney(me.balance.available, me.balance.currency), icon: ShieldQuestion, color: "text-brand bg-brand/10" },
+    { label: "当前余额", value: fmtMoney(balance, me.balance.currency), icon: ShieldQuestion, color: "text-brand bg-brand/10" },
   ];
 
   const cols: Col<UsageLog>[] = [
@@ -56,7 +77,18 @@ export default function Dashboard() {
               <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${color}`}><Icon size={16} /></span>
             </div>
             {stats || label === "当前余额" ? <div className="mt-2 truncate text-xl font-bold tabular-nums sm:text-2xl" title={String(value)}>{value}</div> : <Skeleton className="mt-3 h-7 w-24" />}
-            <div className="mt-1 text-[11px] text-muted">较昨日 —</div>
+            <div className="mt-1 text-[11px] text-muted flex items-center justify-between">
+              <span>{label === "当前余额" ? "按量真实结算" : "较昨日 —"}</span>
+              {label === "当前余额" && (
+                <button
+                  type="button"
+                  onClick={() => setRedeemOpen(true)}
+                  className="rounded bg-brand/10 hover:bg-brand/20 px-2 py-0.5 text-[11px] font-semibold text-brand transition-colors cursor-pointer"
+                >
+                  卡密充值
+                </button>
+              )}
+            </div>
           </Card>
         ))}
       </div>
@@ -129,6 +161,38 @@ export default function Dashboard() {
           )}
         </Card>
       </div>
+
+      {/* 卡密兑换与加款弹窗 */}
+      <Dialog open={redeemOpen} onClose={() => setRedeemOpen(false)} title="卡密兑换充值" width={440}>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs">
+            <span className="text-muted">当前可用余额</span>
+            <span className="font-mono text-sm font-bold text-emerald-500">
+              {fmtMoney(balance, me.balance.currency)}
+            </span>
+          </div>
+
+          <Field label="卡密兑换码" hint="输入获得的 16~20 位卡密代码">
+            <Input
+              value={redeemCode}
+              onChange={(e) => setRedeemCode(e.target.value)}
+              placeholder="例如: CARD-7K9A-2X4B-9PQW"
+              autoFocus
+            />
+          </Field>
+
+          <p className="text-xs text-muted">
+            输入有效卡密后点击兑换，系统将实时为您的账户增加对应面额资金；若您当前为普通用户，支持的卡密还将自动为您升级为 VIP 账号！
+          </p>
+
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line">
+            <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setRedeemOpen(false)}>取消</Button>
+            <Button className="flex-1 sm:flex-initial" disabled={redeeming || !redeemCode.trim()} onClick={handleRedeem}>
+              {redeeming ? "核销中…" : "立即兑换加款"}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

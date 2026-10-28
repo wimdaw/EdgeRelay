@@ -63,6 +63,7 @@ adminRouter.post("/actions", async (c) => {
       "get_oauth",
       "list_announcements",
       "list_upstream_models",
+      "list_redeem_codes",
     ]);
 
     const user = await requireUser(hCtx);
@@ -89,13 +90,22 @@ adminRouter.post("/actions", async (c) => {
       /* ---- 用户管理 ---- */
       case "list_users": {
         const users = await listAllUsers(env);
-        const safe = users.map((u) => ({
-          id: u.id,
-          email: u.email,
-          role: u.role,
-          status: u.status,
-          created_at: u.createdAt,
-        }));
+        const { getBalance } = await import("../billing");
+        const safe = await Promise.all(
+          users.map(async (u) => {
+            const bal = await getBalance(env, `user:${u.id}`);
+            return {
+              id: u.id,
+              email: u.email,
+              role: u.role,
+              status: u.status,
+              balance: bal.available ?? 0,
+              frozen: bal.frozen ?? 0,
+              currency: bal.currency ?? "CNY",
+              created_at: u.createdAt,
+            };
+          })
+        );
         return json({ ok: true, users: safe });
       }
       case "set_role": {
@@ -556,8 +566,69 @@ adminRouter.post("/actions", async (c) => {
         const scope = String(p.scope);
         const amount = Number(p.amount);
         if (!Number.isFinite(amount) || amount === 0) throw new ApiError(400, ErrorCode.BAD_REQUEST, "金额不合法");
-        await topup(hCtx, scope, amount, `管理员 ${admin.email} 手动充值`);
+        const memo = (p.memo as string) || `管理员 ${admin.email} 手动充值加款`;
+        await topup(hCtx, scope, amount, memo);
+
+        // 若勾选了自动升级 VIP，且充值金额 > 0，且当前用户角色为普通用户 (user)，自动提升为 VIP 账号
+        if (p.autoVip && scope.startsWith("user:") && amount > 0) {
+          const targetUserId = scope.slice(5);
+          const targetUser = await getUserById(env, targetUserId);
+          if (targetUser && targetUser.role === "user") {
+            await updateUser(env, targetUserId, { role: "vip" });
+          }
+        }
         return done(null, "balance", scope);
+      }
+
+      /* ---- 卡密兑换与管理 ---- */
+      case "list_redeem_codes": {
+        const { getRedeemCodes } = await import("../storage/db");
+        const codes = await getRedeemCodes(env);
+        return json({ ok: true, codes });
+      }
+      case "generate_redeem_codes": {
+        const count = Math.min(Math.max(1, Number(p.count) || 1), 100);
+        const amount = Number(p.amount);
+        if (!Number.isFinite(amount) || amount <= 0) {
+          throw new ApiError(400, ErrorCode.BAD_REQUEST, "卡密面额必须大于 0");
+        }
+        const autoVip = p.autoVip !== false;
+        const note = (p.note as string) || null;
+        const { getRedeemCodes, saveRedeemCodes } = await import("../storage/db");
+        const list = await getRedeemCodes(env);
+        const newCodes: any[] = [];
+
+        function randomCardCode(): string {
+          const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+          const seg = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+          return `CARD-${seg()}-${seg()}-${seg()}`;
+        }
+
+        for (let i = 0; i < count; i++) {
+          const id = uuid();
+          const code = randomCardCode();
+          newCodes.push({
+            id,
+            code,
+            amount,
+            currency: "CNY",
+            autoVip,
+            status: "unused",
+            createdAt: now,
+            createdById: admin.id,
+            note,
+          });
+        }
+
+        const updated = [...newCodes, ...list];
+        await saveRedeemCodes(env, updated);
+        return done({ codes: newCodes, count: newCodes.length }, "redeem_codes", "batch");
+      }
+      case "delete_redeem_code": {
+        if (!p.codeId) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少卡密 id");
+        const { deleteRedeemCode } = await import("../storage/db");
+        await deleteRedeemCode(env, String(p.codeId));
+        return done(null, "redeem_code", String(p.codeId));
       }
 
       /* ---- 平台设置 ---- */

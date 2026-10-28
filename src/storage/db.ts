@@ -15,6 +15,7 @@ import {
   type ModelRouteRecord,
   type ModelPricingRecord,
   type BalanceRecord,
+  type RedeemCodeRecord,
   type LedgerEntryRecord,
   type UsageRecord,
   type DailyUsageSummary,
@@ -23,6 +24,7 @@ import {
   type AppealRecord,
 } from "../types";
 import { sha256Hex, uuid } from "../crypto";
+import { ApiError, ErrorCode } from "../errors";
 
 // 内存热缓存（优化频繁读取的全局配置和供应商列表，30s TTL）
 const CACHE_TTL_MS = 30_000;
@@ -543,6 +545,55 @@ export async function getLedgerEntries(env: any, scope: string, limit = 50): Pro
   const store = getBlobStore(env);
   const list: LedgerEntryRecord[] = (await store.get(`ledger:${scope}`, { type: "json", consistency: "strong" })) || [];
   return list.slice(0, limit);
+}
+
+// ==========================================
+// 7.5. 卡密兑换与管理 (Redeem Codes)
+// ==========================================
+
+export async function getRedeemCodes(env: any): Promise<RedeemCodeRecord[]> {
+  const store = getBlobStore(env);
+  return (await store.get("redeem_codes:all", { type: "json", consistency: "strong" })) || [];
+}
+
+export async function saveRedeemCodes(env: any, list: RedeemCodeRecord[]): Promise<void> {
+  const store = getBlobStore(env);
+  await store.setJSON("redeem_codes:all", list);
+}
+
+export async function deleteRedeemCode(env: any, codeId: string): Promise<void> {
+  const list = await getRedeemCodes(env);
+  const filtered = list.filter((c) => c.id !== codeId && c.code !== codeId);
+  await saveRedeemCodes(env, filtered);
+}
+
+export async function redeemCodeAtomic(
+  env: any,
+  rawCode: string,
+  userId: string,
+  userEmail: string
+): Promise<RedeemCodeRecord> {
+  const cleanCode = rawCode.trim().toUpperCase();
+  const list = await getRedeemCodes(env);
+  const target = list.find((c) => c.code.toUpperCase() === cleanCode);
+  if (!target) {
+    throw new ApiError(404, ErrorCode.NOT_FOUND, "卡密兑换码不存在，请仔细核对");
+  }
+  if (target.status === "used") {
+    throw new ApiError(400, ErrorCode.BAD_REQUEST, "该卡密已被使用，无法重复兑换");
+  }
+  if (target.status === "revoked") {
+    throw new ApiError(400, ErrorCode.BAD_REQUEST, "该卡密已作废");
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  target.status = "used";
+  target.usedByUserId = userId;
+  target.usedByEmail = userEmail;
+  target.usedAt = now;
+
+  await saveRedeemCodes(env, list);
+  return target;
 }
 
 // ==========================================
