@@ -106,7 +106,7 @@ chatRouter.post("/", async (c) => {
 
     /* ---- 路由与计费预检 ---- */
     const routes = await requireRoutes(env, publicModel);
-    const pricing = await getPricing(env, publicModel);
+    const pricing = (await getPricing(env, publicModel)) || (routes[0] ? await getPricing(env, routes[0].upstreamModel) : null);
     const estPrompt = estimateTokens(promptText);
     const estCompletion = body.max_tokens ?? 1024;
     const estCost = pricing ? estimateCost(pricing, estPrompt, estCompletion) : 0;

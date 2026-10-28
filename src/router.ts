@@ -11,7 +11,25 @@ import { readKeyHealth, sortKeysByHealth } from "./key-health";
 
 export async function listRoutes(env: any, publicName: string): Promise<UpstreamRoute[]> {
   const allModels = await getModels(env);
-  const matched = allModels.filter((m) => m.publicName === publicName && m.enabled === 1);
+  let matched = allModels.filter((m) => m.publicName === publicName && m.enabled === 1);
+
+  // 若未直接精确匹配，支持通过 "渠道标识/模型名" 精准定向指定提供商（如 deepseek/deepseek-chat）
+  if (!matched.length && publicName.includes("/")) {
+    const slashIdx = publicName.indexOf("/");
+    const targetSlug = publicName.slice(0, slashIdx);
+    const subName = publicName.slice(slashIdx + 1);
+    const allProviders = await getProviders(env);
+    const targetProvider = allProviders.find((p) => p.slug === targetSlug || p.id === targetSlug);
+    if (targetProvider) {
+      matched = allModels.filter(
+        (m) =>
+          m.providerId === targetProvider.id &&
+          (m.publicName === subName || m.upstreamModel === subName) &&
+          m.enabled === 1
+      );
+    }
+  }
+
   if (!matched.length) return [];
 
   // 按 priority 升序、cost_weight 升序排序
