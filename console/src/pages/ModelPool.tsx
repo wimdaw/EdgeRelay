@@ -230,7 +230,7 @@ export default function ModelPool({ me: _me }: { me: Me }) {
                           )}
                           title="点击复制模型 ID (提供商ID/模型ID)"
                         >
-                          <code className="text-xs font-mono font-medium">{fullModelId}</code>
+                          <code className="text-xs font-mono font-medium truncate max-w-[210px] sm:max-w-none">{fullModelId}</code>
                           {isCopied ? (
                             <Check size={12} className="text-emerald-500 shrink-0" />
                           ) : (

@@ -130,17 +130,29 @@ export default function Pricing({ me }: { me: Me }) {
       label: "对外模型名",
       sortVal: (r) => r.public_name,
       render: (r) => (
-        <div className="flex flex-col">
-          <span className="font-medium text-ink">{r.public_name}</span>
-          {r.provider_slug && !r.public_name.startsWith(`${r.provider_slug}/`) && (
-            <code className="text-[10px] text-muted/70 font-mono mt-0.5" title="显式强制定向调用该渠道的模型名称">
-              定向: {r.provider_slug}/{r.public_name}
-            </code>
-          )}
-        </div>
+        <span className="font-medium text-ink truncate max-w-[140px] sm:max-w-[200px] inline-block" title={r.public_name}>
+          {r.public_name}
+        </span>
       ),
     },
-    { key: "upstream", label: "上游真实模型", render: (r) => <code className="text-xs font-mono">{r.upstream_model}</code> },
+    {
+      key: "upstream",
+      label: "上游真实模型",
+      sortVal: (r) => `${r.provider_slug || ""}/${r.upstream_model}`,
+      render: (r) => {
+        const fullUpstream = r.provider_slug && !r.upstream_model.startsWith(`${r.provider_slug}/`)
+          ? `${r.provider_slug}/${r.upstream_model}`
+          : r.upstream_model;
+        return (
+          <code
+            className="text-xs font-mono text-muted hover:text-ink truncate max-w-[140px] sm:max-w-[200px] md:max-w-[260px] inline-block"
+            title={fullUpstream}
+          >
+            {fullUpstream}
+          </code>
+        );
+      },
+    },
     { key: "provider", label: "供应商渠道", render: (r) => r.provider_name ?? "—" },
     { key: "priority", label: "优先级", sortVal: (r) => r.priority, render: (r) => <span className="text-xs">{r.priority}（小=优先）</span> },
     {
