@@ -202,5 +202,11 @@
       "source": "/terms.html",
       "cacheTtl": 0
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/home"
+    }
   ]
 }
