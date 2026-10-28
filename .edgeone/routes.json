@@ -2,6 +2,10 @@
   "version": 3,
   "routes": [
     {
+      "src": "^/$",
+      "server-name": "api-node"
+    },
+    {
       "handle": "filesystem"
     },
     {

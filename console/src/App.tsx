@@ -18,8 +18,16 @@ import Announcements from "./pages/Announcements";
 import { Dialog, Button } from "./components/ui";
 import Settings from "./pages/Settings";
 
+declare global {
+  interface Window {
+    __EDGERELAY_SITE__?: SiteInfo;
+  }
+}
+
 function useSiteInfo() {
-  const [site, setSite] = useState<SiteInfo | null>(null);
+  const [site, setSite] = useState<SiteInfo | null>(() =>
+    typeof window !== "undefined" ? window.__EDGERELAY_SITE__ ?? null : null
+  );
   useEffect(() => {
     api<SiteInfo>("/api/site").then((s) => {
       setSite(s);
@@ -35,7 +43,7 @@ function useSiteInfo() {
       setMeta("property", "og:image", s.siteLogoUrl);
       const fav = document.head.querySelector("link[rel=icon]") as HTMLLinkElement | null;
       if (fav) fav.href = s.siteLogoUrl;
-    }).catch(() => setSite(null));
+    }).catch(() => {});
   }, []);
   return site;
 }

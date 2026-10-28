@@ -9,6 +9,14 @@ import type { Me, SiteInfo } from "../lib/api";
 import { cn } from "../lib/utils";
 
 const PROVIDERS = ["OpenAI", "Anthropic", "Google", "DeepSeek", "Meta", "Mistral"];
+const MODEL_FAMILIES = [
+  { provider: "OpenAI", models: ["GPT 系列", "o 系列"], desc: "通用对话、复杂推理与多模态" },
+  { provider: "Anthropic", models: ["Claude 系列"], desc: "长上下文与高质量写作" },
+  { provider: "Google", models: ["Gemini 系列"], desc: "多模态理解与超长上下文" },
+  { provider: "DeepSeek", models: ["DeepSeek-V3", "DeepSeek-R1"], desc: "高性价比中文与推理模型" },
+  { provider: "Meta", models: ["Llama 系列"], desc: "开源模型与灵活部署" },
+  { provider: "Mistral", models: ["Mistral 系列"], desc: "轻量高效与多语言场景" },
+];
 const FEATURES = [
   { icon: Layers, title: "统一 OpenAI 兼容接口", desc: "一套 /v1/chat/completions 调用所有模型，无需改造现有 SDK，切换模型只改一个字段。" },
   { icon: Gauge, title: "多模型智能路由与故障转移", desc: "按优先级与成本自动选择上游，主路由异常时毫秒级切换备用供应商，业务无感。" },
@@ -89,7 +97,7 @@ export default function Landing({ site, me }: { site: SiteInfo | null; me: Me | 
     document.title = `${name} — ${site?.heroTitle ?? "部署在 EdgeOne 边缘的合规 AI API 网关"}`;
   }, [name, site?.heroTitle]);
 
-  const navLinks = [["功能", "#features"], ["模型", "#pricing"], ["定价", "#pricing"], ["文档", "#dev"], ["合规", "#compliance"]] as const;
+  const navLinks = [["功能", "#features"], ["模型", "#models"], ["定价", "#pricing"], ["文档", "#dev"], ["合规", "#compliance"]] as const;
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
@@ -227,6 +235,31 @@ res = client.chat.completions.create(
               <p className="mt-2 text-[13px] leading-relaxed text-muted">{desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* 模型 */}
+      <section id="models" className="border-t border-line bg-surface py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 className="text-center text-3xl font-bold tracking-tight">一个接口，接入主流模型</h2>
+          <p className="mx-auto mt-3 max-w-xl text-center text-sm text-muted">模型清单由管理员在控制台统一配置，主备路由与价格透明可查。</p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {MODEL_FAMILIES.map((m) => (
+              <div key={m.provider} className="rounded-xl2 border border-line bg-bg p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-pop">
+                <div className="flex items-center justify-between">
+                  <span className="text-[15px] font-semibold">{m.provider}</span>
+                  <Layers size={17} className="text-brand" />
+                </div>
+                <p className="mt-2 text-[13px] leading-relaxed text-muted">{m.desc}</p>
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {m.models.map((model) => (
+                    <span key={model} className="rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] text-muted">{model}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-center text-xs text-muted">具体可用模型与价格，以控制台「模型」页和实际配置为准。</p>
         </div>
       </section>
 

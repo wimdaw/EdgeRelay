@@ -66,6 +66,12 @@ function createMemoryStore(): BlobStore {
 export function getBlobStore(env?: any): BlobStore {
   if (cachedBlobStore) return cachedBlobStore;
 
+  // 自动化测试显式走内存实现，避免污染线上 Blob 数据
+  if (env?.USE_MEMORY_STORE === '1') {
+    cachedBlobStore = createMemoryStore();
+    return cachedBlobStore;
+  }
+
   const storeName = env?.BLOB_STORE_NAME || 'edgerelay-db';
 
   // 关键：API Token 模式下必须同时提供 projectId 与 token

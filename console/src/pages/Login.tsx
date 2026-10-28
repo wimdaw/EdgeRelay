@@ -6,8 +6,12 @@ import { Button, Card, Dialog, Field, Input, useToast } from "../components/ui";
 
 export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogin: () => void }) {
   const [mode, setMode] = useState<"login" | "register">("login");
+  const [loginMethod, setLoginMethod] = useState<"password" | "code">("password");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+  const [loginCode, setLoginCode] = useState("");
+  const [loginCountdown, setLoginCountdown] = useState(0);
+  const [sendingLoginCode, setSendingLoginCode] = useState(false);
   const [busy, setBusy] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [regCode, setRegCode] = useState("");
@@ -22,8 +26,16 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
   const submit = async () => {
     setBusy(true);
     try {
-      if (mode === "login") await api("/api/auth/login", "POST", { email, password: pass });
-      else await api("/api/auth/register", "POST", { email, password: pass, code: regCode, inviteCode: inviteCode || undefined, tosAccepted: true, privacyAccepted: true });
+      if (mode === "login") {
+        if (loginMethod === "code") {
+          if (!loginCode.trim()) return toast("请输入邮箱验证码", "err");
+          await api("/api/auth/login", "POST", { email, code: loginCode.trim() });
+        } else {
+          await api("/api/auth/login", "POST", { email, password: pass });
+        }
+      } else {
+        await api("/api/auth/register", "POST", { email, password: pass, code: regCode, inviteCode: inviteCode || undefined, tosAccepted: true, privacyAccepted: true });
+      }
       await onLogin();
       nav("/dashboard");
     } catch (e) {
@@ -31,19 +43,59 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
     } finally { setBusy(false); }
   };
 
+  const sendLoginCode = async () => {
+    if (!email) return toast("请先填写邮箱", "err");
+    setSendingLoginCode(true);
+    try {
+      await api("/api/auth/login", "POST", { action: "send-code", email });
+      toast("登录验证码已发送，请查收邮箱");
+      setLoginCountdown(60);
+      const t = setInterval(() => setLoginCountdown((c) => { if (c <= 1) clearInterval(t); return c - 1; }), 1000);
+    } catch (e) {
+      toast((e as Error).message, "err");
+    } finally { setSendingLoginCode(false); }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-bg p-6">
       <div className="w-full max-w-[400px]">
         <div className="mb-6 flex items-center justify-center gap-2.5">
           {site?.siteLogoUrl ? <img src={site.siteLogoUrl} alt="logo" className="h-10 w-10 rounded-xl2 object-contain shadow-card" /> : <div className="flex h-10 w-10 items-center justify-center rounded-xl2 bg-brand text-lg font-bold text-white shadow-card">E</div>}
-          <div><div className="text-lg font-bold">{site?.siteName ?? "EdgeRelay"}</div><div className="max-w-[260px] text-xs text-muted">{site?.siteDescription ?? "部署在 Cloudflare 边缘的AI API 网关"}</div></div>
+          <div><div className="text-lg font-bold">{site?.siteName ?? "EdgeRelay"}</div><div className="max-w-[260px] text-xs text-muted">{site?.siteDescription ?? "部署在 EdgeOne 边缘的 AI API 网关"}</div></div>
         </div>
         <Card className="p-6">
           <h1 className="text-base font-semibold">{mode === "login" ? "登录控制台" : "注册账号"}</h1>
           <p className="mt-1 text-xs text-muted">{mode === "login" ? "使用平台账号登录" : "注册即表示已阅读并同意服务条款与隐私政策"}</p>
           <form className="mt-5 flex flex-col gap-3.5" onSubmit={(e) => { e.preventDefault(); submit(); }}>
+            {mode === "login" && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-muted">登录方式</span>
+                <div className="flex gap-0.5 rounded-lg bg-surface2 p-0.5">
+                  <button type="button" onClick={() => setLoginMethod("password")}
+                    className={`rounded-md px-3 py-1 text-[11px] font-medium transition-colors ${loginMethod === "password" ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>密码</button>
+                  <button type="button" onClick={() => setLoginMethod("code")} disabled={!site?.smtpEnabled}
+                    title={site?.smtpEnabled ? "使用邮箱验证码登录" : "管理员未开启邮箱验证码登录"}
+                    className={`rounded-md px-3 py-1 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${loginMethod === "code" ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>验证码</button>
+                </div>
+              </div>
+            )}
             <Field label="邮箱"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" /></Field>
-            <Field label="密码"><Input type="password" required minLength={mode === "register" ? 10 : 1} value={pass} onChange={(e) => setPass(e.target.value)} autoComplete={mode === "login" ? "current-password" : "new-password"} /></Field>
+            {mode === "login" && loginMethod === "password" && (
+              <Field label="密码"><Input type="password" required minLength={1} value={pass} onChange={(e) => setPass(e.target.value)} autoComplete="current-password" /></Field>
+            )}
+            {mode === "login" && loginMethod === "code" && (
+              <Field label="邮箱验证码">
+                <div className="flex gap-2">
+                  <Input required value={loginCode} onChange={(e) => setLoginCode(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="6 位验证码" inputMode="numeric" autoComplete="one-time-code" maxLength={6} />
+                  <Button type="button" variant="ghost" disabled={!site?.smtpEnabled || loginCountdown > 0 || sendingLoginCode} className="shrink-0 whitespace-nowrap"
+                    title={site?.smtpEnabled ? "发送登录验证码" : "管理员未开启邮箱验证码登录"}
+                    onClick={sendLoginCode}>{sendingLoginCode ? "发送中…" : loginCountdown > 0 ? `${loginCountdown}s` : "获取验证码"}</Button>
+                </div>
+              </Field>
+            )}
+            {mode === "register" && (
+              <Field label="密码"><Input type="password" required minLength={10} value={pass} onChange={(e) => setPass(e.target.value)} autoComplete="new-password" /></Field>
+            )}
             {mode === "register" && site?.smtpEnabled && (
               <Field label="邮箱验证码">
                 <div className="flex gap-2">
@@ -74,7 +126,9 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
               onClick={() => { location.href = "/api/auth/oauth?provider=google"; }}><Mail size={15} />Google</Button>
           </div>
           {mode === "register" && (
-            <Field label="邀请码（选填）"><Input value={inviteCode} onChange={(e) => setInviteCode(e.target.value.toUpperCase())} placeholder="有邀请码可获额外奖励" /></Field>
+            <div className="mt-4">
+              <Field label="邀请码（选填）"><Input value={inviteCode} onChange={(e) => setInviteCode(e.target.value.toUpperCase())} placeholder="有邀请码可获额外奖励" /></Field>
+            </div>
           )}
           <button className="mt-3 w-full text-center text-xs text-muted hover:text-brand" onClick={() => setResetOpen(true)}>忘记密码？</button>
           <button className="mt-4 w-full text-center text-xs text-muted hover:text-brand" onClick={() => setMode(mode === "login" ? "register" : "login")}>

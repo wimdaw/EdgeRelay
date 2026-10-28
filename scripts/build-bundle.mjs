@@ -3,7 +3,7 @@
  * 使用 esbuild 打包云函数 bundle 到 cloud-functions/[[default]].js，
  * 并在 .edgeone/routes.json 中强制注入 ap-tokyo 节点与 120s 超时配置。
  */
-import { mkdirSync, readFileSync, cpSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, cpSync, writeFileSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
@@ -37,9 +37,12 @@ const bundleSize = readFileSync(join(outDir, "[[default]].js")).length;
 console.log(`[build-bundle] 编译完成！产物路径: cloud-functions/[[default]].js (大小: ${(bundleSize / 1024).toFixed(1)} KiB)`);
 
 // 1. 同步静态资产到 dist/，兼容 EdgeOne 控制台默认的 dist 输出目录
+// 根 index.html 必须排除：否则 EdgeOne 的 filesystem 规则会优先命中静态文件，
+// 绕过函数里的动态 SEO 渲染，导致首页先闪一下默认站点名再被前端改写。
 try {
   cpSync(publicDir, distDir, { recursive: true });
-  console.log(`[build-bundle] 已同步静态资产至 dist/ 目录`);
+  rmSync(join(distDir, "index.html"), { force: true });
+  console.log(`[build-bundle] 已同步静态资产至 dist/ 目录（根 index.html 交给函数动态渲染）`);
 } catch (e) {
   // ignore
 }
@@ -49,6 +52,7 @@ try {
 const routesConfig = {
   version: 3,
   routes: [
+    { src: "^/$", "server-name": "api-node" },
     { handle: "filesystem" },
     { src: "^/(.*)$", "server-name": "api-node" },
   ],

@@ -30,6 +30,28 @@ async function renderSpaHtml(env: Env): Promise<string> {
   const rawHtml = EMBEDDED_ASSETS["/index.html"]?.content || "<!DOCTYPE html><html><head><title>EdgeRelay</title></head><body><div id='root'></div></body></html>";
   let html = rawHtml;
 
+  // 把站点信息同步注入首屏 HTML，前端首次渲染直接使用，
+  // 避免先显示默认站点名、再等 /api/site 返回后才切换的闪烁。
+  const initialSite = {
+    siteName,
+    siteDescription: desc,
+    siteLogoUrl: logo,
+    siteHomepage: s.siteHomepage ?? "",
+    heroBadge: s.heroBadge ?? "跑在 EdgeOne 全球边缘节点",
+    heroTitle: s.heroTitle ?? "部署在 EdgeOne 边缘的合规 AI API 网关",
+    heroSubtitle: s.heroSubtitle ?? "用统一 OpenAI 兼容接口，接入、路由和治理多家大模型服务。合法授权上游、透明计费、哈希链审计——面向开发者与企业的正规聚合分发平台。",
+    supportEmail: s.supportEmail ?? "hackerxiaow@gmail.com",
+    oauth: {
+      github: !!s.oauthGithubEnabled,
+      google: !!s.oauthGoogleEnabled,
+    },
+    smtpEnabled: !!s.smtpEnabled,
+  };
+  const initialJson = JSON.stringify(initialSite)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+
   html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(siteName)} — AI API 网关控制台</title>`);
   html = html.replace(/<meta\s+name="description"[^>]*>/gi, "");
   html = html.replace(/<meta\s+property="og:[^"]*"[^>]*>/gi, "");
@@ -45,6 +67,10 @@ async function renderSpaHtml(env: Env): Promise<string> {
       `<link rel="apple-touch-icon" href="${esc(logo)}">`,
     ].join("\n") + "\n</head>"
   );
+
+  // 放在 head 末尾，避免把 charset 推到 1024 字节之后；
+  // 内联经典脚本会在 defer 的 module 脚本之前执行。
+  html = html.replace(/<\/head>/i, `<script>window.__EDGERELAY_SITE__=${initialJson};</script>\n</head>`);
 
   return html;
 }

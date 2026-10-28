@@ -7,6 +7,7 @@ import { onRequest } from "../cloud-functions/[[default]].js";
 const env = {
   ENCRYPTION_KEY: "test-encryption-key-32bytes-secret-rand",
   SESSION_SECRET: "test-session-key-32bytes-secret-rand",
+  USE_MEMORY_STORE: "1",
 };
 
 let passed = 0;
