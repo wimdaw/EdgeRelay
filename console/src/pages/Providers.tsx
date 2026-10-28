@@ -311,7 +311,7 @@ export default function Providers() {
                 placeholder="例如: DeepSeek 或 OpenAI"
               />
             </Field>
-            <Field label="渠道标识 (Slug)" hint="用于定向前缀，如 deepseek/model">
+            <Field label="渠道标识 (Slug)">
               <Input
                 value={form.slug}
                 onChange={(e) => setForm({ ...form, slug: e.target.value })}
