@@ -12,6 +12,9 @@ export const GET = defineHandler(async (c) => {
     siteDescription: s.siteDescription ?? "",
     siteLogoUrl: s.siteLogoUrl ?? "/logo.png",
     siteHomepage: s.siteHomepage ?? "",
+    icpNumber: s.icpNumber ?? "待办理",
+    copyrightText: s.copyrightText ?? "",
+    githubUrl: s.githubUrl ?? "https://github.com/wimdaw/EdgeRelay",
     oauth: { github: !!s.oauthGithubEnabled, google: !!s.oauthGoogleEnabled },
     smtpEnabled: !!s.smtpEnabled,
   });

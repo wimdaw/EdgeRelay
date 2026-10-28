@@ -109,6 +109,9 @@ export default function Settings() {
         <div className="grid gap-3 md:grid-cols-2">
           <Field label="站点名称"><Input value={String(s.siteName ?? "")} onChange={(e) => set("siteName", e.target.value)} /></Field>
           <Field label="站点主页（可选，用于 Logo 跳转）"><Input value={String(s.siteHomepage ?? "")} onChange={(e) => set("siteHomepage", e.target.value)} placeholder="https://..." /></Field>
+          <Field label="备案号（ICP）"><Input value={String(s.icpNumber ?? "")} onChange={(e) => set("icpNumber", e.target.value)} placeholder="如：京ICP备2024000000号-1；留空则不显示" /></Field>
+          <Field label="版权文案"><Input value={String(s.copyrightText ?? "")} onChange={(e) => set("copyrightText", e.target.value)} placeholder="留空自动使用 © 年份 站点名" /></Field>
+          <Field label="GitHub 链接"><Input value={String(s.githubUrl ?? "")} onChange={(e) => set("githubUrl", e.target.value)} placeholder="https://github.com/...；留空则隐藏图标" /></Field>
           <div className="md:col-span-2"><Field label="站点描述（meta description / og:description）">
             <textarea className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none" rows={2}
               value={String(s.siteDescription ?? "")} onChange={(e) => set("siteDescription", e.target.value)} />

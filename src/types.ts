@@ -61,6 +61,9 @@ export type PlatformSettings = {
   siteDescription?: string;
   siteLogoUrl?: string;
   siteHomepage?: string;
+  icpNumber?: string;
+  copyrightText?: string;
+  githubUrl?: string;
   /* 登录方式 */
   oauthGithubEnabled?: boolean;
   oauthGoogleEnabled?: boolean;
@@ -93,6 +96,9 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   siteDescription: "部署在 Cloudflare 边缘的AI API 网关，用统一 OpenAI 兼容接口接入、路由和派发多家大模型服务。",
   siteLogoUrl: "/logo.png",
   siteHomepage: "",
+  icpNumber: "待办理",
+  copyrightText: "",
+  githubUrl: "https://github.com/wimdaw/EdgeRelay",
 };
 
 export type RateLimits = { rpm: number; tpm: number; concurrency: number };
