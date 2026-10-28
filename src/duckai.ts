@@ -352,63 +352,57 @@ function streamResponse(upstream: Response, model: string): Response {
   const id = `chatcmpl-duckai-${crypto.randomUUID()}`;
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
-  const reader = upstream.body.getReader();
   let buffer = "";
   let sentRole = false;
   let sentDone = false;
 
-  const readable = new ReadableStream<Uint8Array>({
-    async pull(controller) {
-      try {
-        const { done, value } = await reader.read();
-        if (done) {
-          if (!sentDone) {
-            controller.enqueue(encoder.encode(openAiChunk(id, model, {}, "stop")));
-            controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-            sentDone = true;
+  const transform = new TransformStream<Uint8Array, Uint8Array>({
+    transform(chunk, controller) {
+      buffer += decoder.decode(chunk, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || "";
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith("data:")) continue;
+        const payloadStr = trimmed.slice(5).trim();
+        if (!payloadStr || payloadStr.startsWith("[CHAT_TITLE") || payloadStr === "[PING]") continue;
+        if (payloadStr === "[DONE]") {
+          if (!sentRole) {
+            controller.enqueue(encoder.encode(openAiChunk(id, model, { role: "assistant" })));
+            sentRole = true;
           }
-          controller.close();
-          return;
+          controller.enqueue(encoder.encode(openAiChunk(id, model, {}, "stop")));
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          sentDone = true;
+          continue;
         }
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith("data:")) continue;
-          const payloadStr = trimmed.slice(5).trim();
-          if (!payloadStr || payloadStr.startsWith("[CHAT_TITLE")) continue;
-          if (payloadStr === "[DONE]") {
+        try {
+          const ev = JSON.parse(payloadStr);
+          const textDelta = ev.message || (ev.role !== "reasoning" ? ev.text : undefined);
+          if (textDelta) {
             if (!sentRole) {
               controller.enqueue(encoder.encode(openAiChunk(id, model, { role: "assistant" })));
               sentRole = true;
             }
-            controller.enqueue(encoder.encode(openAiChunk(id, model, {}, "stop")));
-            controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-            sentDone = true;
-            continue;
+            controller.enqueue(encoder.encode(openAiChunk(id, model, { content: textDelta })));
           }
-          try {
-            const ev = JSON.parse(payloadStr);
-            const textDelta = ev.message || (ev.role !== "reasoning" ? ev.text : undefined);
-            if (textDelta) {
-              if (!sentRole) {
-                controller.enqueue(encoder.encode(openAiChunk(id, model, { role: "assistant" })));
-                sentRole = true;
-              }
-              controller.enqueue(encoder.encode(openAiChunk(id, model, { content: textDelta })));
-            }
-          } catch {}
+        } catch {}
+      }
+    },
+    flush(controller) {
+      buffer += decoder.decode();
+      if (!sentDone) {
+        if (!sentRole) {
+          controller.enqueue(encoder.encode(openAiChunk(id, model, { role: "assistant" })));
         }
-      } catch (err) {
-        controller.error(err);
+        controller.enqueue(encoder.encode(openAiChunk(id, model, {}, "stop")));
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
       }
     },
   });
 
-  return new Response(readable, {
+  return new Response(upstream.body.pipeThrough(transform), {
     status: 200,
     headers: {
       "Content-Type": "text/event-stream; charset=utf-8",
