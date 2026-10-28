@@ -67,7 +67,7 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
     setSendingLoginCode(true);
     try {
       await api("/api/auth/login", "POST", { action: "send-code", email: cleanEmail });
-      toast("登录验证码已发送，30 分钟内有效");
+      toast("登录验证码已发送，10 分钟内有效");
       setLoginCountdown(60);
       const t = setInterval(() => setLoginCountdown((c) => { if (c <= 1) clearInterval(t); return c - 1; }), 1000);
     } catch (e) {
@@ -126,7 +126,7 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
                       setSendingCode(true);
                       try {
                         await api("/api/auth/register", "POST", { action: "send-code", email: cleanEmail });
-                        toast("验证码已发送，30 分钟内有效");
+                        toast("验证码已发送，10 分钟内有效");
                         setCountdown(60);
                         const t = setInterval(() => setCountdown((c) => { if (c <= 1) clearInterval(t); return c - 1; }), 1000);
                       } catch (e) { toast((e as Error).message, "err"); } finally { setSendingCode(false); }

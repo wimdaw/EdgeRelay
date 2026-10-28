@@ -221,9 +221,9 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
   try {
     let providers = (await store.get("providers:all", { type: "json", consistency: "strong" })) || [];
     let pChanged = false;
-    if (!providers.some((p: any) => p.id === "p_opencode" || p.slug === "opencode")) {
+    if (!providers.some((p: any) => p.id === "opencode" || p.slug === "opencode")) {
       providers.push({
-        id: "p_opencode",
+        id: "opencode",
         name: "OpenCode",
         slug: "opencode",
         kind: "opencode",
@@ -235,9 +235,9 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
       });
       pChanged = true;
     }
-    if (!providers.some((p: any) => p.id === "p_duckai" || p.slug === "duckai")) {
+    if (!providers.some((p: any) => p.id === "duckai" || p.slug === "duckai")) {
       providers.push({
-        id: "p_duckai",
+        id: "duckai",
         name: "Duck.ai",
         slug: "duckai",
         kind: "duckai",
@@ -258,26 +258,26 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
     const existingNames = new Set(models.map((m: any) => m.publicName));
     const newModels: ModelRouteRecord[] = [
       // OpenCode models
-      { id: "m_oc_mimo", publicName: "mimo-v2.6-flash", providerId: "p_opencode", upstreamModel: "mimo-v2.6-flash-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_mimo_f", publicName: "mimo-v2.6-flash-free", providerId: "p_opencode", upstreamModel: "mimo-v2.6-flash-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_ds41", publicName: "deepseek-v4.1-flash", providerId: "p_opencode", upstreamModel: "deepseek-v4.1-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_oc_ds41_f", publicName: "deepseek-v4.1-flash-free", providerId: "p_opencode", upstreamModel: "deepseek-v4.1-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_oc_flint", publicName: "flint-40b", providerId: "p_opencode", upstreamModel: "flint-40b-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_nemo_vl", publicName: "nemotron-3.5-super-vl", providerId: "p_opencode", upstreamModel: "nemotron-3.5-super-vl-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_nemo_lt", publicName: "nemotron-3.5-lightning", providerId: "p_opencode", upstreamModel: "nemotron-3.5-lightning-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_glm53", publicName: "glm-5.3-flash", providerId: "p_opencode", upstreamModel: "glm-5.3-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_oc_pickle", publicName: "big-pickle", providerId: "p_opencode", upstreamModel: "big-pickle", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_beam", publicName: "beam", providerId: "p_opencode", upstreamModel: "beam-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_jev", publicName: "jev-1.13", providerId: "p_opencode", upstreamModel: "jev-1.13-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_mimo", publicName: "mimo-v2.6-flash", providerId: "opencode", upstreamModel: "mimo-v2.6-flash-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_mimo_f", publicName: "mimo-v2.6-flash-free", providerId: "opencode", upstreamModel: "mimo-v2.6-flash-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_ds41", publicName: "deepseek-v4.1-flash", providerId: "opencode", upstreamModel: "deepseek-v4.1-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_oc_ds41_f", publicName: "deepseek-v4.1-flash-free", providerId: "opencode", upstreamModel: "deepseek-v4.1-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_oc_flint", publicName: "flint-40b", providerId: "opencode", upstreamModel: "flint-40b-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_nemo_vl", publicName: "nemotron-3.5-super-vl", providerId: "opencode", upstreamModel: "nemotron-3.5-super-vl-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_nemo_lt", publicName: "nemotron-3.5-lightning", providerId: "opencode", upstreamModel: "nemotron-3.5-lightning-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_glm53", publicName: "glm-5.3-flash", providerId: "opencode", upstreamModel: "glm-5.3-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_oc_pickle", publicName: "big-pickle", providerId: "opencode", upstreamModel: "big-pickle", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_beam", publicName: "beam", providerId: "opencode", upstreamModel: "beam-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_jev", publicName: "jev-1.13", providerId: "opencode", upstreamModel: "jev-1.13-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
       // Duck.ai models
-      { id: "m_dk_luna", publicName: "gpt-6-luna", providerId: "p_duckai", upstreamModel: "gpt-6-luna", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
-      { id: "m_dk_mini", publicName: "gpt-5.4-mini", providerId: "p_duckai", upstreamModel: "gpt-5.4-mini", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
-      { id: "m_dk_haiku", publicName: "claude-haiku-4-5", providerId: "p_duckai", upstreamModel: "claude-haiku-4-5", priority: 10, costWeight: 1, maxContext: 200000, enabled: 1, createdAt: now },
-      { id: "m_dk_mistral", publicName: "mistral-small-2603", providerId: "p_duckai", upstreamModel: "mistral-small-2603", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_dk_oss120b", publicName: "tinfoil/gpt-oss-120b", providerId: "p_duckai", upstreamModel: "tinfoil/gpt-oss-120b", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_dk_gemma31b", publicName: "tinfoil/gemma4-31b", providerId: "p_duckai", upstreamModel: "tinfoil/gemma4-31b", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_dk_oss120b_s", publicName: "gpt-oss-120b", providerId: "p_duckai", upstreamModel: "tinfoil/gpt-oss-120b", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_dk_gemma31b_s", publicName: "gemma4-31b", providerId: "p_duckai", upstreamModel: "tinfoil/gemma4-31b", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_dk_luna", publicName: "gpt-6-luna", providerId: "duckai", upstreamModel: "gpt-6-luna", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
+      { id: "m_dk_mini", publicName: "gpt-5.4-mini", providerId: "duckai", upstreamModel: "gpt-5.4-mini", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
+      { id: "m_dk_haiku", publicName: "claude-haiku-4-5", providerId: "duckai", upstreamModel: "claude-haiku-4-5", priority: 10, costWeight: 1, maxContext: 200000, enabled: 1, createdAt: now },
+      { id: "m_dk_mistral", publicName: "mistral-small-2603", providerId: "duckai", upstreamModel: "mistral-small-2603", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_dk_oss120b", publicName: "tinfoil/gpt-oss-120b", providerId: "duckai", upstreamModel: "tinfoil/gpt-oss-120b", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_dk_gemma31b", publicName: "tinfoil/gemma4-31b", providerId: "duckai", upstreamModel: "tinfoil/gemma4-31b", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_dk_oss120b_s", publicName: "gpt-oss-120b", providerId: "duckai", upstreamModel: "tinfoil/gpt-oss-120b", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_dk_gemma31b_s", publicName: "gemma4-31b", providerId: "duckai", upstreamModel: "tinfoil/gemma4-31b", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
     ];
     let mChanged = false;
     for (const nm of newModels) {
@@ -691,7 +691,7 @@ export async function seedInitialData(env: any): Promise<void> {
   // 1. 默认 Providers
   const initialProviders: ProviderRecord[] = [
     {
-      id: "p_openai",
+      id: "openai",
       name: "OpenAI",
       slug: "openai",
       kind: "openai_compat",
@@ -702,7 +702,7 @@ export async function seedInitialData(env: any): Promise<void> {
       createdAt: now,
     },
     {
-      id: "p_anthropic",
+      id: "anthropic",
       name: "Anthropic",
       slug: "anthropic",
       kind: "openai_compat",
@@ -714,7 +714,7 @@ export async function seedInitialData(env: any): Promise<void> {
       createdAt: now,
     },
     {
-      id: "p_google",
+      id: "google",
       name: "Google",
       slug: "google",
       kind: "openai_compat",
@@ -725,7 +725,7 @@ export async function seedInitialData(env: any): Promise<void> {
       createdAt: now,
     },
     {
-      id: "p_deepseek",
+      id: "deepseek",
       name: "DeepSeek",
       slug: "deepseek",
       kind: "openai_compat",
@@ -736,7 +736,7 @@ export async function seedInitialData(env: any): Promise<void> {
       createdAt: now,
     },
     {
-      id: "p_opencode",
+      id: "opencode",
       name: "OpenCode",
       slug: "opencode",
       kind: "opencode",
@@ -747,7 +747,7 @@ export async function seedInitialData(env: any): Promise<void> {
       createdAt: now,
     },
     {
-      id: "p_duckai",
+      id: "duckai",
       name: "Duck.ai",
       slug: "duckai",
       kind: "duckai",
@@ -761,12 +761,12 @@ export async function seedInitialData(env: any): Promise<void> {
 
   // 2. 默认 Models
   const initialModels: ModelRouteRecord[] = [
-    { id: "m_gpt4o_1", publicName: "gpt-4o", providerId: "p_openai", upstreamModel: "gpt-4o", priority: 10, costWeight: 1.0, maxContext: 128000, enabled: 1, createdAt: now },
-    { id: "m_gpt4o_mini", publicName: "gpt-4o-mini", providerId: "p_openai", upstreamModel: "gpt-4o-mini", priority: 10, costWeight: 1.0, maxContext: 128000, enabled: 1, createdAt: now },
-    { id: "m_sonnet_1", publicName: "claude-sonnet", providerId: "p_anthropic", upstreamModel: "claude-sonnet-4-5", priority: 10, costWeight: 1.0, maxContext: 200000, enabled: 1, createdAt: now },
-    { id: "m_gemini_1", publicName: "gemini-flash", providerId: "p_google", upstreamModel: "gemini-2.0-flash", priority: 10, costWeight: 1.0, maxContext: 1000000, enabled: 1, createdAt: now },
-    { id: "m_deepseek_1", publicName: "deepseek-chat", providerId: "p_deepseek", upstreamModel: "deepseek-chat", priority: 10, costWeight: 1.0, maxContext: 64000, enabled: 1, createdAt: now },
-    { id: "m_deepseek_2", publicName: "deepseek-reasoner", providerId: "p_deepseek", upstreamModel: "deepseek-reasoner", priority: 10, costWeight: 1.0, maxContext: 64000, enabled: 1, createdAt: now },
+    { id: "m_gpt4o_1", publicName: "gpt-4o", providerId: "openai", upstreamModel: "gpt-4o", priority: 10, costWeight: 1.0, maxContext: 128000, enabled: 1, createdAt: now },
+    { id: "m_gpt4o_mini", publicName: "gpt-4o-mini", providerId: "openai", upstreamModel: "gpt-4o-mini", priority: 10, costWeight: 1.0, maxContext: 128000, enabled: 1, createdAt: now },
+    { id: "m_sonnet_1", publicName: "claude-sonnet", providerId: "anthropic", upstreamModel: "claude-sonnet-4-5", priority: 10, costWeight: 1.0, maxContext: 200000, enabled: 1, createdAt: now },
+    { id: "m_gemini_1", publicName: "gemini-flash", providerId: "google", upstreamModel: "gemini-2.0-flash", priority: 10, costWeight: 1.0, maxContext: 1000000, enabled: 1, createdAt: now },
+    { id: "m_deepseek_1", publicName: "deepseek-chat", providerId: "deepseek", upstreamModel: "deepseek-chat", priority: 10, costWeight: 1.0, maxContext: 64000, enabled: 1, createdAt: now },
+    { id: "m_deepseek_2", publicName: "deepseek-reasoner", providerId: "deepseek", upstreamModel: "deepseek-reasoner", priority: 10, costWeight: 1.0, maxContext: 64000, enabled: 1, createdAt: now },
   ];
 
   // 3. 默认 Pricing

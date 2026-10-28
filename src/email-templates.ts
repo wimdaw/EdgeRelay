@@ -1,5 +1,5 @@
 /** 验证码邮件 HTML 模板（EdgeRelay 品牌） */
-export function verifyCodeEmailHtml(siteName: string, code: string, minutes = 30): string {
+export function verifyCodeEmailHtml(siteName: string, code: string, minutes = 10): string {
   return `<!doctype html>
 <html><body style="margin:0;padding:0;background:#f4f5f7;font-family:-apple-system,'PingFang SC','Microsoft YaHei',Segoe UI,sans-serif;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;padding:32px 16px;">

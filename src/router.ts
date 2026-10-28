@@ -21,7 +21,7 @@ export async function listRoutes(env: any, publicName: string): Promise<Upstream
 
   const routes: UpstreamRoute[] = [];
   for (const m of matched) {
-    const p = providerMap.get(m.providerId);
+    const p = providerMap.get(m.providerId) || providerMap.get(m.providerId.replace(/^p_/, "")) || providerMap.get("p_" + m.providerId);
     if (!p || p.status !== "active") continue;
 
     const keys = await getProviderKeys(env, p.id);

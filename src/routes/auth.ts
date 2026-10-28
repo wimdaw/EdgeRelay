@@ -60,13 +60,7 @@ authRouter.post("/register", async (c) => {
         throw new ApiError(429, ErrorCode.RATE_LIMITED, "发送过于频繁，请 1 分钟后再试");
       }
 
-      // 智能复用：若 30 分钟内已有未过期的验证码，继续重发该码，彻底避免多次点击导致旧邮件验证码失效冲突
-      const existingCode =
-        (await kv.get(`emailcode:reg:${emailNorm}`)) ||
-        (await kv.get(`emailcode:common:${emailNorm}`));
-      const code = existingCode && /^\d{6}$/.test(existingCode)
-        ? existingCode
-        : String(Math.floor(100000 + Math.random() * 900000));
+      const code = String(Math.floor(100000 + Math.random() * 900000));
       const password = await decryptSecret(env, settings.smtpPassEnc!);
 
       try {
@@ -81,13 +75,13 @@ authRouter.post("/register", async (c) => {
           {
             to: emailNorm,
             subject: `${settings.siteName ?? "Relay"} 注册验证码`,
-            text: `你正在注册 ${settings.siteName ?? "Relay"} 账号。\n\n验证码：${code}\n\n30 分钟内有效。若非本人操作，请忽略本邮件。`,
-            html: verifyCodeEmailHtml(settings.siteName ?? "Relay", code, 30),
+            text: `你正在注册 ${settings.siteName ?? "Relay"} 账号。\n\n验证码：${code}\n\n10 分钟内有效。若非本人操作，请忽略本邮件。`,
+            html: verifyCodeEmailHtml(settings.siteName ?? "Relay", code, 10),
           }
         );
 
-        await kv.put(`emailcode:reg:${emailNorm}`, code, { expirationTtl: 1800 });
-        await kv.put(`emailcode:common:${emailNorm}`, code, { expirationTtl: 1800 });
+        await kv.put(`emailcode:reg:${emailNorm}`, code, { expirationTtl: 600 });
+        await kv.put(`emailcode:common:${emailNorm}`, code, { expirationTtl: 600 });
         await kv.put(`emailcode:sent:${emailNorm}`, "1", { expirationTtl: 60 });
       } catch (e: any) {
         throw new ApiError(502, ErrorCode.UPSTREAM_ERROR, `邮件发送失败：${e?.message}（请检查 SMTP 配置）`);
@@ -100,7 +94,7 @@ authRouter.post("/register", async (c) => {
         meta: { email: emailNorm },
       });
 
-      return json({ ok: true, message: "验证码已发送（30 分钟内有效）" });
+      return json({ ok: true, message: "验证码已发送（10 分钟内有效）" });
     }
 
     /* ---- 2. 提交注册 ---- */
@@ -213,12 +207,7 @@ authRouter.post("/login", async (c) => {
         throw new ApiError(429, ErrorCode.RATE_LIMITED, "发送过于频繁，请 1 分钟后再试");
       }
 
-      const existingCode =
-        (await kv.get(`emailcode:login:${emailNorm}`)) ||
-        (await kv.get(`emailcode:common:${emailNorm}`));
-      const code = existingCode && /^\d{6}$/.test(existingCode)
-        ? existingCode
-        : String(Math.floor(100000 + Math.random() * 900000));
+      const code = String(Math.floor(100000 + Math.random() * 900000));
       const password = await decryptSecret(env, settings.smtpPassEnc!);
 
       try {
@@ -233,19 +222,19 @@ authRouter.post("/login", async (c) => {
           {
             to: emailNorm,
             subject: `${settings.siteName ?? "Relay"} 登录验证码`,
-            text: `你正在登录 ${settings.siteName ?? "Relay"} 控制台。\n\n验证码：${code}\n\n30 分钟内有效。若非本人操作，请尽快确认账号安全。`,
-            html: verifyCodeEmailHtml(settings.siteName ?? "Relay", code, 30),
+            text: `你正在登录 ${settings.siteName ?? "Relay"} 控制台。\n\n验证码：${code}\n\n10 分钟内有效。若非本人操作，请尽快确认账号安全。`,
+            html: verifyCodeEmailHtml(settings.siteName ?? "Relay", code, 10),
           }
         );
 
-        await kv.put(`emailcode:login:${emailNorm}`, code, { expirationTtl: 1800 });
-        await kv.put(`emailcode:common:${emailNorm}`, code, { expirationTtl: 1800 });
+        await kv.put(`emailcode:login:${emailNorm}`, code, { expirationTtl: 600 });
+        await kv.put(`emailcode:common:${emailNorm}`, code, { expirationTtl: 600 });
         await kv.put(`emailcode:sent:${emailNorm}`, "1", { expirationTtl: 60 });
       } catch (e: any) {
         throw new ApiError(502, ErrorCode.UPSTREAM_ERROR, `邮件发送失败：${e?.message}`);
       }
 
-      return json({ ok: true, message: "登录验证码已发送（30 分钟内有效）" });
+      return json({ ok: true, message: "登录验证码已发送（10 分钟内有效）" });
     }
 
     /* ---- 2. 执行登录校验 ---- */
@@ -434,8 +423,8 @@ authRouter.post("/reset", async (c) => {
         }
       );
 
-      await kv.put(`emailcode:reset:${emailNorm}`, code, { expirationTtl: 1800 });
-      await kv.put(`emailcode:common:${emailNorm}`, code, { expirationTtl: 1800 });
+      await kv.put(`emailcode:reset:${emailNorm}`, code, { expirationTtl: 600 });
+      await kv.put(`emailcode:common:${emailNorm}`, code, { expirationTtl: 600 });
       await kv.put(`emailcode:sent:${emailNorm}`, "1", { expirationTtl: 60 });
 
       return json({ ok: true, message: "重置验证码已发送" });
