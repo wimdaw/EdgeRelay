@@ -1,5 +1,5 @@
 /** 验证码邮件 HTML 模板（EdgeRelay 品牌） */
-export function verifyCodeEmailHtml(siteName: string, code: string, minutes = 10): string {
+export function verifyCodeEmailHtml(siteName: string, code: string, minutes = 30): string {
   return `<!doctype html>
 <html><body style="margin:0;padding:0;background:#f4f5f7;font-family:-apple-system,'PingFang SC','Microsoft YaHei',Segoe UI,sans-serif;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;padding:32px 16px;">
@@ -19,7 +19,7 @@ export function verifyCodeEmailHtml(siteName: string, code: string, minutes = 10
     </div>
   </td></tr>
   <tr><td style="padding:0 32px 12px;">
-    <p style="margin:0;font-size:12px;color:#9ca3af;">验证码 10 分钟内有效，请勿泄露给他人。</p>
+    <p style="margin:0;font-size:12px;color:#9ca3af;">验证码 ${minutes} 分钟内有效，请勿泄露给他人。</p>
   </td></tr>
   <tr><td style="padding:20px 32px 32px;border-top:1px solid #f0f1f3;">
     <p style="margin:0;font-size:11px;color:#9ca3af;">本邮件由 ${siteName} 系统自动发送，请勿直接回复。</p>

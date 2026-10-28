@@ -26,15 +26,33 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
   const submit = async () => {
     setBusy(true);
     try {
+      const cleanEmail = email.trim().toLowerCase();
+      if (!cleanEmail) return toast("请填写邮箱地址", "err");
+
       if (mode === "login") {
         if (loginMethod === "code") {
-          if (!loginCode.trim()) return toast("请输入邮箱验证码", "err");
-          await api("/api/auth/login", "POST", { email, code: loginCode.trim() });
+          const cleanCode = loginCode.trim();
+          if (!cleanCode) return toast("请输入邮箱验证码", "err");
+          if (cleanCode.length !== 6) return toast("请输入完整的 6 位数字验证码", "err");
+          await api("/api/auth/login", "POST", { email: cleanEmail, code: cleanCode });
         } else {
-          await api("/api/auth/login", "POST", { email, password: pass });
+          if (!pass) return toast("请输入密码", "err");
+          await api("/api/auth/login", "POST", { email: cleanEmail, password: pass });
         }
       } else {
-        await api("/api/auth/register", "POST", { email, password: pass, code: regCode, inviteCode: inviteCode || undefined, tosAccepted: true, privacyAccepted: true });
+        const cleanCode = regCode.trim();
+        if (site?.smtpEnabled) {
+          if (!cleanCode) return toast("请输入邮箱验证码", "err");
+          if (cleanCode.length !== 6) return toast("请输入完整的 6 位数字验证码", "err");
+        }
+        await api("/api/auth/register", "POST", {
+          email: cleanEmail,
+          password: pass,
+          code: cleanCode,
+          inviteCode: inviteCode?.trim() || undefined,
+          tosAccepted: true,
+          privacyAccepted: true,
+        });
       }
       await onLogin();
       nav("/dashboard");
@@ -44,11 +62,12 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
   };
 
   const sendLoginCode = async () => {
-    if (!email) return toast("请先填写邮箱", "err");
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) return toast("请先填写邮箱", "err");
     setSendingLoginCode(true);
     try {
-      await api("/api/auth/login", "POST", { action: "send-code", email });
-      toast("登录验证码已发送，请查收邮箱");
+      await api("/api/auth/login", "POST", { action: "send-code", email: cleanEmail });
+      toast("登录验证码已发送，30 分钟内有效");
       setLoginCountdown(60);
       const t = setInterval(() => setLoginCountdown((c) => { if (c <= 1) clearInterval(t); return c - 1; }), 1000);
     } catch (e) {
@@ -86,7 +105,7 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
             {mode === "login" && loginMethod === "code" && (
               <Field label="邮箱验证码">
                 <div className="flex gap-2">
-                  <Input required value={loginCode} onChange={(e) => setLoginCode(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="6 位验证码" inputMode="numeric" autoComplete="one-time-code" maxLength={6} />
+                  <Input required value={loginCode} onChange={(e) => setLoginCode(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="6 位数字验证码" inputMode="numeric" autoComplete="one-time-code" maxLength={6} />
                   <Button type="button" variant="ghost" disabled={!site?.smtpEnabled || loginCountdown > 0 || sendingLoginCode} className="shrink-0 whitespace-nowrap"
                     title={site?.smtpEnabled ? "发送登录验证码" : "管理员未开启邮箱验证码登录"}
                     onClick={sendLoginCode}>{sendingLoginCode ? "发送中…" : loginCountdown > 0 ? `${loginCountdown}s` : "获取验证码"}</Button>
@@ -99,14 +118,15 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
             {mode === "register" && site?.smtpEnabled && (
               <Field label="邮箱验证码">
                 <div className="flex gap-2">
-                  <Input required value={regCode} onChange={(e) => setRegCode(e.target.value)} placeholder="6 位验证码" />
+                  <Input required value={regCode} onChange={(e) => setRegCode(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="6 位数字验证码" inputMode="numeric" autoComplete="one-time-code" maxLength={6} />
                   <Button type="button" variant="ghost" disabled={countdown > 0 || sendingCode} className="shrink-0 whitespace-nowrap"
                     onClick={async () => {
-                      if (!email) return toast("请先填写邮箱", "err");
+                      const cleanEmail = email.trim().toLowerCase();
+                      if (!cleanEmail) return toast("请先填写邮箱", "err");
                       setSendingCode(true);
                       try {
-                        await api("/api/auth/register", "POST", { action: "send-code", email });
-                        toast("验证码已发送，请查收邮箱");
+                        await api("/api/auth/register", "POST", { action: "send-code", email: cleanEmail });
+                        toast("验证码已发送，30 分钟内有效");
                         setCountdown(60);
                         const t = setInterval(() => setCountdown((c) => { if (c <= 1) clearInterval(t); return c - 1; }), 1000);
                       } catch (e) { toast((e as Error).message, "err"); } finally { setSendingCode(false); }
@@ -144,7 +164,7 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
         <div className="flex flex-col gap-3">
           <Field label="邮箱"><Input type="email" value={reset.email} onChange={(e) => setReset({ ...reset, email: e.target.value })} /></Field>
           {reset.stage === 2 && (<>
-            <Field label="验证码（已发送至邮箱，10 分钟有效）"><Input value={reset.code} onChange={(e) => setReset({ ...reset, code: e.target.value })} /></Field>
+            <Field label="验证码（已发送至邮箱，10 分钟有效）"><Input value={reset.code} onChange={(e) => setReset({ ...reset, code: e.target.value.replace(/\D/g, "").slice(0, 6) })} /></Field>
             <Field label="新密码（至少 10 位）"><Input type="password" value={reset.password} onChange={(e) => setReset({ ...reset, password: e.target.value })} /></Field>
           </>)}
           {resetMsg && <p className="text-xs text-muted">{resetMsg}</p>}
