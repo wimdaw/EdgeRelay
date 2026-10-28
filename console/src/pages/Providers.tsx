@@ -27,6 +27,7 @@ export default function Providers() {
   const [newKeyLabel, setNewKeyLabel] = useState("prod");
   // 模型导入流程
   const [importStep, setImportStep] = useState<{ providerId: string; providerName: string; models: string[]; picked: Set<string>; loading: boolean; error?: string } | null>(null);
+  const [customModelInput, setCustomModelInput] = useState("");
   const { confirm, confirmEl } = useConfirm();
   const toast = useToast();
 
@@ -101,13 +102,25 @@ export default function Providers() {
     await pullModels(providerId, providerName, p?.base_url ?? "", "");
   };
 
+  const addCustomModel = () => {
+    if (!customModelInput.trim() || !importStep) return;
+    const names = customModelInput.split(/[\r\n,]+/).map((s) => s.trim()).filter(Boolean);
+    if (!names.length) return;
+    const newModels = Array.from(new Set([...importStep.models, ...names]));
+    const newPicked = new Set(importStep.picked);
+    names.forEach((n) => newPicked.add(n));
+    setImportStep({ ...importStep, models: newModels, picked: newPicked });
+    setCustomModelInput("");
+    toast(`已添加 ${names.length} 个模型到勾选列表`);
+  };
+
   const importPicked = async () => {
     if (!importStep) return;
     const picked = [...importStep.picked];
     if (!picked.length) return toast("请至少选择一个模型", "err");
     try {
       const r = await adminAction<{ result?: { imported?: number } }>("import_models", { providerId: importStep.providerId, models: picked, priority: 10 });
-      toast(`已导入 ${r.result?.imported ?? picked.length} 个模型，请到「模型与定价」设置定价`);
+      toast(`已导入 ${r.result?.imported ?? picked.length} 个模型，可在「模型与定价」调整定价`);
       setImportStep(null); load();
     } catch (e) { toast((e as Error).message, "err"); }
   };
@@ -228,11 +241,11 @@ export default function Providers() {
               </div>
 
               <div className="mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5">
-                <Button variant="soft" className="flex-1 !h-7 !px-2 text-xs" onClick={() => fetchModels(p.id, p.name)} title="从上游导入模型">
-                  <RefreshCw size={12} className="mr-1" />导入
+                <Button variant="soft" className="flex-1 !h-7 !px-2 text-xs" onClick={() => fetchModels(p.id, p.name)} title="从上游导入或手动添加模型">
+                  <RefreshCw size={12} className="mr-1" />导入/添加模型
                 </Button>
                 {!isKeylessSlug(p.slug) && (
-                  <Button variant="soft" className="!h-7 !px-2 text-xs" onClick={() => { setKeyDlg(p); setKeyVal(""); setNewKeyLabel("prod"); }} title="管理多 Key 调度池">
+                  <Button variant="soft" className="!h-7 !px-2 text-xs" onClick={() => { setKeyDlg(p); setKeyVal(""); setNewKeyLabel("prod"); }} title="管理多 Key 轮换池">
                     <Key size={12} className="mr-1 text-muted" />密钥 ({p.key_count})
                   </Button>
                 )}
@@ -250,9 +263,17 @@ export default function Providers() {
           <Field label="名称"><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="DeepSeek" /></Field>
           <Field label="Slug"><Select value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value, url: SLUG_URL[e.target.value] ?? form.url })}>{SLUGS.map((s) => <option key={s}>{s}</option>)}</Select></Field>
           <div className="col-span-2"><Field label="Base URL（OpenAI 兼容端点）"><Input value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://..." /></Field></div>
-          <Field label={isKeylessSlug(form.slug) ? "上游密钥（免 Key 渠道，可选）" : form.id ? "上游密钥（留空保持不变）" : "上游密钥（必填）"}>
-            <Input type="password" value={form.key} onChange={(e) => setForm({ ...form, key: e.target.value })} placeholder={isKeylessSlug(form.slug) ? "无需填写密钥" : "sk-..."} />
-          </Field>
+          <div className="col-span-2">
+            <Field label={isKeylessSlug(form.slug) ? "上游密钥（免 Key 渠道，无需填写）" : form.id ? "追加新密钥（留空保持不变，支持多行批量录入）" : "上游密钥（必填，支持粘贴多个，一行一个）"}>
+              <textarea
+                value={form.key}
+                onChange={(e) => setForm({ ...form, key: e.target.value })}
+                placeholder={isKeylessSlug(form.slug) ? "该渠道完全免费免 Key，直接保存即可" : "sk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy (支持粘贴多个Key一行一个，自动进入多Key轮换池)"}
+                rows={2}
+                className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
+              />
+            </Field>
+          </div>
         </div>
         
         <div className="mt-4 flex justify-end gap-2">
@@ -261,38 +282,70 @@ export default function Providers() {
         </div>
       </Dialog>
 
-      {/* 模型导入 */}
-      <Dialog open={!!importStep} onClose={() => setImportStep(null)} title={`导入模型 — ${importStep?.providerName ?? ""}`} width={520}>
+      {/* 模型导入 / 手动添加 */}
+      <Dialog open={!!importStep} onClose={() => setImportStep(null)} title={`渠道模型管理 — ${importStep?.providerName ?? ""}`} width={540}>
         {importStep?.loading ? (
           <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted"><RefreshCw size={16} className="animate-spin" />正在从上游拉取模型列表…</div>
         ) : importStep?.error ? (
-          <div className="py-6 text-center">
-            <p className="text-[13px] text-err">{importStep.error}</p>
-            <div className="mt-4 flex justify-center gap-2">
-              <Button variant="ghost" onClick={() => setImportStep(null)}>跳过</Button>
-              <Button onClick={() => fetchModels(importStep.providerId, importStep.providerName)}><RefreshCw size={14} />重试获取</Button>
+          <div className="py-4">
+            <p className="text-[13px] text-err mb-3">{importStep.error}</p>
+            <div className="rounded-lg border border-dashed border-line p-3 bg-surface2/30 mb-4">
+              <div className="text-xs font-semibold text-ink mb-1.5">手动添加模型（跳过自动发现）</div>
+              <div className="flex gap-2">
+                <Input
+                  className="!py-1 text-xs"
+                  value={customModelInput}
+                  onChange={(e) => setCustomModelInput(e.target.value)}
+                  placeholder="如: deepseek-chat, deepseek-reasoner"
+                />
+                <Button variant="soft" className="!h-[34px] !px-3 shrink-0 text-xs" onClick={addCustomModel}>
+                  加入
+                </Button>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setImportStep(null)}>关闭</Button>
+              <Button onClick={() => fetchModels(importStep.providerId, importStep.providerName)}><RefreshCw size={14} />重试上游发现</Button>
+              {importStep.picked.size > 0 && <Button onClick={importPicked}>导入已加模型 ({importStep.picked.size})</Button>}
             </div>
           </div>
         ) : (
           <>
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-xs text-muted">上游返回 {importStep?.models.length ?? 0} 个模型，勾选要上架的模型：</span>
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs text-muted">候选模型清单（已勾选 {importStep?.picked.size ?? 0} 个）：</span>
               <button className="text-xs text-brand hover:underline" onClick={() => importStep && setImportStep({ ...importStep, picked: new Set(importStep.models) })}>全选</button>
             </div>
-            <div className="max-h-72 space-y-1 overflow-y-auto rounded-lg border border-line p-2">
-              {importStep?.models.length === 0 && <p className="py-6 text-center text-xs text-muted">上游未返回模型，请检查密钥或稍后手动添加</p>}
+            <div className="max-h-60 space-y-1 overflow-y-auto rounded-lg border border-line p-2">
+              {importStep?.models.length === 0 && <p className="py-6 text-center text-xs text-muted">未发现上游模型，可在下方手动输入模型名称添加</p>}
               {importStep?.models.map((m) => (
-                <label key={m} className={cn("flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-colors", importStep.picked.has(m) ? "bg-brand/10 text-ink" : "hover:bg-surface2")}>
+                <label key={m} className={cn("flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-colors", importStep.picked.has(m) ? "bg-brand/10 text-ink" : "hover:bg-surface2")}>
                   <input type="checkbox" className="h-4 w-4 accent-[#F38020]" checked={importStep.picked.has(m)}
                     onChange={() => { const p = new Set(importStep.picked); if (p.has(m)) p.delete(m); else p.add(m); setImportStep({ ...importStep, picked: p }); }} />
-                  <code>{m}</code>
+                  <code className="font-mono">{m}</code>
                 </label>
               ))}
             </div>
-            <p className="mt-3 text-xs text-muted">导入后对外模型名默认与上游一致，可在「模型与定价」改名并设置价格。</p>
-            <div className="mt-4 flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setImportStep(null)}>跳过</Button>
-              <Button onClick={importPicked}>导入所选模型</Button>
+
+            {/* 手动添加模型栏 */}
+            <div className="mt-2.5 rounded-lg border border-dashed border-line p-2.5 bg-surface2/30">
+              <div className="text-[11px] font-semibold text-ink mb-1">手动输入模型名（如上游未返回，或自定义模型）</div>
+              <div className="flex gap-2">
+                <Input
+                  className="!py-1 text-xs"
+                  value={customModelInput}
+                  onChange={(e) => setCustomModelInput(e.target.value)}
+                  placeholder="例如: deepseek-chat 或 gpt-5 (支持逗号/换行输入多个)"
+                />
+                <Button variant="soft" className="!h-[34px] !px-3 shrink-0 text-xs" onClick={addCustomModel}>
+                  加入清单
+                </Button>
+              </div>
+            </div>
+
+            <p className="mt-2.5 text-[11px] text-muted">导入后模型即刻上架；对外模型名默认与上游一致，可在「模型与定价」修改或配置自定义别名。</p>
+            <div className="mt-3.5 flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setImportStep(null)}>取消</Button>
+              <Button onClick={importPicked} disabled={!importStep?.picked.size}>导入所选模型 ({importStep?.picked.size ?? 0})</Button>
             </div>
           </>
         )}
@@ -302,18 +355,21 @@ export default function Providers() {
       <Dialog open={!!keyDlg} onClose={() => setKeyDlg(null)} title={`密钥池管理 — ${keyDlg?.name ?? ""}`} width={560}>
         <div className="space-y-4">
           <p className="text-xs text-muted">
-            已挂载多 Key 负载均衡与健康熔断。调用上游时使用 Fisher-Yates 随机打散实现分流；遇 429 降权，60 秒后自动试用自愈。
+            已开启多 Key 负载均衡与健康熔断。网关使用 Fisher-Yates 随机打散实现均匀轮换分流；遇 429 自动降权跳过并轮换下一个 Key，60 秒后自动试用自愈。
           </p>
 
           <div className="space-y-2">
-            <div className="text-xs font-semibold text-ink flex items-center gap-1.5">
-              <Key size={13} className="text-brand" />
-              当前密钥列表（{keyDlg?.keys?.length ?? 0}）
+            <div className="text-xs font-semibold text-ink flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Key size={13} className="text-brand" />
+                当前轮换 Key 列表（{keyDlg?.keys?.length ?? 0} 个）
+              </span>
+              <span className="text-[11px] text-muted">支持无缝挂载任意多个 Key</span>
             </div>
 
             {(!keyDlg?.keys || keyDlg.keys.length === 0) ? (
               <div className="rounded-lg border border-line p-3 text-center text-xs text-muted">
-                暂无密钥，请在下方录入首个上游 Key
+                暂无密钥，请在下方录入或批量粘贴 Key
               </div>
             ) : (
               <div className="max-h-52 space-y-1.5 overflow-y-auto rounded-lg border border-line p-2">
@@ -321,7 +377,7 @@ export default function Providers() {
                   <div key={k.id} className="flex items-center justify-between rounded-lg bg-surface2/60 px-2.5 py-1.5 text-xs">
                     <div className="flex items-center gap-2 min-w-0">
                       <code className="text-ink font-mono font-medium truncate max-w-[130px]">{k.fingerprint}...</code>
-                      <span className="rounded bg-line px-1 py-0.5 text-[10px] text-muted">{k.label || "default"}</span>
+                      <span className="rounded bg-line px-1 py-0.5 text-[10px] text-muted">{k.label || "prod"}</span>
                       {k.status === "disabled" ? (
                         <span className="rounded bg-zinc-500/10 px-1 py-0.5 text-[10px] text-zinc-400">已停用</span>
                       ) : k.health_status === "demoted" ? (
@@ -334,7 +390,7 @@ export default function Providers() {
                         </span>
                       ) : (
                         <span className="flex items-center gap-0.5 rounded bg-emerald-500/10 px-1 py-0.5 text-[10px] font-medium text-emerald-500">
-                          <CheckCircle2 size={10} /> 健康
+                          <CheckCircle2 size={10} /> 轮换就绪
                         </span>
                       )}
                     </div>
@@ -361,25 +417,30 @@ export default function Providers() {
           </div>
 
           <div className="rounded-lg border border-dashed border-line p-3 space-y-2.5 bg-surface/50">
-            <div className="text-xs font-semibold text-ink">追加新密钥</div>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="col-span-2">
-                <Input
-                  type="password"
-                  value={keyVal}
-                  onChange={(e) => setKeyVal(e.target.value)}
-                  placeholder="sk-..."
-                />
-              </div>
-              <Input
-                value={newKeyLabel}
-                onChange={(e) => setNewKeyLabel(e.target.value)}
-                placeholder="标签 (如 prod-2)"
+            <div className="text-xs font-semibold text-ink">批量追加新密钥</div>
+            <div className="space-y-1">
+              <textarea
+                value={keyVal}
+                onChange={(e) => setKeyVal(e.target.value)}
+                placeholder={"支持单个或批量粘贴多个 Key，一行一个，例如：\nsk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy"}
+                rows={3}
+                className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
               />
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setKeyDlg(null)}>关闭</Button>
-              <Button onClick={saveKey} disabled={!keyVal.trim()}>保存并追加</Button>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-muted shrink-0">标签</span>
+                <Input
+                  className="!py-1 !w-28 text-xs"
+                  value={newKeyLabel}
+                  onChange={(e) => setNewKeyLabel(e.target.value)}
+                  placeholder="如 prod-2"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="ghost" onClick={() => setKeyDlg(null)}>关闭</Button>
+                <Button onClick={saveKey} disabled={!keyVal.trim()}>保存并追加至池</Button>
+              </div>
             </div>
           </div>
         </div>

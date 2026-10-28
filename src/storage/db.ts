@@ -460,7 +460,14 @@ export async function upsertModel(env: any, model: ModelRouteRecord): Promise<vo
   const list = await getModels(env);
   const idx = list.findIndex((m) => m.id === model.id);
   if (idx >= 0) {
-    list[idx] = model;
+    const prev = list[idx];
+    list[idx] = {
+      ...prev,
+      ...model,
+      providerId: model.providerId || prev.providerId,
+      publicName: model.publicName || prev.publicName,
+      upstreamModel: model.upstreamModel || prev.upstreamModel,
+    };
   } else {
     list.push(model);
   }

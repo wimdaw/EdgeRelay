@@ -20,9 +20,21 @@ export default function Models({ me }: { me: Me }) {
   }, [isAdmin]);
 
   const save = async () => {
+    if (!form.publicName.trim()) return toast("请填写对外统一模型名", "err");
+    if (!form.providerId) return toast("请选择所属供应商渠道", "err");
+    if (!form.upstream.trim()) return toast("请填写上游真实模型名", "err");
     try {
-      await adminAction("upsert_model", { publicName: form.publicName, providerId: form.providerId, upstreamModel: form.upstream, priority: +form.priority || 10, costWeight: +form.cost || 1 });
-      toast("映射已保存"); setDlg(false); load();
+      await adminAction("upsert_model", {
+        publicName: form.publicName.trim(),
+        providerId: form.providerId,
+        upstreamModel: form.upstream.trim(),
+        priority: +form.priority || 10,
+        costWeight: +form.cost || 1,
+      });
+      toast("模型映射已保存并上架");
+      setDlg(false);
+      setForm({ publicName: "", providerId: "", upstream: "", priority: "10", cost: "1" });
+      load();
     } catch (e) { toast((e as Error).message, "err"); }
   };
   const savePrice = async (name: string) => {
@@ -34,7 +46,7 @@ export default function Models({ me }: { me: Me }) {
   };
   const toggle = async (m: ModelRow) => {
     try {
-      await adminAction("upsert_model", { id: m.id, publicName: m.public_name, providerId: "", upstreamModel: m.upstream_model, priority: m.priority, costWeight: m.cost_weight, enabled: !m.enabled });
+      await adminAction("upsert_model", { id: m.id, publicName: m.public_name, upstreamModel: m.upstream_model, priority: m.priority, costWeight: m.cost_weight, enabled: !m.enabled });
       toast("已更新状态"); load();
     } catch (e) { toast((e as Error).message, "err"); }
   };
@@ -83,19 +95,48 @@ export default function Models({ me }: { me: Me }) {
         {rows === null ? <div className="flex flex-col gap-2">{[...Array(5)].map((_, i) => <div key={i} className="skeleton h-9" />)}</div> : <DataTable cols={cols} rows={rows} />}
       </Card>
 
-      <Dialog open={dlg} onClose={() => setDlg(false)} title="新增模型映射">
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="对外统一模型名"><Input value={form.publicName} onChange={(e) => setForm({ ...form, publicName: e.target.value })} placeholder="gpt-4o" /></Field>
-          <Field label="供应商">
-            <Select value={form.providerId} onChange={(e) => setForm({ ...form, providerId: e.target.value })}>
-              <option value="">请选择供应商</option>
-              {providers.map((p) => <option key={p.id} value={p.id}>{p.name}（{p.slug}）</option>)}
-            </Select>
-          </Field>
-          <Field label="上游真实模型名"><Input value={form.upstream} onChange={(e) => setForm({ ...form, upstream: e.target.value })} placeholder="gpt-4o" /></Field>
-          <Field label="优先级"><Input type="number" value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} /></Field>
+      <Dialog open={dlg} onClose={() => setDlg(false)} title="新增模型映射" width={520}>
+        <div className="space-y-3">
+          <p className="text-xs text-muted">
+            为上游供应商关联对外模型名。多个供应商可配置相同的对外模型名，网关将按优先级自动故障转移与容灾。
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="所属供应商">
+              <Select value={form.providerId} onChange={(e) => setForm({ ...form, providerId: e.target.value })}>
+                <option value="">请选择供应商</option>
+                {providers.map((p) => <option key={p.id} value={p.id}>{p.name}（{p.slug}）</option>)}
+              </Select>
+            </Field>
+            <Field label="优先级（数字越小越优先）">
+              <Input type="number" value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} placeholder="10" />
+            </Field>
+            <Field label="上游真实模型名">
+              <Input
+                value={form.upstream}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setForm({
+                    ...form,
+                    upstream: val,
+                    publicName: form.publicName ? form.publicName : val,
+                  });
+                }}
+                placeholder="例如: deepseek-chat 或 gpt-4o"
+              />
+            </Field>
+            <Field label="对外统一模型名">
+              <Input
+                value={form.publicName}
+                onChange={(e) => setForm({ ...form, publicName: e.target.value })}
+                placeholder="例如: deepseek-chat"
+              />
+            </Field>
+          </div>
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setDlg(false)}>取消</Button>
+            <Button onClick={save}>保存并上架</Button>
+          </div>
         </div>
-        <div className="mt-5 flex justify-end gap-2"><Button variant="ghost" onClick={() => setDlg(false)}>取消</Button><Button onClick={save}>保存</Button></div>
       </Dialog>
       {confirmEl}
     </div>

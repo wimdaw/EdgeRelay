@@ -194,18 +194,21 @@ adminRouter.post("/actions", async (c) => {
         });
 
         if (p.key) {
-          const plaintext = String(p.key);
-          const encryptedKey = await encryptSecret(env, plaintext);
-          const keyFingerprint = (await sha256Hex(plaintext)).slice(0, 16);
-          await upsertProviderKey(env, {
-            id: uuid(),
-            providerId: id,
-            label: "default",
-            encryptedKey,
-            keyFingerprint,
-            status: "active",
-            createdAt: now,
-          });
+          const rawKeys = String(p.key).split(/[\r\n,]+/).map((s) => s.trim()).filter(Boolean);
+          for (let i = 0; i < rawKeys.length; i++) {
+            const plaintext = rawKeys[i];
+            const encryptedKey = await encryptSecret(env, plaintext);
+            const keyFingerprint = (await sha256Hex(plaintext)).slice(0, 16);
+            await upsertProviderKey(env, {
+              id: uuid(),
+              providerId: id,
+              label: rawKeys.length > 1 ? `key-${i + 1}` : "default",
+              encryptedKey,
+              keyFingerprint,
+              status: "active",
+              createdAt: now,
+            });
+          }
         }
         return done({ id }, "provider", id);
       }
@@ -225,21 +228,31 @@ adminRouter.post("/actions", async (c) => {
         return done(null, "provider_key", String(p.keyId));
       }
       case "upsert_provider_key": {
-        if (!p.providerId || !p.key) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 providerId 或 key");
-        const plaintext = String(p.key);
-        const encryptedKey = await encryptSecret(env, plaintext);
-        const keyFingerprint = (await sha256Hex(plaintext)).slice(0, 16);
-        const id = (p.id as string) || uuid();
-        await upsertProviderKey(env, {
-          id,
-          providerId: String(p.providerId),
-          label: String(p.label ?? "default"),
-          encryptedKey,
-          keyFingerprint,
-          status: (p.status as "active" | "disabled") ?? "active",
-          createdAt: now,
-        });
-        return done({ id, fingerprint: keyFingerprint }, "provider_key", id);
+        if (!p.providerId || (!p.key && !p.keys)) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 providerId 或 key");
+        const rawKeys = Array.isArray(p.keys)
+          ? p.keys.map(String)
+          : String(p.key).split(/[\r\n,]+/).map((s) => s.trim()).filter(Boolean);
+        if (!rawKeys.length) throw new ApiError(400, ErrorCode.BAD_REQUEST, "请提供有效的 API Key");
+
+        const added: { id: string; fingerprint: string }[] = [];
+        for (let i = 0; i < rawKeys.length; i++) {
+          const plaintext = rawKeys[i];
+          const encryptedKey = await encryptSecret(env, plaintext);
+          const keyFingerprint = (await sha256Hex(plaintext)).slice(0, 16);
+          const id = rawKeys.length === 1 && p.id ? String(p.id) : uuid();
+          const label = rawKeys.length > 1 && !p.label ? `key-${i + 1}` : String(p.label ?? "prod");
+          await upsertProviderKey(env, {
+            id,
+            providerId: String(p.providerId),
+            label,
+            encryptedKey,
+            keyFingerprint,
+            status: (p.status as "active" | "disabled") ?? "active",
+            createdAt: now,
+          });
+          added.push({ id, fingerprint: keyFingerprint });
+        }
+        return done({ added, count: added.length, fingerprint: added[0]?.fingerprint }, "provider_key", String(p.providerId));
       }
 
       /* ---- 模型管理 ---- */
@@ -370,18 +383,75 @@ adminRouter.post("/actions", async (c) => {
       }
       case "upsert_model": {
         const id = (p.id as string) || uuid();
+        const publicName = String(p.publicName);
         await upsertModel(env, {
           id,
-          publicName: String(p.publicName),
+          publicName,
           providerId: String(p.providerId),
           upstreamModel: String(p.upstreamModel),
-          priority: Number(p.priority ?? 100),
+          priority: Number(p.priority ?? 10),
           costWeight: Number(p.costWeight ?? 1),
           maxContext: (p.maxContext as number) ?? null,
           enabled: p.enabled === false ? 0 : 1,
           createdAt: now,
         });
+        const pricing = await getAllPricing(env);
+        if (!pricing[publicName]) {
+          await setPricing(env, {
+            id: `pr_${uuid().slice(0, 8)}`,
+            publicName,
+            inputPerMillion: 0,
+            outputPerMillion: 0,
+            currency: "CNY",
+            createdAt: now,
+          });
+        }
         return done({ id }, "model", id);
+      }
+      case "import_models": {
+        const providerId = String(p.providerId || "");
+        const rawModels = Array.isArray(p.models)
+          ? p.models.map(String)
+          : typeof p.models === "string"
+          ? p.models.split(/[\r\n,]+/).map((s) => s.trim()).filter(Boolean)
+          : [];
+        if (!providerId || !rawModels.length) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 providerId 或 models 列表");
+        const priority = Number(p.priority ?? 10);
+        const costWeight = Number(p.costWeight ?? 1);
+        const existingModels = await getModels(env);
+        let imported = 0;
+        for (const mName of rawModels) {
+          const trimmed = mName.trim();
+          if (!trimmed) continue;
+          const existing = existingModels.find((em) => em.providerId === providerId && em.upstreamModel === trimmed);
+          if (!existing) {
+            const id = `m_${uuid().slice(0, 8)}`;
+            await upsertModel(env, {
+              id,
+              publicName: trimmed,
+              providerId,
+              upstreamModel: trimmed,
+              priority,
+              costWeight,
+              maxContext: null,
+              enabled: 1,
+              createdAt: now,
+            });
+            const pricing = await getAllPricing(env);
+            if (!pricing[trimmed]) {
+              await setPricing(env, {
+                id: `pr_${uuid().slice(0, 8)}`,
+                publicName: trimmed,
+                inputPerMillion: 0,
+                outputPerMillion: 0,
+                currency: "CNY",
+                createdAt: now,
+              });
+            }
+            imported++;
+          }
+        }
+        return done({ imported, total: rawModels.length }, "models", providerId);
       }
       case "delete_model": {
         if (!p.id) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少模型 id");
