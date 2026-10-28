@@ -96,6 +96,14 @@ export default function Landing({ site, me }: { site: SiteInfo | null; me: Me | 
 
   const navLinks = [["功能", "#features"], ["模型", "#pricing"], ["定价", "#pricing"], ["文档", "#dev"], ["合规", "#compliance"]] as const;
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const el = document.querySelector(href);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   const codeSamples = {
     curl: CURL,
     node: `import OpenAI from "openai";
@@ -133,7 +141,7 @@ res = client.chat.completions.create(
           </Link>
           <nav className="hidden flex-1 items-center gap-1 md:flex">
             {navLinks.map(([label, href]) => (
-              <a key={label} href={href} className="rounded-lg px-3 py-2 text-[13px] text-muted transition-colors hover:bg-surface2 hover:text-ink">{label}</a>
+              <a key={label} href={href} onClick={(e) => handleNavClick(e, href)} className="rounded-lg px-3 py-2 text-[13px] text-muted transition-colors hover:bg-surface2 hover:text-ink">{label}</a>
             ))}
           </nav>
           <div className="ml-auto hidden items-center gap-2 md:flex">
@@ -152,7 +160,7 @@ res = client.chat.completions.create(
         {menu && (
           <div className="border-t border-line bg-surface px-4 py-3 md:hidden">
             {navLinks.map(([label, href]) => (
-              <a key={label} href={href} onClick={() => setMenu(false)} className="block rounded-lg px-3 py-2.5 text-sm text-ink hover:bg-surface2">{label}</a>
+              <a key={label} href={href} onClick={(e) => { setMenu(false); handleNavClick(e, href); }} className="block rounded-lg px-3 py-2.5 text-sm text-ink hover:bg-surface2">{label}</a>
             ))}
             <div className="mt-2 flex items-center gap-2 border-t border-line pt-3">
               <ThemeToggle />
