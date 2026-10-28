@@ -16,8 +16,10 @@ export default function Models({ me }: { me: Me }) {
     cost: "1",
     inputPerMillion: "0",
     outputPerMillion: "0",
+    password: "",
   });
   const [editDlg, setEditDlg] = useState<ModelRow | null>(null);
+  const [editPassword, setEditPassword] = useState("");
   const [editForm, setEditForm] = useState({
     id: "",
     publicName: "",
@@ -43,6 +45,7 @@ export default function Models({ me }: { me: Me }) {
     if (!form.publicName.trim()) return toast("请填写对外统一模型名", "err");
     if (!form.providerId) return toast("请选择所属供应商渠道", "err");
     if (!form.upstream.trim()) return toast("请填写上游真实模型名", "err");
+    if (!form.password.trim()) return toast("请输入管理员密码确认操作", "err");
     const inPrice = parseFloat(form.inputPerMillion);
     const outPrice = parseFloat(form.outputPerMillion);
     if (isNaN(inPrice) || isNaN(outPrice) || inPrice < 0 || outPrice < 0) {
@@ -57,16 +60,18 @@ export default function Models({ me }: { me: Me }) {
         costWeight: +form.cost || 1,
         inputPerMillion: inPrice,
         outputPerMillion: outPrice,
+        password: form.password.trim(),
       });
       toast("模型映射已保存并上架");
       setDlg(false);
-      setForm({ publicName: "", providerId: "", upstream: "", priority: "10", cost: "1", inputPerMillion: "0", outputPerMillion: "0" });
+      setForm({ publicName: "", providerId: "", upstream: "", priority: "10", cost: "1", inputPerMillion: "0", outputPerMillion: "0", password: "" });
       load();
     } catch (e) { toast((e as Error).message, "err"); }
   };
 
   const openEdit = (m: ModelRow) => {
     setEditDlg(m);
+    setEditPassword("");
     setEditForm({
       id: m.id,
       publicName: m.public_name,
@@ -85,6 +90,7 @@ export default function Models({ me }: { me: Me }) {
     if (!editForm.publicName.trim()) return toast("请填写对外统一模型名", "err");
     if (!editForm.providerId) return toast("请选择所属供应商渠道", "err");
     if (!editForm.upstreamModel.trim()) return toast("请填写上游真实模型名", "err");
+    if (!editPassword.trim()) return toast("请输入管理员密码确认修改", "err");
     const inPrice = parseFloat(editForm.inputPerMillion);
     const outPrice = parseFloat(editForm.outputPerMillion);
     if (isNaN(inPrice) || isNaN(outPrice) || inPrice < 0 || outPrice < 0) {
@@ -102,27 +108,27 @@ export default function Models({ me }: { me: Me }) {
         inputPerMillion: inPrice,
         outputPerMillion: outPrice,
         enabled: editForm.enabled,
+        password: editPassword.trim(),
       });
-      toast(`「${editForm.publicName}」模型映射与定价已保存`);
+      toast(`「${editForm.publicName}」模型映射与定价已更新`);
       setEditDlg(null);
+      setEditPassword("");
       load();
     } catch (e) {
       toast((e as Error).message, "err");
     }
   };
 
-  const toggle = async (m: ModelRow) => {
-    try {
-      await adminAction("upsert_model", { id: m.id, publicName: m.public_name, upstreamModel: m.upstream_model, priority: m.priority, costWeight: m.cost_weight, enabled: !m.enabled });
-      toast("已更新状态"); load();
-    } catch (e) { toast((e as Error).message, "err"); }
-  };
   const remove = async (m: ModelRow) => {
     if (!(await confirm(`删除模型映射「${m.public_name} → ${m.upstream_model}」？`))) return;
     try { await adminAction("delete_model", { id: m.id }); toast("已删除"); load(); } catch (e) { toast((e as Error).message, "err"); }
   };
 
-  const adminCols: Col<ModelRow>[] = [
+  const cols: Col<ModelRow>[] = [
+    { key: "public", label: "对外模型名", sortVal: (r) => r.public_name, render: (r) => <span className="font-medium text-ink">{r.public_name}</span> },
+    { key: "upstream", label: "上游真实模型", render: (r) => <code className="text-xs font-mono">{r.upstream_model}</code> },
+    { key: "provider", label: "供应商渠道", render: (r) => r.provider_name ?? "—" },
+    { key: "priority", label: "优先级", sortVal: (r) => r.priority, render: (r) => <span className="text-xs">{r.priority}（小=优先）</span> },
     {
       key: "in",
       label: "输入价 / 1M",
@@ -143,30 +149,21 @@ export default function Models({ me }: { me: Me }) {
         </span>
       ),
     },
-    { key: "status", label: "状态", render: (r) => <button onClick={() => toggle(r)} title="点击切换启用/停用"><StatusTag value={r.enabled ? "active" : "pending"} /></button> },
     {
+      key: "status",
+      label: "状态",
+      render: (r) => <StatusTag value={r.enabled ? "active" : "pending"} />,
+    },
+    ...(isAdmin ? [{
       key: "ops",
       label: "操作",
-      render: (r) => (
+      render: (r: ModelRow) => (
         <span className="flex items-center gap-1.5 shrink-0">
           <Button variant="soft" className="!h-7 !px-2.5 text-xs" onClick={() => openEdit(r)}>编辑</Button>
           <Button variant="ghost" className="!h-7 !px-2 text-xs !text-err" onClick={() => remove(r)}>删除</Button>
         </span>
       ),
-    },
-  ];
-  const userCols: Col<ModelRow>[] = [
-    { key: "in", label: "输入价 / 1M", render: (r) => r.input_per_million != null ? `¥${Number(r.input_per_million).toFixed(2)}` : "未定价" },
-    { key: "out", label: "输出价 / 1M", render: (r) => r.output_per_million != null ? `¥${Number(r.output_per_million).toFixed(2)}` : "未定价" },
-    { key: "status", label: "状态", render: (r) => <StatusTag value={r.enabled ? "active" : "pending"} /> },
-  ];
-
-  const cols: Col<ModelRow>[] = [
-    { key: "public", label: "对外模型名", sortVal: (r) => r.public_name, render: (r) => <span className="font-medium">{r.public_name}</span> },
-    { key: "upstream", label: "上游真实模型", render: (r) => <code className="text-xs font-mono">{r.upstream_model}</code> },
-    { key: "provider", label: "供应商", render: (r) => r.provider_name ?? "—" },
-    { key: "priority", label: "优先级", sortVal: (r) => r.priority, render: (r) => <span className="text-xs">{r.priority}（小=优先）</span> },
-    ...(isAdmin ? adminCols : userCols),
+    }] : []),
   ];
 
   return (
@@ -235,6 +232,17 @@ export default function Models({ me }: { me: Me }) {
                 placeholder="0"
               />
             </Field>
+            <div className="col-span-1 sm:col-span-2">
+              <Field label="管理员密码确认" hint="创建新模型映射需核验管理员密码确认身份">
+                <Input
+                  type="password"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="请输入当前管理员密码"
+                  autoComplete="current-password"
+                />
+              </Field>
+            </div>
           </div>
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-line">
             <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setDlg(false)}>取消</Button>
@@ -299,6 +307,17 @@ export default function Models({ me }: { me: Me }) {
                 placeholder="0"
               />
             </Field>
+            <div className="col-span-1 sm:col-span-2">
+              <Field label="管理员密码确认" hint="修改模型映射与定价属核心敏感操作，需验证管理员密码确认身份">
+                <Input
+                  type="password"
+                  value={editPassword}
+                  onChange={(e) => setEditPassword(e.target.value)}
+                  placeholder="请输入当前管理员密码"
+                  autoComplete="current-password"
+                />
+              </Field>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 pt-1">

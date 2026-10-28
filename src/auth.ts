@@ -8,7 +8,7 @@ import type { HandlerCtx, AuthedKey, RateLimits } from "./types";
 import { ApiError, ErrorCode } from "./errors";
 import { hmacHex, sha256Hex, timingSafeEqualHex } from "./crypto";
 import { getSettings } from "./settings";
-import { getSession, getUserById, getApiKeyByHash, updateApiKey } from "./storage/db";
+import { getSession, getUserById, getApiKeyByHash, updateApiKey, updateUser } from "./storage/db";
 
 export type SessionUser = {
   id: string;
@@ -73,8 +73,8 @@ export function requireRole(u: SessionUser, roles: SessionUser["role"][]): void 
   if (!roles.includes(u.role)) throw new ApiError(403, ErrorCode.FORBIDDEN, "权限不足");
 }
 
-/** 管理接口二次验证：需要已登录且通过 step-up（/api/auth/stepup，10 分钟内有效） */
-export async function requireAdminStepUp(c: HandlerCtx): Promise<SessionUser> {
+/** 管理接口二次验证：需要已登录且通过 step-up（支持就地核验管理员密码，或 10 分钟凭证有效） */
+export async function requireAdminStepUp(c: HandlerCtx, providedPassword?: string): Promise<SessionUser> {
   const u = await requireUser(c);
   requireRole(u, ["admin"]);
   const settings = await getSettings(c.env);
@@ -82,8 +82,22 @@ export async function requireAdminStepUp(c: HandlerCtx): Promise<SessionUser> {
 
   const now = Math.floor(Date.now() / 1000);
   const user = await getUserById(c.env, u.id);
-  if (!user?.stepUpUntil || user.stepUpUntil < now) {
-    throw new ApiError(403, ErrorCode.STEP_UP_REQUIRED, "管理操作需要二次验证", {
+  if (!user) throw new ApiError(401, ErrorCode.AUTH_REQUIRED, "用户不存在");
+
+  // 若前端操作携带了管理员密码，优先校验密码以实现即时二次验证
+  if (providedPassword) {
+    const { verifyPassword } = await import("./crypto");
+    const ok = await verifyPassword(providedPassword, user.passwordHash);
+    if (!ok) {
+      throw new ApiError(401, ErrorCode.AUTH_INVALID, "管理员密码错误，验证失败");
+    }
+    const until = now + 600;
+    await updateUser(c.env, u.id, { stepUpUntil: until });
+    return u;
+  }
+
+  if (!user.stepUpUntil || user.stepUpUntil < now) {
+    throw new ApiError(403, ErrorCode.STEP_UP_REQUIRED, "管理操作需要验证管理员密码", {
       stepUpUrl: "/api/auth/stepup",
     });
   }

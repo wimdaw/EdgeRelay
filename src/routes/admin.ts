@@ -70,7 +70,7 @@ adminRouter.post("/actions", async (c) => {
     if (READ_ACTIONS.has(action)) {
       requireRole(user, ["admin", "auditor"]);
     } else {
-      admin = await requireAdminStepUp(hCtx);
+      admin = await requireAdminStepUp(hCtx, typeof p.password === "string" ? p.password : undefined);
     }
 
     const done = async (result: unknown, targetType?: string, targetId?: string) => {
