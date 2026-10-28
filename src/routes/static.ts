@@ -70,6 +70,7 @@ async function renderSpaHtml(env: Env): Promise<string> {
 
   // 放在 head 末尾，避免把 charset 推到 1024 字节之后；
   // 内联经典脚本会在 defer 的 module 脚本之前执行。
+  html = html.replace(/<script>window\.__EDGERELAY_SITE__=[\s\S]*?<\/script>\n?/g, "");
   html = html.replace(/<\/head>/i, `<script>window.__EDGERELAY_SITE__=${initialJson};</script>\n</head>`);
 
   return html;

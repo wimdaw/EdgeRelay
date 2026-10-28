@@ -89,7 +89,7 @@ export default function Landing({ site, me }: { site: SiteInfo | null; me: Me | 
   const [faq, setFaq] = useState<number | null>(0);
   const [lang, setLang] = useState<"curl" | "node" | "python">("curl");
   const scrolled = useScrolled();
-  const name = site?.siteName ?? "EdgeRelay";
+  const name = site?.siteName ?? "AI API 网关";
   const logo = site?.siteLogoUrl ?? "/logo.png";
   const origin = typeof window !== "undefined" ? window.location.origin : "https://api.yourdomain.com";
 
@@ -311,8 +311,8 @@ res = client.chat.completions.create(
                 </li>
               ))}
             </ul>
-            <a href="https://api.obitw.cn/terms.html" target="_blank" rel="noreferrer" className="mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-brand hover:underline">
-              查看完整文档<FileText size={14} />
+            <a href="https://github.com/wimdaw/EdgeRelay" target="_blank" rel="noreferrer" className="mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-brand hover:underline">
+              查看项目文档<FileText size={14} />
             </a>
           </div>
           <div className="min-w-0">
@@ -332,7 +332,7 @@ res = client.chat.completions.create(
       <section id="compliance" className="scroll-mt-20 border-y border-line bg-surface py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <h2 className="text-center text-3xl font-bold tracking-tight">合规与安全，从第一天开始</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-muted">EdgeRelay 是正规的 API 聚合与分发平台——不涉及号池、账号拆分、凭证盗用等任何灰产行为。</p>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-muted">{name} 是正规的 API 聚合与分发平台——不涉及号池、账号拆分、凭证盗用等任何灰产行为。</p>
           <div className="mt-10 grid gap-4 md:grid-cols-3">
             {[
               { icon: Server, title: "合法授权上游", desc: "仅接入持有合法代理、分销或再许可授权的供应商，授权协议编号登记入档并可追溯。" },
@@ -356,10 +356,10 @@ res = client.chat.completions.create(
           {FAQS.map((f, i) => (
             <div key={i} className="overflow-hidden rounded-xl2 border border-line bg-surface shadow-card">
               <button className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm font-medium" onClick={() => setFaq(faq === i ? null : i)} aria-expanded={faq === i}>
-                {f.q}
+                {f.q.replace(/EdgeRelay/g, name)}
                 <ChevronDown size={16} className={cn("shrink-0 text-muted transition-transform", faq === i && "rotate-180")} />
               </button>
-              {faq === i && <p className="border-t border-line px-5 py-4 text-[13px] leading-relaxed text-muted">{f.a}</p>}
+              {faq === i && <p className="border-t border-line px-5 py-4 text-[13px] leading-relaxed text-muted">{f.a.replace(/EdgeRelay/g, name)}</p>}
             </div>
           ))}
         </div>
