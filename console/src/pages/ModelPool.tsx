@@ -118,17 +118,21 @@ export default function ModelPool({ me: _me }: { me: Me }) {
             </p>
           </div>
 
-          {/* API Base 地址快速复制 */}
-          <div className="flex shrink-0 items-center gap-2 rounded-xl border border-line bg-surface2/60 px-3 py-2 text-xs">
-            <span className="text-[11px] font-semibold text-muted shrink-0">API BASE</span>
-            <code className="font-mono text-ink truncate max-w-[180px] sm:max-w-[240px]">{apiBase}</code>
+          {/* API Base 地址快速复制：移动端与桌面端均强制单行，绝不竖排折行 */}
+          <div className="flex w-full md:w-auto items-center flex-nowrap gap-2 rounded-xl border border-line bg-surface2/60 px-2.5 py-1.5 text-xs min-w-0 shrink-0">
+            <span className="shrink-0 rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand font-mono">
+              API BASE
+            </span>
+            <code className="flex-1 min-w-0 font-mono text-xs text-ink truncate whitespace-nowrap max-w-[200px] sm:max-w-[280px]">
+              {apiBase}
+            </code>
             <button
               type="button"
               onClick={() => copyText(apiBase, "API Base")}
-              className="ml-auto flex items-center gap-1 rounded-md bg-brand/10 px-2 py-1 text-[11px] font-medium text-brand hover:bg-brand/20 transition-colors"
+              className="shrink-0 flex items-center gap-1 rounded-md bg-brand/10 hover:bg-brand/20 text-brand px-2 py-1 text-[11px] font-medium transition-colors whitespace-nowrap"
               title="复制 API 根地址"
             >
-              {copiedKey === apiBase ? <Check size={12} /> : <Copy size={12} />}
+              {copiedKey === apiBase ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
               <span>{copiedKey === apiBase ? "已复制" : "复制"}</span>
             </button>
           </div>
@@ -225,18 +229,18 @@ export default function ModelPool({ me: _me }: { me: Me }) {
                           type="button"
                           onClick={() => copyText(fullModelId, "模型 ID")}
                           className={cn(
-                            "group inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface2/60 px-2.5 py-1.5 text-xs font-mono transition-all hover:border-brand/40 hover:bg-brand/5 hover:text-brand",
+                            "group inline-flex items-center flex-nowrap shrink-0 max-w-full gap-1.5 rounded-lg border border-line bg-surface2/60 px-2.5 py-1.5 text-xs font-mono transition-all hover:border-brand/40 hover:bg-brand/5 hover:text-brand",
                             isCopied && "!border-emerald-500/80 !bg-emerald-500/10 !text-emerald-500 font-semibold"
                           )}
                           title="点击复制模型 ID (提供商ID/模型ID)"
                         >
-                          <code className="text-xs font-mono font-medium truncate max-w-[210px] sm:max-w-none">{fullModelId}</code>
+                          <code className="text-xs font-mono font-medium truncate max-w-[190px] sm:max-w-none whitespace-nowrap">{fullModelId}</code>
                           {isCopied ? (
                             <Check size={12} className="text-emerald-500 shrink-0" />
                           ) : (
                             <Copy size={12} className="text-muted/60 group-hover:text-brand shrink-0 transition-colors" />
                           )}
-                          {isCopied && <span className="text-[10px] font-sans font-medium text-emerald-500">已复制</span>}
+                          {isCopied && <span className="text-[10px] font-sans font-medium text-emerald-500 shrink-0 whitespace-nowrap">已复制</span>}
                         </button>
                       );
                     })}
