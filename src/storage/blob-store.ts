@@ -1,6 +1,7 @@
 /**
  * EdgeOne Blob 底层驱动与兼容层
  */
+import { getStore as edgeoneGetStore } from "@edgeone/pages-blob";
 
 export interface BlobStore {
   get(key: string, options?: { type?: 'text' | 'json' | 'stream'; consistency?: 'strong' | 'eventual' }): Promise<any>;
@@ -26,7 +27,7 @@ export interface KVLike {
 
 let cachedBlobStore: BlobStore | null = null;
 
-/** 内存兜底 Store（单测/本地非 EdgeOne 环境） */
+/** 内存兜底 Store（当不在 EdgeOne 运行环境且无凭据时使用） */
 function createMemoryStore(): BlobStore {
   const map = new Map<string, any>();
   return {
@@ -68,40 +69,25 @@ export function getBlobStore(env?: any): BlobStore {
   const storeName = env?.BLOB_STORE_NAME || 'edgerelay-db';
 
   try {
-    // 动态引入或从全局查找 @edgeone/pages-blob
-    // @ts-ignore
-    const blobPkg = (globalThis as any)._edgeone_blob || (typeof require !== 'undefined' ? require('@edgeone/pages-blob') : null);
-    if (blobPkg && typeof blobPkg.getStore === 'function') {
-      cachedBlobStore = blobPkg.getStore({
+    if (typeof edgeoneGetStore === 'function') {
+      const token =
+        env?.EDGEONE_TOKEN_NEW ||
+        env?.EDGEONE_TOKEN ||
+        (typeof process !== 'undefined' ? (process.env.EDGEONE_TOKEN_NEW || process.env.EDGEONE_TOKEN) : undefined);
+      
+      cachedBlobStore = edgeoneGetStore({
         name: storeName,
         consistency: 'strong',
+        ...(token ? { token } : {}),
       });
       return cachedBlobStore!;
     }
   } catch (err: any) {
-    // ignore
+    // 兼容本地测试单测不中断
+    cachedBlobStore = createMemoryStore();
+    return cachedBlobStore;
   }
 
-  // 尝试检查环境变量中的 EdgeOne Token
-  const token = env?.EDGEONE_TOKEN_NEW || env?.EDGEONE_TOKEN || (typeof process !== 'undefined' ? (process.env.EDGEONE_TOKEN_NEW || process.env.EDGEONE_TOKEN) : undefined);
-  if (token) {
-    try {
-      // @ts-ignore
-      const blobPkg = typeof require !== 'undefined' ? require('@edgeone/pages-blob') : null;
-      if (blobPkg && typeof blobPkg.getStore === 'function') {
-        cachedBlobStore = blobPkg.getStore({
-          name: storeName,
-          token,
-          consistency: 'strong',
-        });
-        return cachedBlobStore!;
-      }
-    } catch {
-      // fallback
-    }
-  }
-
-  // 环境兜底
   cachedBlobStore = createMemoryStore();
   return cachedBlobStore;
 }
