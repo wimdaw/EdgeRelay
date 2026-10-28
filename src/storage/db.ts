@@ -211,7 +211,114 @@ export async function updateApiKey(env: any, keyHash: string, updates: Partial<A
 // 5. 供应商与密钥 (Providers & Keys)
 // ==========================================
 
+let freeChannelsSeeded = false;
+
+export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
+  if (freeChannelsSeeded) return;
+  const store = getBlobStore(env);
+  const now = Math.floor(Date.now() / 1000);
+
+  try {
+    let providers = (await store.get("providers:all", { type: "json", consistency: "strong" })) || [];
+    let pChanged = false;
+    if (!providers.some((p: any) => p.id === "p_opencode" || p.slug === "opencode")) {
+      providers.push({
+        id: "p_opencode",
+        name: "OpenCode",
+        slug: "opencode",
+        kind: "opencode",
+        baseUrl: "https://opencode.ai/zen/v1",
+        authScheme: "none",
+        status: "active",
+        authorizationRef: "AUTH-OPENCODE-FREE-2026",
+        createdAt: now,
+      });
+      pChanged = true;
+    }
+    if (!providers.some((p: any) => p.id === "p_duckai" || p.slug === "duckai")) {
+      providers.push({
+        id: "p_duckai",
+        name: "Duck.ai",
+        slug: "duckai",
+        kind: "duckai",
+        baseUrl: "https://duck.ai",
+        authScheme: "none",
+        status: "active",
+        authorizationRef: "AUTH-DUCKAI-FREE-2026",
+        createdAt: now,
+      });
+      pChanged = true;
+    }
+    if (pChanged) {
+      await store.setJSON("providers:all", providers);
+      cachedProviders = { val: providers, at: Date.now() };
+    }
+
+    let models = (await store.get("models:all", { type: "json", consistency: "strong" })) || [];
+    const existingNames = new Set(models.map((m: any) => m.publicName));
+    const newModels: ModelRouteRecord[] = [
+      // OpenCode models
+      { id: "m_oc_mimo", publicName: "mimo-v2.6-flash", providerId: "p_opencode", upstreamModel: "mimo-v2.6-flash-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_mimo_f", publicName: "mimo-v2.6-flash-free", providerId: "p_opencode", upstreamModel: "mimo-v2.6-flash-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_ds41", publicName: "deepseek-v4.1-flash", providerId: "p_opencode", upstreamModel: "deepseek-v4.1-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_oc_ds41_f", publicName: "deepseek-v4.1-flash-free", providerId: "p_opencode", upstreamModel: "deepseek-v4.1-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_oc_flint", publicName: "flint-40b", providerId: "p_opencode", upstreamModel: "flint-40b-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_nemo_vl", publicName: "nemotron-3.5-super-vl", providerId: "p_opencode", upstreamModel: "nemotron-3.5-super-vl-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_nemo_lt", publicName: "nemotron-3.5-lightning", providerId: "p_opencode", upstreamModel: "nemotron-3.5-lightning-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_glm53", publicName: "glm-5.3-flash", providerId: "p_opencode", upstreamModel: "glm-5.3-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_oc_pickle", publicName: "big-pickle", providerId: "p_opencode", upstreamModel: "big-pickle", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_beam", publicName: "beam", providerId: "p_opencode", upstreamModel: "beam-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_oc_jev", publicName: "jev-1.13", providerId: "p_opencode", upstreamModel: "jev-1.13-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      // Duck.ai models
+      { id: "m_dk_luna", publicName: "gpt-6-luna", providerId: "p_duckai", upstreamModel: "gpt-6-luna", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
+      { id: "m_dk_mini", publicName: "gpt-5.4-mini", providerId: "p_duckai", upstreamModel: "gpt-5.4-mini", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
+      { id: "m_dk_haiku", publicName: "claude-haiku-4-5", providerId: "p_duckai", upstreamModel: "claude-haiku-4-5", priority: 10, costWeight: 1, maxContext: 200000, enabled: 1, createdAt: now },
+      { id: "m_dk_mistral", publicName: "mistral-small-2603", providerId: "p_duckai", upstreamModel: "mistral-small-2603", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_dk_oss120b", publicName: "tinfoil/gpt-oss-120b", providerId: "p_duckai", upstreamModel: "tinfoil/gpt-oss-120b", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_dk_gemma31b", publicName: "tinfoil/gemma4-31b", providerId: "p_duckai", upstreamModel: "tinfoil/gemma4-31b", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_dk_oss120b_s", publicName: "gpt-oss-120b", providerId: "p_duckai", upstreamModel: "tinfoil/gpt-oss-120b", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_dk_gemma31b_s", publicName: "gemma4-31b", providerId: "p_duckai", upstreamModel: "tinfoil/gemma4-31b", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+    ];
+    let mChanged = false;
+    for (const nm of newModels) {
+      if (!existingNames.has(nm.publicName)) {
+        models.push(nm);
+        mChanged = true;
+      }
+    }
+    if (mChanged) {
+      await store.setJSON("models:all", models);
+      cachedModels = { val: models, at: Date.now() };
+    }
+
+    let pricing = (await store.get("pricing:all", { type: "json", consistency: "strong" })) || {};
+    let prChanged = false;
+    for (const nm of newModels) {
+      if (!pricing[nm.publicName]) {
+        pricing[nm.publicName] = {
+          id: `pr_${nm.publicName.replace(/[^a-zA-Z0-9]/g, "_")}`,
+          publicName: nm.publicName,
+          inputPerMillion: 0,
+          outputPerMillion: 0,
+          currency: "CNY",
+          createdAt: now,
+        };
+        prChanged = true;
+      }
+    }
+    if (prChanged) {
+      await store.setJSON("pricing:all", pricing);
+      cachedPricing = { val: pricing, at: Date.now() };
+    }
+
+    freeChannelsSeeded = true;
+  } catch (err: any) {
+    console.error("[ensureFreeChannelsSeeded] error:", err?.message);
+  }
+}
+
 export async function getProviders(env: any): Promise<ProviderRecord[]> {
+  await ensureFreeChannelsSeeded(env);
   const now = Date.now();
   if (cachedProviders && now - cachedProviders.at < CACHE_TTL_MS) {
     return cachedProviders.val;
@@ -269,6 +376,7 @@ export async function upsertProviderKey(env: any, key: ProviderKeyRecord): Promi
 // ==========================================
 
 export async function getModels(env: any): Promise<ModelRouteRecord[]> {
+  await ensureFreeChannelsSeeded(env);
   const now = Date.now();
   if (cachedModels && now - cachedModels.at < CACHE_TTL_MS) {
     return cachedModels.val;
@@ -625,6 +733,28 @@ export async function seedInitialData(env: any): Promise<void> {
       authScheme: "bearer",
       status: "active",
       authorizationRef: "AUTH-DEEPSEEK-OFFICIAL-2026",
+      createdAt: now,
+    },
+    {
+      id: "p_opencode",
+      name: "OpenCode",
+      slug: "opencode",
+      kind: "opencode",
+      baseUrl: "https://opencode.ai/zen/v1",
+      authScheme: "none",
+      status: "active",
+      authorizationRef: "AUTH-OPENCODE-FREE-2026",
+      createdAt: now,
+    },
+    {
+      id: "p_duckai",
+      name: "Duck.ai",
+      slug: "duckai",
+      kind: "duckai",
+      baseUrl: "https://duck.ai",
+      authScheme: "none",
+      status: "active",
+      authorizationRef: "AUTH-DUCKAI-FREE-2026",
       createdAt: now,
     },
   ];

@@ -4,12 +4,14 @@ import { adminAction, type Provider } from "../lib/api";
 import { Button, Card, Dialog, EmptyState, Field, Input, Select, StatusTag, useConfirm, useToast } from "../components/ui";
 import { cn } from "../lib/utils";
 
-const SLUGS = ["openai", "anthropic", "google", "deepseek"];
+const SLUGS = ["openai", "anthropic", "google", "deepseek", "opencode", "duckai"];
 const SLUG_URL: Record<string, string> = {
   openai: "https://api.openai.com",
   anthropic: "https://api.anthropic.com",
   google: "https://generativelanguage.googleapis.com/v1beta/openai",
   deepseek: "https://api.deepseek.com",
+  opencode: "https://opencode.ai/zen/v1",
+  duckai: "https://duck.ai",
 };
 
 export default function Providers() {
@@ -33,7 +35,8 @@ export default function Providers() {
   /** 保存供应商；成功后自动拉取上游模型列表进入导入步骤 */
   const save = async () => {
     if (!form.name.trim()) return toast("请填写供应商名称", "err");
-    if (!form.id && !form.key.trim()) return toast("添加供应商必须录入上游密钥", "err");
+    const isKeyless = form.slug === "opencode" || form.slug === "duckai";
+    if (!form.id && !form.key.trim() && !isKeyless) return toast("添加供应商必须录入上游密钥", "err");
     setSaving(true);
     try {
       const payload: Record<string, unknown> = { name: form.name, slug: form.slug, baseUrl: form.url };
@@ -85,8 +88,8 @@ export default function Providers() {
 
   const fetchModels = async (providerId: string, providerName: string) => {
     const p = (rows ?? []).find((x) => x.id === providerId);
-    // 重试：优先用记住的密钥浏览器直拉；没有密钥则提示先录入
-    if (!keyMemo.current[providerId]) {
+    const isKeyless = p?.slug === "opencode" || p?.slug === "duckai";
+    if (!keyMemo.current[providerId] && !isKeyless) {
       setImportStep({ providerId, providerName, models: [], picked: new Set(), loading: false,
         error: "浏览器直拉需要密钥（服务端不保存明文）。请点供应商卡片的「录入密钥」重新输入一次，即可直连上游获取模型列表。" });
       return;
@@ -146,11 +149,14 @@ export default function Providers() {
               </div>
               <dl className="mt-4 space-y-1.5 text-xs text-muted">
                 <div className="flex min-w-0 justify-between gap-3"><span className="shrink-0">Base URL</span><code className="truncate text-ink" title={p.base_url}>{p.base_url}</code></div>
-                <div className="flex justify-between"><span>上游密钥</span><span className="text-ink">{p.key_count} 个{p.key_count === 0 && <span className="ml-1 text-warn">（未录入）</span>}</span></div>
+                <div className="flex justify-between"><span>上游密钥</span><span className="text-ink">{p.slug === 'opencode' || p.slug === 'duckai' ? <span className="text-emerald-500 font-medium">免 Key（公用/免费通道）</span> : <>{p.key_count} 个{p.key_count === 0 && <span className="ml-1 text-warn">（未录入）</span>}</>}</span></div>
                 {p.authorization_expires_at && <div className="flex justify-between"><span>授权到期</span><span className="text-ink">{new Date(p.authorization_expires_at * 1000).toLocaleDateString("zh-CN")}</span></div>}
               </dl>
               <div className="mt-4 flex gap-2">
-                <Button variant="soft" className="flex-1" onClick={() => { setKeyDlg(p); setKeyVal(""); }}>录入密钥</Button>
+                <Button variant="soft" className="flex-1" onClick={() => fetchModels(p.id, p.name)}><RefreshCw size={13} className="mr-1" />导入模型</Button>
+                {p.slug !== "opencode" && p.slug !== "duckai" && (
+                  <Button variant="soft" onClick={() => { setKeyDlg(p); setKeyVal(""); }}>录入密钥</Button>
+                )}
                 <Button variant="ghost" onClick={() => openEdit(p)}>编辑</Button>
                 <Button variant="ghost" className="!text-err" onClick={() => del(p)} aria-label={`删除 ${p.name}`}><Trash2 size={14} /></Button>
               </div>
@@ -165,8 +171,8 @@ export default function Providers() {
           <Field label="名称"><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="DeepSeek" /></Field>
           <Field label="Slug"><Select value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value, url: SLUG_URL[e.target.value] ?? form.url })}>{SLUGS.map((s) => <option key={s}>{s}</option>)}</Select></Field>
           <div className="col-span-2"><Field label="Base URL（OpenAI 兼容端点）"><Input value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://..." /></Field></div>
-          <Field label={form.id ? "上游密钥（留空保持不变）" : "上游密钥（必填）"}>
-            <Input type="password" value={form.key} onChange={(e) => setForm({ ...form, key: e.target.value })} placeholder="sk-..." />
+          <Field label={form.slug === 'opencode' || form.slug === 'duckai' ? "上游密钥（免 Key 渠道，可选）" : form.id ? "上游密钥（留空保持不变）" : "上游密钥（必填）"}>
+            <Input type="password" value={form.key} onChange={(e) => setForm({ ...form, key: e.target.value })} placeholder={form.slug === 'opencode' || form.slug === 'duckai' ? "无需填写密钥" : "sk-..."} />
           </Field>
         </div>
         

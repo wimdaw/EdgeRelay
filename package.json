@@ -16,7 +16,10 @@
   },
   "dependencies": {
     "@edgeone/pages-blob": "^0.0.17",
-    "hono": "^4.12.27"
+    "@wreq-js/binding-linux-x64-gnu": "^3.2.0",
+    "hono": "^4.12.27",
+    "parse5": "^7.3.0",
+    "wreq-js": "^3.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.0",

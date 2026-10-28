@@ -2,12 +2,20 @@
  * EdgeRelay (EdgeOne Pages + Blob) — 核心类型定义
  */
 
+export interface ApiKeyEntry {
+  key: string;
+  enabled: boolean;
+}
+
 export interface Env {
   // 环境变量与密钥
   ENCRYPTION_KEY: string;
   SESSION_SECRET: string;
   ADMIN_BOOTSTRAP_TOKEN?: string;
   CORS_ORIGINS?: string;
+  OPENCODE_RELAY_URL?: string;
+  OPENCODE_RELAY_TOKEN?: string;
+  OPENCODE_MIRRORS_URL?: string;
   MODERATION_API_URL?: string;
   BILLING_CURRENCY?: string;
   // EdgeOne 相关

@@ -26,10 +26,10 @@ export async function listRoutes(env: any, publicName: string): Promise<Upstream
 
     const keys = await getProviderKeys(env, p.id);
     const activeKeys = keys.filter((k) => k.status === "active");
-    if (!activeKeys.length) continue;
+    const isKeyless = p.kind === "opencode" || p.slug === "opencode" || p.kind === "duckai" || p.slug === "duckai" || p.authScheme === "none";
+    if (!activeKeys.length && !isKeyless) continue;
 
-    // 取第一个 active key（或轮询）
-    const pk = activeKeys[0]!;
+    const pk = activeKeys[0];
     let extraHeaders: Record<string, string> = {};
     if (p.extraHeaders) {
       try {
@@ -45,8 +45,8 @@ export async function listRoutes(env: any, publicName: string): Promise<Upstream
       baseUrl: p.baseUrl,
       authScheme: p.authScheme,
       extraHeaders,
-      providerKeyId: pk.id,
-      encryptedKey: pk.encryptedKey,
+      providerKeyId: pk ? pk.id : "keyless",
+      encryptedKey: pk ? pk.encryptedKey : "",
       upstreamModel: m.upstreamModel,
       priority: m.priority,
       costWeight: m.costWeight,

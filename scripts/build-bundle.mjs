@@ -26,7 +26,7 @@ await esbuild.build({
   format: "esm",
   platform: "node",
   target: "node20",
-  external: ["@edgeone/pages-blob"],
+  external: ["@edgeone/pages-blob", "wreq-js", "@wreq-js/binding-linux-x64-gnu"],
   outfile: join(outDir, "[[default]].js"),
   logLevel: "warning",
   sourcemap: false,

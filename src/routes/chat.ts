@@ -119,29 +119,58 @@ chatRouter.post("/", async (c) => {
     for (const route of routes.slice(0, 3)) {
       attempts++;
       try {
-        const { url } = resolveTarget(env, route);
-        const headers = await buildHeaders(env, route);
-        const upstreamBody: Record<string, unknown> = {
-          ...body,
-          model: route.upstreamModel,
-        };
-        if (stream) upstreamBody.stream_options = { include_usage: true };
+        const isOpencode = route.providerKind === "opencode" || route.providerSlug === "opencode";
+        const isDuckai = route.providerKind === "duckai" || route.providerSlug === "duckai";
 
         let resp: Response | null = null;
-        for (let sub = 0; sub < 3; sub++) {
-          if (sub > 0) {
-            const retryAfter = Number(resp?.headers.get("retry-after"));
-            const delay = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter * 1000, 8000) : 1500 * sub;
-            await new Promise((r) => setTimeout(r, delay));
-          }
-          resp = await fetch(url, {
+        if (isOpencode) {
+          const { proxyOpenCodeRequest, resolveOpenCodeUrls, resolveOpenCodeRelay } = await import("../opencode");
+          const mirrors = resolveOpenCodeUrls(env);
+          const relay = resolveOpenCodeRelay(env);
+          resp = await proxyOpenCodeRequest({
+            baseUrl: route.baseUrl || "https://opencode.ai/zen/v1",
+            apiKeys: [],
             method: "POST",
-            headers,
-            body: JSON.stringify(upstreamBody),
-            signal: AbortSignal.timeout(120_000),
+            subPath: "chat/completions",
+            body: JSON.stringify({
+              ...body,
+              model: route.upstreamModel,
+              stream,
+            }),
+            mirrorUrls: mirrors,
+            relay,
           });
-          if (resp.status === 429 && sub < 2) continue;
-          break;
+        } else if (isDuckai) {
+          const { handleDuckAiRequest } = await import("../duckai");
+          resp = await handleDuckAiRequest({
+            model: route.upstreamModel,
+            messages: body.messages,
+            stream,
+          });
+        } else {
+          const { url } = resolveTarget(env, route);
+          const headers = await buildHeaders(env, route);
+          const upstreamBody: Record<string, unknown> = {
+            ...body,
+            model: route.upstreamModel,
+          };
+          if (stream) upstreamBody.stream_options = { include_usage: true };
+
+          for (let sub = 0; sub < 3; sub++) {
+            if (sub > 0) {
+              const retryAfter = Number(resp?.headers.get("retry-after"));
+              const delay = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter * 1000, 8000) : 1500 * sub;
+              await new Promise((r) => setTimeout(r, delay));
+            }
+            resp = await fetch(url, {
+              method: "POST",
+              headers,
+              body: JSON.stringify(upstreamBody),
+              signal: AbortSignal.timeout(120_000),
+            });
+            if (resp.status === 429 && sub < 2) continue;
+            break;
+          }
         }
 
         if (!resp) throw new Error("no response from upstream");

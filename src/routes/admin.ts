@@ -59,6 +59,7 @@ adminRouter.post("/actions", async (c) => {
       "get_smtp",
       "get_oauth",
       "list_announcements",
+      "list_upstream_models",
     ]);
 
     const user = await requireUser(hCtx);
@@ -164,16 +165,17 @@ adminRouter.post("/actions", async (c) => {
       }
       case "upsert_provider": {
         const isNew = !p.id;
-        if (isNew && !p.key) throw new ApiError(400, ErrorCode.BAD_REQUEST, "添加供应商必须同时录入上游密钥");
+        const isKeyless = p.slug === "opencode" || p.slug === "duckai" || p.kind === "opencode" || p.kind === "duckai" || p.authScheme === "none";
+        if (isNew && !p.key && !isKeyless) throw new ApiError(400, ErrorCode.BAD_REQUEST, "添加供应商必须同时录入上游密钥");
         const id = (p.id as string) || uuid();
 
         await upsertProvider(env, {
           id,
           name: String(p.name),
           slug: String(p.slug),
-          kind: String(p.kind ?? "openai_compat"),
+          kind: String(p.kind ?? (isKeyless ? p.slug : "openai_compat")),
           baseUrl: String(p.baseUrl),
-          authScheme: String(p.authScheme ?? "bearer"),
+          authScheme: String(p.authScheme ?? (isKeyless ? "none" : "bearer")),
           extraHeaders: p.extraHeaders ? JSON.stringify(p.extraHeaders) : null,
           status: (p.status as "active" | "disabled") ?? "active",
           authorizationRef: (p.authorizationRef as string) ?? null,
@@ -221,6 +223,61 @@ adminRouter.post("/actions", async (c) => {
       }
 
       /* ---- 模型管理 ---- */
+      case "list_upstream_models": {
+        const providerId = String(p.providerId || "");
+        const providers = await getProviders(env);
+        const prov = providers.find((x) => x.id === providerId || x.slug === providerId);
+        const slug = prov?.slug || prov?.kind || providerId;
+        if (slug === "opencode") {
+          return json({
+            ok: true,
+            models: [
+              "deepseek-v4.1-flash-free",
+              "big-pickle",
+              "beam-free",
+              "flint-40b-free",
+              "mimo-v2.6-flash-free",
+              "nemotron-3.5-super-vl-free",
+              "nemotron-3.5-lightning-free",
+              "jev-1.13-free",
+              "glm-5.3-flash-free",
+            ],
+          });
+        }
+        if (slug === "duckai") {
+          return json({
+            ok: true,
+            models: [
+              "gpt-6-luna",
+              "gpt-5.4-mini",
+              "claude-haiku-4-5",
+              "mistral-small-2603",
+              "tinfoil/gpt-oss-120b",
+              "tinfoil/gemma4-31b",
+            ],
+          });
+        }
+        if (prov?.baseUrl) {
+          const keys = await getProviderKeys(env, prov.id);
+          const activeKey = keys.find((k) => k.status === "active");
+          if (activeKey) {
+            try {
+              const plainKey = await decryptSecret(env, activeKey.encryptedKey);
+              const mRes = await fetch(`${prov.baseUrl.replace(/\/+$/, "")}/v1/models`, {
+                headers: { authorization: `Bearer ${plainKey}` },
+                signal: AbortSignal.timeout(15000),
+              });
+              if (mRes.ok) {
+                const data = (await mRes.json()) as { data?: { id?: string }[] };
+                const mList = (data.data ?? []).map((m) => m.id).filter((x): x is string => !!x);
+                if (mList.length) return json({ ok: true, models: mList });
+              }
+            } catch {}
+          }
+        }
+        return json({ ok: true, models: [] });
+      }
+
       case "list_models": {
         const models = await getModels(env);
         const pricing = await getAllPricing(env);

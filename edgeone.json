@@ -15,7 +15,9 @@
       }
     },
     "externalNodeModules": [
-      "@edgeone/pages-blob"
+      "@edgeone/pages-blob",
+      "wreq-js",
+      "@wreq-js/binding-linux-x64-gnu"
     ]
   },
   "headers": [
