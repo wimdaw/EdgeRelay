@@ -93,6 +93,11 @@ function Shell() {
   if (!ready) return null;
   const logout = () => api("/api/auth/logout", "POST", {}).catch(() => {}).finally(() => { setMe(null); nav("/"); });
 
+  const role = me?.user.role;
+  const isSuperadmin = role === "superadmin";
+  const canManageUsers = role === "superadmin" || role === "admin";
+  const canAudit = role === "superadmin" || role === "auditor";
+
   return (
     <>
     {stepUpEl}
@@ -105,16 +110,17 @@ function Shell() {
       <Route element={me ? <Layout me={me} site={site} onLogout={logout} /> : <Navigate to="/login" replace />}>
         <Route path="/dashboard" element={me ? <Dashboard /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/keys" element={me ? <Keys /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/providers" element={me ? <Providers /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/models" element={me ? <ModelPool me={me} /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/pricing" element={me ? <Pricing me={me} /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/usage" element={me ? <Usage /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/audit" element={me ? <Audit /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/users" element={me ? <Users /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/settings" element={me ? <Settings /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/profile" element={me ? <Profile me={me} onRefresh={refresh} /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/invite" element={me ? <Invite me={me} /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/announcements" element={me ? <Announcements /> : <Navigate to="/login" replace />} />
+        {/* 权限受控页面 */}
+        <Route path="/dashboard/providers" element={isSuperadmin ? <Providers /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard/pricing" element={isSuperadmin && me ? <Pricing me={me} /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard/users" element={canManageUsers ? <Users /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard/settings" element={isSuperadmin ? <Settings /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard/announcements" element={isSuperadmin ? <Announcements /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard/audit" element={canAudit ? <Audit /> : <Navigate to="/dashboard" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
