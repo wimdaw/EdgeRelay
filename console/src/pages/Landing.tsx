@@ -24,7 +24,7 @@ const PRICING = [
   { name: "企业版", price: "定制", unit: "", desc: "规模部署", items: ["私有化/自托管", "SLA 保障", "定制合规方案", "专属供应商协议"], cta: "联系我们", hot: false },
 ];
 const FAQS = [
-  { q: "EdgeRelay 和 OneAPI/NewAPI 有什么区别？", a: "EdgeRelay 原生构建在 Cloudflare Workers 边缘：无服务器运维、全球低延迟、与 D1/KV/R2/AI Gateway 深度集成；同时从第一天内置合规能力——哈希链审计日志、内容安全审核队列、上游授权登记，而不是事后补丁。" },
+  { q: "Relay 和 OneAPI/NewAPI 有什么区别？", a: "Relay 原生构建在 Cloudflare Workers 边缘：无服务器运维、全球低延迟、与 D1/KV/R2/AI Gateway 深度集成；同时从第一天内置合规能力——哈希链审计日志、内容安全审核队列、上游授权登记，而不是事后补丁。" },
   { q: "支持哪些上游模型？", a: "所有提供 OpenAI 兼容接口的主流供应商：OpenAI、Anthropic、Google、DeepSeek 等。前提是你或平台持有对应的合法授权；新供应商通过控制台几分钟即可接入并配置主备路由。" },
   { q: "如何计费？", a: "按模型的输入/输出 Token 分别计价（每百万 Token 单价）。每次调用前预冻结预估额度，响应后按实际用量结算并解冻差额，全部流水可在控制台导出。" },
   { q: "是否支持自托管？", a: "支持。整个平台就是一套 Cloudflare 项目（Workers + D1 + KV + R2），你可以在自己的 Cloudflare 账户上部署一套完全私有的实例。" },
@@ -89,7 +89,7 @@ export default function Landing({ site, me }: { site: SiteInfo | null; me: Me | 
   const [faq, setFaq] = useState<number | null>(0);
   const [lang, setLang] = useState<"curl" | "node" | "python">("curl");
   const scrolled = useScrolled();
-  const name = site?.siteName ?? "EdgeRelay";
+  const name = site?.siteName ?? "Relay";
   const logo = site?.siteLogoUrl ?? "/logo.png";
 
   useEffect(() => { document.title = `${name} — 部署在 Cloudflare 边缘的合规 AI API 网关`; }, [name]);
@@ -290,7 +290,7 @@ res = client.chat.completions.create(
       <section id="compliance" className="scroll-mt-20 border-y border-line bg-surface py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <h2 className="text-center text-3xl font-bold tracking-tight">合规与安全，从第一天开始</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-muted">EdgeRelay 是正规的 API 聚合与分发平台——不涉及号池、账号拆分、凭证盗用等任何灰产行为。</p>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-muted">{name} 是正规的 API 聚合与分发平台——不涉及号池、账号拆分、凭证盗用等任何灰产行为。</p>
           <div className="mt-10 grid gap-4 md:grid-cols-3">
             {[
               { icon: Server, title: "合法授权上游", desc: "仅接入持有合法代理、分销或再许可授权的供应商，授权协议编号登记入档并可追溯。" },

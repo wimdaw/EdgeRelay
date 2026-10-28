@@ -8,7 +8,7 @@ export const GET = defineHandler(async (c) => {
   const env = c.env as unknown as Env;
   const s = await getSettings(env.DB);
   return json({
-    siteName: s.siteName ?? "EdgeRelay",
+    siteName: s.siteName ?? "Relay",
     siteDescription: s.siteDescription ?? "",
     siteLogoUrl: s.siteLogoUrl ?? "/logo.png",
     siteHomepage: s.siteHomepage ?? "",

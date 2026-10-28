@@ -36,7 +36,7 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
       <div className="w-full max-w-[400px]">
         <div className="mb-6 flex items-center justify-center gap-2.5">
           {site?.siteLogoUrl ? <img src={site.siteLogoUrl} alt="logo" className="h-10 w-10 rounded-xl2 object-contain shadow-card" /> : <div className="flex h-10 w-10 items-center justify-center rounded-xl2 bg-brand text-lg font-bold text-white shadow-card">E</div>}
-          <div><div className="text-lg font-bold">{site?.siteName ?? "EdgeRelay"}</div><div className="max-w-[260px] text-xs text-muted">{site?.siteDescription ?? "部署在 Cloudflare 边缘的AI API 网关"}</div></div>
+          <div><div className="text-lg font-bold">{site?.siteName ?? "Relay"}</div><div className="max-w-[260px] text-xs text-muted">{site?.siteDescription ?? "部署在 Cloudflare 边缘的AI API 网关"}</div></div>
         </div>
         <Card className="p-6">
           <h1 className="text-base font-semibold">{mode === "login" ? "登录控制台" : "注册账号"}</h1>

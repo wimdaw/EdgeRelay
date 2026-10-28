@@ -103,7 +103,7 @@ export async function sendMail(cfg: SmtpConfig, mail: { to: string; subject: str
       ].join("\r\n");
     }
     const msg = [
-      `From: ${cfg.username && cfg.username.includes("@") ? cfg.username : "EdgeRelay"} <${cfg.from}>`,
+      `From: ${cfg.username && cfg.username.includes("@") ? cfg.username : "Relay"} <${cfg.from}>`,
       `To: <${mail.to}>`,
       `Subject: ${subject}`,
       `MIME-Version: 1.0`,

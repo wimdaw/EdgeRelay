@@ -11,7 +11,7 @@ export const GET = defineHandler(async (c) => {
   try {
     const env = c.env as unknown as Env;
     const s = await getSettings(env.DB);
-    const siteName = s.siteName ?? "EdgeRelay";
+    const siteName = s.siteName ?? "Relay";
     const desc = s.siteDescription ?? "";
     const logo = s.siteLogoUrl ?? "/logo.png";
 
@@ -22,7 +22,7 @@ export const GET = defineHandler(async (c) => {
     let html = await resp.text();
 
     // title
-    html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(siteName)} — AI API 网关控制台</title>`);
+    html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(siteName)} — 部署在 Cloudflare 边缘的合规 AI API 网关</title>`);
     // meta description / og / favicon：删除已有后统一注入
     html = html.replace(/<meta\s+name="description"[^>]*>/gi, "");
     html = html.replace(/<meta\s+property="og:[^"]*"[^>]*>/gi, "");

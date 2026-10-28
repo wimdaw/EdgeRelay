@@ -44,9 +44,9 @@ export const POST = defineHandler(async (c) => {
         from: settings.smtpFrom ?? settings.smtpUsername ?? "",
       }, {
         to: body.email,
-        subject: `${settings.siteName ?? "EdgeRelay"} 注册验证码`,
-        text: `你正在注册 ${settings.siteName ?? "EdgeRelay"} 账号。\n\n验证码：${code}\n\n10 分钟内有效。若非本人操作，请忽略本邮件。`,
-        html: verifyCodeEmailHtml(settings.siteName ?? "EdgeRelay", code),
+        subject: `${settings.siteName ?? "Relay"} 注册验证码`,
+        text: `你正在注册 ${settings.siteName ?? "Relay"} 账号。\n\n验证码：${code}\n\n10 分钟内有效。若非本人操作，请忽略本邮件。`,
+        html: verifyCodeEmailHtml(settings.siteName ?? "Relay", code),
       });
       // 发送成功后才写入验证码与限流标记，失败时不占用重试机会
       await env.KV.put(`emailcode:${body.email}`, code, { expirationTtl: 600 });

@@ -45,7 +45,7 @@ export default function Invite({ me }: { me: Me }) {
     ctx.fillStyle = "#0F172A"; ctx.fillRect(0, 0, 600, 800);
     ctx.fillStyle = "#F38020"; ctx.fillRect(0, 0, 600, 120);
     ctx.fillStyle = "#ffffff"; ctx.font = "bold 34px Inter, sans-serif";
-    ctx.fillText("EdgeRelay", 40, 72);
+    ctx.fillText("Relay", 40, 72);
     ctx.font = "16px Inter, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.85)";
     ctx.fillText("合规的边缘 AI API 网关 · 邀请你加入", 40, 100);
     // 标题

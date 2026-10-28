@@ -70,7 +70,7 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
       <aside className="hidden w-56 shrink-0 flex-col border-r border-line bg-sidebar lg:flex">
         <a href="#/" className="flex items-center gap-2 px-5 py-4" title="返回官网">
           {site?.siteLogoUrl ? <img src={site.siteLogoUrl} alt="logo" className="h-7 w-7 rounded-lg object-contain" /> : <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-sm font-bold text-white">E</div>}
-          <div className="leading-tight"><div className="text-[13px] font-semibold text-ink">{site?.siteName ?? "EdgeRelay"}</div><div className="text-[10px] text-muted">控制台</div></div>
+          <div className="leading-tight"><div className="text-[13px] font-semibold text-ink">{site?.siteName ?? "Relay"}</div><div className="text-[10px] text-muted">控制台</div></div>
         </a>
         {nav}
         <div className="mt-auto px-5 py-4 text-[11px] text-muted">
@@ -83,7 +83,7 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
       {drawer && (
         <div className="anim-fade fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden" onClick={() => setDrawer(false)}>
           <aside className="h-full w-60 bg-sidebar p-3 shadow-pop" onClick={(e) => e.stopPropagation()}>
-            <div className="mb-3 flex items-center justify-between px-2"><span className="text-sm font-semibold">{site?.siteName ?? "EdgeRelay"}</span>
+            <div className="mb-3 flex items-center justify-between px-2"><span className="text-sm font-semibold">{site?.siteName ?? "Relay"}</span>
               <button onClick={() => setDrawer(false)} aria-label="关闭菜单" className="p-1 text-muted"><X size={18} /></button></div>
             {nav}
             <Button variant="ghost" className="mt-4 w-full" onClick={onLogout}><LogOut size={14} />退出登录</Button>

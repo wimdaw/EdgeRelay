@@ -30,7 +30,7 @@ export async function buildHeaders(env: Env, route: UpstreamRoute): Promise<Reco
   const headers: Record<string, string> = {
     "content-type": "application/json",
     // Workers fetch 默认不带 UA，部分上游网关的 WAF 会拦截空 UA（表现为 403/429）
-    "user-agent": "EdgeRelay/1.0 (+https://api.obitw.cn)",
+    "user-agent": "Relay/1.0 (+https://api.obitw.cn)",
     ...(route.extraHeaders ?? {}),
   };
   if (route.authScheme === "x-api-key") {

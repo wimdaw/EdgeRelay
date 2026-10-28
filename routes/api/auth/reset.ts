@@ -40,8 +40,8 @@ export const POST = defineHandler(async (c) => {
         };
         await sendMail(smtp, {
           to: email,
-          subject: `${s.siteName ?? "EdgeRelay"} 密码重置验证码`,
-          text: `你正在重置 ${s.siteName ?? "EdgeRelay"} 账号密码。\n\n验证码：${code}\n\n10 分钟内有效。若非本人操作，请忽略本邮件。`,
+          subject: `${s.siteName ?? "Relay"} 密码重置验证码`,
+          text: `你正在重置 ${s.siteName ?? "Relay"} 账号密码。\n\n验证码：${code}\n\n10 分钟内有效。若非本人操作，请忽略本邮件。`,
         });
         await audit(c, { actorIp: clientIp(c.req), action: "auth.reset_requested", targetType: "user", targetId: email });
       }
