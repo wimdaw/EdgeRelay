@@ -10,30 +10,15 @@
     <meta property="og:type" content="website" />
     <link rel="icon" href="./logo.png" />
     <script>
-      // 单页应用路由规范化：根路径访问时自动无缝补齐 /#/，避免纯根路径缓存干扰
-      if (window.location.pathname === "/" && (!window.location.hash || window.location.hash === "#")) {
-        window.location.replace("/#/");
+      // 兼容旧书签：访问 /#/login 自动无缝迁移至 /login
+      if (window.location.hash && window.location.hash.startsWith("#/")) {
+        window.location.replace(window.location.hash.slice(1));
       }
     </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      // 捕获全局锚点链接点击，防止与 HashRouter 冲突，实现丝滑平滑滚动
-      document.addEventListener("click", function (e) {
-        var a = e.target.closest("a");
-        if (!a) return;
-        var href = a.getAttribute("href");
-        if (href && href.startsWith("#") && href.length > 1 && !href.startsWith("#/")) {
-          var targetEl = document.querySelector(href);
-          if (targetEl) {
-            e.preventDefault();
-            e.stopPropagation();
-            targetEl.scrollIntoView({ behavior: "smooth" });
-          }
-        }
-      }, true);
-    </script>
+
   </body>
 </html>

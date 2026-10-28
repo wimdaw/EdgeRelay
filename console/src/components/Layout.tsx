@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Bell, Boxes, CircleUser, Gauge, Gift, KeyRound, LogOut, Megaphone, Menu, Monitor, Moon, ScrollText, Server, Settings as SettingsIcon, ShieldCheck, Sun, Users, X } from "lucide-react";
 import { api, type Me, type SiteInfo } from "../lib/api";
 import { cn, fmtMoney } from "../lib/utils";
@@ -48,6 +48,7 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
   const bellCount = visibleAnns.length;
   const { theme, toggle } = useTheme();
   const loc = useLocation();
+  const navigate = useNavigate();
   const toast = useToast();
   useEffect(() => setDrawer(false), [loc.pathname]);
 
@@ -68,10 +69,10 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
     <div className="flex h-screen">
       {/* 桌面侧边栏 */}
       <aside className="hidden w-56 shrink-0 flex-col border-r border-line bg-sidebar lg:flex">
-        <a href="#/" className="flex items-center gap-2 px-5 py-4" title="返回官网">
+        <Link to="/" className="flex items-center gap-2 px-5 py-4" title="返回官网">
           {site?.siteLogoUrl ? <img src={site.siteLogoUrl} alt="logo" className="h-7 w-7 rounded-lg object-contain" /> : <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-sm font-bold text-white">E</div>}
           <div className="leading-tight"><div className="text-[13px] font-semibold text-ink">{site?.siteName ?? "Relay"}</div><div className="text-[10px] text-muted">控制台</div></div>
-        </a>
+        </Link>
         {nav}
         <div className="mt-auto px-5 py-4 text-[11px] text-muted">
           <div>{me.user.email}</div>
@@ -110,7 +111,7 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
             {bellCount > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-err px-1 text-[10px] font-medium text-white">{bellCount}</span>}
           </button>
           <button className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-brand/15 text-xs font-semibold text-brand" title="个人主页"
-            onClick={() => { location.hash = "#/dashboard/profile"; }} aria-label="个人主页">
+            onClick={() => navigate("/dashboard/profile")} aria-label="个人主页">
             {me.avatarUrl ? <img src={me.avatarUrl} alt="头像" className="h-full w-full object-cover" /> : me.user.email[0]?.toUpperCase()}
           </button>
           <Button variant="ghost" className="hidden !px-2.5 lg:inline-flex" onClick={onLogout}><LogOut size={14} />退出</Button>

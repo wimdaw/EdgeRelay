@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { HashRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { api, type Me, type SiteInfo } from "./lib/api";
 import Layout from "./components/Layout";
 import { ToastProvider, useStepUp } from "./components/ui";
@@ -123,9 +123,9 @@ function Shell() {
 export default function App() {
   return (
     <ToastProvider>
-      <HashRouter>
+      <BrowserRouter>
         <Shell />
-      </HashRouter>
+      </BrowserRouter>
     </ToastProvider>
   );
 }

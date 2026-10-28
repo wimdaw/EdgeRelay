@@ -27,7 +27,7 @@ export default function Invite({ me }: { me: Me }) {
   const toast = useToast();
 
   const origin = location.origin;
-  const link = data ? `${origin}/#/login?invite=${data.inviteCode}` : "";
+  const link = data ? `${origin}/login?invite=${data.inviteCode}` : "";
 
   useEffect(() => {
     api<InviteMe>("/api/invite/me").then((d) => { setData(d); if (d.inviteCode) {

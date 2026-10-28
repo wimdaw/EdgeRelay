@@ -19,7 +19,7 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
   const [sendingCode, setSendingCode] = useState(false);
   const [reset, setReset] = useState({ email: "", code: "", password: "", stage: 1 as 1 | 2 });
   const [resetMsg, setResetMsg] = useState("");
-  const [inviteCode, setInviteCode] = useState(() => new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("invite") ?? "");
+  const [inviteCode, setInviteCode] = useState(() => new URLSearchParams(window.location.search).get("invite") || new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("invite") || "");
   const nav = useNavigate();
   const toast = useToast();
 
