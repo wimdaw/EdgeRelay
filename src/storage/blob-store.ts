@@ -27,7 +27,7 @@ export interface KVLike {
 
 let cachedBlobStore: BlobStore | null = null;
 
-/** 内存兜底 Store（当不在 EdgeOne 运行环境且无凭据时使用） */
+/** 内存兜底 Store（仅当连不上 Blob 且用于极速测试时使用） */
 function createMemoryStore(): BlobStore {
   const map = new Map<string, any>();
   return {
@@ -68,22 +68,33 @@ export function getBlobStore(env?: any): BlobStore {
 
   const storeName = env?.BLOB_STORE_NAME || 'edgerelay-db';
 
+  // 关键：API Token 模式下必须同时提供 projectId 与 token
+  const projectId =
+    env?.EDGEONE_PROJECT_ID ||
+    env?.PAGES_PROJECT_ID ||
+    (typeof process !== 'undefined' ? (process.env.EDGEONE_PROJECT_ID || process.env.PAGES_PROJECT_ID) : undefined) ||
+    'makers-fdbswhfbvvwm';
+
+  const token =
+    env?.EDGEONE_TOKEN_NEW ||
+    env?.EDGEONE_TOKEN ||
+    env?.EDGEONE_PAGES_API_TOKEN ||
+    (typeof process !== 'undefined' ? (process.env.EDGEONE_TOKEN_NEW || process.env.EDGEONE_TOKEN || process.env.EDGEONE_PAGES_API_TOKEN) : undefined) ||
+    'cQ7qRdUvqqCTxZx9OyiY0jsmP+qLQjDRCTR0bCYCH/k=';
+
   try {
     if (typeof edgeoneGetStore === 'function') {
-      const token =
-        env?.EDGEONE_TOKEN_NEW ||
-        env?.EDGEONE_TOKEN ||
-        (typeof process !== 'undefined' ? (process.env.EDGEONE_TOKEN_NEW || process.env.EDGEONE_TOKEN) : undefined);
-      
       cachedBlobStore = edgeoneGetStore({
         name: storeName,
         consistency: 'strong',
-        ...(token ? { token } : {}),
+        projectId,
+        token,
       });
+      console.log(`[BlobStore] 成功初始化 EdgeOne Blob Store: ${storeName} (ProjectId: ${projectId})`);
       return cachedBlobStore!;
     }
   } catch (err: any) {
-    // 兼容本地测试单测不中断
+    console.error('[BlobStore] 初始化失败，回退到内存存储:', err?.message);
     cachedBlobStore = createMemoryStore();
     return cachedBlobStore;
   }
