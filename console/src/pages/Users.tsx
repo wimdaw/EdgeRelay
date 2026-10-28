@@ -545,10 +545,15 @@ export default function Users() {
       {/* 调整用户角色弹窗 */}
       <Dialog open={roleDlg.open} onClose={() => setRoleDlg({ open: false, user: null, role: "user" })} title={`调整账号等级 — ${roleDlg.user?.email ?? ""}`} width={500}>
         <div className="space-y-4">
+          <div className="flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs">
+            <span className="text-muted">目标用户当前可用余额</span>
+            <span className="font-mono text-sm font-bold text-emerald-500">¥{(roleDlg.user?.balance ?? 0).toFixed(2)}</span>
+          </div>
+
           <Field label="账号角色等级">
             <Select value={roleDlg.role} onChange={(e) => setRoleDlg({ ...roleDlg, role: e.target.value })}>
               {isSuperadmin && <option value="superadmin">超级管理员 (superadmin) — 最高站长权限，全站管理</option>}
-              {isSuperadmin && <option value="admin">管理员 (admin) — 拥有下级用户管理与转账充值权限</option>}
+              {isSuperadmin && <option value="admin">管理员 (admin) — 拥有下级用户管理与转账充值权限（余额为0不影响任命）</option>}
               <option value="vip">VIP 账号 (vip) — 解锁全量付费大模型，按量扣费</option>
               <option value="user">普通用户 (user) — 仅限免费模型池，免充值不扣费</option>
               {isSuperadmin && <option value="finance">财务人员 (finance)</option>}
@@ -557,8 +562,8 @@ export default function Users() {
           </Field>
 
           <div className="rounded-xl border border-line bg-surface2/60 p-3 text-xs text-muted space-y-1.5">
-            <div>• <b>管理员任命要求</b>：管理员必须由超级管理员在后台添加/任命，不支持直接升级。</div>
-            <div>• <b>自动 VIP 机制</b>：普通用户只要余额 &gt; 0 自动晋升为 VIP；余额等于 0 自动降为普通用户。</div>
+            <div>• <b>管理员 (admin)</b>：由超级管理员在后台任命。管理员余额可以为 0，但余额为 0 时无法向下级转账加款。</div>
+            <div>• <b>自动 VIP 机制</b>：普通用户只要余额 &gt; 0 自动晋升为 VIP；余额等于 0 自动降为普通用户。若需开通 VIP，直接使用「充值」加款即可。</div>
             <div>• <b>权限层级继承</b>：只允许管理与充值权限严格低于自身的下级用户。</div>
           </div>
 

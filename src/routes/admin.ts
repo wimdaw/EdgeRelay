@@ -155,6 +155,20 @@ adminRouter.post("/actions", async (c) => {
         if ((role === "admin" || role === "superadmin") && admin.role !== "superadmin") {
           throw new ApiError(403, ErrorCode.FORBIDDEN, "只有超级管理员可在后台任命管理员");
         }
+
+        // VIP 身份由余额自动驱动（只要余额 > 0 自动生效）：余额为 0 时提示直接使用充值功能
+        if (role === "vip") {
+          const { getOrCreateBalance } = await import("../storage/db");
+          const targetBal = await getOrCreateBalance(env, `user:${target.id}`);
+          if (targetBal.available <= 0) {
+            throw new ApiError(
+              400,
+              ErrorCode.BAD_REQUEST,
+              "VIP 身份由余额自动驱动。若需为该用户开通 VIP，请直接点击该用户的「充值」按钮加款，充值到账后系统将全自动生效 VIP 身份！"
+            );
+          }
+        }
+
         await updateUser(env, String(p.userId), { role });
         return done(null, "user", String(p.userId));
       }
@@ -653,12 +667,21 @@ adminRouter.post("/actions", async (c) => {
         if (amount > 0 && admin.id) {
           const { getOrCreateBalance } = await import("../storage/db");
           const actorBal = await getOrCreateBalance(env, `user:${admin.id}`);
-          if (admin.role !== "superadmin" && actorBal.available < amount) {
-            throw new ApiError(
-              402,
-              ErrorCode.INSUFFICIENT_BALANCE,
-              `您的账户可用余额不足 (当前 ¥${actorBal.available.toFixed(2)})，无法为下级用户充值 ¥${amount.toFixed(2)}`
-            );
+          if (admin.role !== "superadmin") {
+            if (actorBal.available <= 0) {
+              throw new ApiError(
+                402,
+                ErrorCode.INSUFFICIENT_BALANCE,
+                `您的管理员账户当前可用余额为 ¥0.00，无法向下级用户转账加款。请联系超级管理员为您的账户注资！`
+              );
+            }
+            if (actorBal.available < amount) {
+              throw new ApiError(
+                402,
+                ErrorCode.INSUFFICIENT_BALANCE,
+                `您的管理员账户可用余额不足 (当前 ¥${actorBal.available.toFixed(2)})，无法为下级用户充值 ¥${amount.toFixed(2)}`
+              );
+            }
           }
           // 从当前管理员账户转出扣除
           await topup(hCtx, `user:${admin.id}`, -amount, `给下级用户 [${targetUser?.email || scope}] 充值转账扣减`);
