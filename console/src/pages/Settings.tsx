@@ -38,10 +38,14 @@ export default function Settings() {
       <Card className="p-5">
         <h2 className="mb-4 text-sm font-semibold">计费与限流</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Field label="默认 RPM（每 Key）"><Input type="number" value={String(s.defaultRpm ?? 60)} onChange={(e) => set("defaultRpm", +e.target.value)} /></Field>
-          <Field label="默认 TPM（每 Key）"><Input type="number" value={String(s.defaultTpm ?? 100000)} onChange={(e) => set("defaultTpm", +e.target.value)} /></Field>
+          <Field label="默认 RPM（每 Key）" hint="填 0 为完全不限">
+            <Input type="number" value={String(s.defaultRpm ?? 60)} onChange={(e) => set("defaultRpm", +e.target.value)} placeholder="0 为不限" />
+          </Field>
+          <Field label="默认 TPM（每 Key）" hint="填 0 为完全不限">
+            <Input type="number" value={String(s.defaultTpm ?? 100000)} onChange={(e) => set("defaultTpm", +e.target.value)} placeholder="0 为不限" />
+          </Field>
         </div>
-        <p className="mt-3 text-xs text-muted">超出限制返回结构化 HTTP 429 与 Retry-After。并发精确控制建议后续升级 Durable Objects。</p>
+        <p className="mt-3 text-xs text-muted">超出限制返回 HTTP 429 与 Retry-After。填 0 代表完全不限流；可在「定价」页面为每个大模型单独设置独立 RPM 限流。</p>
       </Card>
 
       <Card className="p-5">

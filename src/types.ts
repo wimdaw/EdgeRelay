@@ -224,6 +224,7 @@ export interface ModelPricingRecord {
   inputPerMillion: number;
   outputPerMillion: number;
   currency: string;
+  rpmLimit?: number | null; // null/undefined = 继承全局；0 = 绝对不限流；>0 = 独立限流阈值
   createdAt: number;
 }
 

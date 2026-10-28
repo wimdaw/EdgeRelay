@@ -16,6 +16,7 @@ export default function Pricing({ me }: { me: Me }) {
     cost: "1",
     inputPerMillion: "0",
     outputPerMillion: "0",
+    rpmLimit: "",
     password: "",
   });
   const [editDlg, setEditDlg] = useState<ModelRow | null>(null);
@@ -30,6 +31,7 @@ export default function Pricing({ me }: { me: Me }) {
     costWeight: "1",
     inputPerMillion: "0",
     outputPerMillion: "0",
+    rpmLimit: "",
     enabled: true,
   });
   const { confirm, confirmEl } = useConfirm();
@@ -51,6 +53,10 @@ export default function Pricing({ me }: { me: Me }) {
     if (isNaN(inPrice) || isNaN(outPrice) || inPrice < 0 || outPrice < 0) {
       return toast("请输入合法的输入/输出价格", "err");
     }
+    const rpmVal = form.rpmLimit.trim() === "" ? null : parseInt(form.rpmLimit.trim(), 10);
+    if (rpmVal !== null && (isNaN(rpmVal) || rpmVal < 0)) {
+      return toast("RPM 限流请输入大于等于 0 的整数（0 代表不限）", "err");
+    }
     try {
       await adminAction("upsert_model", {
         publicName: form.publicName.trim(),
@@ -60,11 +66,12 @@ export default function Pricing({ me }: { me: Me }) {
         costWeight: +form.cost || 1,
         inputPerMillion: inPrice,
         outputPerMillion: outPrice,
+        rpmLimit: rpmVal,
         password: form.password.trim(),
       });
       toast("模型映射已保存并上架");
       setDlg(false);
-      setForm({ publicName: "", providerId: "", upstream: "", priority: "10", cost: "1", inputPerMillion: "0", outputPerMillion: "0", password: "" });
+      setForm({ publicName: "", providerId: "", upstream: "", priority: "10", cost: "1", inputPerMillion: "0", outputPerMillion: "0", rpmLimit: "", password: "" });
       load();
     } catch (e) { toast((e as Error).message, "err"); }
   };
@@ -82,6 +89,7 @@ export default function Pricing({ me }: { me: Me }) {
       costWeight: String(m.cost_weight ?? 1),
       inputPerMillion: String(m.input_per_million ?? 0),
       outputPerMillion: String(m.output_per_million ?? 0),
+      rpmLimit: m.rpm_limit != null ? String(m.rpm_limit) : "",
       enabled: m.enabled === 1,
     });
   };
@@ -96,6 +104,10 @@ export default function Pricing({ me }: { me: Me }) {
     if (isNaN(inPrice) || isNaN(outPrice) || inPrice < 0 || outPrice < 0) {
       return toast("请输入合法的输入/输出价格", "err");
     }
+    const rpmVal = editForm.rpmLimit.trim() === "" ? null : parseInt(editForm.rpmLimit.trim(), 10);
+    if (rpmVal !== null && (isNaN(rpmVal) || rpmVal < 0)) {
+      return toast("RPM 限流请输入大于等于 0 的整数（0 代表不限）", "err");
+    }
     try {
       await adminAction("upsert_model", {
         id: editForm.id,
@@ -107,6 +119,7 @@ export default function Pricing({ me }: { me: Me }) {
         costWeight: +editForm.costWeight || 1,
         inputPerMillion: inPrice,
         outputPerMillion: outPrice,
+        rpmLimit: rpmVal,
         enabled: editForm.enabled,
         password: editPassword.trim(),
       });
@@ -176,6 +189,24 @@ export default function Pricing({ me }: { me: Me }) {
       ),
     },
     {
+      key: "rpm",
+      label: "RPM 限流",
+      sortVal: (r) => (r.rpm_limit === 0 ? -1 : r.rpm_limit ?? 999999),
+      render: (r) => (
+        r.rpm_limit === 0 ? (
+          <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500 whitespace-nowrap">
+            不限流
+          </span>
+        ) : typeof r.rpm_limit === "number" && r.rpm_limit > 0 ? (
+          <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-mono font-medium text-brand whitespace-nowrap">
+            {r.rpm_limit} RPM
+          </span>
+        ) : (
+          <span className="text-[11px] text-muted whitespace-nowrap">继承全局</span>
+        )
+      ),
+    },
+    {
       key: "status",
       label: "状态",
       render: (r) => <StatusTag value={r.enabled ? "active" : "pending"} />,
@@ -207,7 +238,7 @@ export default function Pricing({ me }: { me: Me }) {
       <Dialog open={dlg} onClose={() => setDlg(false)} title="新增模型映射与定价" width={540}>
         <div className="space-y-4">
           <p className="text-xs text-muted">
-            为上游供应商关联对外模型名并设定调用单价。多个供应商可配置相同的对外模型名，网关将按优先级自动故障转移与容灾。
+            为上游供应商关联对外模型名并设定调用单价与限流。多个供应商可配置相同的对外模型名，网关将按优先级自动故障转移与容灾。
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="所属供应商">
@@ -258,6 +289,17 @@ export default function Pricing({ me }: { me: Me }) {
                 placeholder="0"
               />
             </Field>
+            <div className="col-span-1 sm:col-span-2">
+              <Field label="模型独立 RPM 限流" hint="填 0 为该模型绝对不限；留空自动继承全局设置">
+                <Input
+                  type="number"
+                  min="0"
+                  value={form.rpmLimit}
+                  onChange={(e) => setForm({ ...form, rpmLimit: e.target.value })}
+                  placeholder="留空继承全局默认（填 0 代表完全不限流）"
+                />
+              </Field>
+            </div>
             <div className="col-span-1 sm:col-span-2">
               <Field label="管理员密码确认" hint="创建新模型映射需核验管理员密码确认身份">
                 <Input
@@ -333,6 +375,17 @@ export default function Pricing({ me }: { me: Me }) {
                 placeholder="0"
               />
             </Field>
+            <div className="col-span-1 sm:col-span-2">
+              <Field label="模型独立 RPM 限流" hint="填 0 为该模型绝对不限；留空自动继承全局设置">
+                <Input
+                  type="number"
+                  min="0"
+                  value={editForm.rpmLimit}
+                  onChange={(e) => setEditForm({ ...editForm, rpmLimit: e.target.value })}
+                  placeholder="留空继承全局默认（填 0 代表完全不限流）"
+                />
+              </Field>
+            </div>
             <div className="col-span-1 sm:col-span-2">
               <Field label="管理员密码确认" hint="修改模型映射与定价属核心敏感操作，需验证管理员密码确认身份">
                 <Input

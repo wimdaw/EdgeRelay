@@ -56,13 +56,16 @@ chatRouter.post("/", async (c) => {
       throw new ApiError(403, ErrorCode.MODEL_NOT_ALLOWED, `该 Key 无权调用模型 ${publicModel}`);
     }
 
-    /* ---- 限流 ---- */
+    /* ---- 限流与定价预检 ---- */
+    const pricing = (await getPricing(env, publicModel)) || (await getPricing(env, subModelName));
+    const modelRpm = pricing?.rpmLimit;
+
     if (!(await checkTpmBeforeRequest(env, key.keyId, key.limits))) {
       return openAiError(429, ErrorCode.RATE_LIMITED, "TPM 超限", { retry_after: 60 });
     }
-    const limit = await checkRateLimit(env, key.keyId, key.limits);
+    const limit = await checkRateLimit(env, key.keyId, key.limits, modelRpm, publicModel);
     if (!limit.ok) {
-      return openAiError(429, ErrorCode.RATE_LIMITED, `${limit.kind?.toUpperCase()} 超限，请稍后重试`, {
+      return openAiError(429, ErrorCode.RATE_LIMITED, limit.reason || `${limit.kind?.toUpperCase()} 超限，请稍后重试`, {
         retry_after: limit.retryAfter,
       });
     }
@@ -107,10 +110,10 @@ chatRouter.post("/", async (c) => {
 
     /* ---- 路由与计费预检 ---- */
     const routes = await requireRoutes(env, publicModel);
-    const pricing = (await getPricing(env, publicModel)) || (routes[0] ? await getPricing(env, routes[0].upstreamModel) : null);
+    const effectivePricing = pricing || (routes[0] ? await getPricing(env, routes[0].upstreamModel) : null);
     const estPrompt = estimateTokens(promptText);
     const estCompletion = body.max_tokens ?? 1024;
-    const estCost = pricing ? estimateCost(pricing, estPrompt, estCompletion) : 0;
+    const estCost = effectivePricing ? estimateCost(effectivePricing, estPrompt, estCompletion) : 0;
     const scope = billingScope(key.userId, key.orgId);
     const { holdId } = await hold(hCtx, scope, estCost, requestId);
 

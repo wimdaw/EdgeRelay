@@ -45,6 +45,7 @@ apiModelsRouter.get("/", async (c) => {
         input_per_million: prc?.inputPerMillion ?? null,
         output_per_million: prc?.outputPerMillion ?? null,
         currency: prc?.currency ?? "CNY",
+        rpm_limit: prc?.rpmLimit ?? null,
       };
     });
 

@@ -411,6 +411,7 @@ adminRouter.post("/actions", async (c) => {
             input_per_million: prc?.inputPerMillion ?? null,
             output_per_million: prc?.outputPerMillion ?? null,
             currency: prc?.currency ?? "CNY",
+            rpm_limit: prc?.rpmLimit ?? null,
           };
         });
         return json({ ok: true, models: rows });
@@ -430,11 +431,14 @@ adminRouter.post("/actions", async (c) => {
           createdAt: now,
         });
 
-        // 若携带定价数据或该模型尚未配置定价，自动维护定价表
+        // 若携带定价或限流数据，或该模型尚未配置定价，自动维护定价表
         const pricing = await getAllPricing(env);
         const existingPricing = pricing[publicName] || (p.oldPublicName ? pricing[String(p.oldPublicName)] : undefined);
         const inputPerMillion = p.inputPerMillion !== undefined ? Number(p.inputPerMillion) : (existingPricing?.inputPerMillion ?? 0);
         const outputPerMillion = p.outputPerMillion !== undefined ? Number(p.outputPerMillion) : (existingPricing?.outputPerMillion ?? 0);
+        const rpmLimit = p.rpmLimit !== undefined
+          ? (p.rpmLimit === null || p.rpmLimit === "" ? null : Number(p.rpmLimit))
+          : (existingPricing?.rpmLimit ?? null);
         const prId = existingPricing?.id || `pr_${uuid().slice(0, 8)}`;
         await setPricing(env, {
           id: prId,
@@ -442,6 +446,7 @@ adminRouter.post("/actions", async (c) => {
           inputPerMillion,
           outputPerMillion,
           currency: String(p.currency ?? existingPricing?.currency ?? "CNY"),
+          rpmLimit,
           createdAt: existingPricing?.createdAt ?? now,
         });
         return done({ id }, "model", id);
@@ -504,19 +509,26 @@ adminRouter.post("/actions", async (c) => {
           input_per_million: pr.inputPerMillion,
           output_per_million: pr.outputPerMillion,
           currency: pr.currency,
+          rpm_limit: pr.rpmLimit ?? null,
         }));
         return json({ ok: true, pricing: rows });
       }
       case "set_pricing": {
         const publicName = String(p.publicName);
         const id = (p.id as string) || uuid();
+        const pricing = await getAllPricing(env);
+        const existing = pricing[publicName];
+        const rpmLimit = p.rpmLimit !== undefined
+          ? (p.rpmLimit === null || p.rpmLimit === "" ? null : Number(p.rpmLimit))
+          : (existing?.rpmLimit ?? null);
         await setPricing(env, {
           id,
           publicName,
           inputPerMillion: Number(p.inputPerMillion),
           outputPerMillion: Number(p.outputPerMillion),
           currency: String(p.currency ?? "CNY"),
-          createdAt: now,
+          rpmLimit,
+          createdAt: existing?.createdAt ?? now,
         });
         return done({ id, publicName }, "pricing", id);
       }
