@@ -8,7 +8,8 @@ import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import Keys from "./pages/Keys";
 import Providers from "./pages/Providers";
-import Models from "./pages/Models";
+import ModelPool from "./pages/ModelPool";
+import Pricing from "./pages/Pricing";
 import Usage from "./pages/Usage";
 import Audit from "./pages/Audit";
 import Users from "./pages/Users";
@@ -105,7 +106,8 @@ function Shell() {
         <Route path="/dashboard" element={me ? <Dashboard /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/keys" element={me ? <Keys /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/providers" element={me ? <Providers /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/models" element={me ? <Models me={me} /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/models" element={me ? <ModelPool me={me} /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/pricing" element={me ? <Pricing me={me} /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/usage" element={me ? <Usage /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/audit" element={me ? <Audit /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/users" element={me ? <Users /> : <Navigate to="/login" replace />} />

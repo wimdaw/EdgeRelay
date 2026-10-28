@@ -48,7 +48,15 @@ apiModelsRouter.get("/", async (c) => {
       };
     });
 
-    return json({ ok: true, models: rows });
+    const safeProviders = providers.map((p) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      kind: p.kind,
+      status: p.status,
+    }));
+
+    return json({ ok: true, models: rows, providers: safeProviders });
   } catch (err) {
     return errorResponse(hCtx, err);
   }

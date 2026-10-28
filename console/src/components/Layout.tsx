@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Bell, Boxes, CircleUser, Gauge, Gift, KeyRound, LogOut, Megaphone, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, ShieldCheck, Sun, Users, X } from "lucide-react";
+import { Bell, Boxes, CircleUser, Coins, Gauge, Gift, KeyRound, Layers, LogOut, Megaphone, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, ShieldCheck, Sun, Users, X } from "lucide-react";
 import { api, type Me, type SiteInfo } from "../lib/api";
 import { cn, fmtMoney } from "../lib/utils";
 import { Button, useToast } from "./ui";
@@ -9,7 +9,8 @@ const NAV = [
   { to: "/dashboard", label: "仪表盘", icon: Gauge, roles: ["user", "admin", "finance", "auditor"] },
   { to: "/dashboard/keys", label: "API Keys", icon: KeyRound, roles: ["user", "admin", "finance", "auditor"] },
   { to: "/dashboard/providers", label: "供应商", icon: Server, roles: ["admin"] },
-  { to: "/dashboard/models", label: "模型与定价", icon: Boxes, roles: ["user", "admin", "finance", "auditor"] },
+  { to: "/dashboard/models", label: "模型池", icon: Layers, roles: ["user", "admin", "finance", "auditor"] },
+  { to: "/dashboard/pricing", label: "定价", icon: Coins, roles: ["user", "admin", "finance", "auditor"] },
   { to: "/dashboard/invite", label: "邀请", icon: Gift, roles: ["user", "admin", "finance", "auditor"] },
   { to: "/dashboard/announcements", label: "公告", icon: Megaphone, roles: ["admin"] },
   { to: "/dashboard/usage", label: "用量日志", icon: ScrollText, roles: ["user", "admin", "finance", "auditor"] },
