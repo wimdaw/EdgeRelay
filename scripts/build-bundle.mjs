@@ -42,9 +42,6 @@ console.log(`[build-bundle] 编译完成！产物路径: cloud-functions/[[defau
 try {
   cpSync(publicDir, distDir, { recursive: true });
   rmSync(join(distDir, "index.html"), { force: true });
-  // EdgeOne 默认把 public/ 当作静态输出目录，根 index.html 会抢在函数路由之前。
-  // build-assets 已经把它内嵌进函数 bundle，这里从部署产物中删除即可。
-  rmSync(join(publicDir, "index.html"), { force: true });
   console.log(`[build-bundle] 已同步静态资产至 dist/ 目录（根 index.html 交给函数动态渲染）`);
 } catch (e) {
   // ignore
