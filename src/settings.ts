@@ -1,28 +1,16 @@
 import type { Env, PlatformSettings } from "./types";
 import { DEFAULT_SETTINGS } from "./types";
 import { ApiError, ErrorCode } from "./errors";
+import { getSettings as dbGetSettings, updateSettings as dbUpdateSettings } from "./storage/db";
 
 /* ---------- 平台合规开关 ---------- */
 
-export async function getSettings(db: Env["DB"]): Promise<PlatformSettings> {
-  const row = await db.prepare("SELECT value FROM settings WHERE key='platform'").first<{ value: string }>();
-  if (!row) return { ...DEFAULT_SETTINGS };
-  try {
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(row.value) };
-  } catch {
-    return { ...DEFAULT_SETTINGS };
-  }
+export async function getSettings(env?: any): Promise<PlatformSettings> {
+  return await dbGetSettings(env);
 }
 
-export async function updateSettings(db: Env["DB"], patch: Partial<PlatformSettings>): Promise<void> {
-  const cur = await getSettings(db);
-  const next = { ...cur, ...patch };
-  const now = Math.floor(Date.now() / 1000);
-  const value = JSON.stringify(next);
-  await db
-    .prepare("INSERT INTO settings (key,value,updated_at) VALUES ('platform',?1,?2) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at")
-    .bind(value, now)
-    .run();
+export async function updateSettings(env: any, patch: Partial<PlatformSettings>): Promise<PlatformSettings> {
+  return await dbUpdateSettings(env, patch);
 }
 
 /** 注册前合规校验：必须完成服务条款与隐私政策确认 */

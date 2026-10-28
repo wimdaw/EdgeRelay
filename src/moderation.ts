@@ -1,13 +1,9 @@
 /**
- * 内容安全钩子
- *  - 可配置启用（settings.contentModerationEnabled）
- *  - 本地规则：敏感词 blocklist（JSON 数组，支持正则）
- *  - 外部钩子：MODERATION_API_URL（POST {input} -> {flagged, rule}），可对接云厂商内容安全 API
- *  - 命中：写入 content_flags（进入人工复核队列），返回结构化 400 content_blocked
- *  - 隐私：默认只存 SHA-256 摘要与脱敏片段，不存原文
+ * 内容安全钩子 (EdgeOne Pages + Blob)
  */
 import type { HandlerCtx, PlatformSettings } from "./types";
 import { sha256Hex, uuid } from "./crypto";
+import { appendContentFlag } from "./storage/db";
 
 export type ModerationResult = { flagged: boolean; rule?: string; maskedExcerpt?: string };
 
@@ -47,7 +43,6 @@ export async function moderate(
         return { flagged: true, rule: result.rule ?? "external" };
       }
     } catch (e) {
-      // 审核 API 不可用时：fail-closed 还是 fail-open 由策略决定，MVP 默认放行并告警
       console.error("moderation_api_error", e);
     }
   }
@@ -64,10 +59,17 @@ async function recordFlag(
   const masked = args.settings.logContentEnabled
     ? args.text.slice(0, 120).replace(/[\u4e00-\u9fa5\w]{2,}/g, (w) => (w.length > 2 ? w[0] + "***" : "*"))
     : null;
-  await c.env.DB.prepare(
-    `INSERT INTO content_flags (id, user_id, api_key_id, request_id, public_model, rule, excerpt_hash, excerpt_masked, status, created_at)
-     VALUES (?1,?2,?3,?4,?5,?6,?7,?8,'pending',?9)`
-  )
-    .bind(uuid(), args.userId, args.apiKeyId ?? null, args.requestId, args.model, rule, excerptHash, masked, now)
-    .run();
+
+  await appendContentFlag(c.env, {
+    id: uuid(),
+    userId: args.userId,
+    apiKeyId: args.apiKeyId ?? null,
+    requestId: args.requestId,
+    publicModel: args.model,
+    rule,
+    excerptHash,
+    excerptMasked: masked,
+    status: "pending",
+    createdAt: now,
+  });
 }

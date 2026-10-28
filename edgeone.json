@@ -1,0 +1,11 @@
+{
+  "cloudFunctions": {
+    "maxDuration": 120,
+    "regions": {
+      "overseas": ["ap-tokyo"]
+    },
+    "externalNodeModules": [
+      "@edgeone/pages-blob"
+    ]
+  }
+}

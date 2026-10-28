@@ -1,40 +1,32 @@
-/// <reference types="@cloudflare/workers-types" />
+/**
+ * EdgeRelay (EdgeOne Pages + Blob) — 核心类型定义
+ */
 
-export type Env = {
-  DB: D1Database;
-  KV: KVNamespace;
-  STORAGE?: R2Bucket; // 可选：日志归档
+export interface Env {
+  // 环境变量与密钥
   ENCRYPTION_KEY: string;
   SESSION_SECRET: string;
   ADMIN_BOOTSTRAP_TOKEN?: string;
-  CF_ACCOUNT_ID?: string;
-  AI_GATEWAY_ID?: string;
   CORS_ORIGINS?: string;
   MODERATION_API_URL?: string;
   BILLING_CURRENCY?: string;
-};
-
-/** 辅助模块依赖的最小环境结构（避免依赖 void 生成的类型产物，便于单测与复用） */
-export type MinimalEnv = {
-  DB: D1Database;
-  KV: KVNamespace;
-  STORAGE?: R2Bucket;
-  ASSETS?: { fetch(request: Request): Promise<Response> };
-  MODERATION_API_URL?: unknown;
+  // EdgeOne 相关
+  EDGEONE_TOKEN?: string;
+  EDGEONE_TOKEN_NEW?: string;
+  BLOB_STORE_NAME?: string;
   [key: string]: unknown;
-};
+}
 
-/** 结构化最小 Request（与 Hono 的 HonoRequest 兼容；Hono 会缓存 body，可多次 json()/text()） */
-export type MinimalReq = {
-  url: string;
-  method: string;
-  header(name: string): string | undefined;
-  text(): Promise<string>;
-  json<T = unknown>(): Promise<T>;
+export type HandlerCtx = {
+  env: Env;
+  req: {
+    url: string;
+    method: string;
+    header(name: string): string | undefined;
+    text(): Promise<string>;
+    json<T = unknown>(): Promise<T>;
+  };
 };
-
-/** 辅助模块的 Handler 上下文参数（与 Hono Context 结构兼容） */
-export type HandlerCtx = { env: MinimalEnv; req: MinimalReq };
 
 export type PlatformSettings = {
   signupsEnabled: boolean;
@@ -48,15 +40,15 @@ export type PlatformSettings = {
   defaultTpm: number;
   auditLogRetentionDays: number;
   /* 安全选项 */
-  stepUpDisabled?: boolean; // 关闭管理接口二次验证（仅保留 admin 角色校验）
-  persistentSession?: boolean; // 保持登录状态（会话 10 年有效）
+  stepUpDisabled?: boolean;
+  persistentSession?: boolean;
   /* 邀请奖励 */
-  inviteRegisterReward?: number; // 新用户注册奖励
-  inviteRewardAmount?: number; // 邀请人每邀一人奖励
+  inviteRegisterReward?: number;
+  inviteRewardAmount?: number;
   inviteDailyTop1?: number;
   inviteDailyTop2?: number;
   inviteDailyTop3?: number;
-  /* 站点信息（SEO + 品牌） */
+  /* 站点信息 */
   siteName?: string;
   siteDescription?: string;
   siteLogoUrl?: string;
@@ -66,14 +58,14 @@ export type PlatformSettings = {
   oauthGoogleEnabled?: boolean;
   oauthGithubClientId?: string;
   oauthGoogleClientId?: string;
-  oauthGithubSecretEnc?: string; // 加密存储
+  oauthGithubSecretEnc?: string;
   oauthGoogleSecretEnc?: string;
   smtpEnabled?: boolean;
   smtpHost?: string;
   smtpPort?: number;
   smtpUsername?: string;
   smtpFrom?: string;
-  smtpPassEnc?: string; // 加密存储
+  smtpPassEnc?: string;
 };
 
 export const DEFAULT_SETTINGS: PlatformSettings = {
@@ -90,7 +82,7 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   stepUpDisabled: false,
   persistentSession: false,
   siteName: "EdgeRelay",
-  siteDescription: "部署在 Cloudflare 边缘的AI API 网关，用统一 OpenAI 兼容接口接入、路由和派发多家大模型服务。",
+  siteDescription: "部署在 EdgeOne 边缘的 AI API 网关，用统一 OpenAI 兼容接口接入、路由和派发多家大模型服务。",
   siteLogoUrl: "/logo.png",
   siteHomepage: "",
 };
@@ -121,3 +113,190 @@ export type AuthedKey = {
   modelWhitelist: string[] | null;
   limits: RateLimits;
 };
+
+export interface UserRecord {
+  id: string;
+  email: string;
+  passwordHash: string;
+  role: "user" | "admin" | "finance" | "auditor";
+  status: "active" | "suspended" | "banned";
+  nickname?: string;
+  bio?: string;
+  avatarUrl?: string;
+  inviteCode?: string;
+  invitedBy?: string;
+  tosAcceptedAt?: number;
+  privacyAcceptedAt?: number;
+  stepUpUntil?: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface SessionRecord {
+  id: string;
+  userId: string;
+  createdAt: number;
+  expiresAt: number;
+  ip?: string;
+  userAgent?: string;
+}
+
+export interface ApiKeyRecord {
+  id: string;
+  userId: string;
+  orgId?: string | null;
+  name: string;
+  keyHash: string;
+  prefix: string;
+  status: "active" | "revoked";
+  quotaUsd?: number | null;
+  spentUsd: number;
+  expiresAt?: number | null;
+  ipWhitelist?: string | null; // JSON array string
+  modelWhitelist?: string | null; // JSON array string
+  requiresSigning: number;
+  createdAt: number;
+  revokedAt?: number | null;
+  lastUsedAt?: number | null;
+}
+
+export interface ProviderRecord {
+  id: string;
+  name: string;
+  slug: string;
+  kind: string; // openai_compat
+  baseUrl: string;
+  authScheme: string; // bearer | x-api-key
+  extraHeaders?: string | null; // JSON string
+  status: "active" | "disabled";
+  authorizationRef?: string | null;
+  authorizationExpiresAt?: number | null;
+  createdAt: number;
+}
+
+export interface ProviderKeyRecord {
+  id: string;
+  providerId: string;
+  label: string;
+  encryptedKey: string;
+  keyFingerprint?: string | null;
+  status: "active" | "disabled";
+  createdAt: number;
+}
+
+export interface ModelRouteRecord {
+  id: string;
+  publicName: string;
+  providerId: string;
+  upstreamModel: string;
+  priority: number;
+  costWeight: number;
+  maxContext?: number | null;
+  enabled: number;
+  createdAt: number;
+}
+
+export interface ModelPricingRecord {
+  id: string;
+  publicName: string;
+  inputPerMillion: number;
+  outputPerMillion: number;
+  currency: string;
+  createdAt: number;
+}
+
+export interface BalanceRecord {
+  id: string;
+  scope: string; // user:{id} | org:{id}
+  available: number;
+  frozen: number;
+  currency: string;
+  updatedAt: number;
+}
+
+export interface LedgerEntryRecord {
+  id: string;
+  scope: string;
+  userId?: string | null;
+  type: "topup" | "hold" | "capture" | "release" | "refund" | "adjustment";
+  amount: number;
+  balanceAfter: number;
+  requestId?: string | null;
+  memo?: string | null;
+  createdAt: number;
+}
+
+export interface UsageRecord {
+  id: string;
+  requestId: string;
+  userId: string;
+  apiKeyId?: string | null;
+  orgId?: string | null;
+  publicModel: string;
+  providerId?: string | null;
+  upstreamModel?: string | null;
+  status: string;
+  httpStatus?: number | null;
+  latencyMs?: number | null;
+  promptTokens: number;
+  completionTokens: number;
+  costUsd: number;
+  currency: string;
+  stream: number;
+  errorCode?: string | null;
+  attempts: number;
+  ip?: string | null;
+  createdAt: number;
+}
+
+export interface DailyUsageSummary {
+  date: string;
+  requests: number;
+  successRequests: number;
+  promptTokens: number;
+  completionTokens: number;
+  totalCostUsd: number;
+  totalLatencyMs: number;
+  byModel: Record<string, { requests: number; promptTokens: number; completionTokens: number; costUsd: number }>;
+  byProvider: Record<string, { requests: number; promptTokens: number; completionTokens: number }>;
+}
+
+export interface AuditLogRecord {
+  id: string;
+  actorUserId?: string | null;
+  actorIp?: string | null;
+  action: string;
+  targetType?: string | null;
+  targetId?: string | null;
+  meta?: string | null;
+  prevHash?: string | null;
+  hash: string;
+  createdAt: number;
+}
+
+export interface ContentFlagRecord {
+  id: string;
+  userId: string;
+  apiKeyId?: string | null;
+  requestId?: string | null;
+  publicModel?: string | null;
+  rule: string;
+  excerptHash?: string | null;
+  excerptMasked?: string | null;
+  status: "pending" | "cleared" | "confirmed" | "dismissed";
+  reviewerId?: string | null;
+  reviewNote?: string | null;
+  createdAt: number;
+  reviewedAt?: number | null;
+}
+
+export interface AppealRecord {
+  id: string;
+  userId: string;
+  targetType: string;
+  targetId?: string | null;
+  reason: string;
+  status: "pending" | "resolved" | "rejected";
+  createdAt: number;
+  resolvedAt?: number | null;
+}

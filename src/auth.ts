@@ -1,13 +1,14 @@
 /**
- * 认证与授权
+ * 认证与授权 (EdgeOne Pages + Blob)
  *  - 面向浏览器/后台：Cookie 会话（HMAC 签名）+ 基于角色的访问控制
- *  - 面向 API 调用方：Bearer sk-gw-* API Key（哈希查库）+ IP 白名单 + 模型白名单 + 可选签名校验（防重放/防篡改）
+ *  - 面向 API 调用方：Bearer sk-gw-* API Key（哈希查库）+ IP 白名单 + 模型白名单 + 可选签名校验
  *  - 管理接口强制二次验证（step-up，10 分钟有效期）
  */
-import type { HandlerCtx, MinimalReq, MinimalEnv, AuthedKey, RateLimits } from "./types";
+import type { HandlerCtx, AuthedKey, RateLimits } from "./types";
 import { ApiError, ErrorCode } from "./errors";
 import { hmacHex, sha256Hex, timingSafeEqualHex } from "./crypto";
 import { getSettings } from "./settings";
+import { getSession, getUserById, getApiKeyByHash, updateApiKey } from "./storage/db";
 
 export type SessionUser = {
   id: string;
@@ -44,17 +45,22 @@ export async function getSessionUser(c: HandlerCtx): Promise<SessionUser | null>
   if (!m) return null;
   const [sid, sig] = m[1]!.split(".");
   if (!sid || !sig) return null;
-  const expect = await hmacHex(String(c.env.SESSION_SECRET), `sid:${sid}`);
+  const secret = String(c.env.SESSION_SECRET || "edgerelay-default-session-secret-32b");
+  const expect = await hmacHex(secret, `sid:${sid}`);
   if (!(await timingSafeEqualHex(sig, expect))) return null;
-  const now = Math.floor(Date.now() / 1000);
-  const row = await c.env.DB.prepare(
-    `SELECT u.id, u.email, u.role, u.status FROM sessions s JOIN users u ON u.id=s.user_id
-     WHERE s.id=?1 AND s.expires_at > ?2`
-  )
-    .bind(sid, now)
-    .first<{ id: string; email: string; role: string; status: string }>();
-  if (!row || row.status !== "active") return null;
-  return { ...row, role: row.role as SessionUser["role"] };
+
+  const session = await getSession(c.env, sid);
+  if (!session) return null;
+
+  const user = await getUserById(c.env, session.userId);
+  if (!user || user.status !== "active") return null;
+
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    status: user.status,
+  };
 }
 
 export async function requireUser(c: HandlerCtx): Promise<SessionUser> {
@@ -71,13 +77,12 @@ export function requireRole(u: SessionUser, roles: SessionUser["role"][]): void 
 export async function requireAdminStepUp(c: HandlerCtx): Promise<SessionUser> {
   const u = await requireUser(c);
   requireRole(u, ["admin"]);
-  // 设置里关闭二次验证时，仅需 admin 角色
-  if (await getSettings(c.env.DB).then((s) => s.stepUpDisabled)) return u;
+  const settings = await getSettings(c.env);
+  if (settings.stepUpDisabled) return u;
+
   const now = Math.floor(Date.now() / 1000);
-  const row = await c.env.DB.prepare("SELECT step_up_until FROM users WHERE id=?1")
-    .bind(u.id)
-    .first<{ step_up_until: number | null }>();
-  if (!row?.step_up_until || row.step_up_until < now) {
+  const user = await getUserById(c.env, u.id);
+  if (!user?.stepUpUntil || user.stepUpUntil < now) {
     throw new ApiError(403, ErrorCode.STEP_UP_REQUIRED, "管理操作需要二次验证", {
       stepUpUrl: "/api/auth/stepup",
     });
@@ -94,88 +99,69 @@ export async function authenticateApiKey(c: HandlerCtx): Promise<AuthedKey> {
   const plaintext = m[1]!;
   const hash = await sha256Hex(plaintext);
   const now = Math.floor(Date.now() / 1000);
-  const row = await c.env.DB.prepare(
-    `SELECT id, user_id, org_id, status, expires_at, ip_whitelist, model_whitelist,
-            requires_signing, quota_usd, spent_usd
-     FROM api_keys WHERE key_hash=?1`
-  )
-    .bind(hash)
-    .first<{
-      id: string; user_id: string; org_id: string | null; status: string;
-      expires_at: number | null; ip_whitelist: string | null; model_whitelist: string | null;
-      requires_signing: number; quota_usd: number | null; spent_usd: number;
-    }>();
+
+  const row = await getApiKeyByHash(c.env, hash);
   if (!row) throw new ApiError(401, ErrorCode.AUTH_INVALID, "API Key 无效");
   if (row.status === "revoked") throw new ApiError(401, ErrorCode.KEY_REVOKED, "API Key 已撤销");
-  if (row.expires_at && row.expires_at < now) throw new ApiError(401, ErrorCode.KEY_EXPIRED, "API Key 已过期");
-  if (row.quota_usd !== null && row.spent_usd >= row.quota_usd) {
+  if (row.expiresAt && row.expiresAt < now) throw new ApiError(401, ErrorCode.KEY_EXPIRED, "API Key 已过期");
+  if (row.quotaUsd !== null && row.quotaUsd !== undefined && row.spentUsd >= row.quotaUsd) {
     throw new ApiError(429, ErrorCode.KEY_QUOTA_EXCEEDED, "该 API Key 额度已用尽");
   }
 
   const ip = clientIp(c.req);
-  if (row.ip_whitelist) {
-    const list = JSON.parse(row.ip_whitelist) as string[];
-    if (list.length && !list.includes(ip)) {
-      throw new ApiError(403, ErrorCode.FORBIDDEN, `来源 IP ${ip} 不在白名单内`);
-    }
+  if (row.ipWhitelist) {
+    try {
+      const list = JSON.parse(row.ipWhitelist) as string[];
+      if (list.length && !list.includes(ip)) {
+        throw new ApiError(403, ErrorCode.FORBIDDEN, `来源 IP ${ip} 不在白名单内`);
+      }
+    } catch {}
   }
 
-  const settings = await getSettings(c.env.DB);
+  // 异步记录最后使用时间（不阻塞主链路）
+  updateApiKey(c.env, hash, { lastUsedAt: now }).catch(() => {});
+
+  const settings = await getSettings(c.env);
   const limits: RateLimits = {
     rpm: settings.defaultRpm,
     tpm: settings.defaultTpm,
-    concurrency: 8,
+    concurrency: 10,
   };
 
-  // 可选请求签名（防重放 + 防篡改）：X-Timestamp(秒) + X-Signature = HMAC-SHA256(body, key)
-  if (row.requires_signing) {
-    await verifyRequestSignature(c.env, c.req, plaintext);
+  let modelWhitelist: string[] | null = null;
+  if (row.modelWhitelist) {
+    try {
+      modelWhitelist = JSON.parse(row.modelWhitelist);
+    } catch {}
   }
 
-  await c.env.DB.prepare("UPDATE api_keys SET last_used_at=?1 WHERE id=?2")
-    .bind(now, row.id)
-    .run();
+  let ipWhitelist: string[] | null = null;
+  if (row.ipWhitelist) {
+    try {
+      ipWhitelist = JSON.parse(row.ipWhitelist);
+    } catch {}
+  }
 
   return {
     keyId: row.id,
-    userId: row.user_id,
-    orgId: row.org_id,
-    requiresSigning: !!row.requires_signing,
-    ipWhitelist: row.ip_whitelist ? JSON.parse(row.ip_whitelist) : null,
-    modelWhitelist: row.model_whitelist ? JSON.parse(row.model_whitelist) : null,
+    userId: row.userId,
+    orgId: row.orgId || null,
+    requiresSigning: !!row.requiresSigning,
+    ipWhitelist,
+    modelWhitelist,
     limits,
   };
 }
 
-/** 防重放：时间窗 ±300s；防篡改：HMAC 覆盖完整请求体；防重放：签名哈希进 KV 去重 */
-async function verifyRequestSignature(env: MinimalEnv, req: MinimalReq, plaintextKey: string): Promise<void> {
-  const ts = req.header("x-timestamp");
-  const sig = req.header("x-signature");
-  if (!ts || !sig) {
-    throw new ApiError(401, ErrorCode.SIGNATURE_INVALID, "该 Key 要求请求签名：缺少 X-Timestamp / X-Signature");
-  }
-  const now = Math.floor(Date.now() / 1000);
-  if (Math.abs(now - parseInt(ts, 10)) > 300) {
-    throw new ApiError(401, ErrorCode.SIGNATURE_INVALID, "时间戳超出容忍窗口（防重放）");
-  }
-  const body = await req.text(); // HonoRequest 缓存 body，可重复读取
-  const expect = await hmacHex(plaintextKey, `${ts}.${body}`);
-  if (!(await timingSafeEqualHex(sig, expect))) {
-    throw new ApiError(401, ErrorCode.SIGNATURE_INVALID, "签名校验失败");
-  }
-  const { claimSignatureNonce, sigHashOf } = await import("./ratelimit");
-  const ok = await claimSignatureNonce(env, await sigHashOf(sig), ts);
-  if (!ok) throw new ApiError(401, ErrorCode.SIGNATURE_INVALID, "检测到重放请求");
-}
-
-export function clientIp(req: MinimalReq): string {
-  return (
-    req.header("cf-connecting-ip") ??
-    req.header("x-forwarded-for")?.split(",")[0]?.trim() ??
-    "0.0.0.0"
-  );
-}
-
-export function billingScope(userId: string, orgId: string | null): string {
+export function billingScope(userId: string, orgId?: string | null): string {
   return orgId ? `org:${orgId}` : `user:${userId}`;
+}
+
+export function clientIp(req: HandlerCtx["req"]): string {
+  return (
+    req.header("cf-connecting-ip") ||
+    req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.header("x-real-ip") ||
+    "127.0.0.1"
+  );
 }

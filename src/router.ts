@@ -1,49 +1,63 @@
 /**
- * 路由与故障转移
+ * 路由与故障转移 (EdgeOne Pages + Blob)
  *  - 一个对外模型可映射多条上游路由（models 表）
  *  - 选择策略：priority 升序（越小越优先）→ cost_weight 升序
  *  - 返回有序候选列表，主路由失败按序 failover
  */
-import type { Env, UpstreamRoute } from "./types";
+import type { UpstreamRoute } from "./types";
 import { ApiError, ErrorCode } from "./errors";
+import { getModels, getProviders, getProviderKeys } from "./storage/db";
 
-export async function listRoutes(db: Env["DB"], publicName: string): Promise<UpstreamRoute[]> {
-  const { results } = await db
-    .prepare(
-      `SELECT m.id AS model_id, m.public_name, m.upstream_model, m.priority, m.cost_weight,
-              p.id AS provider_id, p.slug AS provider_slug, p.kind, p.base_url, p.auth_scheme, p.extra_headers,
-              pk.id AS provider_key_id, pk.encrypted_key
-       FROM models m
-       JOIN providers p ON p.id = m.provider_id AND p.status = 'active'
-       JOIN provider_keys pk ON pk.provider_id = p.id AND pk.status = 'active'
-       WHERE m.public_name = ?1 AND m.enabled = 1
-       ORDER BY m.priority ASC, m.cost_weight ASC`
-    )
-    .bind(publicName)
-    .all<{
-      model_id: string; public_name: string; upstream_model: string; priority: number; cost_weight: number;
-      provider_id: string; provider_slug: string; kind: string; base_url: string; auth_scheme: string;
-      extra_headers: string | null; provider_key_id: string; encrypted_key: string;
-    }>();
+export async function listRoutes(env: any, publicName: string): Promise<UpstreamRoute[]> {
+  const allModels = await getModels(env);
+  const matched = allModels.filter((m) => m.publicName === publicName && m.enabled === 1);
+  if (!matched.length) return [];
 
-  return results.map((r) => ({
-    modelId: r.model_id,
-    providerId: r.provider_id,
-    providerSlug: r.provider_slug,
-    providerKind: r.kind,
-    baseUrl: r.base_url,
-    authScheme: r.auth_scheme,
-    extraHeaders: r.extra_headers ? JSON.parse(r.extra_headers) : {},
-    providerKeyId: r.provider_key_id,
-    encryptedKey: r.encrypted_key,
-    upstreamModel: r.upstream_model,
-    priority: r.priority,
-    costWeight: r.cost_weight,
-  }));
+  // 按 priority 升序、cost_weight 升序排序
+  matched.sort((a, b) => a.priority - b.priority || a.costWeight - b.costWeight);
+
+  const allProviders = await getProviders(env);
+  const providerMap = new Map(allProviders.map((p) => [p.id, p]));
+
+  const routes: UpstreamRoute[] = [];
+  for (const m of matched) {
+    const p = providerMap.get(m.providerId);
+    if (!p || p.status !== "active") continue;
+
+    const keys = await getProviderKeys(env, p.id);
+    const activeKeys = keys.filter((k) => k.status === "active");
+    if (!activeKeys.length) continue;
+
+    // 取第一个 active key（或轮询）
+    const pk = activeKeys[0]!;
+    let extraHeaders: Record<string, string> = {};
+    if (p.extraHeaders) {
+      try {
+        extraHeaders = JSON.parse(p.extraHeaders);
+      } catch {}
+    }
+
+    routes.push({
+      modelId: m.id,
+      providerId: p.id,
+      providerSlug: p.slug,
+      providerKind: p.kind,
+      baseUrl: p.baseUrl,
+      authScheme: p.authScheme,
+      extraHeaders,
+      providerKeyId: pk.id,
+      encryptedKey: pk.encryptedKey,
+      upstreamModel: m.upstreamModel,
+      priority: m.priority,
+      costWeight: m.costWeight,
+    });
+  }
+
+  return routes;
 }
 
-export async function requireRoutes(db: Env["DB"], publicName: string): Promise<UpstreamRoute[]> {
-  const routes = await listRoutes(db, publicName);
+export async function requireRoutes(env: any, publicName: string): Promise<UpstreamRoute[]> {
+  const routes = await listRoutes(env, publicName);
   if (!routes.length) {
     throw new ApiError(404, ErrorCode.MODEL_NOT_FOUND, `模型 ${publicName} 不存在或暂无可用上游`);
   }
@@ -51,10 +65,9 @@ export async function requireRoutes(db: Env["DB"], publicName: string): Promise<
 }
 
 /** 列出对外可见的模型（OpenAI /v1/models 格式） */
-export async function listPublicModels(db: Env["DB"]): Promise<{ id: string; created: number; owned_by: string }[]> {
-  const { results } = await db
-    .prepare("SELECT DISTINCT public_name FROM models WHERE enabled = 1")
-    .all<{ public_name: string }>();
+export async function listPublicModels(env: any): Promise<{ id: string; created: number; owned_by: string }[]> {
+  const models = await getModels(env);
+  const names = Array.from(new Set(models.filter((m) => m.enabled === 1).map((m) => m.publicName)));
   const created = Math.floor(Date.parse("2026-01-01") / 1000);
-  return results.map((r) => ({ id: r.public_name, created, owned_by: "gateway" }));
+  return names.map((name) => ({ id: name, created, owned_by: "gateway" }));
 }

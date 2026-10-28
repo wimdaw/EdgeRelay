@@ -1,7 +1,7 @@
 /**
- * 密码学工具（WebCrypto，Workers 兼容）
+ * 密码学工具（WebCrypto 标准，EdgeOne / Node 20+ 兼容）
  *  - API Key：明文只在创建响应中出现一次，库中仅存 SHA-256
- *  - 上游密钥：AES-256-GCM 加密存储，主密钥来自 ENCRYPTION_KEY secret
+ *  - 上游密钥：AES-256-GCM 加密存储，主密钥来自 ENCRYPTION_KEY
  */
 import type { Env } from "./types";
 
@@ -9,7 +9,14 @@ const enc = new TextEncoder();
 const dec = new TextDecoder();
 
 export function uuid(): string {
-  return crypto.randomUUID();
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 }
 
 export function sha256Hex(data: string): Promise<string> {
@@ -82,7 +89,8 @@ function hexToBuf(hex: string): Uint8Array {
 /* ---------- AES-256-GCM（上游供应商密钥加密） ---------- */
 
 async function aesKey(env: Env): Promise<CryptoKey> {
-  const material = await crypto.subtle.digest("SHA-256", enc.encode(env.ENCRYPTION_KEY));
+  const secret = String(env.ENCRYPTION_KEY || "edgerelay-default-encryption-secret-32b");
+  const material = await crypto.subtle.digest("SHA-256", enc.encode(secret));
   return crypto.subtle.importKey("raw", material, { name: "AES-GCM" }, false, ["encrypt", "decrypt"]);
 }
 
