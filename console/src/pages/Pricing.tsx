@@ -4,7 +4,7 @@ import { adminAction, api, type Me, type ModelRow, type Provider } from "../lib/
 import { Button, Card, Dialog, DataTable, Field, Input, Select, StatusTag, useConfirm, useToast, type Col } from "../components/ui";
 
 export default function Pricing({ me }: { me: Me }) {
-  const isAdmin = me.user.role === "admin";
+  const isAdmin = me.user.role === "superadmin";
   const [rows, setRows] = useState<ModelRow[] | null>(null);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [dlg, setDlg] = useState(false);

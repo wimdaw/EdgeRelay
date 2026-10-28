@@ -49,7 +49,7 @@ inviteRouter.get("/admin", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
     const user = await requireUser(hCtx);
-    requireRole(user, ["admin"]);
+    requireRole(user, ["superadmin"]);
     const settings = await getSettings(c.env);
 
     const allUsers = await listAllUsers(c.env);
@@ -97,7 +97,7 @@ inviteRouter.post("/admin", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
     const user = await requireUser(hCtx);
-    requireRole(user, ["admin"]);
+    requireRole(user, ["superadmin"]);
     const body = await c.req.json<{
       registerReward?: number;
       inviteReward?: number;

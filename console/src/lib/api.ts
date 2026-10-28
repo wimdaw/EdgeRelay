@@ -16,7 +16,7 @@ export async function api<T = unknown>(path: string, method: "GET" | "POST" | "P
   return data as T;
 }
 
-export type Me = { user: { id: string; email: string; role: "user" | "admin" | "finance" | "auditor" }; nickname?: string | null; bio?: string | null; avatarUrl?: string | null; balance: { available: number; frozen: number; currency: string } };
+export type Me = { user: { id: string; email: string; role: "user" | "vip" | "admin" | "superadmin" | "finance" | "auditor" }; nickname?: string | null; bio?: string | null; avatarUrl?: string | null; balance: { available: number; frozen: number; currency: string } };
 export type Stats = { requests: number; errorRate: number; promptTokens: number; completionTokens: number; cost: number; currency: string; pendingContentFlags: number; byStatus: { status: string; n: number }[]; byModel: { public_model: string; n: number; cost: number }[] };
 export type TrendPoint = { date: string; requests: number; tokens: number; errors: number; cost: number };
 export type KeyRow = { id: string; name: string; prefix: string; status: string; quota_usd: number | null; spent_usd: number; expires_at: number | null; ip_whitelist: string | null; model_whitelist: string | null; requires_signing: number; created_at: number; last_used_at: number | null };

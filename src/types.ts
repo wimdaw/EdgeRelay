@@ -129,7 +129,7 @@ export type UpstreamRoute = {
 export type AuthedKey = {
   keyId: string;
   userId: string;
-  userRole: "user" | "vip" | "admin" | "finance" | "auditor";
+  userRole: "user" | "vip" | "admin" | "superadmin" | "finance" | "auditor";
   orgId: string | null;
   requiresSigning: boolean;
   ipWhitelist: string[] | null;
@@ -141,7 +141,7 @@ export interface UserRecord {
   id: string;
   email: string;
   passwordHash: string;
-  role: "user" | "vip" | "admin" | "finance" | "auditor";
+  role: "user" | "vip" | "admin" | "superadmin" | "finance" | "auditor";
   status: "active" | "suspended" | "banned";
   nickname?: string;
   bio?: string;

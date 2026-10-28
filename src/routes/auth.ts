@@ -348,7 +348,7 @@ authRouter.post("/stepup", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
     const u = await requireUser(hCtx);
-    requireRole(u, ["admin"]);
+    requireRole(u, ["superadmin"]);
     const body = await c.req.json<{ password?: string }>();
     if (!body.password) {
       throw new ApiError(400, ErrorCode.BAD_REQUEST, "请输入当前密码完成二次验证");

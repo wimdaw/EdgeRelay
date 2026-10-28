@@ -12,7 +12,8 @@ const RANGES = [
 
 export default function Dashboard() {
   const { me } = useOutletContext<{ me: Me }>();
-  const isAdmin = ["admin", "auditor"].includes(me.user.role);
+  const isSuperadmin = me.user.role === "superadmin";
+  const isAdmin = ["superadmin", "admin", "auditor"].includes(me.user.role);
   const [stats, setStats] = useState<Stats | null>(null);
   const [trend, setTrend] = useState<TrendPoint[] | null>(null);
   const [range, setRange] = useState(7);
@@ -53,7 +54,12 @@ export default function Dashboard() {
     { label: "我的请求数（24h）", value: stats ? fmtInt(stats.requests) : "", icon: Zap, color: "text-brand bg-brand/10" },
     { label: "我的 Token 消耗（24h）", value: stats ? fmtInt(stats.promptTokens + stats.completionTokens) : "", icon: Coins, color: "text-info bg-info/10" },
     { label: "我的成功率（24h）", value: stats ? `${((1 - stats.errorRate) * 100).toFixed(2)}%` : "", icon: Activity, color: "text-ok bg-ok/10" },
-    { label: "当前余额", value: fmtMoney(balance, me.balance.currency), icon: ShieldQuestion, color: "text-brand bg-brand/10" },
+    {
+      label: isSuperadmin ? "当前余额 (超管无限)" : "当前余额",
+      value: isSuperadmin ? `${fmtMoney(balance, me.balance.currency)} (无限)` : fmtMoney(balance, me.balance.currency),
+      icon: ShieldQuestion,
+      color: "text-brand bg-brand/10",
+    },
   ];
 
   const cols: Col<UsageLog>[] = [
@@ -78,8 +84,8 @@ export default function Dashboard() {
             </div>
             {stats || label === "当前余额" ? <div className="mt-2 truncate text-xl font-bold tabular-nums sm:text-2xl" title={String(value)}>{value}</div> : <Skeleton className="mt-3 h-7 w-24" />}
             <div className="mt-1 text-[11px] text-muted flex items-center justify-between">
-              <span>{label === "当前余额" ? "按量真实结算" : "较昨日 —"}</span>
-              {label === "当前余额" && (
+              <span>{label.includes("余额") ? (isSuperadmin ? "超管不卡额度 · 真实扣费记账" : "按量真实结算") : "较昨日 —"}</span>
+              {label.includes("余额") && (
                 <button
                   type="button"
                   onClick={() => setRedeemOpen(true)}

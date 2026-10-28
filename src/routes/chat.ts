@@ -127,7 +127,7 @@ chatRouter.post("/", async (c) => {
     const estCompletion = body.max_tokens ?? 1024;
     const estCost = effectivePricing ? estimateCost(effectivePricing, estPrompt, estCompletion) : 0;
     const scope = billingScope(key.userId, key.orgId);
-    const { holdId } = await hold(hCtx, scope, estCost, requestId);
+    const { holdId } = await hold(hCtx, scope, estCost, requestId, key.userRole);
 
     /* ---- 依次尝试上游（故障转移与多 Key 容灾） ---- */
     const stream = !!body.stream;

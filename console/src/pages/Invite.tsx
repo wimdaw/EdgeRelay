@@ -18,7 +18,7 @@ type AdminData = {
 };
 
 export default function Invite({ me }: { me: Me }) {
-  const isAdmin = me.user.role === "admin";
+  const isAdmin = me.user.role === "superadmin";
   const [data, setData] = useState<InviteMe | null>(null);
   const [admin, setAdmin] = useState<AdminData | null>(null);
   const [qEmail, setQEmail] = useState("");

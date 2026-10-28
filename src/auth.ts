@@ -13,7 +13,7 @@ import { getSession, getUserById, getApiKeyByHash, updateApiKey, updateUser } fr
 export type SessionUser = {
   id: string;
   email: string;
-  role: "user" | "vip" | "admin" | "finance" | "auditor";
+  role: "user" | "vip" | "admin" | "superadmin" | "finance" | "auditor";
   status: string;
 };
 
@@ -76,7 +76,7 @@ export function requireRole(u: SessionUser, roles: SessionUser["role"][]): void 
 /** 管理接口二次验证：需要已登录且通过 step-up（支持就地核验管理员密码，或 10 分钟凭证有效） */
 export async function requireAdminStepUp(c: HandlerCtx, providedPassword?: string): Promise<SessionUser> {
   const u = await requireUser(c);
-  requireRole(u, ["admin"]);
+  requireRole(u, ["superadmin"]);
   const settings = await getSettings(c.env);
   if (settings.stepUpDisabled) return u;
 

@@ -5,19 +5,22 @@ import { api, type Me, type SiteInfo } from "../lib/api";
 import { cn, fmtMoney } from "../lib/utils";
 import { Button, useToast } from "./ui";
 
+const ALL_ROLES = ["user", "vip", "admin", "superadmin", "finance", "auditor"];
+
 const NAV = [
-  { to: "/dashboard", label: "仪表盘", icon: Gauge, roles: ["user", "admin", "finance", "auditor"] },
-  { to: "/dashboard/keys", label: "API Keys", icon: KeyRound, roles: ["user", "admin", "finance", "auditor"] },
-  { to: "/dashboard/providers", label: "供应商", icon: Server, roles: ["admin"] },
-  { to: "/dashboard/models", label: "模型池", icon: Layers, roles: ["user", "admin", "finance", "auditor"] },
-  { to: "/dashboard/pricing", label: "定价", icon: Coins, roles: ["user", "admin", "finance", "auditor"] },
-  { to: "/dashboard/invite", label: "邀请", icon: Gift, roles: ["user", "admin", "finance", "auditor"] },
-  { to: "/dashboard/announcements", label: "公告", icon: Megaphone, roles: ["admin"] },
-  { to: "/dashboard/usage", label: "用量日志", icon: ScrollText, roles: ["user", "admin", "finance", "auditor"] },
-  { to: "/dashboard/audit", label: "审计日志", icon: ShieldCheck, roles: ["admin", "auditor"] },
-  { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ["admin"] },
-  { to: "/dashboard/settings", label: "设置", icon: SettingsIcon, roles: ["admin"] },
-  { to: "/dashboard/profile", label: "个人主页", icon: CircleUser, roles: ["user", "admin", "finance", "auditor"] },
+  { to: "/dashboard", label: "仪表盘", icon: Gauge, roles: ALL_ROLES },
+  { to: "/dashboard/keys", label: "API Keys", icon: KeyRound, roles: ALL_ROLES },
+  { to: "/dashboard/models", label: "模型池", icon: Layers, roles: ALL_ROLES },
+  { to: "/dashboard/usage", label: "用量日志", icon: ScrollText, roles: ALL_ROLES },
+  { to: "/dashboard/invite", label: "邀请", icon: Gift, roles: ALL_ROLES },
+  { to: "/dashboard/profile", label: "个人主页", icon: CircleUser, roles: ALL_ROLES },
+  // 网站治理专属超级管理员
+  { to: "/dashboard/providers", label: "供应商", icon: Server, roles: ["superadmin"] },
+  { to: "/dashboard/pricing", label: "定价", icon: Coins, roles: ["superadmin"] },
+  { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ["superadmin"] },
+  { to: "/dashboard/announcements", label: "公告", icon: Megaphone, roles: ["superadmin"] },
+  { to: "/dashboard/settings", label: "设置", icon: SettingsIcon, roles: ["superadmin"] },
+  { to: "/dashboard/audit", label: "审计日志", icon: ShieldCheck, roles: ["superadmin", "auditor"] },
 ];
 
 export function useTheme() {
@@ -161,9 +164,19 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
             {!collapsed && <span>收缩侧边栏</span>}
           </button>
           {!collapsed && (
-            <div className="mt-2 space-y-0.5 px-2 text-[11px] text-muted">
-              <div className="truncate">{me.user.email}</div>
-              <div className="font-medium text-ink">{fmtMoney(me.balance.available, me.balance.currency)}</div>
+            <div className="mt-2 space-y-1 px-2 text-[11px] text-muted">
+              <div className="flex items-center justify-between gap-1">
+                <span className="truncate">{me.user.email}</span>
+                <span className="shrink-0 text-[10px] rounded bg-brand/10 text-brand px-1.5 py-0.2 font-medium">
+                  {me.user.role === "superadmin" ? "超级管理" : me.user.role === "vip" ? "VIP" : me.user.role === "admin" ? "Admin" : "普通用户"}
+                </span>
+              </div>
+              <div className="font-medium text-ink flex items-center justify-between">
+                <span>{fmtMoney(me.balance.available, me.balance.currency)}</span>
+                {me.user.role === "superadmin" && (
+                  <span className="text-[10px] text-emerald-500 font-semibold font-mono">无限额度</span>
+                )}
+              </div>
             </div>
           )}
         </div>

@@ -68,8 +68,12 @@ adminRouter.post("/actions", async (c) => {
 
     const user = await requireUser(hCtx);
     let admin = user;
-    if (READ_ACTIONS.has(action)) {
-      requireRole(user, ["admin", "auditor"]);
+    if (action === "list_audit" || action === "flags_queue" || action === "appeals_list") {
+      requireRole(user, ["superadmin", "auditor"]);
+    } else if (action === "list_pricing") {
+      requireRole(user, ["superadmin", "finance", "auditor"]);
+    } else if (READ_ACTIONS.has(action)) {
+      requireRole(user, ["superadmin", "auditor"]);
     } else {
       admin = await requireAdminStepUp(hCtx, typeof p.password === "string" ? p.password : undefined);
     }
@@ -110,13 +114,21 @@ adminRouter.post("/actions", async (c) => {
       }
       case "set_role": {
         const role = String(p.role);
-        if (!["user", "vip", "admin", "finance", "auditor"].includes(role)) {
+        if (!["user", "vip", "admin", "superadmin", "finance", "auditor"].includes(role)) {
           throw new ApiError(400, ErrorCode.BAD_REQUEST, "非法角色");
+        }
+        const target = await getUserById(env, String(p.userId));
+        if (target?.email.toLowerCase() === "hackerxiaow@gmail.com" && role !== "superadmin") {
+          throw new ApiError(403, ErrorCode.FORBIDDEN, "创始人超级管理员账号不可被降权");
         }
         await updateUser(env, String(p.userId), { role: role as any });
         return done(null, "user", String(p.userId));
       }
       case "ban_user": {
+        const target = await getUserById(env, String(p.userId));
+        if (target?.role === "superadmin" || target?.email.toLowerCase() === "hackerxiaow@gmail.com") {
+          throw new ApiError(403, ErrorCode.FORBIDDEN, "超级管理员账号不可被封禁");
+        }
         await updateUser(env, String(p.userId), { status: "banned" });
         return done(null, "user", String(p.userId));
       }

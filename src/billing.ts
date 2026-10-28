@@ -47,11 +47,20 @@ export async function getBalance(env: any, scope: string): Promise<{ available: 
   return { available: b.available, frozen: b.frozen, currency: b.currency };
 }
 
-/** 冻结预估额度；不足返回 402 */
-export async function hold(c: HandlerCtx, scope: string, amount: number, requestId: string): Promise<{ holdId: string }> {
+/** 冻结预估额度；超级管理员不限制余额上限，普通/VIP用户不足返回 402 */
+export async function hold(
+  c: HandlerCtx,
+  scope: string,
+  amount: number,
+  requestId: string,
+  userRole?: string
+): Promise<{ holdId: string }> {
   if (amount <= 0) return { holdId: "" };
   const bal = await getOrCreateBalance(c.env, scope);
-  if (bal.available - bal.frozen < amount) {
+
+  // 超级管理员拥有无限调用额度，不卡余额不足拦截；调用照常真实扣费记账
+  const isSuperadmin = userRole === "superadmin";
+  if (!isSuperadmin && bal.available - bal.frozen < amount) {
     throw new ApiError(402, ErrorCode.INSUFFICIENT_BALANCE, "余额不足，请充值", {
       available: bal.available,
       frozen: bal.frozen,

