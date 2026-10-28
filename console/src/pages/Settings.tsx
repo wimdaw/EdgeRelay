@@ -37,7 +37,7 @@ export default function Settings() {
     <div className="grid gap-5 lg:grid-cols-2">
       <Card className="p-5">
         <h2 className="mb-4 text-sm font-semibold">计费与限流</h2>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="默认 RPM（每 Key）"><Input type="number" value={String(s.defaultRpm ?? 60)} onChange={(e) => set("defaultRpm", +e.target.value)} /></Field>
           <Field label="默认 TPM（每 Key）"><Input type="number" value={String(s.defaultTpm ?? 100000)} onChange={(e) => set("defaultTpm", +e.target.value)} /></Field>
         </div>
@@ -161,7 +161,7 @@ export default function Settings() {
             <label className="flex items-center justify-between text-[13px]">启用 SMTP
               <input type="checkbox" className="h-4 w-4 accent-[#F38020]" checked={smtp.enabled} onChange={(e) => setSmtp({ ...smtp, enabled: e.target.checked })} />
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="SMTP 主机"><Input value={smtp.host} onChange={(e) => setSmtp({ ...smtp, host: e.target.value })} placeholder="smtp.example.com" /></Field>
               <Field label="端口（465=TLS / 587=STARTTLS）"><Input type="number" value={String(smtp.port)} onChange={(e) => setSmtp({ ...smtp, port: +e.target.value || 465 })} placeholder="推荐 587" /></Field>
               <Field label="用户名（完整邮箱地址）"><Input value={smtp.username} onChange={(e) => setSmtp({ ...smtp, username: e.target.value })} placeholder="mail@collegehub.cn" /></Field>

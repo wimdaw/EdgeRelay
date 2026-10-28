@@ -26,7 +26,7 @@ export const Select = (p: React.SelectHTMLAttributes<HTMLSelectElement>) => (
 );
 export function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
-    <label className="flex min-w-[150px] flex-1 flex-col gap-1.5">
+    <label className="flex min-w-0 w-full flex-1 flex-col gap-1.5">
       <div className="flex items-center justify-between gap-1">
         <span className="text-xs font-medium text-muted">{label}</span>
         {hint && <span className="text-[10px] text-muted/70">{hint}</span>}
