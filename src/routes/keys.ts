@@ -5,14 +5,14 @@ import { Hono } from "hono";
 import type { Env, HandlerCtx, ApiKeyRecord } from "../types";
 import { requireUser, clientIp } from "../auth";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
-import { generateApiKey, uuid, sha256Hex } from "../crypto";
+import { generateApiKey, uuid } from "../crypto";
 import { audit } from "../audit";
 import { json } from "../settings";
-import { createApiKey, listUserApiKeys, getApiKeyByHash, updateApiKey } from "../storage/db";
+import { createApiKey, listUserApiKeys, updateApiKey } from "../storage/db";
 
 export const keysRouter = new Hono<{ Bindings: Env }>();
 
-/** 获取当前用户的 key 列表 */
+/** 获取当前用户的 key 列表（对齐前端 KeyRow 字段格式） */
 keysRouter.get("/", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
@@ -23,22 +23,22 @@ keysRouter.get("/", async (c) => {
       name: k.name,
       prefix: k.prefix,
       status: k.status,
-      quotaUsd: k.quotaUsd,
-      spentUsd: k.spentUsd,
-      expiresAt: k.expiresAt,
-      modelWhitelist: k.modelWhitelist ? JSON.parse(k.modelWhitelist) : null,
-      ipWhitelist: k.ipWhitelist ? JSON.parse(k.ipWhitelist) : null,
-      requiresSigning: !!k.requiresSigning,
-      createdAt: k.createdAt,
-      lastUsedAt: k.lastUsedAt,
+      quota_usd: k.quotaUsd ?? null,
+      spent_usd: k.spentUsd ?? 0,
+      expires_at: k.expiresAt ?? null,
+      model_whitelist: k.modelWhitelist ?? null,
+      ip_whitelist: k.ipWhitelist ?? null,
+      requires_signing: k.requiresSigning ?? 0,
+      created_at: k.createdAt,
+      last_used_at: k.lastUsedAt ?? null,
     }));
-    return json({ ok: true, keys: safeKeys });
+    return json({ keys: safeKeys });
   } catch (err) {
     return errorResponse(hCtx, err);
   }
 });
 
-/** 创建新 Key（明文仅返回一次） */
+/** 创建新 Key（明文仅返回一次，对齐前端字段） */
 keysRouter.post("/", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
@@ -84,29 +84,27 @@ keysRouter.post("/", async (c) => {
       meta: { name: keyRecord.name, prefix },
     });
 
-    return json({
-      ok: true,
-      key: {
+    return json(
+      {
         id,
         name: keyRecord.name,
         prefix,
-        plaintext, // 仅此一次返回明文
-        quotaUsd: keyRecord.quotaUsd,
-        expiresAt: keyRecord.expiresAt,
-        createdAt: now,
+        key: plaintext, // 仅此一次返回明文
+        warning: "请立即保存此 Key，之后将无法再次查看。",
       },
-    });
+      201
+    );
   } catch (err) {
     return errorResponse(hCtx, err);
   }
 });
 
-/** Key 操作：撤销、轮换 */
+/** Key 操作：撤销、轮换（对齐 rotate / roll） */
 keysRouter.post("/actions", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
     const user = await requireUser(hCtx);
-    const body = await c.req.json<{ action?: string; keyId?: string; plaintext?: string }>();
+    const body = await c.req.json<{ action?: string; keyId?: string }>();
     const action = body.action;
     const keyId = body.keyId;
 
@@ -132,10 +130,10 @@ keysRouter.post("/actions", async (c) => {
         targetId: keyId,
       });
 
-      return json({ ok: true, message: "Key 已撤销" });
+      return json({ ok: true, revoked: keyId });
     }
 
-    if (action === "roll") {
+    if (action === "rotate" || action === "roll") {
       // 撤销旧 key，创建同名新 key
       await updateApiKey(c.env, target.keyHash, {
         status: "revoked",
@@ -167,20 +165,19 @@ keysRouter.post("/actions", async (c) => {
       await audit(hCtx, {
         actorUserId: user.id,
         actorIp: clientIp(hCtx.req),
-        action: "key.roll",
+        action: "key.rotate",
         targetType: "api_key",
-        targetId: newId,
-        meta: { oldKeyId: keyId },
+        targetId: `${keyId}->${newId}`,
       });
 
       return json({
         ok: true,
-        key: {
+        revoked: keyId,
+        created: {
           id: newId,
-          name: newRecord.name,
           prefix,
-          plaintext,
-          createdAt: now,
+          key: plaintext,
+          warning: "请立即保存此 Key，之后将无法再次查看。",
         },
       });
     }

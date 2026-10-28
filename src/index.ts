@@ -10,6 +10,7 @@ import { authRouter } from "./routes/auth";
 import { keysRouter } from "./routes/keys";
 import { billingRouter } from "./routes/billing";
 import { adminRouter } from "./routes/admin";
+import { usageRouter } from "./routes/usage";
 import { siteRouter } from "./routes/site";
 import { staticRouter } from "./routes/static";
 
@@ -51,6 +52,7 @@ app.route("/api/auth", authRouter);
 app.route("/api/keys", keysRouter);
 app.route("/api/billing", billingRouter);
 app.route("/api/admin", adminRouter);
+app.route("/api/usage", usageRouter);
 app.route("/api", siteRouter);
 
 // 4. 静态资产与 SPA Fallback 路由（最后挂载）

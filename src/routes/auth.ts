@@ -65,15 +65,7 @@ authRouter.post("/register", async (c) => {
       updatedAt: now,
     };
 
-    // 专属邀请码
     newUser.inviteCode = id.slice(0, 8).toUpperCase();
-
-    // 邀请奖励
-    const inviteCode = (body.inviteCode ?? "").trim().toUpperCase();
-    if (inviteCode) {
-      // 检查邀请人
-      // 可选支持邀请码 lookup
-    }
 
     await createUser(env, newUser);
 
@@ -105,7 +97,8 @@ authRouter.post("/register", async (c) => {
     });
 
     const secret = String(env.SESSION_SECRET || "edgerelay-default-session-secret-32b");
-    const resp = json({ ok: true, user: { id, email: newUser.email, role: newUser.role } });
+    // 严格对齐前端期望的返回格式：{ id, email }
+    const resp = json({ id, email: newUser.email }, 201);
     return await sessionCookie(resp, secret, sid, maxAge);
   } catch (err) {
     return errorResponse(hCtx, err);
@@ -160,7 +153,8 @@ authRouter.post("/login", async (c) => {
     });
 
     const secret = String(env.SESSION_SECRET || "edgerelay-default-session-secret-32b");
-    const resp = json({ ok: true, user: { id: user.id, email: user.email, role: user.role } });
+    // 严格对齐前端期望的返回格式：{ id, email }
+    const resp = json({ id: user.id, email: user.email });
     return await sessionCookie(resp, secret, sid, maxAge);
   } catch (err) {
     return errorResponse(hCtx, err);
@@ -180,7 +174,7 @@ authRouter.post("/logout", async (c) => {
   return clearCookie(json({ ok: true }));
 });
 
-/** 当前登录态与余额 */
+/** 当前登录态与余额：严格对齐前端 Me 结构 */
 authRouter.get("/me", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
@@ -188,20 +182,18 @@ authRouter.get("/me", async (c) => {
     const full = await getUserById(c.env, u.id);
     const bal = await getOrCreateBalance(c.env, `user:${u.id}`);
     return json({
-      ok: true,
       user: {
         id: u.id,
         email: u.email,
         role: u.role,
-        nickname: full?.nickname,
-        avatarUrl: full?.avatarUrl,
-        inviteCode: full?.inviteCode,
-        createdAt: full?.createdAt,
       },
+      nickname: full?.nickname ?? null,
+      bio: full?.bio ?? null,
+      avatarUrl: full?.avatarUrl ?? null,
       balance: {
-        available: bal.available,
-        frozen: bal.frozen,
-        currency: bal.currency,
+        available: bal.available ?? 0,
+        frozen: bal.frozen ?? 0,
+        currency: bal.currency ?? "CNY",
       },
     });
   } catch (err) {

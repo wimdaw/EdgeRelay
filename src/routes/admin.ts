@@ -86,7 +86,7 @@ adminRouter.post("/actions", async (c) => {
           email: u.email,
           role: u.role,
           status: u.status,
-          createdAt: u.createdAt,
+          created_at: u.createdAt,
         }));
         return json({ ok: true, users: safe });
       }
@@ -112,13 +112,13 @@ adminRouter.post("/actions", async (c) => {
         const keys = await listAllApiKeys(env);
         const safe = keys.map((k) => ({
           id: k.id,
-          userId: k.userId,
+          user_id: k.userId,
           name: k.name,
           prefix: k.prefix,
           status: k.status,
-          quotaUsd: k.quotaUsd,
-          spentUsd: k.spentUsd,
-          createdAt: k.createdAt,
+          quota_usd: k.quotaUsd ?? null,
+          spent_usd: k.spentUsd ?? 0,
+          created_at: k.createdAt,
         }));
         return json({ ok: true, keys: safe });
       }
@@ -138,14 +138,21 @@ adminRouter.post("/actions", async (c) => {
         for (const pr of providers) {
           const keys = await getProviderKeys(env, pr.id);
           out.push({
-            ...pr,
+            id: pr.id,
+            name: pr.name,
+            slug: pr.slug,
+            base_url: pr.baseUrl,
+            status: pr.status,
+            authorization_ref: pr.authorizationRef ?? null,
+            authorization_expires_at: pr.authorizationExpiresAt ?? null,
+            key_count: keys.length,
             extraHeaders: pr.extraHeaders ? JSON.parse(pr.extraHeaders) : {},
             keys: keys.map((k) => ({
               id: k.id,
               label: k.label,
               fingerprint: k.keyFingerprint,
               status: k.status,
-              createdAt: k.createdAt,
+              created_at: k.createdAt,
             })),
           });
         }
@@ -207,7 +214,28 @@ adminRouter.post("/actions", async (c) => {
       /* ---- 模型管理 ---- */
       case "list_models": {
         const models = await getModels(env);
-        return json({ ok: true, models });
+        const pricing = await getAllPricing(env);
+        const providers = await getProviders(env);
+        const providerMap = new Map(providers.map((pr) => [pr.id, pr]));
+
+        const rows = models.map((m) => {
+          const pr = providerMap.get(m.providerId);
+          const prc = pricing[m.publicName];
+          return {
+            id: m.id,
+            public_name: m.publicName,
+            upstream_model: m.upstreamModel,
+            priority: m.priority,
+            cost_weight: m.costWeight,
+            enabled: m.enabled,
+            provider_name: pr?.name ?? null,
+            provider_slug: pr?.slug ?? null,
+            input_per_million: prc?.inputPerMillion ?? null,
+            output_per_million: prc?.outputPerMillion ?? null,
+            currency: prc?.currency ?? "CNY",
+          };
+        });
+        return json({ ok: true, models: rows });
       }
       case "upsert_model": {
         const id = (p.id as string) || uuid();
@@ -226,7 +254,14 @@ adminRouter.post("/actions", async (c) => {
       }
       case "list_pricing": {
         const pricing = await getAllPricing(env);
-        return json({ ok: true, pricing: Object.values(pricing) });
+        const rows = Object.values(pricing).map((pr) => ({
+          id: pr.id,
+          public_name: pr.publicName,
+          input_per_million: pr.inputPerMillion,
+          output_per_million: pr.outputPerMillion,
+          currency: pr.currency,
+        }));
+        return json({ ok: true, pricing: rows });
       }
       case "set_pricing": {
         const publicName = String(p.publicName);
@@ -264,7 +299,18 @@ adminRouter.post("/actions", async (c) => {
       /* ---- 审计与合规 ---- */
       case "list_audit": {
         const logs = await getAuditLogs(env, Number(p.limit) || 100);
-        return json({ ok: true, logs });
+        const safe = logs.map((l) => ({
+          id: l.id,
+          actor_user_id: l.actorUserId ?? undefined,
+          actor_email: null,
+          actor_ip: l.actorIp ?? null,
+          action: l.action,
+          target_type: l.targetType ?? null,
+          target_id: l.targetId ?? null,
+          meta: l.meta ?? null,
+          created_at: l.createdAt,
+        }));
+        return json({ ok: true, logs: safe });
       }
       case "verify_audit_chain": {
         const res = await verifyAuditChain(env);
@@ -287,7 +333,7 @@ adminRouter.post("/actions", async (c) => {
   }
 });
 
-/** 实时统计概览 */
+/** 实时统计概览：严格对齐前端 Stats 结构 */
 adminRouter.get("/stats", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
@@ -297,22 +343,37 @@ adminRouter.get("/stats", async (c) => {
     const today = new Date().toISOString().slice(0, 10);
     const summary = await getDailyUsage(c.env, today);
 
+    const totalN = summary?.requests || 0;
+    const successN = summary?.successRequests || 0;
+    const errorN = totalN - successN;
+
+    const byModelList = [];
+    if (summary?.byModel) {
+      for (const [m, data] of Object.entries(summary.byModel)) {
+        byModelList.push({ public_model: m, n: data.requests, cost: data.costUsd });
+      }
+    }
+
     return json({
-      ok: true,
-      stats: {
-        todayRequests: summary?.requests || 0,
-        todaySuccess: summary?.successRequests || 0,
-        todayTokens: (summary?.promptTokens || 0) + (summary?.completionTokens || 0),
-        todayCostUsd: summary?.totalCostUsd || 0,
-        avgLatencyMs: summary?.requests ? Math.round(summary.totalLatencyMs / summary.requests) : 0,
-      },
+      requests: totalN,
+      errorRate: totalN ? +(errorN / totalN).toFixed(4) : 0,
+      promptTokens: summary?.promptTokens || 0,
+      completionTokens: summary?.completionTokens || 0,
+      cost: summary?.totalCostUsd || 0,
+      currency: "CNY",
+      pendingContentFlags: 0,
+      byStatus: [
+        { status: "success", n: successN },
+        { status: "error", n: errorN },
+      ],
+      byModel: byModelList,
     });
   } catch (err) {
     return errorResponse(hCtx, err);
   }
 });
 
-/** 用量走势图表 */
+/** 用量走势图表：对齐前端 { points: TrendPoint[] } */
 adminRouter.get("/usage/trend", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
@@ -320,22 +381,62 @@ adminRouter.get("/usage/trend", async (c) => {
     requireRole(user, ["admin", "auditor"]);
 
     const days = Math.min(Number(c.req.query("days")) || 7, 30);
-    const trend = [];
+    const points = [];
     const now = Date.now();
 
     for (let i = days - 1; i >= 0; i--) {
       const d = new Date(now - i * 86400 * 1000).toISOString().slice(0, 10);
       const s = await getDailyUsage(c.env, d);
-      trend.push({
+      points.push({
         date: d,
         requests: s?.requests || 0,
-        promptTokens: s?.promptTokens || 0,
-        completionTokens: s?.completionTokens || 0,
-        costUsd: s?.totalCostUsd || 0,
+        tokens: (s?.promptTokens || 0) + (s?.completionTokens || 0),
+        errors: (s?.requests || 0) - (s?.successRequests || 0),
+        cost: s?.totalCostUsd || 0,
       });
     }
 
-    return json({ ok: true, trend });
+    return json({ days, points });
+  } catch (err) {
+    return errorResponse(hCtx, err);
+  }
+});
+
+/** 用量日志：对齐前端 { logs: UsageLog[] } */
+adminRouter.get("/usage/logs", async (c) => {
+  const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
+  try {
+    const user = await requireUser(hCtx);
+    requireRole(user, ["admin", "auditor"]);
+
+    const today = new Date().toISOString().slice(0, 10);
+    const store = getBlobStore(c.env);
+    // 从每日记录列表获取
+    const res = await store.list({ prefix: "usage/record/", paginate: false, consistency: "strong" });
+    const logs = [];
+    for (const b of (res.blobs || []).slice(0, 50)) {
+      const r = await store.get(b.key, { type: "json" });
+      if (r) {
+        logs.push({
+          id: r.id,
+          request_id: r.requestId,
+          user_id: r.userId,
+          public_model: r.publicModel,
+          status: r.status,
+          http_status: r.httpStatus ?? 200,
+          latency_ms: r.latencyMs ?? 0,
+          prompt_tokens: r.promptTokens ?? 0,
+          completion_tokens: r.completionTokens ?? 0,
+          cost_usd: r.costUsd ?? 0,
+          stream: r.stream ?? 0,
+          error_code: r.errorCode ?? null,
+          attempts: r.attempts ?? 1,
+          ip: r.ip ?? "",
+          created_at: r.createdAt,
+        });
+      }
+    }
+    return json({ logs });
   } catch (err) {
     return errorResponse(hCtx, err);
   }

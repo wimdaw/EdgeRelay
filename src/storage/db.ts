@@ -3,6 +3,7 @@
  */
 
 import { getBlobStore, type BlobStore } from "./blob-store";
+export { getBlobStore };
 import {
   type PlatformSettings,
   DEFAULT_SETTINGS,

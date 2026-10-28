@@ -4,40 +4,38 @@
 import { Hono } from "hono";
 import type { Env, HandlerCtx } from "../types";
 import { getSettings, json } from "../settings";
-import { requireUser, clientIp } from "../auth";
+import { requireUser } from "../auth";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
 import { uuid } from "../crypto";
 import { appendAppeal, getAppeals } from "../storage/db";
 
 export const siteRouter = new Hono<{ Bindings: Env }>();
 
-/** 站点信息 */
+/** 站点信息：前端直接解构使用，格式严格对齐原版 SiteInfo */
 siteRouter.get("/site", async (c) => {
   const s = await getSettings(c.env);
   return json({
-    ok: true,
-    site: {
-      name: s.siteName ?? "EdgeRelay",
-      description: s.siteDescription ?? "",
-      logoUrl: s.siteLogoUrl ?? "/logo.png",
-      homepage: s.siteHomepage ?? "",
-      signupsEnabled: s.signupsEnabled,
-      requireTosAcceptance: s.requireTosAcceptance,
-      privacyPolicyUrl: s.privacyPolicyUrl,
-      termsOfServiceUrl: s.termsOfServiceUrl,
+    siteName: s.siteName ?? "EdgeRelay",
+    siteDescription: s.siteDescription ?? "部署在 EdgeOne 边缘的 AI API 网关",
+    siteLogoUrl: s.siteLogoUrl ?? "/logo.png",
+    siteHomepage: s.siteHomepage ?? "",
+    oauth: {
+      github: !!s.oauthGithubEnabled,
+      google: !!s.oauthGoogleEnabled,
     },
+    smtpEnabled: !!s.smtpEnabled,
   });
 });
 
-/** 公告 */
+/** 公告：格式严格对齐 { announcements: [...] } */
 siteRouter.get("/announcements", async (c) => {
   return json({
-    ok: true,
     announcements: [
       {
         id: "anno_welcome",
         title: "欢迎使用 EdgeRelay AI API 边缘网关",
         content: "系统已成功迁移并运行于腾讯云 EdgeOne Pages + Blob 强一致性数据库。",
+        popup: 0,
         createdAt: Math.floor(Date.now() / 1000),
       },
     ],
@@ -51,7 +49,7 @@ siteRouter.get("/appeals", async (c) => {
     const user = await requireUser(hCtx);
     const list = await getAppeals(c.env);
     const userAppeals = list.filter((a) => a.userId === user.id);
-    return json({ ok: true, appeals: userAppeals });
+    return json({ appeals: userAppeals });
   } catch (err) {
     return errorResponse(hCtx, err);
   }
