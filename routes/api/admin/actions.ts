@@ -297,6 +297,7 @@ export const POST = defineHandler(async (c) => {
           "signupsEnabled", "requireTosAcceptance", "contentModerationEnabled", "logContentEnabled",
           "privacyPolicyUrl", "termsOfServiceUrl", "defaultRpm", "defaultTpm", "auditLogRetentionDays",
           "siteName", "siteDescription", "siteLogoUrl", "siteHomepage", "blocklist",
+          "icpNumber", "copyrightText", "githubUrl",
           "stepUpDisabled", "persistentSession",
           "inviteRegisterReward", "inviteRewardAmount", "inviteDailyTop1", "inviteDailyTop2", "inviteDailyTop3",
         ]);
