@@ -16,16 +16,20 @@ import {
   updateApiKey,
   getProviders,
   upsertProvider,
+  deleteProvider,
   getProviderKeys,
   upsertProviderKey,
   getModels,
   upsertModel,
+  deleteModel,
   getAllPricing,
   setPricing,
   getAuditLogs,
   getContentFlags,
   getAppeals,
   getDailyUsage,
+  getAnnouncements,
+  saveAnnouncements,
   getBlobStore,
 } from "../storage/db";
 
@@ -193,6 +197,11 @@ adminRouter.post("/actions", async (c) => {
         }
         return done({ id }, "provider", id);
       }
+      case "delete_provider": {
+        if (!p.id) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少渠道 id");
+        await deleteProvider(env, String(p.id));
+        return done(null, "provider", String(p.id));
+      }
       case "upsert_provider_key": {
         if (!p.providerId || !p.key) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 providerId 或 key");
         const plaintext = String(p.key);
@@ -252,6 +261,11 @@ adminRouter.post("/actions", async (c) => {
         });
         return done({ id }, "model", id);
       }
+      case "delete_model": {
+        if (!p.id) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少模型 id");
+        await deleteModel(env, String(p.id));
+        return done(null, "model", String(p.id));
+      }
       case "list_pricing": {
         const pricing = await getAllPricing(env);
         const rows = Object.values(pricing).map((pr) => ({
@@ -294,6 +308,113 @@ adminRouter.post("/actions", async (c) => {
       case "set_settings": {
         const updated = await updateSettings(env, p as Partial<PlatformSettings>);
         return done({ settings: updated }, "settings", "platform");
+      }
+      case "get_smtp": {
+        const s = await getSettings(env);
+        return json({
+          ok: true,
+          smtp: {
+            enabled: !!s.smtpEnabled,
+            host: s.smtpHost ?? "",
+            port: s.smtpPort ?? 465,
+            username: s.smtpUsername ?? "",
+            from: s.smtpFrom ?? "",
+            hasPassword: !!s.smtpPassEnc,
+          },
+        });
+      }
+      case "set_smtp": {
+        const patch: Partial<PlatformSettings> = {
+          smtpEnabled: !!p.enabled,
+          smtpHost: String(p.host ?? ""),
+          smtpPort: Number(p.port) || 465,
+          smtpUsername: String(p.username ?? ""),
+          smtpFrom: String(p.from ?? ""),
+        };
+        if (p.password) {
+          patch.smtpPassEnc = await encryptSecret(env, String(p.password));
+        }
+        await updateSettings(env, patch);
+        return done(null, "settings", "smtp");
+      }
+      case "get_oauth": {
+        const s = await getSettings(env);
+        return json({
+          ok: true,
+          oauth: {
+            github: {
+              enabled: !!s.oauthGithubEnabled,
+              clientId: s.oauthGithubClientId ?? "",
+              hasSecret: !!s.oauthGithubSecretEnc,
+            },
+            google: {
+              enabled: !!s.oauthGoogleEnabled,
+              clientId: s.oauthGoogleClientId ?? "",
+              hasSecret: !!s.oauthGoogleSecretEnc,
+            },
+          },
+        });
+      }
+      case "set_oauth": {
+        const patch: Partial<PlatformSettings> = {};
+        if (p.github) {
+          const gh = p.github as any;
+          patch.oauthGithubEnabled = !!gh.enabled;
+          patch.oauthGithubClientId = String(gh.clientId ?? "");
+          if (gh.clientSecret) patch.oauthGithubSecretEnc = await encryptSecret(env, String(gh.clientSecret));
+        }
+        if (p.google) {
+          const gg = p.google as any;
+          patch.oauthGoogleEnabled = !!gg.enabled;
+          patch.oauthGoogleClientId = String(gg.clientId ?? "");
+          if (gg.clientSecret) patch.oauthGoogleSecretEnc = await encryptSecret(env, String(gg.clientSecret));
+        }
+        await updateSettings(env, patch);
+        return done(null, "settings", "oauth");
+      }
+
+      /* ---- 公告管理 ---- */
+      case "list_announcements": {
+        const list = await getAnnouncements(env);
+        return json({ ok: true, announcements: list });
+      }
+      case "create_announcement": {
+        const list = await getAnnouncements(env);
+        const aid = uuid();
+        const item = {
+          id: aid,
+          title: String(p.title ?? ""),
+          content: String(p.content ?? ""),
+          popup: p.popup ? 1 : 0,
+          enabled: p.enabled === false ? 0 : 1,
+          created_at: now,
+          updated_at: now,
+        };
+        list.unshift(item);
+        await saveAnnouncements(env, list);
+        return done({ id: aid }, "announcement", aid);
+      }
+      case "update_announcement": {
+        const list = await getAnnouncements(env);
+        const idx = list.findIndex((a) => a.id === String(p.id));
+        if (idx >= 0) {
+          list[idx] = {
+            ...list[idx],
+            title: String(p.title ?? list[idx].title),
+            content: String(p.content ?? list[idx].content),
+            popup: p.popup !== undefined ? (p.popup ? 1 : 0) : list[idx].popup,
+            enabled: p.enabled !== undefined ? (p.enabled ? 1 : 0) : list[idx].enabled,
+            updated_at: now,
+          };
+          await saveAnnouncements(env, list);
+        }
+        return done(null, "announcement", String(p.id));
+      }
+      case "delete_announcement": {
+        const list = await getAnnouncements(env);
+        const filtered = list.filter((a) => a.id !== String(p.id));
+        await saveAnnouncements(env, filtered);
+        return done(null, "announcement", String(p.id));
       }
 
       /* ---- 审计与合规 ---- */
@@ -409,9 +530,7 @@ adminRouter.get("/usage/logs", async (c) => {
     const user = await requireUser(hCtx);
     requireRole(user, ["admin", "auditor"]);
 
-    const today = new Date().toISOString().slice(0, 10);
     const store = getBlobStore(c.env);
-    // 从每日记录列表获取
     const res = await store.list({ prefix: "usage/record/", paginate: false, consistency: "strong" });
     const logs = [];
     for (const b of (res.blobs || []).slice(0, 50)) {

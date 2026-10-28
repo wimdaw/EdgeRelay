@@ -364,9 +364,13 @@ res = client.chat.completions.create(
               <ul className="mt-3 space-y-2.5 text-xs">
                 {col.links.map(([l, href]) => (
                   <li key={l}>
-                    {href.startsWith("/") || href.startsWith("#")
-                      ? <a href={href} className="transition-colors hover:text-white">{l}</a>
-                      : <a href={href} target="_blank" rel="noreferrer" className="transition-colors hover:text-white">{l}</a>}
+                    {href.startsWith("/") && !href.endsWith(".html") ? (
+                      <Link to={href} className="transition-colors hover:text-white">{l}</Link>
+                    ) : href.startsWith("#") ? (
+                      <a href={href} onClick={(e) => handleNavClick(e, href)} className="transition-colors hover:text-white">{l}</a>
+                    ) : (
+                      <a href={href} target={href.endsWith(".html") ? "_blank" : "_blank"} rel="noreferrer" className="transition-colors hover:text-white">{l}</a>
+                    )}
                   </li>
                 ))}
               </ul>

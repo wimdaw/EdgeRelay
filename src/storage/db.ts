@@ -530,6 +530,48 @@ export async function getAppeals(env: any): Promise<AppealRecord[]> {
   return (await store.get("appeals:all", { type: "json", consistency: "strong" })) || [];
 }
 
+export async function deleteModel(env: any, modelId: string): Promise<void> {
+  const models = await getModels(env);
+  const filtered = models.filter((m) => m.id !== modelId);
+  await setModels(env, filtered);
+}
+
+export async function deleteProvider(env: any, providerId: string): Promise<void> {
+  const providers = await getProviders(env);
+  const filtered = providers.filter((p) => p.id !== providerId);
+  await setProviders(env, filtered);
+}
+
+export interface AnnouncementRecord {
+  id: string;
+  title: string;
+  content: string;
+  popup: number;
+  enabled: number;
+  created_at: number;
+  updated_at: number;
+}
+
+export async function getAnnouncements(env: any): Promise<AnnouncementRecord[]> {
+  const store = getBlobStore(env);
+  return (await store.get("announcements:all", { type: "json", consistency: "strong" })) || [
+    {
+      id: "anno_welcome",
+      title: "欢迎使用 EdgeRelay AI API 边缘网关",
+      content: "系统已成功迁移并运行于腾讯云 EdgeOne Pages + Blob 强一致性数据库。",
+      popup: 0,
+      enabled: 1,
+      created_at: Math.floor(Date.now() / 1000),
+      updated_at: Math.floor(Date.now() / 1000),
+    },
+  ];
+}
+
+export async function saveAnnouncements(env: any, list: AnnouncementRecord[]): Promise<void> {
+  const store = getBlobStore(env);
+  await store.setJSON("announcements:all", list);
+}
+
 // ==========================================
 // 11. 初始引导数据 Seed
 // ==========================================
