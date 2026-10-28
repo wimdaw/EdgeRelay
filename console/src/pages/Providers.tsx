@@ -4,15 +4,14 @@ import { adminAction, type Provider } from "../lib/api";
 import { Button, Card, Dialog, EmptyState, Field, Input, Select, StatusTag, useConfirm, useToast } from "../components/ui";
 import { cn } from "../lib/utils";
 
-const SLUGS = ["openai", "anthropic", "google", "deepseek", "opencode", "duckai", "kilo"];
-const SLUG_URL: Record<string, string> = {
-  openai: "https://api.openai.com",
-  anthropic: "https://api.anthropic.com",
-  google: "https://generativelanguage.googleapis.com/v1beta/openai",
-  deepseek: "https://api.deepseek.com",
-  opencode: "https://opencode.ai/zen/v1",
-  duckai: "https://duck.ai",
-  kilo: "https://api.kilo.ai/api/gateway",
+const PRESETS: Record<string, { name: string; slug: string; kind: string; url: string }> = {
+  deepseek: { name: "DeepSeek", slug: "deepseek", kind: "openai_compat", url: "https://api.deepseek.com" },
+  openai: { name: "OpenAI", slug: "openai", kind: "openai_compat", url: "https://api.openai.com" },
+  anthropic: { name: "Anthropic", slug: "anthropic", kind: "anthropic", url: "https://api.anthropic.com" },
+  google: { name: "Google Gemini", slug: "google", kind: "openai_compat", url: "https://generativelanguage.googleapis.com/v1beta/openai" },
+  kilo: { name: "Kilo (免Key)", slug: "kilo", kind: "openai_compat", url: "https://api.kilo.ai/api/gateway" },
+  opencode: { name: "OpenCode (免Key)", slug: "opencode", kind: "openai_compat", url: "https://opencode.ai/zen/v1" },
+  duckai: { name: "Duck.ai (免Key)", slug: "duckai", kind: "openai_compat", url: "https://duck.ai" },
 };
 
 const isKeylessSlug = (slug?: string) => slug === "opencode" || slug === "duckai" || slug === "kilo";
@@ -20,7 +19,7 @@ const isKeylessSlug = (slug?: string) => slug === "opencode" || slug === "duckai
 export default function Providers() {
   const [rows, setRows] = useState<Provider[] | null>(null);
   const [dlg, setDlg] = useState(false);
-  const [form, setForm] = useState({ id: "", name: "", slug: "deepseek", url: SLUG_URL.deepseek, key: "" });
+  const [form, setForm] = useState({ id: "", name: "DeepSeek", slug: "deepseek", kind: "openai_compat", url: "https://api.deepseek.com", key: "" });
   const [saving, setSaving] = useState(false);
   const [keyDlg, setKeyDlg] = useState<Provider | null>(null);
   const [keyVal, setKeyVal] = useState("");
@@ -34,17 +33,43 @@ export default function Providers() {
   const load = () => adminAction<{ providers: Provider[] }>("list_providers").then((d) => setRows(d.providers)).catch((e) => toast(e.message, "err"));
   useEffect(() => { load(); }, []);
 
-  const openNew = () => { setForm({ id: "", name: "", slug: "deepseek", url: SLUG_URL.deepseek, key: "" }); setDlg(true); };
-  const openEdit = (p: Provider) => { setForm({ id: p.id, name: p.name, slug: p.slug, url: p.base_url, key: "" }); setDlg(true); };
+  const openNew = () => {
+    setForm({ id: "", name: "DeepSeek", slug: "deepseek", kind: "openai_compat", url: "https://api.deepseek.com", key: "" });
+    setDlg(true);
+  };
+  const openEdit = (p: Provider) => {
+    setForm({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      kind: p.kind || (p.slug === "anthropic" ? "anthropic" : "openai_compat"),
+      url: p.base_url,
+      key: "",
+    });
+    setDlg(true);
+  };
+
+  const applyPreset = (key: string) => {
+    const pre = PRESETS[key];
+    if (pre) {
+      setForm((f) => ({ ...f, name: pre.name, slug: pre.slug, kind: pre.kind, url: pre.url }));
+    }
+  };
 
   /** 保存供应商；成功后自动拉取上游模型列表进入导入步骤 */
   const save = async () => {
     if (!form.name.trim()) return toast("请填写供应商名称", "err");
+    if (!form.slug.trim()) return toast("请填写渠道标识符 (Slug)", "err");
     const isKeyless = isKeylessSlug(form.slug);
     if (!form.id && !form.key.trim() && !isKeyless) return toast("添加供应商必须录入上游密钥", "err");
     setSaving(true);
     try {
-      const payload: Record<string, unknown> = { name: form.name, slug: form.slug, baseUrl: form.url };
+      const payload: Record<string, unknown> = {
+        name: form.name.trim(),
+        slug: form.slug.trim().toLowerCase(),
+        kind: form.kind,
+        baseUrl: form.url.trim(),
+      };
       if (form.id) payload.id = form.id;
       if (form.key.trim()) payload.key = form.key.trim();
       await adminAction("upsert_provider", payload);
@@ -264,30 +289,79 @@ export default function Providers() {
 
       {/* 添加/编辑供应商 */}
       <Dialog open={dlg} onClose={() => setDlg(false)} title={form.id ? "编辑供应商" : "添加供应商"} width={560}>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="名称"><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="DeepSeek" /></Field>
-          <Field label="Slug"><Select value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value, url: SLUG_URL[e.target.value] ?? form.url })}>{SLUGS.map((s) => <option key={s}>{s}</option>)}</Select></Field>
-          <div className="col-span-2">
-            <Field label={`Base URL（${form.slug === 'anthropic' ? 'Anthropic 官方端点' : isKeylessSlug(form.slug) ? '免 Key 直连端点' : 'OpenAI 兼容端点'}）`}>
-              <Input value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://..." />
+        <div className="space-y-3.5">
+          {!form.id && (
+            <Field label="快速载入预设模板（可选，点击快速填入）">
+              <Select onChange={(e) => applyPreset(e.target.value)} defaultValue="">
+                <option value="">自定义或选择常见预设...</option>
+                {Object.entries(PRESETS).map(([k, v]) => (
+                  <option key={k} value={k}>
+                    {v.name}（{v.kind === "anthropic" ? "Anthropic 官方" : "OpenAI 兼容"}）
+                  </option>
+                ))}
+              </Select>
             </Field>
-          </div>
-          <div className="col-span-2">
-            <Field label={isKeylessSlug(form.slug) ? "上游密钥（免 Key 渠道，无需填写）" : form.id ? "追加新密钥（留空保持不变，支持多行批量录入）" : "上游密钥（必填，支持粘贴多个，一行一个）"}>
-              <textarea
-                value={form.key}
-                onChange={(e) => setForm({ ...form, key: e.target.value })}
-                placeholder={isKeylessSlug(form.slug) ? "该渠道完全免费免 Key，直接保存即可" : "sk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy (支持粘贴多个Key一行一个，自动进入多Key轮换池)"}
-                rows={2}
-                className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Field label="供应商名称">
+              <Input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="例如: DeepSeek 或 OpenAI"
               />
             </Field>
+            <Field label="渠道标识 (Slug)" hint="用于定向前缀，如 deepseek/model">
+              <Input
+                value={form.slug}
+                onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                placeholder="例如: deepseek"
+              />
+            </Field>
+            <div className="col-span-1 sm:col-span-2">
+              <Field label="接口协议类型 (Protocol)">
+                <Select
+                  value={form.kind}
+                  onChange={(e) => {
+                    const nextKind = e.target.value;
+                    setForm({
+                      ...form,
+                      kind: nextKind,
+                      url: nextKind === "anthropic" ? "https://api.anthropic.com" : form.url,
+                    });
+                  }}
+                >
+                  <option value="openai_compat">OpenAI 兼容协议 (OpenAI / DeepSeek / Kilo / OpenCode / Google 等)</option>
+                  <option value="anthropic">Anthropic 官方协议 (Claude 原生 Messages)</option>
+                </Select>
+              </Field>
+            </div>
+            <div className="col-span-1 sm:col-span-2">
+              <Field label={form.kind === "anthropic" ? "Base URL（Anthropic 官方端点）" : "Base URL（OpenAI 兼容端点）"}>
+                <Input
+                  value={form.url}
+                  onChange={(e) => setForm({ ...form, url: e.target.value })}
+                  placeholder={form.kind === "anthropic" ? "https://api.anthropic.com" : "https://api.openai.com"}
+                />
+              </Field>
+            </div>
+            <div className="col-span-1 sm:col-span-2">
+              <Field label={isKeylessSlug(form.slug) ? "上游密钥（免 Key 渠道，无需填写）" : form.id ? "追加新密钥（留空保持不变，支持多行批量录入）" : "上游密钥（必填，支持粘贴多个一行一个）"}>
+                <textarea
+                  value={form.key}
+                  onChange={(e) => setForm({ ...form, key: e.target.value })}
+                  placeholder={isKeylessSlug(form.slug) ? "该渠道完全免费免 Key，直接保存即可" : "sk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy (支持粘贴多个Key一行一个，自动进入多Key轮换池)"}
+                  rows={2}
+                  className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
+                />
+              </Field>
+            </div>
           </div>
-        </div>
-        
-        <div className="mt-4 flex justify-end gap-2">
-          <Button variant="ghost" onClick={() => setDlg(false)}>取消</Button>
-          <Button disabled={saving} onClick={save}>{saving ? "保存中…" : "保存并获取模型列表"}</Button>
+
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line">
+            <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setDlg(false)}>取消</Button>
+            <Button className="flex-1 sm:flex-initial" disabled={saving} onClick={save}>{saving ? "保存中…" : "保存并获取模型列表"}</Button>
+          </div>
         </div>
       </Dialog>
 

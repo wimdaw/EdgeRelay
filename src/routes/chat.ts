@@ -127,6 +127,7 @@ chatRouter.post("/", async (c) => {
       try {
         const isOpencode = route.providerKind === "opencode" || route.providerSlug === "opencode";
         const isDuckai = route.providerKind === "duckai" || route.providerSlug === "duckai";
+        const isAnthropic = route.providerKind === "anthropic" || route.providerSlug === "anthropic";
 
         let resp: Response | null = null;
         if (isOpencode) {
@@ -153,6 +154,29 @@ chatRouter.post("/", async (c) => {
             messages: body.messages,
             stream,
           });
+        } else if (isAnthropic) {
+          const { openAIToAnthropicRequest } = await import("../anthropic-translate");
+          const { request: antRequest } = openAIToAnthropicRequest({ ...body, model: route.upstreamModel, stream });
+          const base = route.baseUrl.replace(/\/+$/, "");
+          const antUrl = `${base}/v1/messages`;
+          const headers = await buildHeaders(env, route);
+          headers["anthropic-version"] = "2023-06-01";
+
+          for (let sub = 0; sub < 3; sub++) {
+            if (sub > 0) {
+              const retryAfter = Number(resp?.headers.get("retry-after"));
+              const delay = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter * 1000, 8000) : 1500 * sub;
+              await new Promise((r) => setTimeout(r, delay));
+            }
+            resp = await fetch(antUrl, {
+              method: "POST",
+              headers,
+              body: JSON.stringify(antRequest),
+              signal: AbortSignal.timeout(120_000),
+            });
+            if (resp.status === 429 && sub < 2) continue;
+            break;
+          }
         } else {
           const { url } = resolveTarget(env, route);
           const headers = await buildHeaders(env, route);
@@ -221,6 +245,108 @@ chatRouter.post("/", async (c) => {
 
         if (route.providerKeyId && route.providerKeyId !== "keyless") {
           await recordKeySuccess(env, route.providerId, route.providerKeyId).catch(() => {});
+        }
+
+        /* ---- Anthropic 协议响应转换 ---- */
+        if (isAnthropic) {
+          const { createOpenAIStreamFromAnthropic, anthropicResponseToOpenAI } = await import("../anthropic-translate");
+          if (stream && resp.body) {
+            let promptTokens = estPrompt;
+            let completionTokens = 0;
+            const antStream = createOpenAIStreamFromAnthropic(resp.body, publicModel, async (u) => {
+              promptTokens = u.promptTokens || promptTokens;
+              completionTokens = u.completionTokens || completionTokens;
+              if (!released) {
+                released = true;
+                await releaseConcurrency(env, key.keyId);
+                const cost = effectivePricing ? estimateCost(effectivePricing, promptTokens, completionTokens) : 0;
+                await settle(hCtx, {
+                  scope,
+                  holdId,
+                  heldAmount: estCost,
+                  actualCost: cost,
+                  requestId,
+                  userId: key.userId,
+                  apiKeyId: key.keyId,
+                });
+                await reportTokenUsage(env, key.keyId, promptTokens + completionTokens);
+                await addUsageRecord(env, {
+                  id: uuid(),
+                  requestId,
+                  userId: key.userId,
+                  apiKeyId: key.keyId,
+                  publicModel,
+                  providerId: route.providerId,
+                  upstreamModel: route.upstreamModel,
+                  status: "success",
+                  httpStatus: 200,
+                  latencyMs: Date.now() - started,
+                  promptTokens,
+                  completionTokens,
+                  costUsd: cost,
+                  currency: "CNY",
+                  stream: 1,
+                  attempts,
+                  ip: clientIp(hCtx.req),
+                  createdAt: Math.floor(Date.now() / 1000),
+                });
+              }
+            });
+            return new Response(antStream, {
+              headers: {
+                "content-type": "text/event-stream; charset=utf-8",
+                "cache-control": "no-cache",
+                "connection": "keep-alive",
+                "x-request-id": requestId,
+              },
+            });
+          }
+
+          // 非流式
+          const antJson = await resp.json();
+          const openAiData = anthropicResponseToOpenAI(antJson, publicModel);
+          const promptTokens = openAiData.usage?.prompt_tokens ?? estPrompt;
+          const completionTokens = openAiData.usage?.completion_tokens ?? estCompletion;
+          const cost = effectivePricing ? estimateCost(effectivePricing, promptTokens, completionTokens) : 0;
+          await settle(hCtx, {
+            scope,
+            holdId,
+            heldAmount: estCost,
+            actualCost: cost,
+            requestId,
+            userId: key.userId,
+            apiKeyId: key.keyId,
+          });
+          released = true;
+          await releaseConcurrency(env, key.keyId);
+          await reportTokenUsage(env, key.keyId, promptTokens + completionTokens);
+          await addUsageRecord(env, {
+            id: uuid(),
+            requestId,
+            userId: key.userId,
+            apiKeyId: key.keyId,
+            publicModel,
+            providerId: route.providerId,
+            upstreamModel: route.upstreamModel,
+            status: "success",
+            httpStatus: 200,
+            latencyMs: Date.now() - started,
+            promptTokens,
+            completionTokens,
+            costUsd: cost,
+            currency: "CNY",
+            stream: 0,
+            attempts,
+            ip: clientIp(hCtx.req),
+            createdAt: Math.floor(Date.now() / 1000),
+          });
+          return new Response(JSON.stringify(openAiData), {
+            status: 200,
+            headers: {
+              "content-type": "application/json; charset=utf-8",
+              "x-request-id": requestId,
+            },
+          });
         }
 
         /* ---- 成功返回：流式 vs 非流式 ---- */

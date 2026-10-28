@@ -181,14 +181,23 @@ adminRouter.post("/actions", async (c) => {
         if (isNew && !p.key && !isKeyless) throw new ApiError(400, ErrorCode.BAD_REQUEST, "添加供应商必须同时录入上游密钥");
         const id = (p.id as string) || uuid();
 
+        const kind = String(p.kind ?? (p.slug === "anthropic" ? "anthropic" : "openai_compat"));
+        const isAnthropic = kind === "anthropic" || p.slug === "anthropic";
+        const authScheme = String(p.authScheme ?? (isAnthropic ? "x-api-key" : isKeyless ? "none" : "bearer"));
+        const extraHeaders = p.extraHeaders
+          ? JSON.stringify(p.extraHeaders)
+          : isAnthropic
+          ? JSON.stringify({ "anthropic-version": "2023-06-01", "content-type": "application/json" })
+          : null;
+
         await upsertProvider(env, {
           id,
           name: String(p.name),
           slug: String(p.slug),
-          kind: String(p.kind ?? (isKeyless ? p.slug : "openai_compat")),
+          kind,
           baseUrl: String(p.baseUrl),
-          authScheme: String(p.authScheme ?? (isKeyless ? "none" : "bearer")),
-          extraHeaders: p.extraHeaders ? JSON.stringify(p.extraHeaders) : null,
+          authScheme,
+          extraHeaders,
           status: (p.status as "active" | "disabled") ?? "active",
           authorizationRef: (p.authorizationRef as string) ?? null,
           authorizationExpiresAt: (p.authorizationExpiresAt as number) ?? null,
