@@ -9,6 +9,19 @@ export default function Models({ me }: { me: Me }) {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [dlg, setDlg] = useState(false);
   const [form, setForm] = useState({ publicName: "", providerId: "", upstream: "", priority: "10", cost: "1" });
+  const [editDlg, setEditDlg] = useState<ModelRow | null>(null);
+  const [editForm, setEditForm] = useState({
+    id: "",
+    publicName: "",
+    oldPublicName: "",
+    providerId: "",
+    upstreamModel: "",
+    priority: "10",
+    costWeight: "1",
+    inputPerMillion: "0",
+    outputPerMillion: "0",
+    enabled: true,
+  });
   const [editing, setEditing] = useState<Record<string, { in: string; out: string }>>({});
   const { confirm, confirmEl } = useConfirm();
   const toast = useToast();
@@ -37,11 +50,69 @@ export default function Models({ me }: { me: Me }) {
       load();
     } catch (e) { toast((e as Error).message, "err"); }
   };
-  const savePrice = async (name: string) => {
-    const e = editing[name];
+
+  const openEdit = (m: ModelRow) => {
+    setEditDlg(m);
+    setEditForm({
+      id: m.id,
+      publicName: m.public_name,
+      oldPublicName: m.public_name,
+      providerId: m.provider_id || "",
+      upstreamModel: m.upstream_model,
+      priority: String(m.priority ?? 10),
+      costWeight: String(m.cost_weight ?? 1),
+      inputPerMillion: String(m.input_per_million ?? 0),
+      outputPerMillion: String(m.output_per_million ?? 0),
+      enabled: m.enabled === 1,
+    });
+  };
+
+  const saveEdit = async () => {
+    if (!editForm.publicName.trim()) return toast("请填写对外统一模型名", "err");
+    if (!editForm.providerId) return toast("请选择所属供应商渠道", "err");
+    if (!editForm.upstreamModel.trim()) return toast("请填写上游真实模型名", "err");
+    const inPrice = parseFloat(editForm.inputPerMillion);
+    const outPrice = parseFloat(editForm.outputPerMillion);
+    if (isNaN(inPrice) || isNaN(outPrice) || inPrice < 0 || outPrice < 0) {
+      return toast("请输入合法的输入/输出价格", "err");
+    }
     try {
-      await adminAction("set_pricing", { publicName: name, inputPerMillion: parseFloat(e.in), outputPerMillion: parseFloat(e.out), currency: "CNY" });
-      toast(`${name} 定价已更新`); load();
+      await adminAction("upsert_model", {
+        id: editForm.id,
+        publicName: editForm.publicName.trim(),
+        oldPublicName: editForm.oldPublicName,
+        providerId: editForm.providerId,
+        upstreamModel: editForm.upstreamModel.trim(),
+        priority: +editForm.priority || 10,
+        costWeight: +editForm.costWeight || 1,
+        inputPerMillion: inPrice,
+        outputPerMillion: outPrice,
+        enabled: editForm.enabled,
+      });
+      toast(`「${editForm.publicName}」模型映射与定价已保存`);
+      setEditDlg(null);
+      load();
+    } catch (e) {
+      toast((e as Error).message, "err");
+    }
+  };
+
+  const savePrice = async (name: string, fallbackIn: number | null, fallbackOut: number | null) => {
+    const e = editing[name];
+    const inVal = parseFloat(e?.in ?? String(fallbackIn ?? 0));
+    const outVal = parseFloat(e?.out ?? String(fallbackOut ?? 0));
+    if (isNaN(inVal) || isNaN(outVal) || inVal < 0 || outVal < 0) {
+      return toast("请输入有效的数字价格", "err");
+    }
+    try {
+      await adminAction("set_pricing", {
+        publicName: name,
+        inputPerMillion: inVal,
+        outputPerMillion: outVal,
+        currency: "CNY",
+      });
+      toast(`「${name}」定价已更新`);
+      load();
     } catch (err) { toast((err as Error).message, "err"); }
   };
   const toggle = async (m: ModelRow) => {
@@ -58,16 +129,47 @@ export default function Models({ me }: { me: Me }) {
   const adminCols: Col<ModelRow>[] = [
     { key: "in", label: "输入价 / 1M", render: (r) => (
       <span className="flex items-center gap-1.5">
-        <Input className="!w-24 !py-1.5 text-xs" value={editing[r.public_name]?.in ?? String(r.input_per_million ?? "")} onChange={(e) => setEditing({ ...editing, [r.public_name]: { in: e.target.value, out: editing[r.public_name]?.out ?? String(r.output_per_million ?? "") } })} aria-label={`输入价 ${r.public_name}`} />
-        <Button variant="soft" className="!h-[34px] !px-2.5 !py-0 text-[11px]" onClick={() => savePrice(r.public_name)}>保存</Button>
+        <Input
+          className="!w-20 sm:!w-24 !py-1 text-xs"
+          value={editing[r.public_name]?.in ?? String(r.input_per_million ?? 0)}
+          onChange={(e) => setEditing({
+            ...editing,
+            [r.public_name]: {
+              in: e.target.value,
+              out: editing[r.public_name]?.out ?? String(r.output_per_million ?? 0),
+            },
+          })}
+          aria-label={`输入价 ${r.public_name}`}
+        />
+        <Button
+          variant="soft"
+          className="!h-7 !px-2 text-[11px]"
+          onClick={() => savePrice(r.public_name, r.input_per_million, r.output_per_million)}
+        >
+          保存
+        </Button>
       </span>
     ) },
     { key: "out", label: "输出价 / 1M", render: (r) => (
-      <Input className="!w-24 !py-1.5 text-xs" value={editing[r.public_name]?.out ?? String(r.output_per_million ?? "")} onChange={(e) => setEditing({ ...editing, [r.public_name]: { in: editing[r.public_name]?.in ?? String(r.input_per_million ?? ""), out: e.target.value } })} aria-label={`输出价 ${r.public_name}`} />
+      <Input
+        className="!w-20 sm:!w-24 !py-1 text-xs"
+        value={editing[r.public_name]?.out ?? String(r.output_per_million ?? 0)}
+        onChange={(e) => setEditing({
+          ...editing,
+          [r.public_name]: {
+            in: editing[r.public_name]?.in ?? String(r.input_per_million ?? 0),
+            out: e.target.value,
+          },
+        })}
+        aria-label={`输出价 ${r.public_name}`}
+      />
     ) },
     { key: "status", label: "状态", render: (r) => <button onClick={() => toggle(r)} title="点击切换启用/停用"><StatusTag value={r.enabled ? "active" : "pending"} /></button> },
     { key: "ops", label: "操作", render: (r) => (
-      <Button variant="ghost" className="!px-2 !py-1 text-xs !text-err" onClick={() => remove(r)}>删除</Button>
+      <span className="flex items-center gap-1">
+        <Button variant="soft" className="!h-7 !px-2.5 text-xs" onClick={() => openEdit(r)}>编辑</Button>
+        <Button variant="ghost" className="!h-7 !px-2 text-xs !text-err" onClick={() => remove(r)}>删除</Button>
+      </span>
     ) },
   ];
   const userCols: Col<ModelRow>[] = [
@@ -135,6 +237,83 @@ export default function Models({ me }: { me: Me }) {
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setDlg(false)}>取消</Button>
             <Button onClick={save}>保存并上架</Button>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* 编辑模型与定价 */}
+      <Dialog open={!!editDlg} onClose={() => setEditDlg(null)} title={`编辑模型与定价 — ${editDlg?.public_name ?? ""}`} width={540}>
+        <div className="space-y-4">
+          <p className="text-xs text-muted">
+            修改模型映射与调用定价。修改对外统一模型名后，系统会自动同步更新对应定价配置并热重载路由。
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Field label="所属供应商渠道">
+              <Select
+                value={editForm.providerId}
+                onChange={(e) => setEditForm({ ...editForm, providerId: e.target.value })}
+              >
+                <option value="">请选择供应商</option>
+                {providers.map((p) => <option key={p.id} value={p.id}>{p.name}（{p.slug}）</option>)}
+              </Select>
+            </Field>
+            <Field label="优先级（数字越小越优先）">
+              <Input
+                type="number"
+                value={editForm.priority}
+                onChange={(e) => setEditForm({ ...editForm, priority: e.target.value })}
+                placeholder="10"
+              />
+            </Field>
+            <Field label="上游真实模型名">
+              <Input
+                value={editForm.upstreamModel}
+                onChange={(e) => setEditForm({ ...editForm, upstreamModel: e.target.value })}
+                placeholder="例如: deepseek-chat"
+              />
+            </Field>
+            <Field label="对外统一模型名">
+              <Input
+                value={editForm.publicName}
+                onChange={(e) => setEditForm({ ...editForm, publicName: e.target.value })}
+                placeholder="例如: deepseek-chat"
+              />
+            </Field>
+            <Field label="输入价格 (元 / 1M Tokens)">
+              <Input
+                type="number"
+                step="0.01"
+                value={editForm.inputPerMillion}
+                onChange={(e) => setEditForm({ ...editForm, inputPerMillion: e.target.value })}
+                placeholder="0"
+              />
+            </Field>
+            <Field label="输出价格 (元 / 1M Tokens)">
+              <Input
+                type="number"
+                step="0.01"
+                value={editForm.outputPerMillion}
+                onChange={(e) => setEditForm({ ...editForm, outputPerMillion: e.target.value })}
+                placeholder="0"
+              />
+            </Field>
+          </div>
+
+          <div className="flex items-center gap-2 pt-1">
+            <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+              <input
+                type="checkbox"
+                className="h-4 w-4 accent-[#F38020]"
+                checked={editForm.enabled}
+                onChange={(e) => setEditForm({ ...editForm, enabled: e.target.checked })}
+              />
+              启用该模型上架调度
+            </label>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-line">
+            <Button variant="ghost" onClick={() => setEditDlg(null)}>取消</Button>
+            <Button onClick={saveEdit}>保存修改</Button>
           </div>
         </div>
       </Dialog>

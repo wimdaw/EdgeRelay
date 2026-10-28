@@ -39,6 +39,7 @@ apiModelsRouter.get("/", async (c) => {
         priority: m.priority,
         cost_weight: m.costWeight,
         enabled: m.enabled,
+        provider_id: m.providerId,
         provider_name: pr?.name ?? null,
         provider_slug: pr?.slug ?? null,
         input_per_million: prc?.inputPerMillion ?? null,

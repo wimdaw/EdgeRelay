@@ -372,6 +372,7 @@ adminRouter.post("/actions", async (c) => {
             priority: m.priority,
             cost_weight: m.costWeight,
             enabled: m.enabled,
+            provider_id: m.providerId,
             provider_name: pr?.name ?? null,
             provider_slug: pr?.slug ?? null,
             input_per_million: prc?.inputPerMillion ?? null,
@@ -395,17 +396,21 @@ adminRouter.post("/actions", async (c) => {
           enabled: p.enabled === false ? 0 : 1,
           createdAt: now,
         });
+
+        // 若携带定价数据或该模型尚未配置定价，自动维护定价表
         const pricing = await getAllPricing(env);
-        if (!pricing[publicName]) {
-          await setPricing(env, {
-            id: `pr_${uuid().slice(0, 8)}`,
-            publicName,
-            inputPerMillion: 0,
-            outputPerMillion: 0,
-            currency: "CNY",
-            createdAt: now,
-          });
-        }
+        const existingPricing = pricing[publicName] || (p.oldPublicName ? pricing[String(p.oldPublicName)] : undefined);
+        const inputPerMillion = p.inputPerMillion !== undefined ? Number(p.inputPerMillion) : (existingPricing?.inputPerMillion ?? 0);
+        const outputPerMillion = p.outputPerMillion !== undefined ? Number(p.outputPerMillion) : (existingPricing?.outputPerMillion ?? 0);
+        const prId = existingPricing?.id || `pr_${uuid().slice(0, 8)}`;
+        await setPricing(env, {
+          id: prId,
+          publicName,
+          inputPerMillion,
+          outputPerMillion,
+          currency: String(p.currency ?? existingPricing?.currency ?? "CNY"),
+          createdAt: existingPricing?.createdAt ?? now,
+        });
         return done({ id }, "model", id);
       }
       case "import_models": {

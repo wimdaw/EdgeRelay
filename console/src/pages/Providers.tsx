@@ -374,9 +374,9 @@ export default function Providers() {
             ) : (
               <div className="max-h-52 space-y-1.5 overflow-y-auto rounded-lg border border-line p-2">
                 {keyDlg.keys.map((k) => (
-                  <div key={k.id} className="flex items-center justify-between rounded-lg bg-surface2/60 px-2.5 py-1.5 text-xs">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <code className="text-ink font-mono font-medium truncate max-w-[130px]">{k.fingerprint}...</code>
+                  <div key={k.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 rounded-lg bg-surface2/60 p-2 sm:px-2.5 sm:py-1.5 text-xs">
+                    <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+                      <code className="text-ink font-mono font-medium truncate max-w-[120px] sm:max-w-[140px]">{k.fingerprint}...</code>
                       <span className="rounded bg-line px-1 py-0.5 text-[10px] text-muted">{k.label || "prod"}</span>
                       {k.status === "disabled" ? (
                         <span className="rounded bg-zinc-500/10 px-1 py-0.5 text-[10px] text-zinc-400">已停用</span>
@@ -394,20 +394,20 @@ export default function Providers() {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div className="flex items-center justify-end gap-1 shrink-0 self-end sm:self-auto pt-0.5 sm:pt-0">
                       <Button
                         variant="ghost"
-                        className="!h-6 !px-1.5 text-[11px]"
+                        className="!h-6 !px-2 text-[11px]"
                         onClick={() => toggleKey(keyDlg.id, k.id, k.status)}
                       >
                         {k.status === "active" ? "停用" : "启用"}
                       </Button>
                       <Button
                         variant="ghost"
-                        className="!h-6 !px-1.5 text-[11px] !text-err"
+                        className="!h-6 !px-2 text-[11px] !text-err"
                         onClick={() => delKey(keyDlg.id, k.id)}
                       >
-                        <Trash2 size={12} />
+                        <Trash2 size={11} className="mr-0.5" />删除
                       </Button>
                     </div>
                   </div>
@@ -427,19 +427,19 @@ export default function Providers() {
                 className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
               />
             </div>
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div className="flex items-center gap-2">
                 <span className="text-[11px] text-muted shrink-0">标签</span>
                 <Input
-                  className="!py-1 !w-28 text-xs"
+                  className="!py-1 flex-1 sm:!w-28 text-xs"
                   value={newKeyLabel}
                   onChange={(e) => setNewKeyLabel(e.target.value)}
                   placeholder="如 prod-2"
                 />
               </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="ghost" onClick={() => setKeyDlg(null)}>关闭</Button>
-                <Button onClick={saveKey} disabled={!keyVal.trim()}>保存并追加至池</Button>
+              <div className="flex items-center justify-end gap-2">
+                <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setKeyDlg(null)}>关闭</Button>
+                <Button className="flex-1 sm:flex-initial" onClick={saveKey} disabled={!keyVal.trim()}>保存并追加至池</Button>
               </div>
             </div>
           </div>
