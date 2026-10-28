@@ -8,7 +8,15 @@ export default function Models({ me }: { me: Me }) {
   const [rows, setRows] = useState<ModelRow[] | null>(null);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [dlg, setDlg] = useState(false);
-  const [form, setForm] = useState({ publicName: "", providerId: "", upstream: "", priority: "10", cost: "1" });
+  const [form, setForm] = useState({
+    publicName: "",
+    providerId: "",
+    upstream: "",
+    priority: "10",
+    cost: "1",
+    inputPerMillion: "0",
+    outputPerMillion: "0",
+  });
   const [editDlg, setEditDlg] = useState<ModelRow | null>(null);
   const [editForm, setEditForm] = useState({
     id: "",
@@ -22,7 +30,6 @@ export default function Models({ me }: { me: Me }) {
     outputPerMillion: "0",
     enabled: true,
   });
-  const [editing, setEditing] = useState<Record<string, { in: string; out: string }>>({});
   const { confirm, confirmEl } = useConfirm();
   const toast = useToast();
 
@@ -36,6 +43,11 @@ export default function Models({ me }: { me: Me }) {
     if (!form.publicName.trim()) return toast("请填写对外统一模型名", "err");
     if (!form.providerId) return toast("请选择所属供应商渠道", "err");
     if (!form.upstream.trim()) return toast("请填写上游真实模型名", "err");
+    const inPrice = parseFloat(form.inputPerMillion);
+    const outPrice = parseFloat(form.outputPerMillion);
+    if (isNaN(inPrice) || isNaN(outPrice) || inPrice < 0 || outPrice < 0) {
+      return toast("请输入合法的输入/输出价格", "err");
+    }
     try {
       await adminAction("upsert_model", {
         publicName: form.publicName.trim(),
@@ -43,10 +55,12 @@ export default function Models({ me }: { me: Me }) {
         upstreamModel: form.upstream.trim(),
         priority: +form.priority || 10,
         costWeight: +form.cost || 1,
+        inputPerMillion: inPrice,
+        outputPerMillion: outPrice,
       });
       toast("模型映射已保存并上架");
       setDlg(false);
-      setForm({ publicName: "", providerId: "", upstream: "", priority: "10", cost: "1" });
+      setForm({ publicName: "", providerId: "", upstream: "", priority: "10", cost: "1", inputPerMillion: "0", outputPerMillion: "0" });
       load();
     } catch (e) { toast((e as Error).message, "err"); }
   };
@@ -97,24 +111,6 @@ export default function Models({ me }: { me: Me }) {
     }
   };
 
-  const savePrice = async (name: string, fallbackIn: number | null, fallbackOut: number | null) => {
-    const e = editing[name];
-    const inVal = parseFloat(e?.in ?? String(fallbackIn ?? 0));
-    const outVal = parseFloat(e?.out ?? String(fallbackOut ?? 0));
-    if (isNaN(inVal) || isNaN(outVal) || inVal < 0 || outVal < 0) {
-      return toast("请输入有效的数字价格", "err");
-    }
-    try {
-      await adminAction("set_pricing", {
-        publicName: name,
-        inputPerMillion: inVal,
-        outputPerMillion: outVal,
-        currency: "CNY",
-      });
-      toast(`「${name}」定价已更新`);
-      load();
-    } catch (err) { toast((err as Error).message, "err"); }
-  };
   const toggle = async (m: ModelRow) => {
     try {
       await adminAction("upsert_model", { id: m.id, publicName: m.public_name, upstreamModel: m.upstream_model, priority: m.priority, costWeight: m.cost_weight, enabled: !m.enabled });
@@ -127,60 +123,47 @@ export default function Models({ me }: { me: Me }) {
   };
 
   const adminCols: Col<ModelRow>[] = [
-    { key: "in", label: "输入价 / 1M", render: (r) => (
-      <span className="flex items-center gap-1.5">
-        <Input
-          className="!w-20 sm:!w-24 !py-1 text-xs"
-          value={editing[r.public_name]?.in ?? String(r.input_per_million ?? 0)}
-          onChange={(e) => setEditing({
-            ...editing,
-            [r.public_name]: {
-              in: e.target.value,
-              out: editing[r.public_name]?.out ?? String(r.output_per_million ?? 0),
-            },
-          })}
-          aria-label={`输入价 ${r.public_name}`}
-        />
-        <Button
-          variant="soft"
-          className="!h-7 !px-2 text-[11px]"
-          onClick={() => savePrice(r.public_name, r.input_per_million, r.output_per_million)}
-        >
-          保存
-        </Button>
-      </span>
-    ) },
-    { key: "out", label: "输出价 / 1M", render: (r) => (
-      <Input
-        className="!w-20 sm:!w-24 !py-1 text-xs"
-        value={editing[r.public_name]?.out ?? String(r.output_per_million ?? 0)}
-        onChange={(e) => setEditing({
-          ...editing,
-          [r.public_name]: {
-            in: editing[r.public_name]?.in ?? String(r.input_per_million ?? 0),
-            out: e.target.value,
-          },
-        })}
-        aria-label={`输出价 ${r.public_name}`}
-      />
-    ) },
+    {
+      key: "in",
+      label: "输入价 / 1M",
+      sortVal: (r) => r.input_per_million ?? 0,
+      render: (r) => (
+        <span className="font-mono text-xs font-medium text-ink">
+          {r.input_per_million != null ? `¥${Number(r.input_per_million).toFixed(2)}` : "未定价"}
+        </span>
+      ),
+    },
+    {
+      key: "out",
+      label: "输出价 / 1M",
+      sortVal: (r) => r.output_per_million ?? 0,
+      render: (r) => (
+        <span className="font-mono text-xs font-medium text-ink">
+          {r.output_per_million != null ? `¥${Number(r.output_per_million).toFixed(2)}` : "未定价"}
+        </span>
+      ),
+    },
     { key: "status", label: "状态", render: (r) => <button onClick={() => toggle(r)} title="点击切换启用/停用"><StatusTag value={r.enabled ? "active" : "pending"} /></button> },
-    { key: "ops", label: "操作", render: (r) => (
-      <span className="flex items-center gap-1">
-        <Button variant="soft" className="!h-7 !px-2.5 text-xs" onClick={() => openEdit(r)}>编辑</Button>
-        <Button variant="ghost" className="!h-7 !px-2 text-xs !text-err" onClick={() => remove(r)}>删除</Button>
-      </span>
-    ) },
+    {
+      key: "ops",
+      label: "操作",
+      render: (r) => (
+        <span className="flex items-center gap-1.5 shrink-0">
+          <Button variant="soft" className="!h-7 !px-2.5 text-xs" onClick={() => openEdit(r)}>编辑</Button>
+          <Button variant="ghost" className="!h-7 !px-2 text-xs !text-err" onClick={() => remove(r)}>删除</Button>
+        </span>
+      ),
+    },
   ];
   const userCols: Col<ModelRow>[] = [
-    { key: "in", label: "输入价 / 1M", render: (r) => r.input_per_million != null ? `${r.input_per_million} ${r.currency ?? "CNY"}` : "未定价" },
-    { key: "out", label: "输出价 / 1M", render: (r) => r.output_per_million != null ? `${r.output_per_million} ${r.currency ?? "CNY"}` : "未定价" },
+    { key: "in", label: "输入价 / 1M", render: (r) => r.input_per_million != null ? `¥${Number(r.input_per_million).toFixed(2)}` : "未定价" },
+    { key: "out", label: "输出价 / 1M", render: (r) => r.output_per_million != null ? `¥${Number(r.output_per_million).toFixed(2)}` : "未定价" },
     { key: "status", label: "状态", render: (r) => <StatusTag value={r.enabled ? "active" : "pending"} /> },
   ];
 
   const cols: Col<ModelRow>[] = [
     { key: "public", label: "对外模型名", sortVal: (r) => r.public_name, render: (r) => <span className="font-medium">{r.public_name}</span> },
-    { key: "upstream", label: "上游真实模型", render: (r) => <code className="text-xs">{r.upstream_model}</code> },
+    { key: "upstream", label: "上游真实模型", render: (r) => <code className="text-xs font-mono">{r.upstream_model}</code> },
     { key: "provider", label: "供应商", render: (r) => r.provider_name ?? "—" },
     { key: "priority", label: "优先级", sortVal: (r) => r.priority, render: (r) => <span className="text-xs">{r.priority}（小=优先）</span> },
     ...(isAdmin ? adminCols : userCols),
@@ -197,12 +180,13 @@ export default function Models({ me }: { me: Me }) {
         {rows === null ? <div className="flex flex-col gap-2">{[...Array(5)].map((_, i) => <div key={i} className="skeleton h-9" />)}</div> : <DataTable cols={cols} rows={rows} />}
       </Card>
 
-      <Dialog open={dlg} onClose={() => setDlg(false)} title="新增模型映射" width={520}>
-        <div className="space-y-3">
+      {/* 新增模型映射 */}
+      <Dialog open={dlg} onClose={() => setDlg(false)} title="新增模型映射" width={540}>
+        <div className="space-y-4">
           <p className="text-xs text-muted">
-            为上游供应商关联对外模型名。多个供应商可配置相同的对外模型名，网关将按优先级自动故障转移与容灾。
+            为上游供应商关联对外模型名并设定调用单价。多个供应商可配置相同的对外模型名，网关将按优先级自动故障转移与容灾。
           </p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="所属供应商">
               <Select value={form.providerId} onChange={(e) => setForm({ ...form, providerId: e.target.value })}>
                 <option value="">请选择供应商</option>
@@ -233,10 +217,28 @@ export default function Models({ me }: { me: Me }) {
                 placeholder="例如: deepseek-chat"
               />
             </Field>
+            <Field label="输入价格 (元 / 1M Tokens)">
+              <Input
+                type="number"
+                step="0.01"
+                value={form.inputPerMillion}
+                onChange={(e) => setForm({ ...form, inputPerMillion: e.target.value })}
+                placeholder="0"
+              />
+            </Field>
+            <Field label="输出价格 (元 / 1M Tokens)">
+              <Input
+                type="number"
+                step="0.01"
+                value={form.outputPerMillion}
+                onChange={(e) => setForm({ ...form, outputPerMillion: e.target.value })}
+                placeholder="0"
+              />
+            </Field>
           </div>
-          <div className="mt-4 flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => setDlg(false)}>取消</Button>
-            <Button onClick={save}>保存并上架</Button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-line">
+            <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setDlg(false)}>取消</Button>
+            <Button className="flex-1 sm:flex-initial" onClick={save}>保存并上架</Button>
           </div>
         </div>
       </Dialog>
@@ -311,9 +313,9 @@ export default function Models({ me }: { me: Me }) {
             </label>
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-line">
-            <Button variant="ghost" onClick={() => setEditDlg(null)}>取消</Button>
-            <Button onClick={saveEdit}>保存修改</Button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-line">
+            <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setEditDlg(null)}>取消</Button>
+            <Button className="flex-1 sm:flex-initial" onClick={saveEdit}>保存修改</Button>
           </div>
         </div>
       </Dialog>
