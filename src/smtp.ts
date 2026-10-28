@@ -12,19 +12,21 @@ export type SmtpConfig = {
   username: string;
   password: string;
   from: string;
+  fromName?: string;
 };
 
 const b64 = (s: string) => Buffer.from(s).toString("base64");
 
 export async function sendMail(
   cfg: SmtpConfig,
-  mail: { to: string; subject: string; text: string; html?: string }
+  mail: { to: string; subject: string; text: string; html?: string; fromName?: string }
 ): Promise<void> {
   const host = cfg.host.trim();
   const port = cfg.port || 465;
   const user = cfg.username.includes("@") ? cfg.username : cfg.from || cfg.username;
   const pass = cfg.password;
   const from = cfg.from || user;
+  const fromName = mail.fromName || cfg.fromName || "Relay AI";
 
   return new Promise<void>((resolve, reject) => {
     let settled = false;
@@ -118,8 +120,12 @@ export async function sendMail(
           const boundary = `----=_EdgeRelay_${Date.now().toString(36)}`;
           const subjectEncoded = `=?UTF-8?B?${b64(mail.subject)}?=`;
 
+          const fromHeader = fromName
+            ? `=?UTF-8?B?${b64(fromName)}?= <${from}>`
+            : `<${from}>`;
+
           const headers = [
-            `From: <${from}>`,
+            `From: ${fromHeader}`,
             `To: <${mail.to}>`,
             `Subject: ${subjectEncoded}`,
             `MIME-Version: 1.0`,

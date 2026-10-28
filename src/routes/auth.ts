@@ -74,6 +74,7 @@ authRouter.post("/register", async (c) => {
           },
           {
             to: emailNorm,
+            fromName: "Relay AI",
             subject: `${settings.siteName ?? "Relay"} 注册验证码`,
             text: `你正在注册 ${settings.siteName ?? "Relay"} 账号。\n\n验证码：${code}\n\n10 分钟内有效。若非本人操作，请忽略本邮件。`,
             html: verifyCodeEmailHtml(settings.siteName ?? "Relay", code, 10),
@@ -221,6 +222,7 @@ authRouter.post("/login", async (c) => {
           },
           {
             to: emailNorm,
+            fromName: "Relay AI",
             subject: `${settings.siteName ?? "Relay"} 登录验证码`,
             text: `你正在登录 ${settings.siteName ?? "Relay"} 控制台。\n\n验证码：${code}\n\n10 分钟内有效。若非本人操作，请尽快确认账号安全。`,
             html: verifyCodeEmailHtml(settings.siteName ?? "Relay", code, 10),
@@ -417,6 +419,7 @@ authRouter.post("/reset", async (c) => {
         },
         {
           to: emailNorm,
+          fromName: "Relay AI",
           subject: `${settings.siteName ?? "Relay"} 密码重置验证码`,
           text: `你的密码重置验证码为：${code}，10 分钟内有效。`,
           html: verifyCodeEmailHtml(settings.siteName ?? "Relay", code),
