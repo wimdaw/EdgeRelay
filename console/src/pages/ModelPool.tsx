@@ -194,26 +194,24 @@ export default function ModelPool({ me: _me }: { me: Me }) {
 
             return (
               <Card key={provider.id} className="p-4 sm:p-4.5 flex flex-col gap-3">
-                {/* 渠道信息顶栏 */}
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line/60 pb-2.5">
-                  <div className="flex items-center gap-2.5 min-w-0">
+                {/* 渠道信息顶栏：强制单行绝对不折行 */}
+                <div className="flex items-center justify-between gap-2 sm:gap-3 flex-nowrap border-b border-line/60 pb-2.5 min-w-0">
+                  <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-xs font-bold text-brand">
                       {provider.name[0]?.toUpperCase() || <Server size={14} />}
                     </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-ink truncate">{provider.name}</span>
-                        <code className="text-[10px] text-muted rounded bg-surface2 px-1 py-0.5 font-mono">{provider.slug}</code>
-                      </div>
+                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                      <span className="text-xs font-bold text-ink truncate">{provider.name}</span>
+                      <code className="text-[10px] text-muted rounded bg-surface2 px-1.5 py-0.5 font-mono shrink-0">{provider.slug}</code>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className="rounded bg-line/70 px-2 py-0.5 text-[10px] text-muted font-medium">
+                  <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <span className="rounded bg-line/70 px-2 py-0.5 text-[10px] text-muted font-medium whitespace-nowrap">
                       {protocolLabel}
                     </span>
-                    <span className="flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-500">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <span className="flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-500 whitespace-nowrap">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
                       {pModels.length} 个就绪
                     </span>
                   </div>
