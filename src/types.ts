@@ -48,11 +48,15 @@ export type PlatformSettings = {
   inviteDailyTop1?: number;
   inviteDailyTop2?: number;
   inviteDailyTop3?: number;
-  /* 站点信息 */
+  /* 站点信息与首页展示 */
   siteName?: string;
   siteDescription?: string;
   siteLogoUrl?: string;
   siteHomepage?: string;
+  heroBadge?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  supportEmail?: string;
   /* 登录方式 */
   oauthGithubEnabled?: boolean;
   oauthGoogleEnabled?: boolean;
@@ -85,6 +89,10 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   siteDescription: "部署在 EdgeOne 边缘的 AI API 网关，用统一 OpenAI 兼容接口接入、路由和派发多家大模型服务。",
   siteLogoUrl: "/logo.png",
   siteHomepage: "",
+  heroBadge: "跑在 EdgeOne 全球边缘节点",
+  heroTitle: "部署在 EdgeOne 边缘的合规 AI API 网关",
+  heroSubtitle: "用统一 OpenAI 兼容接口，接入、路由和治理多家大模型服务。合法授权上游、透明计费、哈希链审计——面向开发者与企业的正规聚合分发平台。",
+  supportEmail: "hackerxiaow@gmail.com",
 };
 
 export type RateLimits = { rpm: number; tpm: number; concurrency: number };

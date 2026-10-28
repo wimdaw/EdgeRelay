@@ -29,7 +29,7 @@ export type Flag = { id: string; user_id: string; public_model: string | null; r
 export type Appeal = { id: string; user_id: string; target_type: string; reason: string; status: string; created_at: number };
 export type PlatformSettings = Record<string, unknown> & { signupsEnabled?: boolean; requireTosAcceptance?: boolean; contentModerationEnabled?: boolean; logContentEnabled?: boolean; privacyPolicyUrl?: string; termsOfServiceUrl?: string; defaultRpm?: number; defaultTpm?: number; auditLogRetentionDays?: number };
 
-export type SiteInfo = { siteName: string; siteDescription: string; siteLogoUrl: string; siteHomepage: string; oauth: { github: boolean; google: boolean }; smtpEnabled: boolean };
+export type SiteInfo = { siteName: string; siteDescription: string; siteLogoUrl: string; siteHomepage: string; heroBadge?: string; heroTitle?: string; heroSubtitle?: string; supportEmail?: string; oauth: { github: boolean; google: boolean }; smtpEnabled: boolean };
 
 export const adminAction = <T = { ok: true; result?: unknown }>(action: string, payload: Record<string, unknown> = {}) =>
   api<T>("/api/admin/actions", "POST", { action, payload });

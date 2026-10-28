@@ -109,6 +109,15 @@ export default function Settings() {
         <div className="grid gap-3 md:grid-cols-2">
           <Field label="站点名称"><Input value={String(s.siteName ?? "")} onChange={(e) => set("siteName", e.target.value)} /></Field>
           <Field label="站点主页（可选，用于 Logo 跳转）"><Input value={String(s.siteHomepage ?? "")} onChange={(e) => set("siteHomepage", e.target.value)} placeholder="https://..." /></Field>
+          <Field label="首页徽章标签（Hero Badge）"><Input value={String(s.heroBadge ?? "跑在 EdgeOne 全球边缘节点")} onChange={(e) => set("heroBadge", e.target.value)} /></Field>
+          <Field label="底部技术支持邮箱"><Input value={String(s.supportEmail ?? "hackerxiaow@gmail.com")} onChange={(e) => set("supportEmail", e.target.value)} /></Field>
+          <div className="md:col-span-2"><Field label="首页主标语（Hero 标题）">
+            <Input value={String(s.heroTitle ?? "部署在 EdgeOne 边缘的合规 AI API 网关")} onChange={(e) => set("heroTitle", e.target.value)} />
+          </Field></div>
+          <div className="md:col-span-2"><Field label="首页副标语介绍">
+            <textarea className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none" rows={2}
+              value={String(s.heroSubtitle ?? "用统一 OpenAI 兼容接口，接入、路由和治理多家大模型服务。合法授权上游、透明计费、哈希链审计——面向开发者与企业的正规聚合分发平台。")} onChange={(e) => set("heroSubtitle", e.target.value)} />
+          </Field></div>
           <div className="md:col-span-2"><Field label="站点描述（meta description / og:description）">
             <textarea className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none" rows={2}
               value={String(s.siteDescription ?? "")} onChange={(e) => set("siteDescription", e.target.value)} />

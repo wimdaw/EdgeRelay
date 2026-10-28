@@ -15,7 +15,7 @@ const FEATURES = [
   { icon: Coins, title: "用量计费与额度管理", desc: "输入/输出分开计价，请求前冻结、完成后结算，余额、流水、账单导出一应俱全。" },
   { icon: Zap, title: "限流与防滥用", desc: "Key 级 RPM/TPM/并发控制，可选请求签名防重放防篡改，超限返回结构化 429。" },
   { icon: ScrollText, title: "审计日志与合规支持", desc: "哈希链防篡改的审计日志保留 180 天以上，内容安全审核钩子与人工复核队列。" },
-  { icon: Globe, title: "边缘部署，低延迟全球加速", desc: "跑在 Cloudflare 全球边缘节点，就近接入、就近转发，天然高可用。" },
+  { icon: Globe, title: "边缘部署，低延迟全球加速", desc: "跑在腾讯云 EdgeOne 全球边缘节点，就近接入、就近转发，天然高可用。" },
 ];
 const PRICING = [
   { name: "免费版", price: "¥0", unit: "/月", desc: "体验与评估", items: ["$1 体验额度", "全部公开模型", "社区支持"], cta: "免费开始", hot: false },
@@ -24,12 +24,12 @@ const PRICING = [
   { name: "企业版", price: "定制", unit: "", desc: "规模部署", items: ["私有化/自托管", "SLA 保障", "定制合规方案", "专属供应商协议"], cta: "联系我们", hot: false },
 ];
 const FAQS = [
-  { q: "EdgeRelay 和 OneAPI/NewAPI 有什么区别？", a: "EdgeRelay 原生构建在 Cloudflare Workers 边缘：无服务器运维、全球低延迟、与 D1/KV/R2/AI Gateway 深度集成；同时从第一天内置合规能力——哈希链审计日志、内容安全审核队列、上游授权登记，而不是事后补丁。" },
+  { q: "EdgeRelay 和 OneAPI/NewAPI 有什么区别？", a: "EdgeRelay 原生构建在腾讯云 EdgeOne Pages 边缘：无服务器运维、全球低延迟、与 EdgeOne Blob 强一致数据库深度集成；同时内置合规能力——哈希链审计日志、内容安全审核队列、上游授权登记，开箱即用。" },
   { q: "支持哪些上游模型？", a: "所有提供 OpenAI 兼容接口的主流供应商：OpenAI、Anthropic、Google、DeepSeek 等。前提是你或平台持有对应的合法授权；新供应商通过控制台几分钟即可接入并配置主备路由。" },
   { q: "如何计费？", a: "按模型的输入/输出 Token 分别计价（每百万 Token 单价）。每次调用前预冻结预估额度，响应后按实际用量结算并解冻差额，全部流水可在控制台导出。" },
-  { q: "是否支持自托管？", a: "支持。整个平台就是一套 Cloudflare 项目（Workers + D1 + KV + R2），你可以在自己的 Cloudflare 账户上部署一套完全私有的实例。" },
+  { q: "是否支持自托管？", a: "支持。整个平台是一套轻量现代的 EdgeOne Pages + Blob 开源架构，你可以在自己的腾讯云 EdgeOne 账户上一键部署一套完全私有的实例。" },
   { q: "数据隐私如何保障？", a: "平台默认不记录任何对话内容明文，仅保存请求元数据（模型、耗时、Token 数）；上游密钥 AES-256-GCM 加密存储；审计日志哈希链防篡改并支持完整性校验。" },
-  { q: "如何开始使用？", a: "注册账号 → 控制台创建 API Key → 把 Base URL 换成 https://api.obitw.cn 即可。整个过程不超过 5 分钟。" },
+  { q: "如何开始使用？", a: "注册账号 → 控制台创建 API Key → 把 Base URL 换成本站域名即可。整个过程不超过 5 分钟。" },
 ];
 
 function useScrolled() {
@@ -76,14 +76,6 @@ function CodeBlock({ title, code }: { title: string; code: string }) {
   );
 }
 
-const CURL = `curl https://api.obitw.cn/v1/chat/completions \\
-  -H "Authorization: Bearer sk-gw-****" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "model": "deepseek-chat",
-    "messages": [{"role": "user", "content": "你好"}]
-  }'`;
-
 export default function Landing({ site, me }: { site: SiteInfo | null; me: Me | null }) {
   const [menu, setMenu] = useState(false);
   const [faq, setFaq] = useState<number | null>(0);
@@ -91,8 +83,11 @@ export default function Landing({ site, me }: { site: SiteInfo | null; me: Me | 
   const scrolled = useScrolled();
   const name = site?.siteName ?? "EdgeRelay";
   const logo = site?.siteLogoUrl ?? "/logo.png";
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://api.yourdomain.com";
 
-  useEffect(() => { document.title = `${name} — 部署在 Cloudflare 边缘的合规 AI API 网关`; }, [name]);
+  useEffect(() => {
+    document.title = `${name} — ${site?.heroTitle ?? "部署在 EdgeOne 边缘的合规 AI API 网关"}`;
+  }, [name, site?.heroTitle]);
 
   const navLinks = [["功能", "#features"], ["模型", "#pricing"], ["定价", "#pricing"], ["文档", "#dev"], ["合规", "#compliance"]] as const;
 
@@ -105,11 +100,17 @@ export default function Landing({ site, me }: { site: SiteInfo | null; me: Me | 
   };
 
   const codeSamples = {
-    curl: CURL,
+    curl: `curl ${origin}/v1/chat/completions \\
+  -H "Authorization: Bearer sk-gw-****" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "deepseek-chat",
+    "messages": [{"role": "user", "content": "你好"}]
+  }'`,
     node: `import OpenAI from "openai";
 
 const client = new OpenAI({
-  baseURL: "https://api.obitw.cn/v1",
+  baseURL: "${origin}/v1",
   apiKey: process.env.EDGERELAY_KEY,
 });
 
@@ -120,7 +121,7 @@ const res = await client.chat.completions.create({
     python: `from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://api.obitw.cn/v1",
+    base_url="${origin}/v1",
     api_key="sk-gw-****",
 )
 
@@ -185,20 +186,20 @@ res = client.chat.completions.create(
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-medium text-brand">
-              <Zap size={12} />跑在 Cloudflare 全球边缘节点
+              <Zap size={12} />{site?.heroBadge ?? "跑在 EdgeOne 全球边缘节点"}
             </span>
             <h1 className="mt-5 text-4xl font-bold leading-[1.15] tracking-tight sm:text-5xl">
-              <span className="text-balance">部署在 Cloudflare 边缘的<span className="text-brand">合规 AI API 网关</span></span>
+              <span className="text-balance">{site?.heroTitle ?? "部署在 EdgeOne 边缘的合规 AI API 网关"}</span>
             </h1>
             <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-muted">
-              用统一 OpenAI 兼容接口，接入、路由和治理多家大模型服务。合法授权上游、透明计费、哈希链审计——面向开发者与企业的正规聚合分发平台。
+              {site?.heroSubtitle ?? "用统一 OpenAI 兼容接口，接入、路由和治理多家大模型服务。合法授权上游、透明计费、哈希链审计——面向开发者与企业的正规聚合分发平台。"}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to={me ? "/dashboard" : "/login"}><button className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-brand-hover hover:shadow-pop">开始使用<ArrowRight size={15} /></button></Link>
-              <a href="#dev"><button className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-6 py-3 text-sm font-medium transition-colors hover:bg-surface2">查看文档<BookOpen size={15} /></button></a>
+              <a href="#dev" onClick={(e) => handleNavClick(e, "#dev")}><button className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-6 py-3 text-sm font-medium transition-colors hover:bg-surface2">查看文档<BookOpen size={15} /></button></a>
             </div>
           </div>
-          <div className="min-w-0"><CodeBlock title="快速开始 — curl" code={CURL} /></div>
+          <div className="min-w-0"><CodeBlock title="快速开始 — curl" code={codeSamples.curl} /></div>
         </div>
       </section>
 
@@ -339,7 +340,7 @@ res = client.chat.completions.create(
           <p className="mx-auto mt-3 max-w-md text-sm text-muted">注册即送体验额度，5 分钟完成第一次调用。</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to={me ? "/dashboard" : "/login"}><button className="rounded-lg bg-brand px-7 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-hover">免费开始</button></Link>
-            <a href="mailto:support@obitw.cn"><button className="rounded-lg border border-line bg-surface px-7 py-3 text-sm font-medium transition-colors hover:bg-surface2">联系销售</button></a>
+            <a href={site?.supportEmail ? `mailto:${site.supportEmail}` : "mailto:hackerxiaow@gmail.com"}><button className="rounded-lg border border-line bg-surface px-7 py-3 text-sm font-medium transition-colors hover:bg-surface2">联系销售</button></a>
           </div>
         </div>
       </section>
@@ -352,7 +353,7 @@ res = client.chat.completions.create(
               <img src={logo} alt={name} className="h-7 w-7 rounded-lg object-contain" />
               <span className="text-[15px] font-bold text-white">{name}</span>
             </div>
-            <p className="mt-3 max-w-xs text-xs leading-relaxed">部署在 Cloudflare 边缘的合规 AI API 网关，用统一 OpenAI 兼容接口接入、路由和派发多家大模型服务。</p>
+            <p className="mt-3 max-w-xs text-xs leading-relaxed">{site?.siteDescription ?? "部署在 EdgeOne 边缘的合规 AI API 网关，用统一 OpenAI 兼容接口接入、路由和派发多家大模型服务。"}</p>
           </div>
           {[
             { t: "产品", links: [["功能特性", "#features"], ["模型与定价", "#pricing"], ["进入控制台", "/dashboard"], ["注册账号", "/login"]] },
