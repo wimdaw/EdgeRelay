@@ -202,7 +202,12 @@ export default function Providers() {
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-sm font-bold text-brand">{p.name[0]}</div>
                     <div className="min-w-0">
                       <div className="truncate text-xs font-semibold leading-tight">{p.name}</div>
-                      <code className="text-[10px] text-muted">{p.slug}</code>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <code className="text-[10px] text-muted font-mono">{p.slug}</code>
+                        <span className="text-[9px] rounded bg-line px-1 text-muted">
+                          {p.slug === "anthropic" || p.kind === "anthropic" ? "Anthropic 原生" : isKeylessSlug(p.slug) ? "免 Key" : "OpenAI 兼容"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <StatusTag value={p.status} />
@@ -262,7 +267,11 @@ export default function Providers() {
         <div className="grid grid-cols-2 gap-3">
           <Field label="名称"><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="DeepSeek" /></Field>
           <Field label="Slug"><Select value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value, url: SLUG_URL[e.target.value] ?? form.url })}>{SLUGS.map((s) => <option key={s}>{s}</option>)}</Select></Field>
-          <div className="col-span-2"><Field label="Base URL（OpenAI 兼容端点）"><Input value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://..." /></Field></div>
+          <div className="col-span-2">
+            <Field label={`Base URL（${form.slug === 'anthropic' ? 'Anthropic 官方端点' : isKeylessSlug(form.slug) ? '免 Key 直连端点' : 'OpenAI 兼容端点'}）`}>
+              <Input value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://..." />
+            </Field>
+          </div>
           <div className="col-span-2">
             <Field label={isKeylessSlug(form.slug) ? "上游密钥（免 Key 渠道，无需填写）" : form.id ? "追加新密钥（留空保持不变，支持多行批量录入）" : "上游密钥（必填，支持粘贴多个，一行一个）"}>
               <textarea

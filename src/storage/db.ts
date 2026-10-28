@@ -263,6 +263,14 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
       });
       pChanged = true;
     }
+    // 自动修正 Anthropic 协议与鉴权类型
+    const anthropicP = providers.find((p: any) => p.id === "anthropic" || p.slug === "anthropic");
+    if (anthropicP && (anthropicP.kind === "openai_compat" || anthropicP.authScheme !== "x-api-key")) {
+      anthropicP.kind = "anthropic";
+      anthropicP.authScheme = "x-api-key";
+      anthropicP.extraHeaders = JSON.stringify({ "anthropic-version": "2023-06-01", "content-type": "application/json" });
+      pChanged = true;
+    }
     if (pChanged) {
       await store.setJSON("providers:all", providers);
       cachedProviders = { val: providers, at: Date.now() };
@@ -771,7 +779,7 @@ export async function seedInitialData(env: any): Promise<void> {
       id: "anthropic",
       name: "Anthropic",
       slug: "anthropic",
-      kind: "openai_compat",
+      kind: "anthropic",
       baseUrl: "https://api.anthropic.com",
       authScheme: "x-api-key",
       extraHeaders: JSON.stringify({ "anthropic-version": "2023-06-01", "content-type": "application/json" }),

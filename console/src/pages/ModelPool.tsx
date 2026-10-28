@@ -185,6 +185,13 @@ export default function ModelPool({ me: _me }: { me: Me }) {
               provider.kind === "opencode" ||
               provider.kind === "duckai";
 
+            const protocolLabel =
+              provider.slug === "anthropic" || provider.kind === "anthropic"
+                ? "Anthropic 官方协议"
+                : isKeyless
+                ? "免 Key 直连"
+                : "OpenAI 兼容";
+
             return (
               <Card key={provider.id} className="p-4 sm:p-4.5 flex flex-col gap-3">
                 {/* 渠道信息顶栏 */}
@@ -203,7 +210,7 @@ export default function ModelPool({ me: _me }: { me: Me }) {
 
                   <div className="flex items-center gap-2">
                     <span className="rounded bg-line/70 px-2 py-0.5 text-[10px] text-muted font-medium">
-                      {isKeyless ? "免 Key 直连" : "OpenAI 兼容"}
+                      {protocolLabel}
                     </span>
                     <span className="flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-500">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />

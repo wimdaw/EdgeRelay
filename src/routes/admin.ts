@@ -150,6 +150,8 @@ adminRouter.post("/actions", async (c) => {
             id: pr.id,
             name: pr.name,
             slug: pr.slug,
+            kind: pr.kind || (pr.slug === "anthropic" ? "anthropic" : "openai_compat"),
+            auth_scheme: pr.authScheme || (pr.slug === "anthropic" ? "x-api-key" : "bearer"),
             base_url: pr.baseUrl,
             status: pr.status,
             authorization_ref: pr.authorizationRef ?? null,
@@ -332,6 +334,37 @@ adminRouter.post("/actions", async (c) => {
               "cohere/north-mini-code:free",
               "nvidia/nemotron-3-ultra-550b-a55b:free",
               "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+            ],
+          });
+        }
+        if (slug === "anthropic") {
+          try {
+            const keys = await getProviderKeys(env, prov?.id || "anthropic");
+            const activeKey = keys.find((k) => k.status === "active");
+            if (activeKey) {
+              const plainKey = await decryptSecret(env, activeKey.encryptedKey);
+              const res = await fetch("https://api.anthropic.com/v1/models", {
+                headers: {
+                  "x-api-key": plainKey,
+                  "anthropic-version": "2023-06-01",
+                },
+                signal: AbortSignal.timeout(10000),
+              });
+              if (res.ok) {
+                const d = (await res.json()) as { data?: { id?: string }[] };
+                const mList = (d.data ?? []).map((m) => m.id).filter((x): x is string => !!x);
+                if (mList.length) return json({ ok: true, models: mList });
+              }
+            }
+          } catch {}
+          return json({
+            ok: true,
+            models: [
+              "claude-3-5-sonnet-20241022",
+              "claude-3-5-haiku-20241022",
+              "claude-3-opus-20240229",
+              "claude-3-sonnet-20240229",
+              "claude-3-haiku-20240307",
             ],
           });
         }
