@@ -92,6 +92,12 @@ export default function Landing({ site, me }: { site: SiteInfo | null; me: Me | 
   const name = site?.siteName ?? "Relay";
   const logo = site?.siteLogoUrl ?? "/logo.png";
   const origin = typeof window !== "undefined" ? window.location.origin : "https://api.yourdomain.com";
+  const rawGithubUrl = site?.githubUrl?.trim() ?? "";
+  const githubUrl = rawGithubUrl
+    ? (/^https?:\/\//i.test(rawGithubUrl) ? rawGithubUrl : `https://${rawGithubUrl}`)
+    : "";
+  const copyright = site?.copyrightText?.trim() || `© ${new Date().getFullYear()} ${name}. All rights reserved.`;
+  const icpNumber = site?.icpNumber?.trim() ?? "";
 
   useEffect(() => {
     document.title = `${name} — ${site?.heroTitle ?? "部署在 EdgeOne 边缘的合规 AI API 网关"}`;
@@ -413,12 +419,12 @@ res = client.chat.completions.create(
         </div>
         <div className="border-t border-white/10">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-5 text-[11px] sm:flex-row sm:px-6">
-            <span>© {new Date().getFullYear()} {name}. All rights reserved.</span>
+            <span>{copyright}</span>
             <span className="flex items-center gap-4">
               <a href="/terms.html" className="hover:text-white">服务条款</a>
               <a href="/privacy.html" className="hover:text-white">隐私政策</a>
-              <span className="text-zinc-600">备案号：待办理</span>
-              <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub"><GithubIcon size={15} className="hover:text-white" /></a>
+              {icpNumber ? <span className="text-zinc-600">备案号：{icpNumber}</span> : null}
+              {githubUrl ? <a href={githubUrl} target="_blank" rel="noreferrer" aria-label="GitHub"><GithubIcon size={15} className="hover:text-white" /></a> : null}
             </span>
           </div>
         </div>

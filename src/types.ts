@@ -57,6 +57,9 @@ export type PlatformSettings = {
   heroTitle?: string;
   heroSubtitle?: string;
   supportEmail?: string;
+  icpNumber?: string;
+  copyrightText?: string;
+  githubUrl?: string;
   /* 登录方式 */
   oauthGithubEnabled?: boolean;
   oauthGoogleEnabled?: boolean;
@@ -93,6 +96,9 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   heroTitle: "部署在 EdgeOne 边缘的合规 AI API 网关",
   heroSubtitle: "用统一 OpenAI 兼容接口，接入、路由和治理多家大模型服务。合法授权上游、透明计费、哈希链审计——面向开发者与企业的正规聚合分发平台。",
   supportEmail: "hackerxiaow@gmail.com",
+  icpNumber: "待办理",
+  copyrightText: "",
+  githubUrl: "https://github.com/wimdaw/EdgeRelay",
 };
 
 export type RateLimits = { rpm: number; tpm: number; concurrency: number };
