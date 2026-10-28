@@ -249,6 +249,20 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
       });
       pChanged = true;
     }
+    if (!providers.some((p: any) => p.id === "kilo" || p.slug === "kilo")) {
+      providers.push({
+        id: "kilo",
+        name: "Kilo",
+        slug: "kilo",
+        kind: "kilo",
+        baseUrl: "https://api.kilo.ai/api/gateway",
+        authScheme: "none",
+        status: "active",
+        authorizationRef: "AUTH-KILO-FREE-2026",
+        createdAt: now,
+      });
+      pChanged = true;
+    }
     if (pChanged) {
       await store.setJSON("providers:all", providers);
       cachedProviders = { val: providers, at: Date.now() };
@@ -289,6 +303,18 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
       { id: "m_dk_gemma31b", publicName: "tinfoil/gemma4-31b", providerId: "duckai", upstreamModel: "tinfoil/gemma4-31b", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
       { id: "m_dk_oss120b_s", publicName: "gpt-oss-120b", providerId: "duckai", upstreamModel: "tinfoil/gpt-oss-120b", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
       { id: "m_dk_gemma31b_s", publicName: "gemma4-31b", providerId: "duckai", upstreamModel: "tinfoil/gemma4-31b", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      // Kilo free models (11 个实测验证全通模型)
+      { id: "m_kl_auto_f", publicName: "kilo-auto/free", providerId: "kilo", upstreamModel: "kilo-auto/free", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
+      { id: "m_kl_or_f", publicName: "openrouter/free", providerId: "kilo", upstreamModel: "openrouter/free", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
+      { id: "m_kl_nemo_vl_f", publicName: "nvidia/nemotron-3.5-super-vl:free", providerId: "kilo", upstreamModel: "nvidia/nemotron-3.5-super-vl:free", priority: 10, costWeight: 1, maxContext: 1000000, enabled: 1, createdAt: now },
+      { id: "m_kl_nemo_lt_f", publicName: "nvidia/nemotron-3.5-lightning:free", providerId: "kilo", upstreamModel: "nvidia/nemotron-3.5-lightning:free", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
+      { id: "m_kl_beam_f", publicName: "reflection/beam-free", providerId: "kilo", upstreamModel: "reflection/beam-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_kl_xing_f", publicName: "xingchen-agi/xing4.0-29b-a4b:free", providerId: "kilo", upstreamModel: "xingchen-agi/xing4.0-29b-a4b:free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_kl_dots_f", publicName: "dots-studio/dots-3-note-preview:free", providerId: "kilo", upstreamModel: "dots-studio/dots-3-note-preview:free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_kl_lfm_f", publicName: "liquid/lfm-2.5-2.6b:free", providerId: "kilo", upstreamModel: "liquid/lfm-2.5-2.6b:free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
+      { id: "m_kl_north_f", publicName: "cohere/north-mini-code:free", providerId: "kilo", upstreamModel: "cohere/north-mini-code:free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
+      { id: "m_kl_nemo_u550_f", publicName: "nvidia/nemotron-3-ultra-550b-a55b:free", providerId: "kilo", upstreamModel: "nvidia/nemotron-3-ultra-550b-a55b:free", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
+      { id: "m_kl_nemo_nano_f", publicName: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", providerId: "kilo", upstreamModel: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
     ];
     for (const nm of newModels) {
       if (!existingNames.has(nm.publicName)) {
@@ -387,6 +413,21 @@ export async function upsertProviderKey(env: any, key: ProviderKeyRecord): Promi
     keys.push(key);
   }
   await setProviderKeys(env, key.providerId, keys);
+}
+
+export async function deleteProviderKey(env: any, providerId: string, keyId: string): Promise<void> {
+  const keys = await getProviderKeys(env, providerId);
+  const filtered = keys.filter((k) => k.id !== keyId && k.keyFingerprint !== keyId);
+  await setProviderKeys(env, providerId, filtered);
+}
+
+export async function updateProviderKeyStatus(env: any, providerId: string, keyId: string, status: "active" | "disabled"): Promise<void> {
+  const keys = await getProviderKeys(env, providerId);
+  const idx = keys.findIndex((k) => k.id === keyId || k.keyFingerprint === keyId);
+  if (idx >= 0) {
+    keys[idx].status = status;
+    await setProviderKeys(env, providerId, keys);
+  }
 }
 
 // ==========================================

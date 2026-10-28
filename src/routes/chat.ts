@@ -11,6 +11,7 @@ import { getSettings } from "../settings";
 import { requireRoutes } from "../router";
 import { getPricing, hold, settle, releaseHold, estimateCost } from "../billing";
 import { buildHeaders, resolveTarget, RETRYABLE_STATUS, estimateTokens } from "../providers";
+import { recordKeySuccess, recordKeyFailure } from "../key-health";
 import { uuid } from "../crypto";
 import { addUsageRecord } from "../storage/db";
 
@@ -112,11 +113,12 @@ chatRouter.post("/", async (c) => {
     const scope = billingScope(key.userId, key.orgId);
     const { holdId } = await hold(hCtx, scope, estCost, requestId);
 
-    /* ---- 依次尝试上游（故障转移） ---- */
+    /* ---- 依次尝试上游（故障转移与多 Key 容灾） ---- */
     const stream = !!body.stream;
     let attempts = 0;
     let lastUpstreamError = "";
-    for (const route of routes.slice(0, 3)) {
+    const candidateRoutes = routes.slice(0, 5);
+    for (const route of candidateRoutes) {
       attempts++;
       try {
         const isOpencode = route.providerKind === "opencode" || route.providerSlug === "opencode";
@@ -177,7 +179,12 @@ chatRouter.post("/", async (c) => {
 
         if (!resp.ok) {
           lastUpstreamError = `status ${resp.status}`;
-          if (RETRYABLE_STATUS.has(resp.status)) {
+          if (route.providerKeyId && route.providerKeyId !== "keyless") {
+            const isTerminal = resp.status === 401 || resp.status === 402;
+            await recordKeyFailure(env, route.providerId, route.providerKeyId, isTerminal).catch(() => {});
+          }
+          const isAuthOrQuota = resp.status === 401 || resp.status === 402;
+          if (RETRYABLE_STATUS.has(resp.status) || (isAuthOrQuota && attempts < candidateRoutes.length)) {
             continue;
           }
           const errText = await resp.text();
@@ -206,6 +213,10 @@ chatRouter.post("/", async (c) => {
             createdAt: Math.floor(Date.now() / 1000),
           });
           return new Response(errText, { status: resp.status, headers: { "content-type": "application/json" } });
+        }
+
+        if (route.providerKeyId && route.providerKeyId !== "keyless") {
+          await recordKeySuccess(env, route.providerId, route.providerKeyId).catch(() => {});
         }
 
         /* ---- 成功返回：流式 vs 非流式 ---- */
@@ -360,6 +371,9 @@ chatRouter.post("/", async (c) => {
         });
       } catch (err: any) {
         lastUpstreamError = err?.message || String(err);
+        if (route.providerKeyId && route.providerKeyId !== "keyless") {
+          await recordKeyFailure(env, route.providerId, route.providerKeyId, false).catch(() => {});
+        }
       }
     }
 

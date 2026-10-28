@@ -19,6 +19,8 @@ import {
   deleteProvider,
   getProviderKeys,
   upsertProviderKey,
+  deleteProviderKey,
+  updateProviderKeyStatus,
   getModels,
   upsertModel,
   deleteModel,
@@ -32,6 +34,7 @@ import {
   saveAnnouncements,
   getBlobStore,
 } from "../storage/db";
+import { readKeyHealth } from "../key-health";
 
 export const adminRouter = new Hono<{ Bindings: Env }>();
 
@@ -142,6 +145,7 @@ adminRouter.post("/actions", async (c) => {
         const out = [];
         for (const pr of providers) {
           const keys = await getProviderKeys(env, pr.id);
+          const health = await readKeyHealth(env, pr.id);
           out.push({
             id: pr.id,
             name: pr.name,
@@ -152,20 +156,26 @@ adminRouter.post("/actions", async (c) => {
             authorization_expires_at: pr.authorizationExpiresAt ?? null,
             key_count: keys.length,
             extraHeaders: pr.extraHeaders ? JSON.parse(pr.extraHeaders) : {},
-            keys: keys.map((k) => ({
-              id: k.id,
-              label: k.label,
-              fingerprint: k.keyFingerprint,
-              status: k.status,
-              created_at: k.createdAt,
-            })),
+            keys: keys.map((k) => {
+              const h = health[k.id] || health[k.keyFingerprint];
+              return {
+                id: k.id,
+                label: k.label,
+                fingerprint: k.keyFingerprint,
+                status: k.status,
+                health_status: h?.demotedAt ? "demoted" : (h?.failures ? "unhealthy" : "healthy"),
+                failures: h?.failures || 0,
+                demoted_at: h?.demotedAt || null,
+                created_at: k.createdAt,
+              };
+            }),
           });
         }
         return json({ ok: true, providers: out });
       }
       case "upsert_provider": {
         const isNew = !p.id;
-        const isKeyless = p.slug === "opencode" || p.slug === "duckai" || p.kind === "opencode" || p.kind === "duckai" || p.authScheme === "none";
+        const isKeyless = p.slug === "opencode" || p.slug === "duckai" || p.slug === "kilo" || p.kind === "opencode" || p.kind === "duckai" || p.kind === "kilo" || p.authScheme === "none";
         if (isNew && !p.key && !isKeyless) throw new ApiError(400, ErrorCode.BAD_REQUEST, "添加供应商必须同时录入上游密钥");
         const id = (p.id as string) || uuid();
 
@@ -203,6 +213,16 @@ adminRouter.post("/actions", async (c) => {
         if (!p.id) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少渠道 id");
         await deleteProvider(env, String(p.id));
         return done(null, "provider", String(p.id));
+      }
+      case "delete_provider_key": {
+        if (!p.providerId || !p.keyId) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 providerId 或 keyId");
+        await deleteProviderKey(env, String(p.providerId), String(p.keyId));
+        return done(null, "provider_key", String(p.keyId));
+      }
+      case "toggle_provider_key": {
+        if (!p.providerId || !p.keyId || !p.status) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少参数");
+        await updateProviderKeyStatus(env, String(p.providerId), String(p.keyId), p.status as "active" | "disabled");
+        return done(null, "provider_key", String(p.keyId));
       }
       case "upsert_provider_key": {
         if (!p.providerId || !p.key) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 providerId 或 key");
@@ -268,6 +288,37 @@ adminRouter.post("/actions", async (c) => {
               "mistral-small-2603",
               "tinfoil/gpt-oss-120b",
               "tinfoil/gemma4-31b",
+            ],
+          });
+        }
+        if (slug === "kilo") {
+          try {
+            const res = await fetch("https://api.kilo.ai/api/gateway/models", {
+              headers: { "user-agent": "Relay/1.0" },
+              signal: AbortSignal.timeout(10000),
+            });
+            if (res.ok) {
+              const d = (await res.json()) as { data?: { id?: string }[] };
+              const freeList = (d.data ?? [])
+                .map((m) => m.id)
+                .filter((id): id is string => typeof id === "string" && (id.includes(":free") || id === "kilo-auto/free" || id === "openrouter/free"));
+              if (freeList.length) return json({ ok: true, models: freeList });
+            }
+          } catch {}
+          return json({
+            ok: true,
+            models: [
+              "kilo-auto/free",
+              "openrouter/free",
+              "nvidia/nemotron-3.5-super-vl:free",
+              "nvidia/nemotron-3.5-lightning:free",
+              "reflection/beam-free",
+              "xingchen-agi/xing4.0-29b-a4b:free",
+              "dots-studio/dots-3-note-preview:free",
+              "liquid/lfm-2.5-2.6b:free",
+              "cohere/north-mini-code:free",
+              "nvidia/nemotron-3-ultra-550b-a55b:free",
+              "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
             ],
           });
         }

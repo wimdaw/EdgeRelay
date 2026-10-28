@@ -30,6 +30,8 @@
 | **OpenAI 兼容网关** | ✅ 已完成 | `POST /v1/chat/completions` 支持非流式与流式 SSE 透传、主备多路由自动 Failover、429 退避、实际 Token 计费与预冻结。 |
 | **免 Key 渠道 (OpenCode)** | ✅ 已完成 | 完整移植 `opencode.ts` + `opencode-compat.ts`，自动注入官方 `<env>`、CLI 提示词与 11 官方工具定义，集成 `wreq-js` (Bun 17-cipher) TLS 模拟与镜像轮换。 |
 | **免 Key 渠道 (Duck.ai)** | ✅ 已完成 | 实现 `duckai.ts` 原生微沙箱挑战求解（`node:vm` + `parse5`），5ms 内本地求解 DuckDuckGo JS 挑战，配合 `TransformStream` 实时流式转译，零外部容器依赖。 |
+| **免 Key 渠道 (Kilo)** | ✅ 已完成 | 接入 Kilo 聚合网关（`https://api.kilo.ai/api/gateway`），内置自举 11 个实测验证全通免费模型（包含 `kilo-auto/free`、`openrouter/free`、Nemotron 3.5 100万超大上下文等），动态拉取上游免费层模型。 |
+| **多 Key 轮换与健康熔断** | ✅ 已完成 | 移植 Fisher-Yates 随机打散实现多 Key 均匀负载均衡；集成 429/5xx 熔断降权与 401/402 强熔断，60 秒后自动转入试用（Probation）自愈；控制台支持多 Key 池增删停用与健康状态可视化。 |
 | **标准干净网址 (BrowserRouter)** | ✅ 已完成 | 彻底废除 `HashRouter` 与强制追加 `/#/` 的旧脚本，全量升级为标准 HTML5 History 路由，首页为纯原生根路径，内链与外链干净无 `#`，并提供旧书签平滑重定向。 |
 | **首屏防闪闭环** | ✅ 已完成 | 静态 `public/index.html` 烘焙正确品牌（Relay），静态标题、`useSiteInfo` 与 Landing 标题三处完全一致；配合单次 `Clear-Site-Data: "cache"` 自愈，彻底消除旧缓存闪烁。 |
 | **可收缩侧边栏 (Rail Collapse)** | ✅ 已完成 | 对齐 `ai-gateway-edgeone` 交互，桌面端支持在 224px 与 68px 之间平滑过渡，顶部与底部双向配备切换按钮，折叠态图标居中带原生 Tooltip，`localStorage` 持久化记忆。 |
@@ -118,14 +120,15 @@ git checkout edgeone
 ## 六、 后续迭代规划与开发计划 (Roadmap & Development Plan)
 
 ### 阶段一：渠道生态扩展与上游连接池优化 (近期计划)
-- [ ] **接入更多免 Key / 免费体验渠道**：
-  - 参考 `ai-gateway-edgeone` 接入 `Kilo` 聚合渠道（`kilo-auto/frontier`、`kilo-auto/balanced`、`kilo-auto/efficient`、`gemma-3-27b`、`hy3` 等）。
-  - 参考 `ai-gateway-edgeone` 接入 `Z.AI` 渠道（GLM 体验模型）。
-- [ ] **多 Key 轮换与健康熔断机制**：
+- [x] **接入更多免 Key / 免费体验渠道**：
+  - 参考 `ai-gateway-edgeone` 接入 `Kilo` 聚合网关，内置自举 11 个实测验证全通免费模型（`kilo-auto/free`、`openrouter/free`、`nvidia/nemotron-3.5-super-vl:free` 等）。
+  - （可选备用）参考 `ai-gateway-edgeone` 接入 `Z.AI` 渠道（GLM 体验模型）。
+- [x] **多 Key 轮换与健康熔断机制**：
   - 针对单个付费供应商（如 OpenAI、DeepSeek、Anthropic）支持挂载多个 API Key。
-  - 实现基于权重/轮询的 Key 调度；遭遇 429 或配额耗尽时自动进入冷却名单，冷却时间过后自愈。
+  - 采用 Fisher-Yates 随机打散实现负载均衡；遭遇 429 连续超限或 401/402 终态错误自动进入冷却名单，60 秒后自动转入试用队列（Probation）自愈探测。
+  - 控制台配备「密钥池管理」弹窗，支持多 Key 增删停用与健康状态（健康/异常/熔断冷却）实时显示。
 - [ ] **超时与重试细粒度控制**：
-  - 针对长上下文与深度推理模型（如 `deepseek-reasoner`、`gpt-6-luna`），允许按模型单独设置上游等待超时（最大放宽至 180s）。
+  - 针对长上下文与深度推理模型，统一受限于 EdgeOne 单次请求上限 120 秒约束，网关层配置 120s 超时保障。
 
 ### 阶段二：智能路由与安全合规深化 (中期计划)
 - [ ] **模型逻辑分组与虚拟别名 (Virtual Model Alias)**：

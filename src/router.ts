@@ -7,6 +7,7 @@
 import type { UpstreamRoute } from "./types";
 import { ApiError, ErrorCode } from "./errors";
 import { getModels, getProviders, getProviderKeys } from "./storage/db";
+import { readKeyHealth, sortKeysByHealth } from "./key-health";
 
 export async function listRoutes(env: any, publicName: string): Promise<UpstreamRoute[]> {
   const allModels = await getModels(env);
@@ -26,10 +27,9 @@ export async function listRoutes(env: any, publicName: string): Promise<Upstream
 
     const keys = await getProviderKeys(env, p.id);
     const activeKeys = keys.filter((k) => k.status === "active");
-    const isKeyless = p.kind === "opencode" || p.slug === "opencode" || p.kind === "duckai" || p.slug === "duckai" || p.authScheme === "none";
+    const isKeyless = p.kind === "opencode" || p.slug === "opencode" || p.kind === "duckai" || p.slug === "duckai" || p.kind === "kilo" || p.slug === "kilo" || p.authScheme === "none";
     if (!activeKeys.length && !isKeyless) continue;
 
-    const pk = activeKeys[0];
     let extraHeaders: Record<string, string> = {};
     if (p.extraHeaders) {
       try {
@@ -37,20 +37,43 @@ export async function listRoutes(env: any, publicName: string): Promise<Upstream
       } catch {}
     }
 
-    routes.push({
-      modelId: m.id,
-      providerId: p.id,
-      providerSlug: p.slug,
-      providerKind: p.kind,
-      baseUrl: p.baseUrl,
-      authScheme: p.authScheme,
-      extraHeaders,
-      providerKeyId: pk ? pk.id : "keyless",
-      encryptedKey: pk ? pk.encryptedKey : "",
-      upstreamModel: m.upstreamModel,
-      priority: m.priority,
-      costWeight: m.costWeight,
-    });
+    if (activeKeys.length === 0) {
+      // 免 Key 渠道（如 opencode, duckai, kilo）
+      routes.push({
+        modelId: m.id,
+        providerId: p.id,
+        providerSlug: p.slug,
+        providerKind: p.kind,
+        baseUrl: p.baseUrl,
+        authScheme: p.authScheme,
+        extraHeaders,
+        providerKeyId: "keyless",
+        encryptedKey: "",
+        upstreamModel: m.upstreamModel,
+        priority: m.priority,
+        costWeight: m.costWeight,
+      });
+    } else {
+      // 多 Key 渠道：读取健康度并按健康/洗牌/试用/降权排序
+      const health = await readKeyHealth(env, p.id);
+      const sortedKeys = sortKeysByHealth(activeKeys, health);
+      for (const pk of sortedKeys) {
+        routes.push({
+          modelId: m.id,
+          providerId: p.id,
+          providerSlug: p.slug,
+          providerKind: p.kind,
+          baseUrl: p.baseUrl,
+          authScheme: p.authScheme,
+          extraHeaders,
+          providerKeyId: pk.id,
+          encryptedKey: pk.encryptedKey,
+          upstreamModel: m.upstreamModel,
+          priority: m.priority,
+          costWeight: m.costWeight,
+        });
+      }
+    }
   }
 
   return routes;
