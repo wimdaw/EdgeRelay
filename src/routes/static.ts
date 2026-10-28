@@ -8,6 +8,14 @@ import { getSettings } from "../settings";
 
 export const staticRouter = new Hono<{ Bindings: Env }>();
 
+const HTML_CACHE_HEADERS = {
+  "content-type": "text/html; charset=utf-8",
+  "cache-control": "no-store, no-cache, must-revalidate, max-age=0",
+  pragma: "no-cache",
+  expires: "0",
+  "cdn-cache-control": "no-store",
+};
+
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
@@ -51,9 +59,7 @@ staticRouter.get("*", async (c) => {
   if (asset) {
     if (pathname === "/index.html") {
       const html = await renderSpaHtml(c.env);
-      return new Response(html, {
-        headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" },
-      });
+      return new Response(html, { headers: HTML_CACHE_HEADERS });
     }
     const headers: Record<string, string> = {
       "content-type": asset.type,
@@ -71,7 +77,5 @@ staticRouter.get("*", async (c) => {
 
   // 2. SPA Fallback（前端路由如 /login, /dashboard/*, /privacy 等）
   const html = await renderSpaHtml(c.env);
-  return new Response(html, {
-    headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" },
-  });
+  return new Response(html, { headers: HTML_CACHE_HEADERS });
 });

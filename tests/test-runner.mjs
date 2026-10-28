@@ -49,9 +49,11 @@ console.log("=== EdgeRelay (EdgeOne Pages + Blob) 自动化回归测试 ===\n");
   const resHome = await request("/");
   assert(resHome.status === 200, "首页根路由 HTTP 200");
   const html = await resHome.text();
-  assert(html.includes("<title>EdgeRelay — AI API 网关控制台</title>"), "首页成功注入动态 SEO 标题");
+  assert(/<title>[^<]+ — AI API 网关控制台<\/title>/.test(html), "首页成功注入动态 SEO 标题");
 
-  const resAsset = await request("/assets/index-Dv_u8plx.js");
+  const assetMatch = html.match(/src="\.\/assets\/(index-[^"]+\.js)"/);
+  assert(!!assetMatch, "首页包含入口 JS 资产");
+  const resAsset = await request(`/assets/${assetMatch[1]}`);
   assert(resAsset.status === 200, "静态 JS 资产 HTTP 200");
   assert(resAsset.headers.get("content-type")?.includes("javascript"), "静态资产 Content-Type 正确");
 }

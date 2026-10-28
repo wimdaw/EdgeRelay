@@ -6,9 +6,10 @@
   "description": "部署在腾讯云 EdgeOne Pages + Blob 数据库上的合规 AI API 网关 (OpenAI 兼容接口)",
   "main": "cloud-functions/[[default]].js",
   "scripts": {
+    "build:console": "npm --prefix console install --legacy-peer-deps --no-audit --no-fund && npm --prefix console run build",
     "build:assets": "node scripts/build-assets.mjs",
     "build:bundle": "node scripts/build-bundle.mjs",
-    "build": "npm run build:assets && npm run build:bundle",
+    "build": "npm run build:console && npm run build:assets && npm run build:bundle",
     "deploy": "npm run build && edgeone makers deploy --json",
     "test": "node tests/test-runner.mjs"
   },
