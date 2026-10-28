@@ -112,9 +112,9 @@ export default function ModelPool({ me: _me }: { me: Me }) {
               <h1 className="text-base font-bold text-ink">模型池 (Model Pool)</h1>
             </div>
             <p className="mt-1 text-xs text-muted max-w-2xl">
-              汇聚已就绪的所有上游大模型服务。点击任意模型胶囊即可一键复制模型标识；支持标准模型名调用或使用
-              <code className="mx-1 rounded bg-surface2 px-1 text-ink font-mono">渠道/模型</code>
-              精准锁定指定上游。
+              已就绪的所有上游大模型目录。模型调用格式统一规范为
+              <code className="mx-1 rounded bg-surface2 px-1 text-ink font-mono font-medium">提供商ID/模型ID</code>
+              （例如 <span className="font-mono text-ink">deepseek/deepseek-chat</span> 或 <span className="font-mono text-ink">kilo/kilo-auto/free</span>）。点击任意模型胶囊即可一键复制并填入客户端。
             </p>
           </div>
 
@@ -208,55 +208,36 @@ export default function ModelPool({ me: _me }: { me: Me }) {
                   </div>
                 </div>
 
-                {/* 模型胶囊徽章列表 */}
+                {/* 模型胶囊徽章列表（对齐 ai-gateway-edgeone 样式与体验） */}
                 {pModels.length === 0 ? (
                   <div className="py-2 text-xs text-muted">该渠道暂无已启用模型</div>
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {pModels.map((m) => {
-                      const modelId = m.public_name;
-                      const directionalId = `${provider.slug}/${m.public_name}`;
-                      const isModelCopied = copiedKey === modelId;
-                      const isDirCopied = copiedKey === directionalId;
+                      const fullModelId = m.public_name.startsWith(`${provider.slug}/`)
+                        ? m.public_name
+                        : `${provider.slug}/${m.public_name}`;
+                      const isCopied = copiedKey === fullModelId;
 
                       return (
-                        <div
+                        <button
                           key={m.id}
-                          className="group relative flex items-center rounded-lg border border-line bg-surface2/40 text-xs transition-all hover:border-brand/40 hover:bg-surface2"
-                        >
-                          {/* 主模型名复制按钮 */}
-                          <button
-                            type="button"
-                            onClick={() => copyText(modelId, "标准模型名")}
-                            className={cn(
-                              "flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-ink transition-colors",
-                              isModelCopied && "!text-emerald-500 font-semibold"
-                            )}
-                            title="点击一键复制标准模型名称"
-                          >
-                            <span className="font-medium">{modelId}</span>
-                            {isModelCopied ? (
-                              <Check size={11} className="text-emerald-500" />
-                            ) : (
-                              <Copy size={11} className="text-muted/60 group-hover:text-ink transition-colors" />
-                            )}
-                          </button>
-
-                          {/* 渠道定向后缀小按钮 */}
-                          {!modelId.startsWith(`${provider.slug}/`) && (
-                            <button
-                              type="button"
-                              onClick={() => copyText(directionalId, "强制定向模型名")}
-                              className={cn(
-                                "border-l border-line px-1.5 py-1.5 text-[10px] font-mono text-muted transition-colors hover:bg-brand/10 hover:text-brand",
-                                isDirCopied && "!text-emerald-500 font-semibold !bg-emerald-500/10"
-                              )}
-                              title={`复制强制指定该渠道的前缀名称: ${directionalId}`}
-                            >
-                              {isDirCopied ? "已复制定向" : `${provider.slug}/`}
-                            </button>
+                          type="button"
+                          onClick={() => copyText(fullModelId, "模型 ID")}
+                          className={cn(
+                            "group inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface2/60 px-2.5 py-1.5 text-xs font-mono transition-all hover:border-brand/40 hover:bg-brand/5 hover:text-brand",
+                            isCopied && "!border-emerald-500/80 !bg-emerald-500/10 !text-emerald-500 font-semibold"
                           )}
-                        </div>
+                          title="点击复制模型 ID (提供商ID/模型ID)"
+                        >
+                          <code className="text-xs font-mono font-medium">{fullModelId}</code>
+                          {isCopied ? (
+                            <Check size={12} className="text-emerald-500 shrink-0" />
+                          ) : (
+                            <Copy size={12} className="text-muted/60 group-hover:text-brand shrink-0 transition-colors" />
+                          )}
+                          {isCopied && <span className="text-[10px] font-sans font-medium text-emerald-500">已复制</span>}
+                        </button>
                       );
                     })}
                   </div>
