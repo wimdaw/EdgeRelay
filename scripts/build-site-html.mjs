@@ -61,7 +61,8 @@ const name = site.siteName || "Relay";
 const desc = site.siteDescription || DEFAULT_SITE.siteDescription;
 const logo = site.siteLogoUrl || "/logo.png";
 
-html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(name)} — AI API 网关控制台</title>`);
+const titleSuffix = site.heroTitle || DEFAULT_SITE.heroTitle;
+html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(name)} — ${esc(titleSuffix)}</title>`);
 html = html.replace(/<meta\s+name="description"[^>]*>/gi, `<meta name="description" content="${esc(desc)}">`);
 html = html.replace(/<meta\s+property="og:title"[^>]*>/gi, `<meta property="og:title" content="${esc(name)}">`);
 html = html.replace(/<meta\s+property="og:description"[^>]*>/gi, `<meta property="og:description" content="${esc(desc)}">`);

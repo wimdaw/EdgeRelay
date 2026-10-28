@@ -52,7 +52,8 @@ async function renderSpaHtml(env: Env): Promise<string> {
     .replace(/\u2028/g, "\\u2028")
     .replace(/\u2029/g, "\\u2029");
 
-  html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(siteName)} — AI API 网关控制台</title>`);
+  const titleSuffix = s.heroTitle ?? "部署在 EdgeOne 边缘的合规 AI API 网关";
+  html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(siteName)} — ${esc(titleSuffix)}</title>`);
   html = html.replace(/<meta\s+name="description"[^>]*>/gi, "");
   html = html.replace(/<meta\s+property="og:[^"]*"[^>]*>/gi, "");
   html = html.replace(

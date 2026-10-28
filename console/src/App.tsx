@@ -31,7 +31,7 @@ function useSiteInfo() {
   useEffect(() => {
     api<SiteInfo>("/api/site").then((s) => {
       setSite(s);
-      document.title = `${s.siteName} — AI API 网关控制台`;
+      document.title = `${s.siteName} — ${s.heroTitle ?? "部署在 EdgeOne 边缘的合规 AI API 网关"}`;
       const setMeta = (attr: string, key: string, content: string) => {
         let el = document.head.querySelector(`meta[${attr}="${key}"]`);
         if (!el) { el = document.createElement("meta"); el.setAttribute(attr, key); document.head.appendChild(el); }
