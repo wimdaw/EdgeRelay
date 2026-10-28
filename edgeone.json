@@ -4,6 +4,12 @@
     "regions": {
       "overseas": ["ap-tokyo"]
     },
+    "nodejs": {
+      "maxDuration": 120,
+      "regions": {
+        "overseas": ["ap-tokyo"]
+      }
+    },
     "externalNodeModules": [
       "@edgeone/pages-blob"
     ]

@@ -1,0 +1,22 @@
+{
+  "version": 3,
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "^/(.*)$",
+      "server-name": "api-node"
+    }
+  ],
+  "conf": {
+    "cloudFunctions": {
+      "maxDuration": 120,
+      "regions": {
+        "overseas": [
+          "ap-tokyo"
+        ]
+      }
+    }
+  }
+}
