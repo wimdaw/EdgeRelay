@@ -2,6 +2,7 @@
  * 站点信息、公告与申诉路由
  */
 import { Hono } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
 import type { Env, HandlerCtx } from "../types";
 import { getSettings, json } from "../settings";
 import { requireUser } from "../auth";
@@ -13,6 +14,13 @@ export const siteRouter = new Hono<{ Bindings: Env }>();
 
 /** 站点信息：前端直接解构使用，格式严格对齐原版 SiteInfo */
 siteRouter.get("/site", async (c) => {
+  // 一次性清掉旧版浏览器缓存：旧客户端会先渲染 EdgeRelay 再被 /api/site 改成 Relay。
+  // 用 Cookie 保证每个浏览器只清一次，避免每次访问都丢掉静态资源缓存。
+  c.header("Cache-Control", "no-store");
+  if (!getCookie(c, "gw_cache_reset_v1")) {
+    setCookie(c, "gw_cache_reset_v1", "1", { path: "/", maxAge: 31536000, sameSite: "Lax" });
+    c.header("Clear-Site-Data", '"cache"');
+  }
   const s = await getSettings(c.env);
   return json({
     siteName: s.siteName ?? "Relay",
