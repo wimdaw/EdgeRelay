@@ -25,8 +25,11 @@ export async function sendMail(
   const port = cfg.port || 465;
   const user = cfg.username.includes("@") ? cfg.username : cfg.from || cfg.username;
   const pass = cfg.password;
-  const from = cfg.from || user;
-  const fromName = mail.fromName || cfg.fromName || "Relay AI";
+  const rawFrom = (cfg.from || user).trim();
+  const emailMatch = rawFrom.match(/<([^>]+)>/) || rawFrom.match(/([^\s<]+@[^\s>]+)/);
+  const from = emailMatch ? emailMatch[1].trim() : rawFrom;
+  const rawNameMatch = rawFrom.match(/^([^<]+)</);
+  const fromName = (mail.fromName || cfg.fromName || (rawNameMatch ? rawNameMatch[1].trim() : "") || "Relay AI").trim();
 
   return new Promise<void>((resolve, reject) => {
     let settled = false;
@@ -120,12 +123,17 @@ export async function sendMail(
           const boundary = `----=_EdgeRelay_${Date.now().toString(36)}`;
           const subjectEncoded = `=?UTF-8?B?${b64(mail.subject)}?=`;
 
+          // RFC 5322 规范：纯 ASCII 姓名（如 "Relay AI"）必须使用标准双引号格式，
+          // 网易 163 等反垃圾邮件网关对纯英文采用 Base64 编码会判定为异常并强制回退为邮箱前缀 wimdaw；
+          // 仅当含有非 ASCII 字符（如中文）时才使用 RFC 2047 MIME 编码。
+          const isAsciiOnly = /^[\x20-\x7E]+$/.test(fromName);
           const fromHeader = fromName
-            ? `=?UTF-8?B?${b64(fromName)}?= <${from}>`
+            ? (isAsciiOnly ? `"${fromName.replace(/"/g, '\\"')}" <${from}>` : `=?UTF-8?B?${b64(fromName)}?= <${from}>`)
             : `<${from}>`;
 
           const headers = [
             `From: ${fromHeader}`,
+            `Reply-To: ${fromHeader}`,
             `To: <${mail.to}>`,
             `Subject: ${subjectEncoded}`,
             `MIME-Version: 1.0`,
