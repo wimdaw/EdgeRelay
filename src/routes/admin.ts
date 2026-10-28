@@ -100,7 +100,7 @@ adminRouter.post("/actions", async (c) => {
       }
       case "set_role": {
         const role = String(p.role);
-        if (!["user", "admin", "finance", "auditor"].includes(role)) {
+        if (!["user", "vip", "admin", "finance", "auditor"].includes(role)) {
           throw new ApiError(400, ErrorCode.BAD_REQUEST, "非法角色");
         }
         await updateUser(env, String(p.userId), { role: role as any });
@@ -226,6 +226,15 @@ adminRouter.post("/actions", async (c) => {
       case "delete_provider": {
         if (!p.id) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少渠道 id");
         await deleteProvider(env, String(p.id));
+        return done(null, "provider", String(p.id));
+      }
+      case "toggle_provider": {
+        if (!p.id || !p.status) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少渠道 id 或状态");
+        const providers = await getProviders(env);
+        const target = providers.find((pr) => pr.id === String(p.id));
+        if (!target) throw new ApiError(404, ErrorCode.NOT_FOUND, "渠道不存在");
+        target.status = p.status as "active" | "disabled";
+        await setProviders(env, providers);
         return done(null, "provider", String(p.id));
       }
       case "delete_provider_key": {

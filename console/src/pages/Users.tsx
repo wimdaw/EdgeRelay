@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { adminAction, type UserRow, type Flag, type Appeal } from "../lib/api";
-import { Button, Card, DataTable, Dialog, Field, Input, StatusTag, useConfirm, useToast, type Col } from "../components/ui";
+import { Button, Card, DataTable, Dialog, Field, Input, Select, StatusTag, useConfirm, useToast, type Col } from "../components/ui";
 import { fmtTime } from "../lib/utils";
+
+const ROLE_MAP: Record<string, { label: string; color: string; desc: string }> = {
+  user: { label: "普通用户", color: "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20", desc: "仅限免费模型池，免充值不扣费" },
+  vip: { label: "VIP 账号", color: "bg-amber-500/10 text-amber-500 font-semibold border border-amber-500/20", desc: "解锁全量付费模型，按量扣除余额" },
+  admin: { label: "管理员", color: "bg-brand/10 text-brand font-semibold border border-brand/20", desc: "最高治理权限，全模型按量扣费" },
+  finance: { label: "财务人员", color: "bg-purple-500/10 text-purple-400 border border-purple-500/20", desc: "财务与账单核对权限" },
+  auditor: { label: "审计员", color: "bg-blue-500/10 text-blue-400 border border-blue-500/20", desc: "审计日志只读权限" },
+};
 
 export default function Users() {
   const [tab, setTab] = useState<"users" | "flags" | "appeals">("users");
@@ -10,6 +18,7 @@ export default function Users() {
   const [flags, setFlags] = useState<Flag[] | null>(null);
   const [appeals, setAppeals] = useState<Appeal[] | null>(null);
   const [invite, setInvite] = useState<{ open: boolean; email: string; role: string }>({ open: false, email: "", role: "member" });
+  const [roleDlg, setRoleDlg] = useState<{ open: boolean; user: UserRow | null; role: string }>({ open: false, user: null, role: "user" });
   const { confirm, confirmEl } = useConfirm();
   const toast = useToast();
 
@@ -18,18 +27,46 @@ export default function Users() {
   const loadAppeals = () => adminAction<{ appeals: Appeal[] }>("appeals_list").then((d) => setAppeals(d.appeals)).catch(() => setAppeals([]));
   useEffect(() => { loadUsers(); }, []);
 
+  const changeRole = async () => {
+    if (!roleDlg.user) return;
+    try {
+      await adminAction("set_role", { userId: roleDlg.user.id, role: roleDlg.role });
+      toast(`已将「${roleDlg.user.email}」角色更新为 ${ROLE_MAP[roleDlg.role]?.label || roleDlg.role}`);
+      setRoleDlg({ open: false, user: null, role: "user" });
+      loadUsers();
+    } catch (e) {
+      toast((e as Error).message, "err");
+    }
+  };
+
   const userCols: Col<UserRow>[] = [
-    { key: "email", label: "邮箱", sortVal: (r) => r.email, render: (r) => <span className="font-medium">{r.email}</span> },
-    { key: "id", label: "ID", render: (r) => <code className="text-xs text-muted">{r.id.slice(0, 8)}…</code> },
-    { key: "role", label: "角色", render: (r) => <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand">{r.role}</span> },
-    { key: "roleV", label: "角色值", render: (r) => <code className="text-xs">{r.role}</code> },
+    { key: "email", label: "邮箱", sortVal: (r) => r.email, render: (r) => <span className="font-medium text-ink">{r.email}</span> },
+    { key: "id", label: "用户 ID", render: (r) => <code className="text-xs text-muted font-mono">{r.id.slice(0, 8)}…</code> },
+    {
+      key: "role",
+      label: "账号等级 / 角色",
+      render: (r) => {
+        const item = ROLE_MAP[r.role] || { label: r.role, color: "bg-surface2 text-muted", desc: "" };
+        return (
+          <button
+            type="button"
+            onClick={() => setRoleDlg({ open: true, user: r, role: r.role })}
+            className={`rounded-full px-2.5 py-0.5 text-[11px] transition-all hover:scale-105 cursor-pointer ${item.color}`}
+            title="点击修改用户角色等级与权限"
+          >
+            {item.label}
+          </button>
+        );
+      },
+    },
     { key: "status", label: "状态", render: (r) => <StatusTag value={r.status} /> },
-    { key: "created", label: "创建时间", sortVal: (r) => r.created_at, render: (r) => <span className="text-xs text-muted">{fmtTime(r.created_at)}</span> },
+    { key: "created", label: "注册时间", sortVal: (r) => r.created_at, render: (r) => <span className="text-xs text-muted">{fmtTime(r.created_at)}</span> },
     { key: "ops", label: "操作", render: (r) => (
-      <span className="flex gap-1.5">
+      <span className="flex items-center gap-1.5 shrink-0">
+        <Button variant="soft" className="!h-7 !px-2 text-xs" onClick={() => setRoleDlg({ open: true, user: r, role: r.role })}>调整角色</Button>
         {r.status === "active"
-          ? <Button variant="ghost" className="!px-2 !py-1 text-xs !text-err" onClick={async (e) => { e.stopPropagation(); if (await confirm(`封禁 ${r.email}？将同时撤销其全部 Key 并强制下线。`)) { await adminAction("ban_user", { userId: r.id }); toast("已封禁"); loadUsers(); } }}>封禁</Button>
-          : <Button variant="ghost" className="!px-2 !py-1 text-xs" onClick={async (e) => { e.stopPropagation(); await adminAction("unban_user", { userId: r.id }); toast("已解封"); loadUsers(); }}>解封</Button>}
+          ? <Button variant="ghost" className="!h-7 !px-2 text-xs !text-err" onClick={async (e) => { e.stopPropagation(); if (await confirm(`封禁 ${r.email}？将同时撤销其全部 Key 并强制下线。`)) { await adminAction("ban_user", { userId: r.id }); toast("已封禁"); loadUsers(); } }}>封禁</Button>
+          : <Button variant="ghost" className="!h-7 !px-2 text-xs" onClick={async (e) => { e.stopPropagation(); await adminAction("unban_user", { userId: r.id }); toast("已解封"); loadUsers(); }}>解封</Button>}
       </span>
     ) },
   ];
@@ -37,18 +74,36 @@ export default function Users() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit" role="tablist">
-        {([["users", "用户"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const).map(([k, l]) => (
+        {([["users", "用户与权限"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const).map(([k, l]) => (
           <button key={k} role="tab" aria-selected={tab === k} onClick={() => { setTab(k); (k === "flags" ? loadFlags : k === "appeals" ? loadAppeals : loadUsers)(); }}
             className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{l}</button>
         ))}
       </div>
 
       {tab === "users" && (
-        <Card className="p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs text-muted">角色：user / admin / finance / auditor（审计员对日志只读）</p>
+        <Card className="p-4 sm:p-5 flex flex-col gap-3.5">
+          {/* 用户等级与权限说明条 */}
+          <div className="rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted space-y-1.5">
+            <div className="font-semibold text-ink text-[13px] mb-1">用户体系与调用计费分级规则：</div>
+            <div className="flex items-start gap-2">
+              <span className="shrink-0 rounded bg-zinc-500/10 text-zinc-400 px-1.5 py-0.5 text-[10px] font-bold">普通用户 (user)</span>
+              <span>默认注册用户级别。<b>完全免费使用所有 0 元免费模型池</b>（免充值、不扣费）；若调用付费高级模型，网关自动拦截并提示升级。</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="shrink-0 rounded bg-amber-500/10 text-amber-500 px-1.5 py-0.5 text-[10px] font-bold">VIP 账号 (vip)</span>
+              <span><b>解锁全站所有大模型</b>。调用付费模型根据真实输入输出 Token 扣除账户余额；调用免费模型依然 0 元免扣费。</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="shrink-0 rounded bg-brand/10 text-brand px-1.5 py-0.5 text-[10px] font-bold">系统管理员 (admin)</span>
+              <span>拥有控制台所有治理与配置权限，解锁调用全量大模型，同样参与真实 Token 计费扣费以保证数据透明。</span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted">共计 {users?.length ?? 0} 位注册用户</span>
             <Button onClick={() => setInvite({ open: true, email: "", role: "member" })}><Plus size={14} />邀请成员</Button>
           </div>
+
           {users === null ? <div className="flex flex-col gap-2">{[...Array(5)].map((_, i) => <div key={i} className="skeleton h-9" />)}</div> : <DataTable cols={userCols} rows={users} />}
         </Card>
       )}
@@ -92,6 +147,32 @@ export default function Users() {
           )}
         </Card>
       )}
+
+      {/* 调整用户角色弹窗 */}
+      <Dialog open={roleDlg.open} onClose={() => setRoleDlg({ open: false, user: null, role: "user" })} title={`调整账号等级 — ${roleDlg.user?.email ?? ""}`} width={500}>
+        <div className="space-y-4">
+          <Field label="账号角色等级">
+            <Select value={roleDlg.role} onChange={(e) => setRoleDlg({ ...roleDlg, role: e.target.value })}>
+              <option value="user">普通用户 (user) — 仅限免费模型池，不扣费</option>
+              <option value="vip">VIP 账号 (vip) — 解锁全量付费大模型，按量扣费</option>
+              <option value="admin">管理员 (admin) — 最高系统权限，全模型按量扣费</option>
+              <option value="finance">财务人员 (finance)</option>
+              <option value="auditor">审计员 (auditor)</option>
+            </Select>
+          </Field>
+
+          <div className="rounded-xl border border-line bg-surface2/60 p-3 text-xs text-muted space-y-1.5">
+            <div>• <b>普通用户</b>：免充值畅享所有 0 元模型（OpenCode、Kilo、Duck.ai 等）；调用付费模型会自动拦截并引导升级。</div>
+            <div>• <b>VIP 账号</b>：可自由调用全站所有模型；付费模型按实际 Token 用量扣除账户余额。</div>
+            <div>• <b>管理员</b>：拥有后台控制台配置权限，调用全量大模型同样真实扣费。</div>
+          </div>
+
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line">
+            <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setRoleDlg({ open: false, user: null, role: "user" })}>取消</Button>
+            <Button className="flex-1 sm:flex-initial" onClick={changeRole}>确认修改角色</Button>
+          </div>
+        </div>
+      </Dialog>
 
       <Dialog open={invite.open} onClose={() => setInvite({ ...invite, open: false })} title="邀请组织成员" width={440}>
         <div className="flex flex-col gap-3">

@@ -60,6 +60,18 @@ chatRouter.post("/", async (c) => {
     const pricing = (await getPricing(env, publicModel)) || (await getPricing(env, subModelName));
     const modelRpm = pricing?.rpmLimit;
 
+    /* ---- 用户角色与模型分级门禁 ---- */
+    // 普通用户仅限使用免费模型（0元定价）；VIP 用户与管理员可解锁全量付费模型并真实扣费
+    const isPaidModel = !!pricing && (pricing.inputPerMillion > 0 || pricing.outputPerMillion > 0);
+    const userRole = key.userRole || "user";
+    if (userRole === "user" && isPaidModel) {
+      throw new ApiError(
+        403,
+        ErrorCode.MODEL_NOT_ALLOWED,
+        `模型「${publicModel}」为付费高级模型，普通用户仅可调用免费模型池。请联系管理员升级为 VIP 账号解锁全量付费模型！`
+      );
+    }
+
     if (!(await checkTpmBeforeRequest(env, key.keyId, key.limits))) {
       return openAiError(429, ErrorCode.RATE_LIMITED, "TPM 超限", { retry_after: 60 });
     }

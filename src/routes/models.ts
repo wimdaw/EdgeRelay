@@ -29,7 +29,10 @@ apiModelsRouter.get("/", async (c) => {
     const providers = await getProviders(c.env);
     const providerMap = new Map(providers.map((p) => [p.id, p]));
 
-    const rows = models.map((m) => {
+    const activeProviderIds = new Set(providers.filter((p) => p.status === "active").map((p) => p.id));
+    const activeModels = models.filter((m) => activeProviderIds.has(m.providerId));
+
+    const rows = activeModels.map((m) => {
       const pr = providerMap.get(m.providerId);
       const prc = pricing[m.publicName];
       return {
@@ -49,13 +52,15 @@ apiModelsRouter.get("/", async (c) => {
       };
     });
 
-    const safeProviders = providers.map((p) => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      kind: p.kind,
-      status: p.status,
-    }));
+    const safeProviders = providers
+      .filter((p) => p.status === "active")
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        kind: p.kind,
+        status: p.status,
+      }));
 
     return json({ ok: true, models: rows, providers: safeProviders });
   } catch (err) {

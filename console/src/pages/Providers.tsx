@@ -197,6 +197,15 @@ export default function Providers() {
     } catch (e) { toast((e as Error).message, "err"); }
   };
 
+  const toggleProvider = async (p: Provider) => {
+    const nextStatus = p.status === "active" ? "disabled" : "active";
+    try {
+      await adminAction("toggle_provider", { id: p.id, status: nextStatus });
+      toast(`已${nextStatus === "active" ? "启用" : "停用"}渠道「${p.name}」`);
+      load();
+    } catch (e) { toast((e as Error).message, "err"); }
+  };
+
   const del = async (p: Provider) => {
     if (!(await confirm(`删除供应商「${p.name}」？其模型映射与上游密钥将一并删除，不可恢复。`))) return;
     try {
@@ -220,7 +229,7 @@ export default function Providers() {
       ) : (
         <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {rows.map((p) => (
-            <Card key={p.id} className="p-4 flex flex-col justify-between">
+            <Card key={p.id} className={cn("p-4 flex flex-col justify-between transition-all", p.status === "disabled" && "opacity-75 border-dashed bg-surface/50")}>
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex min-w-0 items-center gap-2.5">
@@ -235,7 +244,14 @@ export default function Providers() {
                       </div>
                     </div>
                   </div>
-                  <StatusTag value={p.status} />
+                  <button
+                    type="button"
+                    onClick={() => toggleProvider(p)}
+                    title={`点击${p.status === "active" ? "停用" : "启用"}该渠道（停用后相应模型在模型池与定价中隐藏）`}
+                    className="cursor-pointer transition-transform hover:scale-105 shrink-0"
+                  >
+                    <StatusTag value={p.status} />
+                  </button>
                 </div>
                 <dl className="mt-3 space-y-1.5 text-[11px] text-muted">
                   <div className="flex min-w-0 justify-between gap-2">
@@ -272,13 +288,21 @@ export default function Providers() {
 
               <div className="mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5">
                 <Button variant="soft" className="flex-1 !h-7 !px-2 text-xs" onClick={() => fetchModels(p.id, p.name)} title="从上游导入或手动添加模型">
-                  <RefreshCw size={12} className="mr-1" />导入/添加模型
+                  <RefreshCw size={12} className="mr-1" />导入
                 </Button>
                 {!isKeylessSlug(p.slug) && (
                   <Button variant="soft" className="!h-7 !px-2 text-xs" onClick={() => { setKeyDlg(p); setKeyVal(""); setNewKeyLabel("prod"); }} title="管理多 Key 轮换池">
                     <Key size={12} className="mr-1 text-muted" />密钥 ({p.key_count})
                   </Button>
                 )}
+                <Button
+                  variant="ghost"
+                  className={cn("!h-7 !px-2 text-xs", p.status === "active" ? "!text-muted hover:!text-err" : "!text-emerald-500 font-semibold")}
+                  onClick={() => toggleProvider(p)}
+                  title="切换渠道启用/停用状态"
+                >
+                  {p.status === "active" ? "停用" : "启用"}
+                </Button>
                 <Button variant="ghost" className="!h-7 !px-2 text-xs" onClick={() => openEdit(p)}>编辑</Button>
                 <Button variant="ghost" className="!h-7 !px-1.5 text-xs !text-err" onClick={() => del(p)} aria-label={`删除 ${p.name}`}><Trash2 size={13} /></Button>
               </div>

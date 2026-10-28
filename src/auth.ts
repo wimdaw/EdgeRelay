@@ -13,7 +13,7 @@ import { getSession, getUserById, getApiKeyByHash, updateApiKey, updateUser } fr
 export type SessionUser = {
   id: string;
   email: string;
-  role: "user" | "admin" | "finance" | "auditor";
+  role: "user" | "vip" | "admin" | "finance" | "auditor";
   status: string;
 };
 
@@ -156,9 +156,13 @@ export async function authenticateApiKey(c: HandlerCtx): Promise<AuthedKey> {
     } catch {}
   }
 
+  const user = await getUserById(c.env, row.userId);
+  const userRole = (user?.role as AuthedKey["userRole"]) || "user";
+
   return {
     keyId: row.id,
     userId: row.userId,
+    userRole,
     orgId: row.orgId || null,
     requiresSigning: !!row.requiresSigning,
     ipWhitelist,

@@ -109,8 +109,9 @@ export async function requireRoutes(env: any, publicName: string): Promise<Upstr
 export async function listPublicModels(env: any): Promise<{ id: string; created: number; owned_by: string }[]> {
   const models = await getModels(env);
   const providers = await getProviders(env);
+  const activeProviders = new Set(providers.filter((p) => p.status === "active").map((p) => p.id));
   const providerMap = new Map(providers.map((p) => [p.id, p]));
-  const activeModels = models.filter((m) => m.enabled === 1);
+  const activeModels = models.filter((m) => m.enabled === 1 && activeProviders.has(m.providerId));
   const names = new Set<string>();
 
   for (const m of activeModels) {
