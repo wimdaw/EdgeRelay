@@ -7,7 +7,7 @@
  * 把模板改名为 _index.template.html，由 build-assets.mjs 映射为 /index.html
  * 内嵌进云函数。public/ 下不再保留 index.html，根路径自然落到函数。
  */
-import { readFileSync, writeFileSync, rmSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -77,6 +77,7 @@ const initialJson = JSON.stringify(site)
 html = html.replace(/<\/head>/i, `<script>window.__EDGERELAY_SITE__=${initialJson};</script>\n</head>`);
 
 writeFileSync(templatePath, html, "utf8");
-// 关键：不把 index.html 留在静态目录，根路径强制走云函数动态渲染 + no-store
-rmSync(sourcePath, { force: true });
-console.log(`[build-site-html] 已生成动态首页模板（${name}），静态 index.html 已移除`);
+// EdgeOne 的根路径仍优先命中静态 index.html；必须保留一份正确品牌的入口，
+// 否则 / 会直接 404。函数侧继续使用 _index.template.html 做动态兜底。
+writeFileSync(sourcePath, html, "utf8");
+console.log(`[build-site-html] 已生成首页入口与动态模板（${name}）`);

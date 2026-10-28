@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Relay — AI API 网关控制台</title>
+    <meta name="description" content="部署在 EdgeOne 边缘的 AI API 网关，用统一 OpenAI 兼容接口接入、路由和派发多家大模型服务。">
+    <meta property="og:title" content="Relay">
+    <meta property="og:description" content="部署在 EdgeOne 边缘的 AI API 网关，用统一 OpenAI 兼容接口接入、路由和派发多家大模型服务。">
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/logo.png">
+    <script>
+      // 单页应用路由规范化：根路径访问时自动无缝补齐 /#/，避免纯根路径缓存干扰
+      if (window.location.pathname === "/" && (!window.location.hash || window.location.hash === "#")) {
+        window.location.replace("/#/");
+      }
+    </script>
+    <script type="module" crossorigin src="./assets/index-U2TJDRHr.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/vendor-CWE7MT8u.js">
+    <link rel="modulepreload" crossorigin href="./assets/charts-Dt4jC32N.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-CovmXnOU.css">
+  <script>window.__EDGERELAY_SITE__={"siteName":"Relay","siteDescription":"部署在 EdgeOne 边缘的 AI API 网关，用统一 OpenAI 兼容接口接入、路由和派发多家大模型服务。","siteLogoUrl":"/logo.png","siteHomepage":"","heroBadge":"跑在 EdgeOne 全球边缘节点","heroTitle":"部署在 EdgeOne 边缘的合规 AI API 网关","heroSubtitle":"用统一 OpenAI 兼容接口，接入、路由和治理多家大模型服务。合法授权上游、透明计费、哈希链审计——面向开发者与企业的正规聚合分发平台。","supportEmail":"hackerxiaow@gmail.com","oauth":{"github":false,"google":false},"smtpEnabled":true};</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // 捕获全局锚点链接点击，防止与 HashRouter 冲突，实现丝滑平滑滚动
+      document.addEventListener("click", function (e) {
+        var a = e.target.closest("a");
+        if (!a) return;
+        var href = a.getAttribute("href");
+        if (href && href.startsWith("#") && href.length > 1 && !href.startsWith("#/")) {
+          var targetEl = document.querySelector(href);
+          if (targetEl) {
+            e.preventDefault();
+            e.stopPropagation();
+            targetEl.scrollIntoView({ behavior: "smooth" });
+          }
+        }
+      }, true);
+    </script>
+  </body>
+</html>
