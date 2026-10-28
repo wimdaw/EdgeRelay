@@ -110,8 +110,12 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
     <div className="flex h-screen">
       {/* 桌面侧边栏（支持平滑收缩/展开） */}
       <aside
-        style={{ width: collapsed ? 68 : 224 }}
-        className="hidden shrink-0 flex-col border-r border-line bg-sidebar transition-[width] duration-200 ease-in-out overflow-x-hidden lg:flex"
+        style={{
+          width: collapsed ? 68 : 224,
+          minWidth: collapsed ? 68 : 224,
+          maxWidth: collapsed ? 68 : 224,
+        }}
+        className="hidden shrink-0 flex-col border-r border-line bg-sidebar transition-all duration-200 ease-in-out overflow-x-hidden lg:flex"
       >
         <Link
           to="/"
