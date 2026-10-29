@@ -200,6 +200,35 @@ let apiKeyId = "";
   assert(auditData.result.ok === true, "防篡改哈希链（SHA-256 Chain）完整性校验通过");
 }
 
+// 8.1 审计日志删除与清空（删除后自动重建哈希链）
+{
+  const action = (name, payload = {}) => request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: { action: name, payload },
+  });
+
+  const listData = await (await action("list_audit", { limit: 50 })).json();
+  assert(Array.isArray(listData.logs) && listData.logs.length > 0, "审计日志列表返回记录");
+  const target = listData.logs.find((l) => l.action === "admin.topup") ?? listData.logs[0];
+
+  const delRes = await action("delete_audit_log", { id: target.id });
+  assert(delRes.status === 200, "删除单条审计日志 HTTP 200");
+  const afterDel = await (await action("list_audit", { limit: 50 })).json();
+  assert(!afterDel.logs.some((l) => l.id === target.id), "目标审计日志已删除");
+
+  const verifyAfterDel = await (await action("verify_audit_chain")).json();
+  assert(verifyAfterDel.result.ok === true, "删除后哈希链自动重建并校验通过");
+
+  const clearRes = await action("clear_audit_logs");
+  assert(clearRes.status === 200, "清空审计日志 HTTP 200");
+  const afterClear = await (await action("list_audit", { limit: 50 })).json();
+  assert(afterClear.logs.length === 1 && afterClear.logs[0].action === "admin.clear_audit_logs", "清空后仅保留本次清空操作的审计记录");
+
+  const verifyAfterClear = await (await action("verify_audit_chain")).json();
+  assert(verifyAfterClear.result.ok === true, "清空后哈希链从 GENESIS 重新校验通过");
+}
+
 // 9. 超级管理员仪表盘回归：superadmin 必须能读取管理员用量接口
 {
   const regRes = await request("/api/auth/register", {

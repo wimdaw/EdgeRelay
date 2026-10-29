@@ -757,6 +757,38 @@ export async function getUserUsageRecords(env: any, userId: string, date: string
 // 9. 哈希链防篡改审计日志 (Audit Logs)
 // ==========================================
 
+const AUDIT_GENESIS_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
+
+/** 从最旧一条开始向新一条推进，重算整条链的 prevHash 与 hash */
+async function rebuildAuditChain(chain: AuditLogRecord[]): Promise<AuditLogRecord[]> {
+  let prevHash = AUDIT_GENESIS_HASH;
+  const rebuilt = chain.slice();
+  for (let i = rebuilt.length - 1; i >= 0; i--) {
+    const metaStr = rebuilt[i].meta || "";
+    const hash = await sha256Hex(`${prevHash}|${rebuilt[i].id}|${rebuilt[i].action}|${metaStr}|${rebuilt[i].createdAt}`);
+    rebuilt[i] = { ...rebuilt[i], prevHash, hash };
+    prevHash = hash;
+  }
+  return rebuilt;
+}
+
+/** 删除单条审计日志并重建哈希链，返回剩余条数 */
+export async function deleteAuditLog(env: any, id: string): Promise<number> {
+  const store = getBlobStore(env);
+  const chain: AuditLogRecord[] = (await store.get("audit:chain", { type: "json", consistency: "strong" })) || [];
+  const filtered = chain.filter((l) => l.id !== id);
+  if (filtered.length === chain.length) return chain.length;
+  const rebuilt = await rebuildAuditChain(filtered);
+  await store.setJSON("audit:chain", rebuilt);
+  return rebuilt.length;
+}
+
+/** 清空全部审计日志（下一次写入将从 GENESIS 重新开始） */
+export async function clearAuditLogs(env: any): Promise<void> {
+  const store = getBlobStore(env);
+  await store.setJSON("audit:chain", []);
+}
+
 /**
  * 按后台配置的保留天数裁剪最旧的审计日志。
  * 只从链尾（最旧一端）删除，保留段内的 prevHash 链接关系不受影响。
@@ -785,7 +817,7 @@ export async function appendAuditLog(
   const store = getBlobStore(env);
   const chain: AuditLogRecord[] = (await store.get("audit:chain", { type: "json", consistency: "strong" })) || [];
   const prev = chain.length > 0 ? chain[0] : null;
-  const prevHash = prev ? prev.hash : "0000000000000000000000000000000000000000000000000000000000000000";
+  const prevHash = prev ? prev.hash : AUDIT_GENESIS_HASH;
 
   const id = uuid();
   const createdAt = Math.floor(Date.now() / 1000);

@@ -30,6 +30,8 @@ import {
   getAllPricing,
   setPricing,
   getAuditLogs,
+  deleteAuditLog,
+  clearAuditLogs,
   getContentFlags,
   getAppeals,
   getDailyUsage,
@@ -93,6 +95,8 @@ adminRouter.post("/actions", async (c) => {
         "set_pricing",
         "set_settings",
         "set_smtp",
+        "delete_audit_log",
+        "clear_audit_logs",
         "upsert_site_logo",
         "generate_redeem_codes",
         "delete_redeem_code",
@@ -907,6 +911,15 @@ adminRouter.post("/actions", async (c) => {
           created_at: l.createdAt,
         }));
         return json({ ok: true, logs: safe });
+      }
+      case "delete_audit_log": {
+        if (!p.id) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少审计日志 id");
+        const remaining = await deleteAuditLog(env, String(p.id));
+        return done({ remaining }, "audit_log", String(p.id));
+      }
+      case "clear_audit_logs": {
+        await clearAuditLogs(env);
+        return done(null, "audit_logs", "all");
       }
       case "verify_audit_chain": {
         const res = await verifyAuditChain(env);
