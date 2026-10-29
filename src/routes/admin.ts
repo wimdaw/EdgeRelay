@@ -6,16 +6,18 @@ import type { Env, HandlerCtx, PlatformSettings, UserRole } from "../types";
 import { ROLE_HIERARCHY } from "../types";
 import { requireAdminStepUp, requireUser, requireRole, clientIp } from "../auth";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
-import { uuid, encryptSecret, sha256Hex } from "../crypto";
+import { uuid, encryptSecret, decryptSecret, sha256Hex } from "../crypto";
 import { getSettings, updateSettings, json } from "../settings";
 import { audit, verifyAuditChain } from "../audit";
 import { topup } from "../billing";
 import {
   listAllUsers,
+  getUserById,
   updateUser,
   listAllApiKeys,
   updateApiKey,
   getProviders,
+  setProviders,
   upsertProvider,
   deleteProvider,
   getProviderKeys,
@@ -101,15 +103,33 @@ adminRouter.post("/actions", async (c) => {
       }
     }
 
+    // 审计元数据脱敏：禁止把管理员密码等敏感字段写入不可篡改的审计链
+    const REDACT_KEYS = new Set(["password", "apiKey", "key", "secret", "token"]);
+    const auditMeta: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(p)) {
+      if (REDACT_KEYS.has(k)) {
+        auditMeta[k] = "***redacted***";
+      } else if (typeof v === "string" && v.length > 200) {
+        auditMeta[k] = `${v.slice(0, 200)}…(${v.length} chars)`;
+      } else {
+        auditMeta[k] = v;
+      }
+    }
+
     const done = async (result: unknown, targetType?: string, targetId?: string) => {
-      await audit(hCtx, {
-        actorUserId: admin.id,
-        actorIp: clientIp(hCtx.req),
-        action: `admin.${action}`,
-        targetType,
-        targetId,
-        meta: p,
-      });
+      try {
+        await audit(hCtx, {
+          actorUserId: admin.id,
+          actorIp: clientIp(hCtx.req),
+          action: `admin.${action}`,
+          targetType,
+          targetId,
+          meta: auditMeta,
+        });
+      } catch (err: any) {
+        // 审计写失败不得影响主业务结果，仅记录日志
+        console.error("[audit] append failed:", err?.message);
+      }
       return json({ ok: true, result });
     };
 

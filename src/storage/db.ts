@@ -144,7 +144,7 @@ export async function deleteUser(env: any, id: string): Promise<boolean> {
 
   // 3. 撤销该用户全部生效的 API Key
   try {
-    const keys = await listApiKeys(env, id);
+    const keys = await listUserApiKeys(env, id);
     for (const k of keys) {
       await updateApiKey(env, k.keyHash, { status: "revoked", revokedAt: Math.floor(Date.now() / 1000) });
     }
