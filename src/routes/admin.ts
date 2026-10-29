@@ -920,7 +920,27 @@ adminRouter.post("/actions", async (c) => {
       default:
         throw new ApiError(400, ErrorCode.BAD_REQUEST, `未知管理操作: ${action}`);
     }
-  } catch (err) {
+  } catch (err: any) {
+    // 运维排障：superadmin 主动携带 x-relay-debug: 1 时回传真实错误信息（默认不回传，避免泄露内部细节）
+    if (c.req.header("x-relay-debug") === "1") {
+      try {
+        const u = await requireUser(hCtx);
+        if (u.role === "superadmin") {
+          console.error("[admin/actions] debug failure:", err?.stack || err);
+          return json(
+            {
+              error: {
+                message: String(err?.message || err),
+                type: ErrorCode.INTERNAL,
+                code: ErrorCode.INTERNAL,
+                details: { stack: String(err?.stack || "").split("\n").slice(0, 6).join("\n") },
+              },
+            },
+            500
+          );
+        }
+      } catch {}
+    }
     return errorResponse(hCtx, err);
   }
 });
