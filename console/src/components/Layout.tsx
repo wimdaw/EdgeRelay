@@ -209,7 +209,11 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
           </button>
           <div className="text-sm font-medium">{NAV.filter((n) => n.roles.includes(me.user.role)).find((n) => loc.pathname.startsWith(n.to))?.label ?? "仪表盘"}</div>
           <div className="flex-1" />
-          <span className="hidden text-xs text-muted sm:block">{fmtMoney(me.balance.available, me.balance.currency)}（冻结 {me.balance.frozen.toFixed(4)}）</span>
+          <span className="hidden text-xs text-muted sm:block">
+            {me.unlimited
+              ? "∞ 无限额度（铸币方）"
+              : `${fmtMoney(me.balance.available, me.balance.currency)}（冻结 ${me.balance.frozen.toFixed(4)}）`}
+          </span>
           <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-medium text-brand">{me.user.role}</span>
           <button className="rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink" onClick={toggle} aria-label={theme === "dark" ? "切换浅色模式" : "切换深色模式"}>
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
