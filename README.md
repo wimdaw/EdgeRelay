@@ -21,7 +21,10 @@
 4. **前端 SPA 静态资产一体化内嵌**：
    - 前端管理控制台（Landing 官网 + 登录注册 + 全部 Dashboard）产物完整内嵌进云函数 Bundle，彻底杜绝 EdgeOne makers 模式下根目录静态文件 404 的问题。
    - 根路径与页面路由访问时自动注入动态 SEO 标题、站点描述与自定义 Logo。
-5. **完整保留原版所有合规与安全特性**：
+5. **个人主页内置全站备份 / 恢复**：
+   - 支持导出/导入完整 JSON 备份，覆盖用户、密钥、渠道、模型、计费、用量与审计日志。
+   - 支持生成保存在 EdgeOne Blob 的站内快照（最多 10 份），无需 R2 等外部对象存储。
+6. **完整保留原版所有合规与安全特性**：
    - 供应商授权协议编号存证 (`authorization_ref`)。
    - 上游密钥 AES-256-GCM 密文落盘，内存短暂解密。
    - 密码 PBKDF2-SHA256 哈希，API Key 仅存 SHA-256。
@@ -103,6 +106,12 @@ npm run deploy
 | `/api/billing/balance` | GET | 钱包余额 |
 | `/api/billing/ledger` | GET | 消费与充值流水（支持 `?format=csv` 导出） |
 | `/api/admin/actions` | POST | 统一管理动作（用户、Key、渠道、模型、定价、充值、设置、审计校验） |
+| `/api/admin/backup/export` | GET | 导出全站 JSON 备份（superadmin + 二次验证） |
+| `/api/admin/backup/import` | POST | 导入并覆盖恢复全站数据（superadmin + 二次验证） |
+| `/api/admin/backup/list` | GET | 站内快照列表 |
+| `/api/admin/backup/snapshot` | POST | 生成站内快照（保存在 EdgeOne Blob） |
+| `/api/admin/backup/restore` | POST | 恢复指定站内快照 |
+| `/api/admin/backup/delete` | POST | 删除指定站内快照 |
 | `/api/admin/stats` | GET | 24小时调用量与延迟统计 |
 | `/api/admin/usage/trend`| GET | 用量图表数据走势 |
 | `/api/site` | GET | 动态站点信息与 SEO 配置 |

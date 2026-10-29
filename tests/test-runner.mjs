@@ -259,6 +259,78 @@ let apiKeyId = "";
   assert(Array.isArray(logsData.logs), "用量日志接口返回 logs 数组");
 }
 
+// 10. 全站备份 / 导入 / 站内快照
+{
+  const jsonHeaders = { cookie: adminCookie, "content-type": "application/json" };
+
+  // 10.1 先写入一个可校验的昵称
+  const setBefore = await request("/api/user/profile", {
+    method: "PATCH",
+    headers: jsonHeaders,
+    body: { nickname: "备份前昵称", bio: "backup-test" },
+  });
+  assert(setBefore.status === 200, "写入备份前昵称 HTTP 200");
+
+  // 10.2 导出备份
+  const exportRes = await request("/api/admin/backup/export", { headers: { cookie: adminCookie } });
+  assert(exportRes.status === 200, "导出全站备份 HTTP 200");
+  assert((exportRes.headers.get("content-disposition") || "").includes("edgerelay-backup-"), "导出响应带备份文件名");
+  const backup = await exportRes.json();
+  assert(backup.format === "edgerelay-backup" && backup.version === 1, "备份格式标识正确");
+  assert(Array.isArray(backup.entries) && backup.entries.length > 0, "备份包含业务数据条目");
+  assert(!backup.entries.some((entry) => entry.key.startsWith("session:")), "备份不包含登录会话");
+  assert(!backup.entries.some((entry) => entry.key.startsWith("backup:")), "备份不包含站内快照自身");
+  assert(!backup.entries.some((entry) => entry.key.startsWith("kv/")), "备份不包含验证码/限流等瞬时状态");
+
+  // 10.3 修改数据后导入，验证恢复
+  const setAfter = await request("/api/user/profile", {
+    method: "PATCH",
+    headers: jsonHeaders,
+    body: { nickname: "备份后昵称" },
+  });
+  assert(setAfter.status === 200, "写入备份后昵称 HTTP 200");
+
+  const importRes = await request("/api/admin/backup/import", {
+    method: "POST",
+    headers: jsonHeaders,
+    body: backup,
+  });
+  assert(importRes.status === 200, "导入全站备份 HTTP 200");
+  const importData = await importRes.json();
+  assert(importData.ok === true && importData.summary.entries > 0, "导入返回恢复条目统计");
+
+  const meAfterImport = await (await request("/api/auth/me", { headers: { cookie: adminCookie } })).json();
+  assert(meAfterImport.nickname === "备份前昵称", "导入后昵称恢复到备份时状态");
+  assert(meAfterImport.user.role === "superadmin", "导入后当前管理员会话仍然有效");
+
+  // 10.4 生成 / 列出 / 恢复 / 删除站内快照
+  const snapRes = await request("/api/admin/backup/snapshot", { method: "POST", headers: jsonHeaders, body: {} });
+  assert(snapRes.status === 200, "生成站内快照 HTTP 200");
+  const snapshot = (await snapRes.json()).snapshot;
+  assert(snapshot && typeof snapshot.id === "string" && snapshot.entries > 0, "快照返回有效元数据");
+
+  const listRes = await request("/api/admin/backup/list", { headers: { cookie: adminCookie } });
+  const listData = await listRes.json();
+  assert(Array.isArray(listData.snapshots) && listData.snapshots.some((item) => item.id === snapshot.id), "快照列表包含新生成的快照");
+
+  const restoreRes = await request("/api/admin/backup/restore", {
+    method: "POST",
+    headers: jsonHeaders,
+    body: { id: snapshot.id },
+  });
+  assert(restoreRes.status === 200, "恢复站内快照 HTTP 200");
+
+  const deleteRes = await request("/api/admin/backup/delete", {
+    method: "POST",
+    headers: jsonHeaders,
+    body: { id: snapshot.id },
+  });
+  assert(deleteRes.status === 200, "删除站内快照 HTTP 200");
+
+  const listAfter = await (await request("/api/admin/backup/list", { headers: { cookie: adminCookie } })).json();
+  assert(!listAfter.snapshots.some((item) => item.id === snapshot.id), "删除后快照不再出现在列表");
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

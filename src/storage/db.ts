@@ -34,6 +34,14 @@ let cachedProviders: { val: ProviderRecord[]; at: number } | null = null;
 let cachedModels: { val: ModelRouteRecord[]; at: number } | null = null;
 let cachedPricing: { val: Record<string, ModelPricingRecord>; at: number } | null = null;
 
+/** 备份导入/恢复后清空进程内缓存，保证立即读取恢复后的 Blob 数据 */
+export function invalidateStorageCaches(): void {
+  cachedSettings = null;
+  cachedProviders = null;
+  cachedModels = null;
+  cachedPricing = null;
+}
+
 // ==========================================
 // 1. 全局配置 (Settings)
 // ==========================================
