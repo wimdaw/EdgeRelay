@@ -34,8 +34,18 @@ const corsMiddleware = cors({
 });
 app.use("*", corsMiddleware);
 
-// 2. 健康检查
-app.get("/health", (c) => c.json({ status: "ok", engine: "edgeone-pages", storage: "edgeone-blob" }));
+// 2. 健康检查（附带实例探针：同一 Node 进程内 instance 不变、requests 递增，便于确认热复用）
+const INSTANCE_ID = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+let instanceRequests = 0;
+app.get("/health", (c) =>
+  c.json({
+    status: "ok",
+    engine: "edgeone-pages",
+    storage: "edgeone-blob",
+    instance: INSTANCE_ID,
+    requests: ++instanceRequests,
+  })
+);
 
 // 3. 核心 API 路由
 app.route("/v1/chat/completions", chatRouter);
