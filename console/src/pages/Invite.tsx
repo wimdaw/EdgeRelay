@@ -91,7 +91,12 @@ export default function Invite({ me }: { me: Me }) {
         <p className="mb-5 text-xs text-muted">分享你的专属链接或海报，好友注册成功后双方自动获得奖励。</p>
         <div className="grid gap-5 md:grid-cols-2">
           <div className="flex flex-col gap-3">
-            <Field label="专属邀请链接"><div className="flex gap-2"><Input readOnly value={link} className="font-mono !text-xs" /><CopyButton text={link} label="复制" /></div></Field>
+            <Field label="专属邀请链接">
+              <div className="flex flex-nowrap items-center gap-2">
+                <Input readOnly value={link} className="min-w-0 flex-1 font-mono !text-xs" />
+                <CopyButton text={link} label="复制" />
+              </div>
+            </Field>
             <div className="grid grid-cols-3 gap-3">
               <div className="rounded-lg border border-line bg-surface2 p-3 text-center"><div className="text-xl font-bold text-brand">{data?.invitedCount ?? "—"}</div><div className="text-[11px] text-muted">已邀请人数</div></div>
               <div className="rounded-lg border border-line bg-surface2 p-3 text-center"><div className="text-xl font-bold text-ok">{data ? `${data.totalReward.toFixed(2)}` : "—"}</div><div className="text-[11px] text-muted">累计奖励（元）</div></div>
@@ -140,24 +145,26 @@ export default function Invite({ me }: { me: Me }) {
           <Card className="p-5">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h2 className="flex items-center gap-2 text-sm font-semibold"><Trophy size={16} className="text-brand" />邀请情况（共 {admin?.totalInvited ?? 0} 人被邀请）</h2>
-              <div className="flex gap-2">
-                <Input placeholder="按邀请人邮箱查询" value={qEmail} onChange={(e) => setQEmail(e.target.value)} className="!w-56" />
-                <Button variant="ghost" onClick={() => api<AdminData>(`/api/invite/admin?email=${encodeURIComponent(qEmail)}`).then((d) => { setAdmin(d); setCfg(d.config); })}>查询</Button>
+              <div className="flex w-full flex-nowrap items-center gap-2 sm:w-auto">
+                <Input placeholder="按邀请人邮箱查询" value={qEmail} onChange={(e) => setQEmail(e.target.value)} className="min-w-0 flex-1 sm:!w-56" />
+                <Button variant="ghost" className="shrink-0" onClick={() => api<AdminData>(`/api/invite/admin?email=${encodeURIComponent(qEmail)}`).then((d) => { setAdmin(d); setCfg(d.config); })}>查询</Button>
               </div>
             </div>
             {admin === null ? <div className="skeleton h-32" /> : (
-              <table className="w-full text-[13px]">
-                <thead><tr className="border-b border-line bg-surface2 text-left text-xs text-muted">
-                  <th className="px-3 py-2">排名</th><th className="px-3 py-2">邀请人</th><th className="px-3 py-2">已邀请人数</th>
-                </tr></thead>
-                <tbody>{(qEmail ? admin.query.map((q) => ({ email: q.email, nickname: null, invited_count: q.invited_count })) : admin.ranking).map((r, i) => (
-                  <tr key={i} className="border-b border-line/50 last:border-0">
-                    <td className="px-3 py-2">{i < 3 && !qEmail ? <span className={cn2(i)}>{i + 1}</span> : i + 1}</td>
-                    <td className="px-3 py-2">{r.nickname || r.email}</td>
-                    <td className="px-3 py-2 font-medium text-brand">{r.invited_count}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
+              <div className="overflow-x-auto rounded-lg border border-line">
+                <table className="w-full text-[13px]">
+                  <thead><tr className="border-b border-line bg-surface2 text-left text-xs text-muted">
+                    <th className="whitespace-nowrap px-3 py-2">排名</th><th className="px-3 py-2">邀请人</th><th className="whitespace-nowrap px-3 py-2">已邀请人数</th>
+                  </tr></thead>
+                  <tbody>{(qEmail ? admin.query.map((q) => ({ email: q.email, nickname: null, invited_count: q.invited_count })) : admin.ranking).map((r, i) => (
+                    <tr key={i} className="border-b border-line/50 last:border-0">
+                      <td className="whitespace-nowrap px-3 py-2">{i < 3 && !qEmail ? <span className={cn2(i)}>{i + 1}</span> : i + 1}</td>
+                      <td className="break-all px-3 py-2">{r.nickname || r.email}</td>
+                      <td className="whitespace-nowrap px-3 py-2 font-medium text-brand">{r.invited_count}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
             )}
           </Card>
         </>

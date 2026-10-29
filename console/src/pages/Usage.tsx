@@ -37,7 +37,7 @@ export default function Usage() {
   return (
     <div className="flex flex-col gap-4">
       <Card className="p-4">
-        <div className="flex flex-wrap items-end gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <Field label="时间范围">
             <Select value={f.days} onChange={(e) => setF({ ...f, days: e.target.value })}>
               <option value="1">近 24 小时</option><option value="7">近 7 天</option><option value="30">近 30 天</option>
@@ -48,15 +48,22 @@ export default function Usage() {
               <option value="">全部</option>{["success", "upstream_error", "content_blocked", "no_route", "insufficient_balance"].map((s) => <option key={s}>{s}</option>)}
             </Select>
           </Field>
-          <Field label="模型名"><Input value={f.model} onChange={(e) => setF({ ...f, model: e.target.value })} placeholder="deepseek-chat" /></Field>
-          <Field label="用户 ID"><Input value={f.userId} onChange={(e) => setF({ ...f, userId: e.target.value })} /></Field>
+          <Field label="模型名">
+            <Input value={f.model} onChange={(e) => setF({ ...f, model: e.target.value })} placeholder="deepseek-chat" />
+          </Field>
+          <Field label="用户 ID">
+            <Input value={f.userId} onChange={(e) => setF({ ...f, userId: e.target.value })} placeholder="用户 ID" />
+          </Field>
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3">
           <Button onClick={load}>查询</Button>
           <Button variant="ghost" className="!text-err" onClick={async () => {
             if (!(await confirm("清空全部用量日志？此操作不可恢复（账单流水不受影响）。"))) return;
             try { await adminAction("clear_usage_logs", {}); toast("已清空"); load(); } catch (e) { toast((e as Error).message, "err"); }
           }}>清空全部日志</Button>
-          <span className="flex-1" />
-          <Button variant="ghost" onClick={() => rows && downloadCsv(`usage-${Date.now()}.csv`,
+          <span className="hidden sm:block flex-1" />
+          <Button variant="ghost" className="ml-auto sm:ml-0" onClick={() => rows && downloadCsv(`usage-${Date.now()}.csv`,
             ["time", "user", "model", "status", "http", "latency_ms", "prompt_tokens", "completion_tokens", "cost", "request_id"],
             rows.map((r) => [fmtTime(r.created_at), r.user_id, r.public_model, r.status, r.http_status, r.latency_ms, r.prompt_tokens, r.completion_tokens, r.cost_usd, r.request_id]))}>
             <Download size={14} />导出 CSV

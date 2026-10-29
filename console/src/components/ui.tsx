@@ -125,13 +125,14 @@ export function EmptyState({ icon, title, hint, action }: { icon?: React.ReactNo
 export function CopyButton({ text, label = "复制" }: { text: string; label?: string }) {
   const [done, setDone] = useState(false);
   return (
-    <button className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] text-muted hover:bg-surface2 hover:text-ink" onClick={async () => {
+    <button className="inline-flex shrink-0 flex-nowrap items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-[11px] text-muted hover:bg-surface2 hover:text-ink" onClick={async () => {
       try { await navigator.clipboard.writeText(text); } catch {
         const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove();
       }
       setDone(true); setTimeout(() => setDone(false), 1500);
     }}>
-      {done ? <Check size={12} className="text-ok" /> : <Copy size={12} />}{done ? "已复制" : label}
+      {done ? <Check size={12} className="shrink-0 text-ok" /> : <Copy size={12} className="shrink-0" />}
+      <span className="whitespace-nowrap">{done ? "已复制" : label}</span>
     </button>
   );
 }
