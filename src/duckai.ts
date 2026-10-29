@@ -28,6 +28,63 @@ const DEFAULT_HEADERS: Record<string, string> = {
   "Sec-Fetch-Mode": "cors",
 };
 
+/**
+ * Duck.ai 按出口 IP 限流：实测 3 并发仍正常，8 并发约 5/8 返回 429，
+ * 且 429 会同时命中 status 与 chat，触发后同一 IP 约 1 分钟内持续 429。
+ * 因此单实例内限制并发为 2，并对 429 做短退避重试，避免自身突发把整条渠道打挂。
+ */
+const DUCKAI_MAX_CONCURRENCY = 1;
+const DUCKAI_MIN_INTERVAL_MS = 1500;
+const DUCKAI_RETRY_DELAYS_MS = [2000, 4000];
+
+let duckActive = 0;
+let duckLastStart = 0;
+const duckWaiters: Array<() => void> = [];
+
+async function acquireDuckSlot(): Promise<void> {
+  if (duckActive < DUCKAI_MAX_CONCURRENCY) {
+    duckActive++;
+  } else {
+    await new Promise<void>((resolve) => duckWaiters.push(resolve));
+    duckActive++;
+  }
+  // 单实例内串行并保持最小请求间隔，避免瞬时并发触发 DuckDuckGo 的 IP 限流。
+  const waitMs = duckLastStart + DUCKAI_MIN_INTERVAL_MS - Date.now();
+  if (waitMs > 0) await sleep(waitMs);
+  duckLastStart = Date.now();
+}
+
+function releaseDuckSlot(): void {
+  duckActive--;
+  const next = duckWaiters.shift();
+  if (next) next();
+}
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * 带限流退避的 fetch：429 时按 Retry-After（上限 8s）或内置退避重试。
+ * 每次尝试都新建 AbortSignal，避免共享超时信号在重试期间提前中止。
+ */
+async function fetchDuckWithRetry(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  let last: Response | null = null;
+  for (let attempt = 0; attempt <= DUCKAI_RETRY_DELAYS_MS.length; attempt++) {
+    const res = await fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+    if (res.status !== 429) return res;
+    last = res;
+    res.body?.cancel().catch(() => {});
+    if (attempt < DUCKAI_RETRY_DELAYS_MS.length) {
+      const retryAfter = Number(res.headers.get("retry-after"));
+      const waitMs =
+        Number.isFinite(retryAfter) && retryAfter > 0
+          ? Math.min(retryAfter * 1000, 8000)
+          : DUCKAI_RETRY_DELAYS_MS[attempt];
+      await sleep(waitMs + Math.floor(Math.random() * 400));
+    }
+  }
+  return last!;
+}
+
 export const DUCKAI_MODELS = [
   { id: "gpt-6-luna", name: "GPT-6 Luna (Free)" },
   { id: "gpt-5.4-mini", name: "GPT-5.4 mini (Free)" },
@@ -251,7 +308,7 @@ let feVersionCache: { version: string; expiresAt: number } | null = null;
 async function getFeVersion(): Promise<string> {
   if (feVersionCache && feVersionCache.expiresAt > Date.now()) return feVersionCache.version;
   try {
-    const res = await fetch(`${BASE_URL}/`, { headers: { "User-Agent": USER_AGENT }, signal: AbortSignal.timeout(10000) });
+    const res = await fetchDuckWithRetry(`${BASE_URL}/`, { headers: { "User-Agent": USER_AGENT } }, 10000);
     if (res.ok) {
       const html = await res.text();
       const version = html.match(FE_VERSION_PATTERN)?.[0];
@@ -453,12 +510,21 @@ export async function handleDuckAiRequest(input: {
     return new Response(JSON.stringify({ error: { message: "messages 不能为空", type: "invalid_request_error" } }), { status: 400 });
   }
 
+  await acquireDuckSlot();
+  try {
   const requestedModel = resolveModel(input.model);
-  const statusRes = await fetch(STATUS_URL, {
+  const statusRes = await fetchDuckWithRetry(STATUS_URL, {
     headers: { ...DEFAULT_HEADERS, "x-vqd-accept": "1", "User-Agent": USER_AGENT },
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!statusRes.ok) throw new Error(`Duck.ai status 返回 HTTP ${statusRes.status}`);
+  }, 15000);
+  if (!statusRes.ok) {
+    if (statusRes.status === 429) {
+      return new Response(JSON.stringify({ error: { message: "Duck.ai 上游按 IP 限流（HTTP 429），请稍后重试", type: "rate_limit_error", code: "rate_limited" } }), {
+        status: 429,
+        headers: { "Content-Type": "application/json; charset=utf-8", "Retry-After": "5", "Cache-Control": "no-store" },
+      });
+    }
+    throw new Error(`Duck.ai status 返回 HTTP ${statusRes.status}`);
+  }
   const challenge = statusRes.headers.get("x-vqd-hash-1");
   if (!challenge) throw new Error("Duck.ai 没有返回挑战令牌");
 
@@ -483,7 +549,7 @@ export async function handleDuckAiRequest(input: {
     },
   };
 
-  const upstream = await fetch(CHAT_URL, {
+  const upstream = await fetchDuckWithRetry(CHAT_URL, {
     method: "POST",
     headers: {
       ...DEFAULT_HEADERS,
@@ -496,8 +562,7 @@ export async function handleDuckAiRequest(input: {
       "x-vqd-hash-1": solvedChallenge,
     },
     body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(60000),
-  });
+  }, 50000);
 
   if (!upstream.ok) {
     const errText = await upstream.text().catch(() => "");
@@ -508,4 +573,7 @@ export async function handleDuckAiRequest(input: {
   }
 
   return input.stream ? streamResponse(upstream, input.model) : await parseNonStreamingResponse(upstream, input.model);
+  } finally {
+    releaseDuckSlot();
+  }
 }
