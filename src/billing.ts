@@ -5,8 +5,9 @@
  *  - 全部变动写 ledger 流水，可对账/导出
  *  - Key 级额度在认证层已检查（api_keys.spentUsd）
  *
- * 性能：余额与账本都走进程内写穿透缓存，冻结/结算不再阻塞对话响应，
- *       账本随用量一起批量落库（见 storage/write-behind.ts）。
+ * 运行环境适配：EdgeOne 每次请求都是全新进程，余额与账本**必须在本请求内 await 落库**；
+ * 余额单键写 + 账本按 scope 分组批量读改写，全部并行，付费调用也只多 1~2 轮往返。
+ * 零费用调用（免费模型）完全跳过余额/账本，热路径零计费开销。
  */
 import type { HandlerCtx } from "./types";
 import { ApiError, ErrorCode } from "./errors";
@@ -15,9 +16,7 @@ import {
   getAllPricing,
   getOrCreateBalance,
   updateBalance,
-  persistBalanceNow,
-  appendLedgerEntry,
-  appendLedgerEntryBuffered,
+  appendLedgerEntries,
   touchApiKeyUsage,
 } from "./storage/db";
 
@@ -77,18 +76,22 @@ export async function hold(
   const now = Math.floor(Date.now() / 1000);
 
   bal.frozen += amount;
-  await updateBalance(c.env, scope, bal);
-
-  appendLedgerEntryBuffered(c.env, {
-    id: holdId,
-    scope,
-    type: "hold",
-    amount,
-    balanceAfter: bal.available - bal.frozen,
-    requestId,
-    memo: `hold ${amount.toFixed(6)}`,
-    createdAt: now,
-  });
+  // 余额写 + 账本单条，同一请求内并行落库
+  await Promise.all([
+    updateBalance(c.env, scope, bal),
+    appendLedgerEntries(c.env, [
+      {
+        id: holdId,
+        scope,
+        type: "hold",
+        amount,
+        balanceAfter: bal.available - bal.frozen,
+        requestId,
+        memo: `hold ${amount.toFixed(6)}`,
+        createdAt: now,
+      },
+    ]),
+  ]);
 
   return { holdId };
 }
@@ -100,12 +103,30 @@ export async function settle(
 ): Promise<void> {
   const now = Math.floor(Date.now() / 1000);
   const releaseAmount = Math.max(0, args.heldAmount - args.actualCost);
+  // 零费用调用（免费模型）完全跳过余额与账本
+  if (args.unlimited ? releaseAmount <= 0 && args.actualCost <= 0 : args.heldAmount <= 0 && args.actualCost <= 0) {
+    return;
+  }
+
   const bal = await getOrCreateBalance(c.env, args.scope);
+  const entries: {
+    id: string;
+    scope: string;
+    userId?: string | null;
+    type: "hold" | "capture" | "release" | "topup" | "adjustment" | "refund";
+    amount: number;
+    balanceAfter: number;
+    requestId?: string | null;
+    memo?: string | null;
+    createdAt: number;
+  }[] = [];
+
+  let extraJobs: Promise<unknown>[] = [];
 
   if (!args.unlimited) {
     bal.available -= args.actualCost;
     bal.frozen = Math.max(0, bal.frozen - args.heldAmount);
-    await updateBalance(c.env, args.scope, bal);
+    extraJobs.push(updateBalance(c.env, args.scope, bal));
 
     // 扣费后若余额归零或为负，自动降级为普通用户 (user)
     if (bal.available <= 0 && args.userId) {
@@ -115,7 +136,7 @@ export async function settle(
   }
 
   // 1. 记 capture（超级管理员虽不占用额度，但仍记录真实用量与费用流水，保证账目清晰）
-  appendLedgerEntryBuffered(c.env, {
+  entries.push({
     id: uuid(),
     scope: args.scope,
     userId: args.userId,
@@ -129,7 +150,7 @@ export async function settle(
 
   // 2. 记 release 差额
   if (releaseAmount > 0) {
-    appendLedgerEntryBuffered(c.env, {
+    entries.push({
       id: uuid(),
       scope: args.scope,
       userId: args.userId,
@@ -142,10 +163,12 @@ export async function settle(
     });
   }
 
-  // 3. 更新 key 的 spentUsd（内存立即生效，落库节流合并）
+  // 3. 更新 key 的 spentUsd（请求内内存可见，收尾随用量批量落库）
   if (args.apiKeyId && args.actualCost > 0) {
     touchApiKeyUsage(c.env, args.apiKeyId, { spentDelta: args.actualCost });
   }
+
+  await Promise.all([...extraJobs, appendLedgerEntries(c.env, entries)]);
 }
 
 /** 请求失败时全额解冻 */
@@ -154,34 +177,40 @@ export async function releaseHold(c: HandlerCtx, scope: string, holdId: string, 
   const now = Math.floor(Date.now() / 1000);
   const bal = await getOrCreateBalance(c.env, scope);
   bal.frozen = Math.max(0, bal.frozen - heldAmount);
-  await updateBalance(c.env, scope, bal);
 
-  appendLedgerEntryBuffered(c.env, {
-    id: uuid(),
-    scope,
-    type: "release",
-    amount: heldAmount,
-    balanceAfter: bal.available - bal.frozen,
-    requestId,
-    memo: `release on failure ${heldAmount.toFixed(6)}`,
-    createdAt: now,
-  });
+  await Promise.all([
+    updateBalance(c.env, scope, bal),
+    appendLedgerEntries(c.env, [
+      {
+        id: uuid(),
+        scope,
+        type: "release",
+        amount: heldAmount,
+        balanceAfter: bal.available - bal.frozen,
+        requestId,
+        memo: `release on failure ${heldAmount.toFixed(6)}`,
+        createdAt: now,
+      },
+    ]),
+  ]);
 }
 
-/** 充值/调整（管理员或支付回调调用）：立即落库，跨实例立刻可见 */
+/** 充值/调整（管理员或支付回调调用）：立即落库，跨请求立刻可见 */
 export async function topup(c: HandlerCtx, scope: string, amount: number, memo: string): Promise<void> {
   const now = Math.floor(Date.now() / 1000);
   const bal = await getOrCreateBalance(c.env, scope);
   bal.available += amount;
-  await persistBalanceNow(c.env, scope, bal);
+  await updateBalance(c.env, scope, bal);
 
-  await appendLedgerEntry(c.env, {
-    id: uuid(),
-    scope,
-    type: amount >= 0 ? "topup" : "adjustment",
-    amount,
-    balanceAfter: bal.available,
-    memo,
-    createdAt: now,
-  });
+  await appendLedgerEntries(c.env, [
+    {
+      id: uuid(),
+      scope,
+      type: amount >= 0 ? "topup" : "adjustment",
+      amount,
+      balanceAfter: bal.available,
+      memo,
+      createdAt: now,
+    },
+  ]);
 }

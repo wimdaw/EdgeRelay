@@ -1,19 +1,15 @@
 /**
  * EdgeRelay 数据访问层（基于 EdgeOne Blob 数据库）
+ *
+ * 运行环境结论（2026-10 实测）：EdgeOne 云函数**每次请求都是全新进程**（无 waitUntil、
+ * 实例不复用），因此：
+ *  - 进程内缓存只在单个请求内去重（同键多次读只走一次 I/O）
+ *  - 所有写入必须在请求生命周期内 await 完成，绝不能依赖后台定时器
+ *  - settings/providers/models/pricing 合并为单键 config:all，一次读取替代四次
  */
-
 import { getBlobStore } from "./blob-store";
 export { getBlobStore };
 import { TtlCache, mapLimit } from "./cache";
-import {
-  enqueueUsageWrite,
-  enqueueLedgerWrite,
-  flushWriteBehind,
-  mergeUsageDeltaInto,
-  pendingDailyDelta,
-  pendingLedgerEntries,
-  pendingUsageRecords,
-} from "./write-behind";
 import {
   type PlatformSettings,
   DEFAULT_SETTINGS,
@@ -37,75 +33,189 @@ import {
 import { sha256Hex, uuid } from "../crypto";
 import { ApiError, ErrorCode } from "../errors";
 
-/**
- * 进程内热缓存（EdgeOne Blob 单次强一致读写约 100~200ms，热路径必须避免重复读）
- *  - 管理端写入会同步 set/delete，本实例立即可见
- *  - 跨实例最多滞后一个 TTL，且过期后 stale-while-revalidate，请求不等待刷新
- */
-const SETTINGS_TTL = 60_000;
-const CONFIG_TTL = 60_000;
-const AUTH_TTL = 30_000;
-const USER_TTL = 60_000;
-const PROVIDER_KEYS_TTL = 60_000;
-
-const settingsCache = new TtlCache<PlatformSettings>(SETTINGS_TTL, 2);
-const providersCache = new TtlCache<ProviderRecord[]>(CONFIG_TTL, 2);
-const modelsCache = new TtlCache<ModelRouteRecord[]>(CONFIG_TTL, 2);
-const pricingCache = new TtlCache<Record<string, ModelPricingRecord>>(CONFIG_TTL, 2);
-const apiKeyCache = new TtlCache<ApiKeyRecord | null>(AUTH_TTL, 5000);
-const userCache = new TtlCache<UserRecord | null>(USER_TTL, 2000);
-const sessionCache = new TtlCache<SessionRecord | null>(USER_TTL, 2000);
-const providerKeysCache = new TtlCache<ProviderKeyRecord[]>(PROVIDER_KEYS_TTL, 200);
-const announcementCache = new TtlCache<AnnouncementRecord[]>(60_000, 2);
+/** 请求内 TTL 缓存：同一请求内同键只读一次 Blob */
+const apiKeyCache = new TtlCache<ApiKeyRecord | null>(30_000, 5000);
+const userCache = new TtlCache<UserRecord | null>(30_000, 2000);
+const sessionCache = new TtlCache<SessionRecord | null>(30_000, 2000);
+const providerKeysCache = new TtlCache<ProviderKeyRecord[]>(30_000, 200);
+const announcementCache = new TtlCache<AnnouncementRecord[]>(30_000, 2);
+const configCache = new TtlCache<ConfigSnapshot>(30_000, 2);
 
 /** keyId -> keyHash 二级索引，避免按 id 反查时全表扫 Key */
 const apiKeyIdIndex = new Map<string, string>();
 
 /** 备份导入/恢复后清空进程内缓存，保证立即读取恢复后的 Blob 数据 */
 export function invalidateStorageCaches(): void {
-  settingsCache.clear();
-  providersCache.clear();
-  modelsCache.clear();
-  pricingCache.clear();
+  configCache.clear();
   apiKeyCache.clear();
   userCache.clear();
   sessionCache.clear();
   providerKeysCache.clear();
   announcementCache.clear();
   apiKeyIdIndex.clear();
+  apiKeyDirty.clear();
   balanceCache.clear();
-  apiKeyWriteTimers.clear();
   auditChainCache = null;
-  freeChannelsSeeded = false;
 }
 
 // ==========================================
-// 1. 全局配置 (Settings)
+// 1. 全局配置快照 (Config Snapshot)
+//    settings + providers + models + pricing 合并为单键，热路径一次读取
 // ==========================================
 
-export async function getSettings(env?: any): Promise<PlatformSettings> {
-  return settingsCache.get("platform", async () => {
+export type ConfigSnapshot = {
+  settings: PlatformSettings;
+  providers: ProviderRecord[];
+  models: ModelRouteRecord[];
+  pricing: Record<string, ModelPricingRecord>;
+};
+
+async function loadConfigSnapshot(env: any): Promise<ConfigSnapshot> {
+  return configCache.get("snapshot", async () => {
     const store = getBlobStore(env);
-    const stored = await store.get("settings:platform", { type: "json", consistency: "strong" });
-    if (!stored) {
-      // 首次启动，保存默认设置
-      await store.setJSON("settings:platform", DEFAULT_SETTINGS);
-      return DEFAULT_SETTINGS;
+    const snap = (await store.get("config:all", { type: "json", consistency: "strong" })) as Partial<ConfigSnapshot> | null;
+    if (
+      snap?.settings &&
+      Array.isArray(snap.providers) &&
+      Array.isArray(snap.models) &&
+      snap.pricing &&
+      typeof snap.pricing === "object"
+    ) {
+      snap.settings.auditLogRetentionDays = clampAuditRetentionDays(snap.settings.auditLogRetentionDays);
+      return snap as ConfigSnapshot;
     }
-    const merged: PlatformSettings = { ...DEFAULT_SETTINGS, ...stored };
-    merged.auditLogRetentionDays = clampAuditRetentionDays(merged.auditLogRetentionDays);
-    return merged;
+
+    // 首次（或旧版本遗留）：从独立键并发重建快照并写回，之后热路径只需读单键
+    const [rawSettings, rawProviders, rawModels, rawPricing] = await Promise.all([
+      store.get("settings:platform", { type: "json", consistency: "strong" }),
+      store.get("providers:all", { type: "json", consistency: "strong" }),
+      store.get("models:all", { type: "json", consistency: "strong" }),
+      store.get("pricing:all", { type: "json", consistency: "strong" }),
+    ]);
+    if (!rawProviders || !rawModels || !rawPricing) {
+      await seedInitialData(env);
+    }
+    const [, providers2, models2, pricing2] = await Promise.all([
+      store.get("settings:platform", { type: "json", consistency: "strong" }),
+      store.get("providers:all", { type: "json", consistency: "strong" }),
+      store.get("models:all", { type: "json", consistency: "strong" }),
+      store.get("pricing:all", { type: "json", consistency: "strong" }),
+    ]);
+    const mergedSettings: PlatformSettings = { ...DEFAULT_SETTINGS, ...(rawSettings || {}) };
+    mergedSettings.auditLogRetentionDays = clampAuditRetentionDays(mergedSettings.auditLogRetentionDays);
+    const built: ConfigSnapshot = {
+      settings: mergedSettings,
+      providers: (providers2 || []) as ProviderRecord[],
+      models: (models2 || []) as ModelRouteRecord[],
+      pricing: ((pricing2 || {}) as Record<string, ModelPricingRecord>),
+    };
+    await store.setJSON("config:all", built);
+    return built;
   });
 }
 
-export async function updateSettings(env: any, patch: Partial<PlatformSettings>): Promise<PlatformSettings> {
+/** 把补丁写回 config:all（同时保持独立遗留键同步，便于回滚旧版本代码） */
+async function saveConfigSnapshot(
+  env: any,
+  patch: Partial<ConfigSnapshot>
+): Promise<ConfigSnapshot> {
   const store = getBlobStore(env);
+  const cur = await loadConfigSnapshot(env);
+  const next: ConfigSnapshot = { ...cur, ...patch };
+  await store.setJSON("config:all", next);
+  configCache.set("snapshot", next);
+  // 同步遗留键（备份/旧版兼容）
+  const jobs: Promise<unknown>[] = [];
+  if (patch.settings) jobs.push(store.setJSON("settings:platform", patch.settings));
+  if (patch.providers) jobs.push(store.setJSON("providers:all", patch.providers));
+  if (patch.models) jobs.push(store.setJSON("models:all", patch.models));
+  if (patch.pricing) jobs.push(store.setJSON("pricing:all", patch.pricing));
+  await Promise.all(jobs);
+  return next;
+}
+
+export async function getSettings(env?: any): Promise<PlatformSettings> {
+  return (await loadConfigSnapshot(env)).settings;
+}
+
+export async function updateSettings(env: any, patch: Partial<PlatformSettings>): Promise<PlatformSettings> {
   const cur = await getSettings(env);
   const updated: PlatformSettings = { ...cur, ...patch };
   updated.auditLogRetentionDays = clampAuditRetentionDays(updated.auditLogRetentionDays);
-  await store.setJSON("settings:platform", updated);
-  settingsCache.set("platform", updated);
+  await saveConfigSnapshot(env, { settings: updated });
   return updated;
+}
+
+export async function getProviders(env: any): Promise<ProviderRecord[]> {
+  return (await loadConfigSnapshot(env)).providers;
+}
+
+export async function setProviders(env: any, list: ProviderRecord[]): Promise<void> {
+  await saveConfigSnapshot(env, { providers: list });
+}
+
+export async function upsertProvider(env: any, provider: ProviderRecord): Promise<void> {
+  const list = await getProviders(env);
+  const idx = list.findIndex((p) => p.id === provider.id);
+  const next = list.slice();
+  if (idx >= 0) {
+    next[idx] = provider;
+  } else {
+    next.push(provider);
+  }
+  await setProviders(env, next);
+}
+
+export async function deleteProvider(env: any, providerId: string): Promise<void> {
+  const providers = await getProviders(env);
+  await setProviders(
+    env,
+    providers.filter((p) => p.id !== providerId)
+  );
+}
+
+export async function getModels(env: any): Promise<ModelRouteRecord[]> {
+  return (await loadConfigSnapshot(env)).models;
+}
+
+export async function setModels(env: any, list: ModelRouteRecord[]): Promise<void> {
+  await saveConfigSnapshot(env, { models: list });
+}
+
+export async function upsertModel(env: any, model: ModelRouteRecord): Promise<void> {
+  const list = await getModels(env);
+  const idx = list.findIndex((m) => m.id === model.id);
+  const next = list.slice();
+  if (idx >= 0) {
+    const prev = list[idx]!;
+    next[idx] = {
+      ...prev,
+      ...model,
+      providerId: model.providerId || prev.providerId,
+      publicName: model.publicName || prev.publicName,
+      upstreamModel: model.upstreamModel || prev.upstreamModel,
+    };
+  } else {
+    next.push(model);
+  }
+  await setModels(env, next);
+}
+
+export async function deleteModel(env: any, modelId: string): Promise<void> {
+  const models = await getModels(env);
+  await setModels(
+    env,
+    models.filter((m) => m.id !== modelId)
+  );
+}
+
+export async function getAllPricing(env: any): Promise<Record<string, ModelPricingRecord>> {
+  return (await loadConfigSnapshot(env)).pricing;
+}
+
+export async function setPricing(env: any, pricing: ModelPricingRecord): Promise<void> {
+  const map = await getAllPricing(env);
+  await saveConfigSnapshot(env, { pricing: { ...map, [pricing.publicName]: pricing } });
 }
 
 // ==========================================
@@ -267,8 +377,7 @@ export async function getApiKeyByHash(env: any, keyHash: string): Promise<ApiKey
   return row;
 }
 
-/** 按 keyId 取记录（命中 hash 索引时零 I/O），用于扣费/最后使用时间更新 */
-async function getApiKeyById(env: any, keyId: string): Promise<ApiKeyRecord | null> {
+export async function getApiKeyById(env: any, keyId: string): Promise<ApiKeyRecord | null> {
   const hash = apiKeyIdIndex.get(keyId);
   if (hash) {
     const cached = apiKeyCache.peek(hash);
@@ -316,7 +425,7 @@ export async function listAllApiKeys(env: any): Promise<ApiKeyRecord[]> {
 
 export async function updateApiKey(env: any, keyHash: string, updates: Partial<ApiKeyRecord>): Promise<ApiKeyRecord | null> {
   const store = getBlobStore(env);
-  const cur = (await getApiKeyByHash(env, keyHash)) || null;
+  const cur = await getApiKeyByHash(env, keyHash);
   if (!cur) return null;
   const updated: ApiKeyRecord = { ...cur, ...updates };
   await store.setJSON(`key:${keyHash}`, updated);
@@ -326,291 +435,38 @@ export async function updateApiKey(env: any, keyHash: string, updates: Partial<A
 }
 
 /**
- * 热路径专用：在内存里更新 Key 的 lastUsedAt / spentUsd，落库做 4 秒节流合并。
- * 配额判定读的是内存记录，因此扣费立即可见。
+ * 热路径专用：在请求内内存里更新 Key 的 lastUsedAt / spentUsd，标记为待写。
+ * 对话收尾时由 commitApiKeyUsage 随用量一起批量落库（同一轮并行写）。
  */
-export function touchApiKeyUsage(
-  env: any,
-  keyId: string,
-  patch: { lastUsedAt?: number; spentDelta?: number }
-): void {
+const apiKeyDirty = new Set<string>();
+
+export function touchApiKeyUsage(env: any, keyId: string, patch: { lastUsedAt?: number; spentDelta?: number }): void {
   const hash = apiKeyIdIndex.get(keyId);
-  if (!hash) {
-    // 索引缺失时异步补一次（不影响主流程）
-    void getApiKeyById(env, keyId).catch(() => {});
-    return;
-  }
+  if (!hash) return;
   const rec = apiKeyCache.peek(hash);
   if (!rec) return;
   if (patch.lastUsedAt) rec.lastUsedAt = patch.lastUsedAt;
   if (patch.spentDelta) rec.spentUsd = (rec.spentUsd || 0) + patch.spentDelta;
-  scheduleApiKeyPersist(env, hash);
+  apiKeyDirty.add(hash);
 }
 
-const apiKeyWriteTimers = new Map<string, ReturnType<typeof setTimeout>>();
-
-function scheduleApiKeyPersist(env: any, keyHash: string): void {
-  if (apiKeyWriteTimers.has(keyHash)) return;
-  const timer = setTimeout(() => {
-    apiKeyWriteTimers.delete(keyHash);
-    const rec = apiKeyCache.peek(keyHash);
-    if (!rec) return;
-    getBlobStore(env)
-      .setJSON(`key:${keyHash}`, { ...rec })
-      .catch(() => {});
-  }, 4000);
-  apiKeyWriteTimers.set(keyHash, timer);
+/** 把本请求内变更过的 Key 记录批量落库（必须 await，进程生命周期内完成） */
+export async function commitApiKeyUsage(env: any): Promise<void> {
+  if (apiKeyDirty.size === 0) return;
+  const hashes = Array.from(apiKeyDirty);
+  apiKeyDirty.clear();
+  const store = getBlobStore(env);
+  await Promise.all(
+    hashes.map(async (hash) => {
+      const rec = apiKeyCache.peek(hash);
+      if (rec) await store.setJSON(`key:${hash}`, { ...rec });
+    })
+  );
 }
 
 // ==========================================
 // 5. 供应商与密钥 (Providers & Keys)
 // ==========================================
-
-let freeChannelsSeeded = false;
-let freeChannelsSeedPromise: Promise<void> | null = null;
-
-/** 冷启动自举：single-flight，避免并发首请求各自跑一轮全量读取 */
-export function ensureFreeChannelsSeeded(env: any): Promise<void> {
-  if (freeChannelsSeeded) return Promise.resolve();
-  if (!freeChannelsSeedPromise) {
-    freeChannelsSeedPromise = seedFreeChannels(env)
-      .catch((err: any) => {
-        console.error("[ensureFreeChannelsSeeded] error:", err?.message);
-      })
-      .finally(() => {
-        freeChannelsSeedPromise = null;
-      });
-  }
-  return freeChannelsSeedPromise;
-}
-
-async function seedFreeChannels(env: any): Promise<void> {
-  const store = getBlobStore(env);
-  const now = Math.floor(Date.now() / 1000);
-
-  try {
-    // 三份配置一次性并发读取，冷启动从 3 轮串行往返压成 1 轮
-    const [rawProviders, rawModels, rawPricing] = await Promise.all([
-      store.get("providers:all", { type: "json", consistency: "strong" }),
-      store.get("models:all", { type: "json", consistency: "strong" }),
-      store.get("pricing:all", { type: "json", consistency: "strong" }),
-    ]);
-    let providers = rawProviders || [];
-    let pChanged = false;
-    if (!providers.some((p: any) => p.id === "opencode" || p.slug === "opencode")) {
-      providers.push({
-        id: "opencode",
-        name: "OpenCode",
-        slug: "opencode",
-        kind: "opencode",
-        baseUrl: "https://opencode.ai/zen/v1",
-        authScheme: "none",
-        status: "active",
-        authorizationRef: "AUTH-OPENCODE-FREE-2026",
-        createdAt: now,
-      });
-      pChanged = true;
-    }
-    if (!providers.some((p: any) => p.id === "duckai" || p.slug === "duckai")) {
-      providers.push({
-        id: "duckai",
-        name: "Duck.ai",
-        slug: "duckai",
-        kind: "duckai",
-        baseUrl: "https://duck.ai",
-        authScheme: "none",
-        status: "active",
-        authorizationRef: "AUTH-DUCKAI-FREE-2026",
-        createdAt: now,
-      });
-      pChanged = true;
-    }
-    if (!providers.some((p: any) => p.id === "kilo" || p.slug === "kilo")) {
-      providers.push({
-        id: "kilo",
-        name: "Kilo",
-        slug: "kilo",
-        kind: "kilo",
-        baseUrl: "https://api.kilo.ai/api/gateway",
-        authScheme: "none",
-        status: "active",
-        authorizationRef: "AUTH-KILO-FREE-2026",
-        createdAt: now,
-      });
-      pChanged = true;
-    }
-    // 自动修正 Anthropic 协议与鉴权类型
-    const anthropicP = providers.find((p: any) => p.id === "anthropic" || p.slug === "anthropic");
-    if (anthropicP && (anthropicP.kind === "openai_compat" || anthropicP.authScheme !== "x-api-key")) {
-      anthropicP.kind = "anthropic";
-      anthropicP.authScheme = "x-api-key";
-      anthropicP.extraHeaders = JSON.stringify({ "anthropic-version": "2023-06-01", "content-type": "application/json" });
-      pChanged = true;
-    }
-    if (pChanged) {
-      await store.setJSON("providers:all", providers);
-      providersCache.set("all", providers);
-    }
-
-    // 自动将首选站长 hackerxiaow@gmail.com 升级为 superadmin 超级管理员
-    try {
-      const allUsers = await listAllUsers(env);
-      const targetUser = allUsers.find(
-        (u) => u.email.toLowerCase() === "hackerxiaow@gmail.com"
-      );
-      if (targetUser && targetUser.role !== "superadmin") {
-        await updateUser(env, targetUser.id, { role: "superadmin" });
-      }
-
-      // 超级管理员是铸币方，额度无限：历史「给下级转账扣减」留下的负余额无实际意义，归零并留痕
-      const su = allUsers.find((u) => u.role === "superadmin" || u.email.toLowerCase() === "hackerxiaow@gmail.com");
-      if (su) {
-        const suBal = await getOrCreateBalance(env, `user:${su.id}`);
-        if (suBal.available < 0) {
-          const delta = -suBal.available;
-          suBal.available = 0;
-          await updateBalance(env, `user:${su.id}`, suBal);
-          await appendLedgerEntry(env, {
-            id: uuid(),
-            scope: `user:${su.id}`,
-            userId: su.id,
-            type: "adjustment",
-            amount: delta,
-            balanceAfter: 0,
-            memo: "超级管理员额度无限：历史负余额归零（铸币方不计透支）",
-            createdAt: now,
-          });
-        }
-      }
-    } catch {}
-
-    let models = rawModels || [];
-    
-    // 严格按规范清洗：OpenCode 仅保留官方免费层模型（全部带 -free 结尾，特例为 big-pickle）
-    // 移除不带 -free 的别名项
-    const rawLen = models.length;
-    models = models.filter((m: any) => {
-      const pId = m.providerId || "";
-      if (pId === "opencode" || pId === "p_opencode") {
-        return m.publicName === "big-pickle" || m.publicName.endsWith("-free");
-      }
-      return true;
-    });
-    let mChanged = models.length !== rawLen;
-
-    const existingNames = new Set(models.map((m: any) => m.publicName));
-    const newModels: ModelRouteRecord[] = [
-      // OpenCode 官方免费层模型（9 个）
-      { id: "m_oc_mimo_f", publicName: "mimo-v2.6-flash-free", providerId: "opencode", upstreamModel: "mimo-v2.6-flash-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_ds41_f", publicName: "deepseek-v4.1-flash-free", providerId: "opencode", upstreamModel: "deepseek-v4.1-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_oc_flint_f", publicName: "flint-40b-free", providerId: "opencode", upstreamModel: "flint-40b-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_nemo_vl_f", publicName: "nemotron-3.5-super-vl-free", providerId: "opencode", upstreamModel: "nemotron-3.5-super-vl-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_nemo_lt_f", publicName: "nemotron-3.5-lightning-free", providerId: "opencode", upstreamModel: "nemotron-3.5-lightning-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_glm53_f", publicName: "glm-5.3-flash-free", providerId: "opencode", upstreamModel: "glm-5.3-flash-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_oc_pickle", publicName: "big-pickle", providerId: "opencode", upstreamModel: "big-pickle", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_beam_f", publicName: "beam-free", providerId: "opencode", upstreamModel: "beam-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_oc_jev_f", publicName: "jev-1.13-free", providerId: "opencode", upstreamModel: "jev-1.13-free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      // Duck.ai models
-      { id: "m_dk_luna", publicName: "gpt-6-luna", providerId: "duckai", upstreamModel: "gpt-6-luna", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
-      { id: "m_dk_mini", publicName: "gpt-5.4-mini", providerId: "duckai", upstreamModel: "gpt-5.4-mini", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
-      { id: "m_dk_haiku", publicName: "claude-haiku-4-5", providerId: "duckai", upstreamModel: "claude-haiku-4-5", priority: 10, costWeight: 1, maxContext: 200000, enabled: 1, createdAt: now },
-      { id: "m_dk_mistral", publicName: "mistral-small-2603", providerId: "duckai", upstreamModel: "mistral-small-2603", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_dk_oss120b", publicName: "tinfoil/gpt-oss-120b", providerId: "duckai", upstreamModel: "tinfoil/gpt-oss-120b", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_dk_gemma31b", publicName: "tinfoil/gemma4-31b", providerId: "duckai", upstreamModel: "tinfoil/gemma4-31b", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_dk_oss120b_s", publicName: "gpt-oss-120b", providerId: "duckai", upstreamModel: "tinfoil/gpt-oss-120b", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_dk_gemma31b_s", publicName: "gemma4-31b", providerId: "duckai", upstreamModel: "tinfoil/gemma4-31b", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      // Kilo free models (11 个实测验证全通模型)
-      { id: "m_kl_auto_f", publicName: "kilo-auto/free", providerId: "kilo", upstreamModel: "kilo-auto/free", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
-      { id: "m_kl_or_f", publicName: "openrouter/free", providerId: "kilo", upstreamModel: "openrouter/free", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
-      { id: "m_kl_nemo_vl_f", publicName: "nvidia/nemotron-3.5-super-vl:free", providerId: "kilo", upstreamModel: "nvidia/nemotron-3.5-super-vl:free", priority: 10, costWeight: 1, maxContext: 1000000, enabled: 1, createdAt: now },
-      { id: "m_kl_nemo_lt_f", publicName: "nvidia/nemotron-3.5-lightning:free", providerId: "kilo", upstreamModel: "nvidia/nemotron-3.5-lightning:free", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
-      { id: "m_kl_beam_f", publicName: "reflection/beam-free", providerId: "kilo", upstreamModel: "reflection/beam-free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_kl_xing_f", publicName: "xingchen-agi/xing4.0-29b-a4b:free", providerId: "kilo", upstreamModel: "xingchen-agi/xing4.0-29b-a4b:free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_kl_dots_f", publicName: "dots-studio/dots-3-note-preview:free", providerId: "kilo", upstreamModel: "dots-studio/dots-3-note-preview:free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_kl_lfm_f", publicName: "liquid/lfm-2.5-2.6b:free", providerId: "kilo", upstreamModel: "liquid/lfm-2.5-2.6b:free", priority: 10, costWeight: 1, maxContext: 32000, enabled: 1, createdAt: now },
-      { id: "m_kl_north_f", publicName: "cohere/north-mini-code:free", providerId: "kilo", upstreamModel: "cohere/north-mini-code:free", priority: 10, costWeight: 1, maxContext: 64000, enabled: 1, createdAt: now },
-      { id: "m_kl_nemo_u550_f", publicName: "nvidia/nemotron-3-ultra-550b-a55b:free", providerId: "kilo", upstreamModel: "nvidia/nemotron-3-ultra-550b-a55b:free", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
-      { id: "m_kl_nemo_nano_f", publicName: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", providerId: "kilo", upstreamModel: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", priority: 10, costWeight: 1, maxContext: 128000, enabled: 1, createdAt: now },
-    ];
-    for (const nm of newModels) {
-      if (!existingNames.has(nm.publicName)) {
-        models.push(nm);
-        mChanged = true;
-      }
-    }
-    if (mChanged) {
-      await store.setJSON("models:all", models);
-      modelsCache.set("all", models);
-    }
-
-    let pricing = rawPricing || {};
-    let prChanged = false;
-    // 清理废弃模型的 pricing 键
-    const validPublicNames = new Set(models.map((m: any) => m.publicName));
-    for (const k of Object.keys(pricing)) {
-      if (!validPublicNames.has(k)) {
-        delete pricing[k];
-        prChanged = true;
-      }
-    }
-    for (const nm of newModels) {
-      if (!pricing[nm.publicName]) {
-        pricing[nm.publicName] = {
-          id: `pr_${nm.publicName.replace(/[^a-zA-Z0-9]/g, "_")}`,
-          publicName: nm.publicName,
-          inputPerMillion: 0,
-          outputPerMillion: 0,
-          currency: "CNY",
-          createdAt: now,
-        };
-        prChanged = true;
-      }
-    }
-    if (prChanged) {
-      await store.setJSON("pricing:all", pricing);
-      pricingCache.set("all", pricing);
-    }
-
-    // 自举时已经读到最新数据，直接回填缓存，冷启动少一轮读取
-    providersCache.set("all", providers);
-    modelsCache.set("all", models);
-    pricingCache.set("all", pricing);
-
-    freeChannelsSeeded = true;
-  } catch (err: any) {
-    console.error("[ensureFreeChannelsSeeded] error:", err?.message);
-  }
-}
-
-export async function getProviders(env: any): Promise<ProviderRecord[]> {
-  await ensureFreeChannelsSeeded(env);
-  return providersCache.get("all", async () => {
-    const store = getBlobStore(env);
-    let list = await store.get("providers:all", { type: "json", consistency: "strong" });
-    if (!list) {
-      await seedInitialData(env);
-      list = (await store.get("providers:all", { type: "json", consistency: "strong" })) || [];
-    }
-    return list;
-  });
-}
-
-export async function setProviders(env: any, list: ProviderRecord[]): Promise<void> {
-  const store = getBlobStore(env);
-  await store.setJSON("providers:all", list);
-  providersCache.set("all", list);
-}
-
-export async function upsertProvider(env: any, provider: ProviderRecord): Promise<void> {
-  const list = await getProviders(env);
-  const idx = list.findIndex((p) => p.id === provider.id);
-  if (idx >= 0) {
-    list[idx] = provider;
-  } else {
-    list.push(provider);
-  }
-  await setProviders(env, list);
-}
 
 export async function getProviderKeys(env: any, providerId: string): Promise<ProviderKeyRecord[]> {
   return providerKeysCache.get(providerId, async () => {
@@ -657,128 +513,43 @@ export async function updateProviderKeyStatus(env: any, providerId: string, keyI
   const idx = keys.findIndex((k) => k.id === keyId || k.keyFingerprint === keyId);
   if (idx >= 0) {
     const next = keys.slice();
-    next[idx] = { ...next[idx], status };
+    next[idx] = { ...next[idx]!, status };
     await setProviderKeys(env, providerId, next);
   }
 }
 
 // ==========================================
-// 6. 模型与路由 (Models & Pricing)
+// 6. 钱包与记账 (Balances & Ledger)
 // ==========================================
 
-export async function getModels(env: any): Promise<ModelRouteRecord[]> {
-  await ensureFreeChannelsSeeded(env);
-  return modelsCache.get("all", async () => {
-    const store = getBlobStore(env);
-    let list = await store.get("models:all", { type: "json", consistency: "strong" });
-    if (!list) {
-      await seedInitialData(env);
-      list = (await store.get("models:all", { type: "json", consistency: "strong" })) || [];
-    }
-    return list;
-  });
-}
-
-export async function setModels(env: any, list: ModelRouteRecord[]): Promise<void> {
-  const store = getBlobStore(env);
-  await store.setJSON("models:all", list);
-  modelsCache.set("all", list);
-}
-
-export async function upsertModel(env: any, model: ModelRouteRecord): Promise<void> {
-  const list = await getModels(env);
-  const idx = list.findIndex((m) => m.id === model.id);
-  if (idx >= 0) {
-    const prev = list[idx];
-    list[idx] = {
-      ...prev,
-      ...model,
-      providerId: model.providerId || prev.providerId,
-      publicName: model.publicName || prev.publicName,
-      upstreamModel: model.upstreamModel || prev.upstreamModel,
-    };
-  } else {
-    list.push(model);
-  }
-  await setModels(env, list);
-}
-
-export async function getAllPricing(env: any): Promise<Record<string, ModelPricingRecord>> {
-  return pricingCache.get("all", async () => {
-    const store = getBlobStore(env);
-    let map = await store.get("pricing:all", { type: "json", consistency: "strong" });
-    if (!map) {
-      await seedInitialData(env);
-      map = (await store.get("pricing:all", { type: "json", consistency: "strong" })) || {};
-    }
-    return map;
-  });
-}
-
-export async function setPricing(env: any, pricing: ModelPricingRecord): Promise<void> {
-  const store = getBlobStore(env);
-  const map = await getAllPricing(env);
-  const next = { ...map, [pricing.publicName]: pricing };
-  await store.setJSON("pricing:all", next);
-  pricingCache.set("all", next);
-}
-
-// ==========================================
-// 7. 钱包与记账 (Balances & Ledger)
-// ==========================================
-
-/**
- * 钱包写穿透缓存：
- *  - 首次读取后常驻内存，冻结/扣费在内存里原子完成（同一实例内不会丢更新）
- *  - 落库 800ms 防抖合并，一次对话原本 2~6 次余额写变成一次
- *  - 空闲 60s 后后台对齐远端，避免长期实例余额过旧
- */
-type BalanceEntry = {
-  bal: BalanceRecord;
-  at: number;
-  dirty: boolean;
-  timer?: ReturnType<typeof setTimeout>;
-  writing: boolean;
-};
-const balanceCache = new Map<string, BalanceEntry>();
+/** 请求内余额缓存：同一请求内重复读只走一次 I/O；任何变更立即落库 */
+const balanceCache = new Map<string, BalanceRecord>();
 const balanceLoads = new Map<string, Promise<BalanceRecord>>();
-const BALANCE_REFRESH_MS = 30_000;
-const BALANCE_WRITE_DELAY_MS = 800;
-
-function balanceStoreKey(scope: string): string {
-  return `balance:${scope}`;
-}
 
 export async function getOrCreateBalance(env: any, scope: string): Promise<BalanceRecord> {
   const cached = balanceCache.get(scope);
-  if (cached) {
-    if (!cached.dirty && !cached.writing && Date.now() - cached.at > BALANCE_REFRESH_MS) {
-      void refreshBalanceFromRemote(env, scope, cached);
-    }
-    return cached.bal;
-  }
-
+  if (cached) return cached;
   const pending = balanceLoads.get(scope);
   if (pending) return pending;
 
   const load = (async () => {
     const store = getBlobStore(env);
-    const b = await store.get(balanceStoreKey(scope), { type: "json", consistency: "strong" });
-    if (b) {
-      balanceCache.set(scope, { bal: b, at: Date.now(), dirty: false, writing: false });
-      return b as BalanceRecord;
+    const b = (await store.get(`balance:${scope}`, { type: "json", consistency: "strong" })) as BalanceRecord | null;
+    if (!b) {
+      const initial: BalanceRecord = {
+        id: uuid(),
+        scope,
+        available: 0,
+        frozen: 0,
+        currency: "CNY",
+        updatedAt: Math.floor(Date.now() / 1000),
+      };
+      await store.setJSON(`balance:${scope}`, initial);
+      balanceCache.set(scope, initial);
+      return initial;
     }
-    const initial: BalanceRecord = {
-      id: uuid(),
-      scope,
-      available: 0,
-      frozen: 0,
-      currency: "CNY",
-      updatedAt: Math.floor(Date.now() / 1000),
-    };
-    balanceCache.set(scope, { bal: initial, at: Date.now(), dirty: true, writing: false });
-    scheduleBalancePersist(env, scope);
-    return initial;
+    balanceCache.set(scope, b);
+    return b;
   })();
 
   balanceLoads.set(scope, load);
@@ -789,105 +560,51 @@ export async function getOrCreateBalance(env: any, scope: string): Promise<Balan
   }
 }
 
-async function refreshBalanceFromRemote(env: any, scope: string, entry: BalanceEntry): Promise<void> {
-  if (entry.writing || entry.dirty) return;
-  try {
-    const store = getBlobStore(env);
-    const fresh = (await store.get(balanceStoreKey(scope), { type: "json", consistency: "strong" })) as BalanceRecord | null;
-    if (!fresh || entry.dirty) return;
-    entry.bal.available = fresh.available;
-    entry.bal.frozen = fresh.frozen;
-    entry.bal.currency = fresh.currency;
-    entry.at = Date.now();
-  } catch {
-    // 后台刷新失败不影响请求
-  }
-}
-
-/** 标记余额变更并合并落库（热路径调用，不阻塞） */
+/** 立即落库（请求内必须 await，保证余额变更在进程生命周期内持久化） */
 export async function updateBalance(env: any, scope: string, balance: BalanceRecord): Promise<void> {
-  const entry = balanceCache.get(scope);
   balance.updatedAt = Math.floor(Date.now() / 1000);
-  if (entry) {
-    entry.bal = balance;
-    entry.dirty = true;
-  } else {
-    balanceCache.set(scope, { bal: balance, at: Date.now(), dirty: true, writing: false });
-  }
-  scheduleBalancePersist(env, scope);
+  balanceCache.set(scope, balance);
+  await getBlobStore(env).setJSON(`balance:${scope}`, { ...balance });
 }
 
-/** 立即落库（充值/管理操作需要跨实例立刻可见） */
 export async function persistBalanceNow(env: any, scope: string, balance: BalanceRecord): Promise<void> {
-  const entry = balanceCache.get(scope);
-  balance.updatedAt = Math.floor(Date.now() / 1000);
-  if (entry) {
-    entry.bal = balance;
-    entry.dirty = false;
-  } else {
-    balanceCache.set(scope, { bal: balance, at: Date.now(), dirty: false, writing: false });
+  await updateBalance(env, scope, balance);
+}
+
+/** 批量写入账本：按 scope 分组并发读改写（hold/capture/release 多条一次落盘） */
+export async function appendLedgerEntries(env: any, entries: LedgerEntryRecord[]): Promise<void> {
+  if (!entries.length) return;
+  const store = getBlobStore(env);
+  const byScope = new Map<string, LedgerEntryRecord[]>();
+  for (const entry of entries) {
+    const list = byScope.get(entry.scope) || [];
+    list.push(entry);
+    byScope.set(entry.scope, list);
   }
-  await getBlobStore(env).setJSON(balanceStoreKey(scope), { ...balance });
-  const e = balanceCache.get(scope);
-  if (e) e.at = Date.now();
-}
-
-function scheduleBalancePersist(env: any, scope: string): void {
-  const entry = balanceCache.get(scope);
-  if (!entry || entry.timer || entry.writing) return;
-  entry.timer = setTimeout(() => {
-    entry.timer = undefined;
-    void persistBalance(env, scope);
-  }, BALANCE_WRITE_DELAY_MS);
-}
-
-async function persistBalance(env: any, scope: string): Promise<void> {
-  const entry = balanceCache.get(scope);
-  if (!entry || !entry.dirty || entry.writing) return;
-  entry.dirty = false;
-  entry.writing = true;
-  try {
-    await getBlobStore(env).setJSON(balanceStoreKey(scope), { ...entry.bal });
-    entry.at = Date.now();
-  } catch {
-    entry.dirty = true;
-  } finally {
-    entry.writing = false;
-    if (entry.dirty) scheduleBalancePersist(env, scope);
-  }
-}
-
-/** 热路径账本写入：进内存缓冲，随用量一起批量落库 */
-export function appendLedgerEntryBuffered(env: any, entry: LedgerEntryRecord): void {
-  enqueueLedgerWrite(env, entry);
+  await Promise.all(
+    Array.from(byScope.entries()).map(async ([scope, list]) => {
+      const key = `ledger:${scope}`;
+      const cur: LedgerEntryRecord[] = (await store.get(key, { type: "json", consistency: "strong" })) || [];
+      const seen = new Set(cur.map((e) => e.id));
+      const fresh = list.filter((e) => !seen.has(e.id));
+      const merged = fresh.reverse().concat(cur).slice(0, 500);
+      await store.setJSON(key, merged);
+    })
+  );
 }
 
 export async function appendLedgerEntry(env: any, entry: LedgerEntryRecord): Promise<void> {
-  const store = getBlobStore(env);
-  const list: LedgerEntryRecord[] = (await store.get(`ledger:${entry.scope}`, { type: "json", consistency: "strong" })) || [];
-  list.unshift(entry);
-  if (list.length > 500) list.length = 500; // 保留最新 500 条
-  await store.setJSON(`ledger:${entry.scope}`, list);
+  await appendLedgerEntries(env, [entry]);
 }
 
 export async function getLedgerEntries(env: any, scope: string, limit = 50): Promise<LedgerEntryRecord[]> {
   const store = getBlobStore(env);
   const list: LedgerEntryRecord[] = (await store.get(`ledger:${scope}`, { type: "json", consistency: "strong" })) || [];
-  const pending = pendingLedgerEntries(scope);
-  if (!pending.length) return list.slice(0, limit);
-  const seen = new Set<string>();
-  const merged: LedgerEntryRecord[] = [];
-  for (const e of [...pending, ...list]) {
-    if (seen.has(e.id)) continue;
-    seen.add(e.id);
-    merged.push(e);
-    if (merged.length >= limit) break;
-  }
-  return merged;
+  return list.slice(0, limit);
 }
 
 // ==========================================
-// 7.5. 卡密兑换与管理 (Redeem Codes)
+// 7. 卡密兑换与管理 (Redeem Codes)
 // ==========================================
 
 export async function getRedeemCodes(env: any): Promise<RedeemCodeRecord[]> {
@@ -940,19 +657,33 @@ export async function redeemCodeAtomic(
 // ==========================================
 
 /**
- * 热路径写入：只做内存聚合，600ms 窗口内合并成一轮并行写，不阻塞对话响应。
- * 读取接口会叠加尚未落库的缓冲数据，后台立刻能看到刚产生的用量。
+ * 热路径写入：一次性四路并行的「写单条 + 日汇总 + 最近列表 + 用户日列表」，
+ * 全部在本请求生命周期内 await 完成（EdgeOne 进程不跨请求复用，不能依赖后台定时器）。
+ * 可选携带本请求待提交的 Key 记录（lastUsedAt/spentUsd）一起落库。
  */
-export async function addUsageRecord(env: any, record: UsageRecord): Promise<void> {
-  enqueueUsageWrite(env, record);
+export async function addUsageRecord(
+  env: any,
+  record: UsageRecord,
+  extra?: { apiKeyWrite?: { keyHash: string; record: ApiKeyRecord } }
+): Promise<void> {
+  const store = getBlobStore(env);
+  const date = new Date(record.createdAt * 1000).toISOString().slice(0, 10);
+
+  const jobs: Promise<unknown>[] = [
+    store.setJSON(`usage:record:${record.requestId}`, record),
+    updateDailyUsage(env, store, date, record),
+    updateRecentUsage(env, store, record),
+    updateUserDailyUsage(env, store, record, date),
+  ];
+  if (extra?.apiKeyWrite) {
+    jobs.push(store.setJSON(`key:${extra.apiKeyWrite.keyHash}`, extra.apiKeyWrite.record));
+  }
+  await Promise.all(jobs);
 }
 
-export async function getDailyUsage(env: any, date: string): Promise<DailyUsageSummary | null> {
-  const store = getBlobStore(env);
-  const raw = (await store.get(`usage:daily:${date}`, { type: "json", consistency: "strong" })) as DailyUsageSummary | null;
-  const delta = pendingDailyDelta(date);
-  if (!delta) return raw;
-  const base: DailyUsageSummary = raw || {
+async function updateDailyUsage(env: any, store: any, date: string, record: UsageRecord): Promise<void> {
+  const key = `usage:daily:${date}`;
+  const daily: DailyUsageSummary = (await store.get(key, { type: "json", consistency: "strong" })) || {
     date,
     requests: 0,
     successRequests: 0,
@@ -963,31 +694,61 @@ export async function getDailyUsage(env: any, date: string): Promise<DailyUsageS
     byModel: {},
     byProvider: {},
   };
-  return mergeUsageDeltaInto(base, delta);
+
+  daily.requests += 1;
+  if (record.status === "success") daily.successRequests += 1;
+  daily.promptTokens += record.promptTokens || 0;
+  daily.completionTokens += record.completionTokens || 0;
+  daily.totalCostUsd += record.costUsd || 0;
+  daily.totalLatencyMs += record.latencyMs || 0;
+
+  const mName = record.publicModel || "unknown";
+  const m = (daily.byModel[mName] = daily.byModel[mName] || { requests: 0, promptTokens: 0, completionTokens: 0, costUsd: 0 });
+  m.requests += 1;
+  m.promptTokens += record.promptTokens || 0;
+  m.completionTokens += record.completionTokens || 0;
+  m.costUsd += record.costUsd || 0;
+
+  const pName = record.providerId || "unknown";
+  const p = (daily.byProvider[pName] = daily.byProvider[pName] || { requests: 0, promptTokens: 0, completionTokens: 0 });
+  p.requests += 1;
+  p.promptTokens += record.promptTokens || 0;
+  p.completionTokens += record.completionTokens || 0;
+
+  await store.setJSON(key, daily);
+}
+
+async function updateRecentUsage(env: any, store: any, record: UsageRecord): Promise<void> {
+  const key = "usage:recent";
+  const cur: UsageRecord[] = (await store.get(key, { type: "json", consistency: "strong" })) || [];
+  // 按 requestId 去重，保证并发/重试写入幂等
+  const seen = new Set(cur.map((r) => r.requestId));
+  const merged = (seen.has(record.requestId) ? cur.slice() : [record].concat(cur)).slice(0, 200);
+  await store.setJSON(key, merged);
+}
+
+async function updateUserDailyUsage(env: any, store: any, record: UsageRecord, date: string): Promise<void> {
+  const key = `usage:user:${record.userId}:${date}`;
+  const cur: UsageRecord[] = (await store.get(key, { type: "json", consistency: "strong" })) || [];
+  const seen = new Set(cur.map((r) => r.requestId));
+  const merged = (seen.has(record.requestId) ? cur.slice() : [record].concat(cur)).slice(0, 200);
+  await store.setJSON(key, merged);
+}
+
+export async function getDailyUsage(env: any, date: string): Promise<DailyUsageSummary | null> {
+  const store = getBlobStore(env);
+  return await store.get(`usage:daily:${date}`, { type: "json", consistency: "strong" });
 }
 
 export async function getUserUsageRecords(env: any, userId: string, date: string): Promise<UsageRecord[]> {
   const store = getBlobStore(env);
-  const stored: UsageRecord[] = (await store.get(`usage:user:${userId}:${date}`, { type: "json", consistency: "strong" })) || [];
-  const pending = pendingUsageRecords(userId, date);
-  if (!pending.length) return stored;
-  const seen = new Set(pending.map((r) => r.requestId));
-  return pending.concat(stored.filter((r) => !seen.has(r.requestId)));
+  return (await store.get(`usage:user:${userId}:${date}`, { type: "json", consistency: "strong" })) || [];
 }
 
-/** 最近用量记录（含内存缓冲），供后台用量日志使用 */
+/** 最近用量记录，供后台用量日志使用 */
 export async function getRecentUsageRecords(env: any): Promise<UsageRecord[]> {
   const store = getBlobStore(env);
-  const stored: UsageRecord[] = (await store.get("usage:recent", { type: "json", consistency: "strong" })) || [];
-  const pending = pendingUsageRecords();
-  if (!pending.length) return stored;
-  const seen = new Set(pending.map((r) => r.requestId));
-  return pending.concat(stored.filter((r) => !seen.has(r.requestId)));
-}
-
-/** 立即把缓冲的用量/账本落库（备份、退出前检查等场景） */
-export async function flushUsageWrites(env: any): Promise<void> {
-  await flushWriteBehind(env);
+  return (await store.get("usage:recent", { type: "json", consistency: "strong" })) || [];
 }
 
 // ==========================================
@@ -996,7 +757,7 @@ export async function flushUsageWrites(env: any): Promise<void> {
 
 const AUDIT_GENESIS_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
 
-/** 审计链进程内缓存：管理操作原本每次都要读整条链（可能 1000 条）+ 写回 */
+/** 审计链请求内缓存：单次管理操作只需读一次整条链 */
 let auditChainCache: AuditLogRecord[] | null = null;
 let auditChainLoad: Promise<AuditLogRecord[]> | null = null;
 
@@ -1167,17 +928,9 @@ export async function getAppeals(env: any): Promise<AppealRecord[]> {
   return (await store.get("appeals:all", { type: "json", consistency: "strong" })) || [];
 }
 
-export async function deleteModel(env: any, modelId: string): Promise<void> {
-  const models = await getModels(env);
-  const filtered = models.filter((m) => m.id !== modelId);
-  await setModels(env, filtered);
-}
-
-export async function deleteProvider(env: any, providerId: string): Promise<void> {
-  const providers = await getProviders(env);
-  const filtered = providers.filter((p) => p.id !== providerId);
-  await setProviders(env, filtered);
-}
+// ==========================================
+// 11. 公告 (Announcements)
+// ==========================================
 
 export interface AnnouncementRecord {
   id: string;
@@ -1219,7 +972,7 @@ export async function saveAnnouncements(env: any, list: AnnouncementRecord[]): P
 }
 
 // ==========================================
-// 11. 初始引导数据 Seed
+// 12. 初始引导数据 Seed
 // ==========================================
 
 export async function seedInitialData(env: any): Promise<void> {
