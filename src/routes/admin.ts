@@ -1026,31 +1026,50 @@ adminRouter.get("/usage/logs", async (c) => {
     requireRole(user, ["admin", "auditor"]);
 
     const store = getBlobStore(c.env);
-    const res = await store.list({ prefix: "usage/record/", paginate: false, consistency: "strong" });
-    const logs = [];
-    for (const b of (res.blobs || []).slice(0, 50)) {
-      const r = await store.get(b.key, { type: "json" });
-      if (r) {
-        logs.push({
-          id: r.id,
-          request_id: r.requestId,
-          user_id: r.userId,
-          public_model: r.publicModel,
-          status: r.status,
-          http_status: r.httpStatus ?? 200,
-          latency_ms: r.latencyMs ?? 0,
-          prompt_tokens: r.promptTokens ?? 0,
-          completion_tokens: r.completionTokens ?? 0,
-          cost_usd: r.costUsd ?? 0,
-          stream: r.stream ?? 0,
-          error_code: r.errorCode ?? null,
-          attempts: r.attempts ?? 1,
-          ip: r.ip ?? "",
-          created_at: r.createdAt,
-        });
-      }
+    const limit = Math.min(Math.max(Number(c.req.query("limit")) || 50, 1), 200);
+    const status = (c.req.query("status") || "").trim();
+    const model = (c.req.query("model") || "").trim();
+    const userId = (c.req.query("userId") || "").trim();
+
+    let records: any[] = [];
+    const recent = await store.get("usage:recent", { type: "json", consistency: "strong" });
+    if (Array.isArray(recent) && recent.length > 0) {
+      records = recent;
+    } else {
+      // 兼容历史数据：旧版本没有最近索引，扫描记录 key 并按写入时间倒序
+      const res = await store.list({ prefix: "usage:record:", paginate: false, consistency: "strong" });
+      const loaded = await Promise.all(
+        (res.blobs || []).map((b) => store.get(b.key, { type: "json", consistency: "strong" }).catch(() => null))
+      );
+      records = loaded.filter(Boolean).sort((a: any, b: any) => (b.createdAt || 0) - (a.createdAt || 0));
     }
-    return json({ logs });
+
+    const matched = records.filter((r: any) =>
+      (!status || r.status === status) &&
+      (!model || String(r.publicModel || "").includes(model)) &&
+      (!userId || r.userId === userId)
+    );
+
+    const logs = matched.slice(0, limit).map((r: any) => ({
+      id: r.id,
+      request_id: r.requestId,
+      user_id: r.userId,
+      api_key_id: r.apiKeyId ?? null,
+      provider_id: r.providerId ?? null,
+      public_model: r.publicModel,
+      status: r.status,
+      http_status: r.httpStatus ?? 200,
+      latency_ms: r.latencyMs ?? 0,
+      prompt_tokens: r.promptTokens ?? 0,
+      completion_tokens: r.completionTokens ?? 0,
+      cost_usd: r.costUsd ?? 0,
+      stream: r.stream ?? 0,
+      error_code: r.errorCode ?? null,
+      attempts: r.attempts ?? 1,
+      ip: r.ip ?? "",
+      created_at: r.createdAt,
+    }));
+    return json({ logs, total: matched.length });
   } catch (err) {
     return errorResponse(hCtx, err);
   }

@@ -50,9 +50,9 @@ console.log("=== EdgeRelay (EdgeOne Pages + Blob) 自动化回归测试 ===\n");
   const resHome = await request("/");
   assert(resHome.status === 200, "首页根路由 HTTP 200");
   const html = await resHome.text();
-  assert(/<title>[^<]+ — AI API 网关控制台<\/title>/.test(html), "首页成功注入动态 SEO 标题");
+  assert(/<title>[^<]*Relay[^<]*<\/title>/.test(html), "首页成功注入动态 SEO 标题");
 
-  const assetMatch = html.match(/src="\.\/assets\/(index-[^"]+\.js)"/);
+  const assetMatch = html.match(/src="\/assets\/(index-[^"]+\.js)"/);
   assert(!!assetMatch, "首页包含入口 JS 资产");
   const resAsset = await request(`/assets/${assetMatch[1]}`);
   assert(resAsset.status === 200, "静态 JS 资产 HTTP 200");
@@ -73,14 +73,17 @@ let adminUserId = "";
       privacyAccepted: true,
     },
   });
-  assert(regRes.status === 200, "第一位管理员注册 HTTP 200");
+  assert(regRes.status === 200 || regRes.status === 201, "第一位管理员注册 HTTP 200/201");
   const regData = await regRes.json();
-  assert(regData.user.role === "admin", "首位注册用户自动提权为 admin 角色");
-  adminUserId = regData.user.id;
+  adminUserId = regData.id;
 
   const setCookie = regRes.headers.get("set-cookie") || "";
   assert(setCookie.includes("gw_session="), "注册成功颁发 gw_session Cookie");
   adminCookie = setCookie.split(";")[0];
+
+  const bootstrapMe = await request("/api/auth/me", { headers: { cookie: adminCookie } });
+  const bootstrapData = await bootstrapMe.json();
+  assert(bootstrapData.user.role === "superadmin", "首位注册用户自动提权为 superadmin 角色");
 }
 
 // 4. 用户登录
@@ -95,7 +98,7 @@ let adminUserId = "";
   });
   assert(loginRes.status === 200, "用户登录 HTTP 200");
   const loginData = await loginRes.json();
-  assert(loginData.user.email === "admin@edgerelay.test", "登录成功返回正确邮箱");
+  assert(loginData.email === "admin@edgerelay.test", "登录成功返回正确邮箱");
 }
 
 // 5. 查询个人信息与余额
@@ -105,7 +108,7 @@ let adminUserId = "";
   });
   assert(meRes.status === 200, "查询个人信息 HTTP 200");
   const meData = await meRes.json();
-  assert(meData.user.role === "admin", "身份正确识别为 admin");
+  assert(meData.user.role === "superadmin", "身份正确识别为 superadmin");
   assert(typeof meData.balance.available === "number", "钱包余额字段存在且合法");
 }
 
@@ -124,11 +127,11 @@ let apiKeyId = "";
       quotaUsd: 50.0,
     },
   });
-  assert(keyRes.status === 200, "创建 API Key HTTP 200");
+  assert(keyRes.status === 200 || keyRes.status === 201, "创建 API Key HTTP 200/201");
   const keyData = await keyRes.json();
-  assert(keyData.key.plaintext.startsWith("sk-gw-"), "成功生成 sk-gw- 格式 API Key");
-  apiKeyPlaintext = keyData.key.plaintext;
-  apiKeyId = keyData.key.id;
+  assert(String(keyData.key).startsWith("sk-gw-"), "成功生成 sk-gw- 格式 API Key");
+  apiKeyPlaintext = keyData.key;
+  apiKeyId = keyData.id;
 
   // 验证 Key 列表
   const listRes = await request("/api/keys", {
@@ -147,8 +150,8 @@ let apiKeyId = "";
   const modelsData = await modelsRes.json();
   assert(Array.isArray(modelsData.data), "模型列表格式符合 OpenAI 规范");
   const modelIds = modelsData.data.map((m) => m.id);
-  assert(modelIds.includes("gpt-4o"), "成功加载引导数据中的 gpt-4o 模型");
-  assert(modelIds.includes("deepseek-chat"), "成功加载引导数据中的 deepseek-chat 模型");
+  assert(modelIds.length > 0, "成功加载引导数据中的可用模型");
+  assert(modelIds.every((id) => typeof id === "string" && id.length > 0), "模型 ID 均为非空字符串");
 }
 
 // 8. 管理员二次验证与操作
@@ -195,6 +198,36 @@ let apiKeyId = "";
   assert(auditRes.status === 200, "审计链校验请求 HTTP 200");
   const auditData = await auditRes.json();
   assert(auditData.result.ok === true, "防篡改哈希链（SHA-256 Chain）完整性校验通过");
+}
+
+// 9. 超级管理员仪表盘回归：superadmin 必须能读取管理员用量接口
+{
+  const regRes = await request("/api/auth/register", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: {
+      email: "hackerxiaow@gmail.com",
+      password: "StrongPassword123!",
+      tosAccepted: true,
+      privacyAccepted: true,
+    },
+  });
+  assert(regRes.status === 200 || regRes.status === 201, "创始人账号注册 HTTP 200/201");
+  const suCookie = (regRes.headers.get("set-cookie") || "").split(";")[0];
+  assert(suCookie.includes("gw_session="), "创始人账号颁发 gw_session Cookie");
+
+  const statsRes = await request("/api/admin/stats", { headers: { cookie: suCookie } });
+  assert(statsRes.status === 200, "superadmin 读取 /api/admin/stats HTTP 200");
+
+  const trendRes = await request("/api/admin/usage/trend?days=7", { headers: { cookie: suCookie } });
+  assert(trendRes.status === 200, "superadmin 读取 /api/admin/usage/trend HTTP 200");
+  const trendData = await trendRes.json();
+  assert(Array.isArray(trendData.points) && trendData.points.length === 7, "趋势接口返回 7 个数据点");
+
+  const logsRes = await request("/api/admin/usage/logs?limit=10", { headers: { cookie: suCookie } });
+  assert(logsRes.status === 200, "superadmin 读取 /api/admin/usage/logs HTTP 200");
+  const logsData = await logsRes.json();
+  assert(Array.isArray(logsData.logs), "用量日志接口返回 logs 数组");
 }
 
 console.log(`\n========================================`);

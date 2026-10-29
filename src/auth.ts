@@ -82,7 +82,12 @@ export async function requireUser(c: HandlerCtx): Promise<SessionUser> {
 }
 
 export function requireRole(u: SessionUser, roles: SessionUser["role"][]): void {
-  if (!roles.includes(u.role)) throw new ApiError(403, ErrorCode.FORBIDDEN, "权限不足");
+  if (roles.includes(u.role)) return;
+  // superadmin 是最高层级，天然满足任何角色要求（admin/auditor/finance 等）
+  if (u.role === "superadmin") return;
+  // admin 向下继承 vip/user 的普通用户能力
+  if (u.role === "admin" && (roles.includes("vip") || roles.includes("user"))) return;
+  throw new ApiError(403, ErrorCode.FORBIDDEN, "权限不足");
 }
 
 /** 管理接口二次验证：需要已登录且通过 step-up（支持就地核验管理员密码，或 10 分钟凭证有效） */

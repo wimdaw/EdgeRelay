@@ -725,7 +725,14 @@ export async function addUsageRecord(env: any, record: UsageRecord): Promise<voi
 
   await store.setJSON(dailyKey, daily);
 
-  // 3. 用户/日期日用量列表追加（用于前端明细展示）
+  // 3. 最近记录索引（后台仪表盘只看最近几十条，避免全量扫描记录 key）
+  const recentKey = "usage:recent";
+  const recent: UsageRecord[] = (await store.get(recentKey, { type: "json", consistency: "strong" })) || [];
+  recent.unshift(record);
+  if (recent.length > 200) recent.length = 200;
+  await store.setJSON(recentKey, recent);
+
+  // 4. 用户/日期日用量列表追加（用于前端明细展示）
   const userDailyKey = `usage:user:${record.userId}:${date}`;
   const userList: UsageRecord[] = (await store.get(userDailyKey, { type: "json", consistency: "strong" })) || [];
   userList.unshift(record);
