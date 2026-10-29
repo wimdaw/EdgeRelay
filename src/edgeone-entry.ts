@@ -25,6 +25,13 @@ import app from "./index";
 export async function onRequest(context: any) {
   const incoming: Request = context.request;
 
+  // 诊断：记录本次调用上下文中可用的能力（waitUntil 等），供 /health 探针读取
+  const ctx: any = context || {};
+  const g: any = globalThis as any;
+  g.__EO_CTX_KEYS = Object.keys(ctx);
+  g.__EO_CTX_WAITUNTIL = typeof ctx.waitUntil === "function";
+  g.__EO_CTX_ENV_KEYS = Object.keys(ctx.env || {});
+
   const env = {
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || "edgerelay-default-encryption-secret-32b",
     SESSION_SECRET: process.env.SESSION_SECRET || "edgerelay-default-session-secret-32b",

@@ -44,6 +44,9 @@ app.get("/health", (c) =>
     storage: "edgeone-blob",
     instance: INSTANCE_ID,
     requests: ++instanceRequests,
+    ctxKeys: (globalThis as any).__EO_CTX_KEYS ?? null,
+    waitUntil: (globalThis as any).__EO_CTX_WAITUNTIL ?? null,
+    envKeys: (globalThis as any).__EO_CTX_ENV_KEYS ?? null,
   })
 );
 
