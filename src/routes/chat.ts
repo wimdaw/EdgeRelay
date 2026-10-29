@@ -355,6 +355,7 @@ chatRouter.post("/", async (c) => {
     /* ---- 依次尝试上游（故障转移与多 Key 容灾） ---- */
     let attempts = 0;
     let lastUpstreamError = "";
+    let lastUpstreamStatus = 0;
     const candidateRoutes = routes.slice(0, 5);
 
     const recordFailure = async (route: UpstreamRoute, status?: number) => {
@@ -434,6 +435,7 @@ chatRouter.post("/", async (c) => {
 
         if (!resp.ok) {
           lastUpstreamError = `status ${resp.status}`;
+          lastUpstreamStatus = resp.status;
           await recordFailure(route, resp.status);
           const isAuthOrQuota = resp.status === 401 || resp.status === 402;
           if (RETRYABLE_STATUS.has(resp.status) || (isAuthOrQuota && attempts < candidateRoutes.length)) {
@@ -590,6 +592,11 @@ chatRouter.post("/", async (c) => {
       ip,
       createdAt: Math.floor(Date.now() / 1000),
     }, keyId);
+
+    // 全部上游都返回 429 时，保留限流语义，避免客户端把限流误判为服务故障
+    if (lastUpstreamStatus === 429) {
+      return openAiError(429, ErrorCode.RATE_LIMITED, `所有可用上游均限流（已尝试 ${attempts} 条路由），请稍后重试：${lastUpstreamError}`, { retry_after: 5 });
+    }
 
     return openAiError(502, ErrorCode.UPSTREAM_ERROR, `所有可用上游均调用失败（已尝试 ${attempts} 条路由）：${lastUpstreamError}`);
   } catch (err) {

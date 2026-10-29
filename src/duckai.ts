@@ -31,7 +31,7 @@ const DEFAULT_HEADERS: Record<string, string> = {
 /**
  * Duck.ai 按出口 IP 限流：实测 3 并发仍正常，8 并发约 5/8 返回 429，
  * 且 429 会同时命中 status 与 chat，触发后同一 IP 约 1 分钟内持续 429。
- * 因此单实例内限制并发为 2，并对 429 做短退避重试，避免自身突发把整条渠道打挂。
+ * 因此单实例内串行处理并保持最小间隔，并对 429 做短退避重试，避免自身突发把整条渠道打挂。
  */
 const DUCKAI_MAX_CONCURRENCY = 1;
 const DUCKAI_MIN_INTERVAL_MS = 1500;
