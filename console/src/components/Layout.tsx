@@ -51,14 +51,13 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
   // 红点只统计还没看过的公告；打开铃铛或弹窗展示后会写入已读，不再显示 1
   const seenAnnIds = getSeenAnnouncementIds(meKey);
   const bellCount = anns.filter((a) => !seenAnnIds.has(a.id)).length;
-  const toggleBell = () => {
-    const next = !bellOpen;
-    setBellOpen(next);
-    if (next && anns.length) {
-      markAnnouncementsSeen(meKey, anns.map((a) => a.id));
-      setAnnTick((t) => t + 1);
-    }
-  };
+  const toggleBell = () => setBellOpen((v) => !v);
+  // 铃铛打开即视为看过列表（含晚到的公告数据），写入已读后红点消失
+  useEffect(() => {
+    if (!bellOpen || anns.length === 0) return;
+    markAnnouncementsSeen(meKey, anns.map((a) => a.id));
+    setAnnTick((t) => t + 1);
+  }, [bellOpen, anns, meKey]);
   const { theme, toggle } = useTheme();
   const loc = useLocation();
   const navigate = useNavigate();

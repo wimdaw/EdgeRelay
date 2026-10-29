@@ -876,17 +876,23 @@ export interface AnnouncementRecord {
 
 export async function getAnnouncements(env: any): Promise<AnnouncementRecord[]> {
   const store = getBlobStore(env);
-  return (await store.get("announcements:all", { type: "json", consistency: "strong" })) || [
+  const existing = (await store.get("announcements:all", { type: "json", consistency: "strong" })) as AnnouncementRecord[] | null;
+  if (existing) return existing;
+  // 首次读取时把欢迎公告落库，避免兜底数据的创建时间每次请求都变成"刚刚"
+  const now = Math.floor(Date.now() / 1000);
+  const seeded: AnnouncementRecord[] = [
     {
       id: "anno_welcome",
       title: "欢迎使用 Relay AI API 边缘网关",
       content: "系统已成功迁移并运行于腾讯云 EdgeOne Pages + Blob 强一致性数据库。",
       popup: 0,
       enabled: 1,
-      created_at: Math.floor(Date.now() / 1000),
-      updated_at: Math.floor(Date.now() / 1000),
+      created_at: now,
+      updated_at: now,
     },
   ];
+  await store.setJSON("announcements:all", seeded);
+  return seeded;
 }
 
 export async function saveAnnouncements(env: any, list: AnnouncementRecord[]): Promise<void> {
