@@ -219,6 +219,19 @@ function injectCompatMarker(messages: any[], block: string, probe: string): void
  * 客户端本来不带工具时补 tool_choice='none'，避免模型真去调用这些占位定义。
  * 幂等：重复调用（重试/客户端已注入）不会二次追加。
  */
+/**
+ * 免费层工具名黑名单（2026-10-29 实证）：客户端 tools 里只要有一个工具名
+ * （大小写不敏感、子串匹配）命中，官方源站就把整包判定为非官方客户端，
+ * 直接返回 429 FreeUsageLimitError，与工具数量、schema、请求体大小均无关。
+ * 已知命中项来自 ZCode 的动态工作流工具，必须在转发前剔除，否则整轮对话必然失败。
+ */
+const OPENCODE_BLOCKED_TOOL_PATTERNS = ['getworkflowrun', 'fillworkflowhole']
+
+function isBlockedClientTool(tool: any): boolean {
+  const name = String(tool?.function?.name ?? tool?.name ?? '').toLowerCase()
+  return name.length > 0 && OPENCODE_BLOCKED_TOOL_PATTERNS.some((pattern) => name.includes(pattern))
+}
+
 export function ensureOpenCodeCompat(payload: any): void {
   const messages = Array.isArray(payload?.messages) ? payload.messages : null
   if (!messages || messages.length === 0) return
@@ -228,7 +241,21 @@ export function ensureOpenCodeCompat(payload: any): void {
   // 客户端工具与官方工具同名时，上游会以 "must not be specified more than once" 400 拒绝，
   // 因此这里剔除客户端的重名项（官方定义必须保留，它是免费层校验依据）。
   const officialNames = new Set(OPENCODE_OFFICIAL_TOOLS.map((tool) => tool.function.name))
-  const clientTools = tools.filter((tool) => !officialNames.has(tool?.function?.name ?? tool?.name))
+  const blockedNames = new Set<string>()
+  const clientTools = tools.filter((tool) => {
+    const name = tool?.function?.name ?? tool?.name
+    if (officialNames.has(name)) return false
+    if (isBlockedClientTool(tool)) {
+      if (typeof name === 'string') blockedNames.add(name)
+      return false
+    }
+    return true
+  })
+  // 客户端强制指定了被剔除的工具时，tool_choice 会指向不存在的函数导致 400，这里降级为 auto。
+  const forcedName = payload?.tool_choice?.function?.name ?? payload?.tool_choice?.name
+  if (typeof forcedName === 'string' && blockedNames.has(forcedName)) {
+    payload.tool_choice = clientTools.length > 0 ? 'auto' : 'none'
+  }
   const alreadyPrepended =
     clientTools.length === tools.length &&
     tools.length >= OPENCODE_OFFICIAL_TOOLS.length &&
