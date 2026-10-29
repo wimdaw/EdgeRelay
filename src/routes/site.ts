@@ -8,7 +8,7 @@ import { getSettings, json } from "../settings";
 import { requireUser } from "../auth";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
 import { uuid } from "../crypto";
-import { appendAppeal, getAppeals } from "../storage/db";
+import { appendAppeal, getAppeals, getAnnouncements } from "../storage/db";
 
 export const siteRouter = new Hono<{ Bindings: Env }>();
 
@@ -42,19 +42,15 @@ siteRouter.get("/site", async (c) => {
   });
 });
 
-/** 公告：格式严格对齐 { announcements: [...] } */
+/** 公告：读取后台真实公告（仅启用项，按时间倒序） */
 siteRouter.get("/announcements", async (c) => {
-  return json({
-    announcements: [
-      {
-        id: "anno_welcome",
-        title: "欢迎使用 Relay AI API 边缘网关",
-        content: "系统已成功迁移并运行于腾讯云 EdgeOne Pages + Blob 强一致性数据库。",
-        popup: 0,
-        createdAt: Math.floor(Date.now() / 1000),
-      },
-    ],
-  });
+  const list = await getAnnouncements(c.env);
+  const announcements = list
+    .filter((a) => a.enabled === 1)
+    .sort((a, b) => b.created_at - a.created_at)
+    .slice(0, 20)
+    .map((a) => ({ id: a.id, title: a.title, content: a.content, popup: a.popup, created_at: a.created_at }));
+  return json({ announcements });
 });
 
 /** 申诉 */

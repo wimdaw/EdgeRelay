@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Bell, Boxes, CircleUser, Coins, Gauge, Gift, KeyRound, Layers, LogOut, Megaphone, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, ShieldCheck, Sun, Users, X } from "lucide-react";
 import { api, type Me, type SiteInfo } from "../lib/api";
+import { getSeenAnnouncementIds, markAnnouncementsSeen } from "../lib/announcements";
 import { cn, fmtMoney } from "../lib/utils";
 import { Button, useToast } from "./ui";
 
@@ -36,7 +37,7 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
   const [drawer, setDrawer] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
   const [anns, setAnns] = useState<Ann[]>([]);
-  // 公告被"下次再说/不再提示"后重新过滤红点
+  // 公告被"下次再说/不再提示"后重新过滤列表；打开铃铛/看过弹窗后重新计算红点
   const [annTick, setAnnTick] = useState(0);
   useEffect(() => {
     const h = () => setAnnTick((t) => t + 1);
@@ -44,11 +45,20 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
     return () => window.removeEventListener("gw:ann-changed", h);
   }, []);
   useEffect(() => { api<{ announcements: Ann[] }>("/api/announcements").then((d) => setAnns(d.announcements)).catch(() => setAnns([])); }, []);
-  // 红点只统计未关闭的公告（与弹窗的"下次再说/不再提示"逻辑一致）
   const meKey = me.user.id;
   void annTick; // 事件触发时强制重算
   const visibleAnns = anns.filter((a) => !localStorage.getItem(`ann-never-${a.id}-${meKey}`) && !sessionStorage.getItem(`ann-later-${a.id}-${meKey}`));
-  const bellCount = visibleAnns.length;
+  // 红点只统计还没看过的公告；打开铃铛或弹窗展示后会写入已读，不再显示 1
+  const seenAnnIds = getSeenAnnouncementIds(meKey);
+  const bellCount = anns.filter((a) => !seenAnnIds.has(a.id)).length;
+  const toggleBell = () => {
+    const next = !bellOpen;
+    setBellOpen(next);
+    if (next && anns.length) {
+      markAnnouncementsSeen(meKey, anns.map((a) => a.id));
+      setAnnTick((t) => t + 1);
+    }
+  };
   const { theme, toggle } = useTheme();
   const loc = useLocation();
   const navigate = useNavigate();
@@ -226,7 +236,7 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
           <button className="hidden rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink sm:block" onClick={followSystem} aria-label="跟随系统主题">
             <Monitor size={16} />
           </button>
-          <button className="relative rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink" onClick={() => setBellOpen(!bellOpen)} aria-label="站内通知">
+          <button className="relative rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink" onClick={toggleBell} aria-label="站内通知">
             <Bell size={16} />
             {bellCount > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-err px-1 text-[10px] font-medium text-white">{bellCount}</span>}
           </button>

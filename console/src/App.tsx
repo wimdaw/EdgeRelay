@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { api, type Me, type SiteInfo } from "./lib/api";
+import { markAnnouncementsSeen } from "./lib/announcements";
 import Layout from "./components/Layout";
 import { ToastProvider, useStepUp } from "./components/ui";
 import Login from "./pages/Login";
@@ -60,11 +61,15 @@ function AnnouncementPopup({ meKey }: { meKey: string }) {
         if (localStorage.getItem(`ann-never-${popup.id}-${meKey}`)) return;
         if (sessionStorage.getItem(`ann-later-${popup.id}-${meKey}`)) return;
         setAnn(popup);
+        // 弹窗一旦展示即视为已读，铃铛红点不再计数
+        markAnnouncementsSeen(meKey, [popup.id]);
+        window.dispatchEvent(new CustomEvent("gw:ann-changed"));
       }).catch(() => {});
   }, [meKey]);
   if (!ann) return null;
   const dismiss = (never: boolean) => {
     (never ? localStorage : sessionStorage).setItem(`${never ? "ann-never" : "ann-later"}-${ann.id}-${meKey}`, "1");
+    markAnnouncementsSeen(meKey, [ann.id]);
     setAnn(null);
     window.dispatchEvent(new CustomEvent("gw:ann-changed")); // 通知顶栏铃铛重新过滤红点
   };
