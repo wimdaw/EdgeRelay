@@ -10,6 +10,14 @@ const RANGES = [
   { key: 1, label: "24h" }, { key: 7, label: "7d" }, { key: 30, label: "30d" },
 ];
 
+const fmtAxis = (v: number) => {
+  if (v >= 1e6) return `${+(v / 1e6).toFixed(1)}M`;
+  if (v >= 1e3) return `${+(v / 1e3).toFixed(1)}k`;
+  return String(v);
+};
+
+const shortModel = (v: string) => (v.length > 18 ? `${v.slice(0, 17)}…` : v);
+
 export default function Dashboard() {
   const { me } = useOutletContext<{ me: Me }>();
   const isSuperadmin = me.user.role === "superadmin";
@@ -115,14 +123,14 @@ export default function Dashboard() {
         <div className="h-64">
           {trend === null ? <Skeleton className="h-full" /> : (
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trend} margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
+              <AreaChart data={trend} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
                 <defs>
                   <linearGradient id="gReq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F38020" stopOpacity={0.35} /><stop offset="100%" stopColor="#F38020" stopOpacity={0} /></linearGradient>
                   <linearGradient id="gTok" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#2563EB" stopOpacity={0.3} /><stop offset="100%" stopColor="#2563EB" stopOpacity={0} /></linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--c-line))" vertical={false} />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: "rgb(var(--c-muted))" }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: "rgb(var(--c-muted))" }} tickLine={false} axisLine={false} />
+                <YAxis width={44} tickFormatter={fmtAxis} tick={{ fontSize: 11, fill: "rgb(var(--c-muted))" }} tickLine={false} axisLine={false} />
                 <Tooltip contentStyle={{ background: "rgb(var(--c-surface))", border: "1px solid rgb(var(--c-line))", borderRadius: 10, fontSize: 12 }} />
                 <Area type="monotone" dataKey="requests" name="请求数" stroke="#F38020" strokeWidth={2} fill="url(#gReq)" />
                 <Area type="monotone" dataKey="tokens" name="Tokens" stroke="#2563EB" strokeWidth={2} fill="url(#gTok)" />
@@ -142,7 +150,7 @@ export default function Dashboard() {
                 <BarChart data={stats.byModel} layout="vertical" margin={{ left: 8, right: 16 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--c-line))" horizontal={false} />
                   <XAxis type="number" tick={{ fontSize: 11, fill: "rgb(var(--c-muted))" }} tickLine={false} axisLine={false} />
-                  <YAxis type="category" dataKey="public_model" width={100} tick={{ fontSize: 11, fill: "rgb(var(--c-muted))" }} tickLine={false} axisLine={false} />
+                  <YAxis type="category" dataKey="public_model" width={128} tickFormatter={shortModel} tick={{ fontSize: 10, fill: "rgb(var(--c-muted))" }} tickLine={false} axisLine={false} />
                   <Tooltip contentStyle={{ background: "rgb(var(--c-surface))", border: "1px solid rgb(var(--c-line))", borderRadius: 10, fontSize: 12 }} />
                   <Bar dataKey="n" name="请求数" radius={[0, 6, 6, 0]} fill="#F38020" />
                 </BarChart>
