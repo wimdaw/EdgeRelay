@@ -15,6 +15,7 @@ import Usage from "./pages/Usage";
 import Audit from "./pages/Audit";
 import Users from "./pages/Users";
 import Profile from "./pages/Profile";
+import Backup from "./pages/Backup";
 import Invite from "./pages/Invite";
 import Announcements from "./pages/Announcements";
 import { Dialog, Button } from "./components/ui";
@@ -118,6 +119,7 @@ function Shell() {
         <Route path="/dashboard/models" element={me ? <ModelPool me={me} /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/usage" element={me ? <Usage /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/profile" element={me ? <Profile me={me} onRefresh={refresh} /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/backup" element={isSuperadmin ? <Backup /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/invite" element={me ? <Invite me={me} /> : <Navigate to="/login" replace />} />
         {/* 权限受控页面 */}
         <Route path="/dashboard/providers" element={isSuperadmin ? <Providers /> : <Navigate to="/dashboard" replace />} />

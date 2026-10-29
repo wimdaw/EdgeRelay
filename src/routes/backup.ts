@@ -19,6 +19,13 @@ import {
   deleteBackupSnapshot,
   type BackupFile,
 } from "../backup";
+import {
+  getTelegramStatus,
+  saveTelegramConfig,
+  clearTelegramConfig,
+  sendTelegramTest,
+  pushBackupToTelegram,
+} from "../backup-telegram";
 
 export const backupRouter = new Hono<{ Bindings: Env }>();
 
@@ -177,6 +184,101 @@ backupRouter.post("/delete", async (c) => {
     });
 
     return json({ ok: true, message: "快照已删除" });
+  } catch (err) {
+    return errorResponse(hCtx, err);
+  }
+});
+
+/** Telegram 备份配置状态（Token 只返回掩码） */
+backupRouter.get("/telegram", async (c) => {
+  const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
+  try {
+    await requireSuperadmin(hCtx);
+    return json({ ok: true, ...(await getTelegramStatus(c.env)) });
+  } catch (err) {
+    return errorResponse(hCtx, err);
+  }
+});
+
+/** 保存 Telegram 机器人配置 */
+backupRouter.post("/telegram", async (c) => {
+  const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
+  try {
+    const admin = await requireSuperadminStepUp(hCtx);
+    const body = await readJsonBody<{ botToken?: string; chatId?: string }>(c);
+    const status = await saveTelegramConfig(c.env, body);
+
+    await audit(hCtx, {
+      actorUserId: admin.id,
+      actorIp: clientIp(hCtx.req),
+      action: "admin.backup_telegram_save",
+      targetType: "backup",
+      meta: { chatId: status.chatId },
+    });
+
+    return json({ ok: true, message: "Telegram 备份配置已保存", status });
+  } catch (err) {
+    return errorResponse(hCtx, err);
+  }
+});
+
+/** 发送 Telegram 测试消息（可用未保存的表单值） */
+backupRouter.post("/telegram/test", async (c) => {
+  const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
+  try {
+    const admin = await requireSuperadminStepUp(hCtx);
+    const body = await readJsonBody<{ botToken?: string; chatId?: string }>(c);
+    const message = await sendTelegramTest(c.env, body);
+
+    await audit(hCtx, {
+      actorUserId: admin.id,
+      actorIp: clientIp(hCtx.req),
+      action: "admin.backup_telegram_test",
+      targetType: "backup",
+    });
+
+    return json({ ok: true, message });
+  } catch (err) {
+    return errorResponse(hCtx, err);
+  }
+});
+
+/** 把全站备份作为 JSON 文件推送到 Telegram */
+backupRouter.post("/telegram/push", async (c) => {
+  const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
+  try {
+    const admin = await requireSuperadminStepUp(hCtx);
+    const result = await pushBackupToTelegram(c.env);
+
+    await audit(hCtx, {
+      actorUserId: admin.id,
+      actorIp: clientIp(hCtx.req),
+      action: "admin.backup_telegram_push",
+      targetType: "backup",
+      meta: { entries: result.entries },
+    });
+
+    return json({ ok: true, message: result.message, entries: result.entries });
+  } catch (err) {
+    return errorResponse(hCtx, err);
+  }
+});
+
+/** 清除 Telegram 备份配置 */
+backupRouter.post("/telegram/clear", async (c) => {
+  const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
+  try {
+    const admin = await requireSuperadminStepUp(hCtx);
+    await clearTelegramConfig(c.env);
+
+    await audit(hCtx, {
+      actorUserId: admin.id,
+      actorIp: clientIp(hCtx.req),
+      action: "admin.backup_telegram_clear",
+      targetType: "backup",
+    });
+
+    return json({ ok: true, message: "Telegram 备份配置已清除" });
   } catch (err) {
     return errorResponse(hCtx, err);
   }

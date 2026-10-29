@@ -331,6 +331,76 @@ let apiKeyId = "";
   assert(!listAfter.snapshots.some((item) => item.id === snapshot.id), "删除后快照不再出现在列表");
 }
 
+// 11. Telegram 机器人备份
+{
+  const jsonHeaders = { cookie: adminCookie, "content-type": "application/json" };
+  const testToken = "123456789:AA_test_token_abcdefghijklmnopqrstuvwxyz";
+
+  // 11.1 保存配置（Token 加密落盘，接口只回掩码）
+  const saveRes = await request("/api/admin/backup/telegram", {
+    method: "POST",
+    headers: jsonHeaders,
+    body: { botToken: testToken, chatId: "-1001234567890" },
+  });
+  assert(saveRes.status === 200, "保存 Telegram 配置 HTTP 200");
+  const saveData = await saveRes.json();
+  assert(saveData.status.configured === true, "Telegram 配置状态为已配置");
+  assert(saveData.status.botTokenMasked && !saveData.status.botTokenMasked.includes("AA_test_token"), "Telegram Bot Token 仅返回掩码");
+
+  // 11.2 读取配置状态
+  const statusRes = await request("/api/admin/backup/telegram", { headers: { cookie: adminCookie } });
+  assert(statusRes.status === 200, "读取 Telegram 配置 HTTP 200");
+  const statusData = await statusRes.json();
+  assert(statusData.configured === true && statusData.chatId === "-1001234567890", "Telegram Chat ID 持久化正确");
+
+  // 11.3 全站备份不包含 Telegram 配置（backup: 前缀）
+  const exportRes = await request("/api/admin/backup/export", { headers: { cookie: adminCookie } });
+  const exportData = await exportRes.json();
+  assert(!exportData.entries.some((entry) => entry.key === "backup:telegram"), "全站备份不包含 Telegram Bot Token");
+
+  // 11.4 测试消息与推送备份（拦截 Telegram 网络请求）
+  const realFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), init });
+    return new Response(JSON.stringify({ ok: true, result: { message_id: 1 } }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  };
+  try {
+    const testRes = await request("/api/admin/backup/telegram/test", {
+      method: "POST",
+      headers: jsonHeaders,
+      body: {},
+    });
+    assert(testRes.status === 200, "发送 Telegram 测试消息 HTTP 200");
+    assert(calls.some((call) => call.url.includes("/sendMessage")), "测试消息调用 Telegram sendMessage");
+
+    const pushRes = await request("/api/admin/backup/telegram/push", {
+      method: "POST",
+      headers: jsonHeaders,
+      body: {},
+    });
+    assert(pushRes.status === 200, "推送备份到 Telegram HTTP 200");
+    const pushCall = calls.find((call) => call.url.includes("/sendDocument"));
+    assert(!!pushCall, "推送备份调用 Telegram sendDocument");
+    assert(pushCall.init.body instanceof FormData, "推送内容为 multipart FormData 文件");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+
+  // 11.5 清除配置
+  const clearRes = await request("/api/admin/backup/telegram/clear", {
+    method: "POST",
+    headers: jsonHeaders,
+    body: {},
+  });
+  assert(clearRes.status === 200, "清除 Telegram 配置 HTTP 200");
+  const statusAfter = await (await request("/api/admin/backup/telegram", { headers: { cookie: adminCookie } })).json();
+  assert(statusAfter.configured === false, "清除后 Telegram 配置状态为未配置");
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

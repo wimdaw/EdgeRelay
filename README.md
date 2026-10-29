@@ -21,9 +21,11 @@
 4. **前端 SPA 静态资产一体化内嵌**：
    - 前端管理控制台（Landing 官网 + 登录注册 + 全部 Dashboard）产物完整内嵌进云函数 Bundle，彻底杜绝 EdgeOne makers 模式下根目录静态文件 404 的问题。
    - 根路径与页面路由访问时自动注入动态 SEO 标题、站点描述与自定义 Logo。
-5. **个人主页内置全站备份 / 恢复**：
+5. **独立「数据备份」控制台页面**：
+   - 位于侧边栏「个人主页」下方，仅超级管理员可见。
    - 支持导出/导入完整 JSON 备份，覆盖用户、密钥、渠道、模型、计费、用量与审计日志。
    - 支持生成保存在 EdgeOne Blob 的站内快照（最多 10 份），无需 R2 等外部对象存储。
+   - 支持 Telegram 机器人备份：加密保存 Bot Token，可发送测试消息并把完整备份文件推送到指定会话。
 6. **完整保留原版所有合规与安全特性**：
    - 供应商授权协议编号存证 (`authorization_ref`)。
    - 上游密钥 AES-256-GCM 密文落盘，内存短暂解密。
@@ -112,6 +114,10 @@ npm run deploy
 | `/api/admin/backup/snapshot` | POST | 生成站内快照（保存在 EdgeOne Blob） |
 | `/api/admin/backup/restore` | POST | 恢复指定站内快照 |
 | `/api/admin/backup/delete` | POST | 删除指定站内快照 |
+| `/api/admin/backup/telegram` | GET / POST | 读取 / 保存 Telegram 机器人备份配置 |
+| `/api/admin/backup/telegram/test` | POST | 发送 Telegram 测试消息 |
+| `/api/admin/backup/telegram/push` | POST | 推送完整备份文件到 Telegram |
+| `/api/admin/backup/telegram/clear` | POST | 清除 Telegram 机器人配置 |
 | `/api/admin/stats` | GET | 24小时调用量与延迟统计 |
 | `/api/admin/usage/trend`| GET | 用量图表数据走势 |
 | `/api/site` | GET | 动态站点信息与 SEO 配置 |
