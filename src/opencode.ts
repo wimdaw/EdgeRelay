@@ -113,7 +113,7 @@ export interface OpenCodeTestResult {
   success: boolean
   message: string
   statusCode?: number
-  data?: unknown
+  data?: any
 }
 
 export function isOpenCodeProvider(providerId: string): boolean {

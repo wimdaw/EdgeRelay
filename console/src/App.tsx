@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { api, type Me, type SiteInfo } from "./lib/api";
 import { markAnnouncementsSeen } from "./lib/announcements";
@@ -6,20 +6,22 @@ import Layout from "./components/Layout";
 import { ToastProvider, useStepUp } from "./components/ui";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
-import Dashboard from "./pages/Dashboard";
-import Keys from "./pages/Keys";
-import Providers from "./pages/Providers";
-import ModelPool from "./pages/ModelPool";
-import Pricing from "./pages/Pricing";
-import Usage from "./pages/Usage";
-import Audit from "./pages/Audit";
-import Users from "./pages/Users";
-import Profile from "./pages/Profile";
-import Backup from "./pages/Backup";
-import Invite from "./pages/Invite";
-import Announcements from "./pages/Announcements";
 import { Dialog, Button } from "./components/ui";
-import Settings from "./pages/Settings";
+
+// 控制台页面按需加载：首屏官网/登录不再被迫下载 recharts 等 375KB 大包
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Keys = lazy(() => import("./pages/Keys"));
+const Providers = lazy(() => import("./pages/Providers"));
+const ModelPool = lazy(() => import("./pages/ModelPool"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const Usage = lazy(() => import("./pages/Usage"));
+const Audit = lazy(() => import("./pages/Audit"));
+const Users = lazy(() => import("./pages/Users"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Backup = lazy(() => import("./pages/Backup"));
+const Invite = lazy(() => import("./pages/Invite"));
+const Announcements = lazy(() => import("./pages/Announcements"));
+const Settings = lazy(() => import("./pages/Settings"));
 
 declare global {
   interface Window {
@@ -108,6 +110,7 @@ function Shell() {
     <>
     {stepUpEl}
     {me && <AnnouncementPopup meKey={me.user.id} />}
+    <Suspense fallback={<div className="flex min-h-[40vh] items-center justify-center text-[13px] text-muted">加载中…</div>}>
     <Routes>
       {/* 公开官网 */}
       <Route path="/" element={<Landing site={site} me={me} />} />
@@ -131,6 +134,7 @@ function Shell() {
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
     </>
   );
 }

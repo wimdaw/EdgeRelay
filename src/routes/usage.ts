@@ -64,25 +64,20 @@ usageRouter.get("/trend", async (c) => {
   try {
     const user = await requireUser(hCtx);
     const days = Math.min(Number(c.req.query("days")) || 7, 30);
-    const points = [];
     const now = Date.now();
 
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(now - i * 86400 * 1000).toISOString().slice(0, 10);
-      const records = await getUserUsageRecords(c.env, user.id, d);
+    // 各天数据并发读取：7/14/30 天分别从 N 轮串行降为 1 轮
+    const dates = Array.from({ length: days }, (_, i) => new Date(now - (days - 1 - i) * 86400 * 1000).toISOString().slice(0, 10));
+    const allRecords = await Promise.all(dates.map((d) => getUserUsageRecords(c.env, user.id, d)));
+
+    const points = dates.map((d, idx) => {
+      const records = allRecords[idx]!;
       const requests = records.length;
       const tokens = records.reduce((a, r) => a + (r.promptTokens || 0) + (r.completionTokens || 0), 0);
       const errors = records.filter((r) => r.status !== "success").length;
       const cost = records.reduce((a, r) => a + (r.costUsd || 0), 0);
-
-      points.push({
-        date: d,
-        requests,
-        tokens,
-        errors,
-        cost,
-      });
-    }
+      return { date: d, requests, tokens, errors, cost };
+    });
 
     return json({ days, points });
   } catch (err) {

@@ -88,10 +88,20 @@ function hexToBuf(hex: string): Uint8Array {
 
 /* ---------- AES-256-GCM（上游供应商密钥加密） ---------- */
 
+let cachedAes: { secret: string; key: Promise<CryptoKey> } | null = null;
+
 async function aesKey(env: Env): Promise<CryptoKey> {
   const secret = String(env.ENCRYPTION_KEY || "edgerelay-default-encryption-secret-32b");
-  const material = await crypto.subtle.digest("SHA-256", enc.encode(secret));
-  return crypto.subtle.importKey("raw", material, { name: "AES-GCM" }, false, ["encrypt", "decrypt"]);
+  if (cachedAes && cachedAes.secret === secret) return cachedAes.key;
+  const key = crypto.subtle
+    .digest("SHA-256", enc.encode(secret))
+    .then((material) => crypto.subtle.importKey("raw", material, { name: "AES-GCM" }, false, ["encrypt", "decrypt"]))
+    .catch((err) => {
+      if (cachedAes && cachedAes.secret === secret) cachedAes = null;
+      throw err;
+    });
+  cachedAes = { secret, key };
+  return key;
 }
 
 export async function encryptSecret(env: Env, plaintext: string): Promise<string> {
@@ -105,7 +115,13 @@ export async function encryptSecret(env: Env, plaintext: string): Promise<string
   return `v1:${bufToHex(iv.buffer)}:${bufToHex(ct)}`;
 }
 
+/** 上游密钥明文缓存：同一密文只解密一次（热路径每个请求都要构造上游 Header） */
+const plaintextCache = new Map<string, string>();
+const PLAINTEXT_CACHE_MAX = 4096;
+
 export async function decryptSecret(env: Env, blob: string): Promise<string> {
+  const hit = plaintextCache.get(blob);
+  if (hit !== undefined) return hit;
   const [version, ivHex, ctHex] = blob.split(":");
   if (version !== "v1") throw new Error("unsupported ciphertext version");
   const key = await aesKey(env);
@@ -114,7 +130,10 @@ export async function decryptSecret(env: Env, blob: string): Promise<string> {
     key,
     hexToBuf(ctHex) as BufferSource
   );
-  return dec.decode(pt);
+  const plain = dec.decode(pt);
+  if (plaintextCache.size >= PLAINTEXT_CACHE_MAX) plaintextCache.clear();
+  plaintextCache.set(blob, plain);
+  return plain;
 }
 
 /* ---------- 平台 API Key 生成 ---------- */

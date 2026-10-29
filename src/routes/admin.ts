@@ -21,7 +21,7 @@ import {
   upsertProvider,
   deleteProvider,
   getProviderKeys,
-  upsertProviderKey,
+  bulkUpsertProviderKeys,
   deleteProviderKey,
   updateProviderKeyStatus,
   getModels,
@@ -35,11 +35,13 @@ import {
   getContentFlags,
   getAppeals,
   getDailyUsage,
+  getRecentUsageRecords,
   getAnnouncements,
   saveAnnouncements,
   getBlobStore,
 } from "../storage/db";
 import { readKeyHealth } from "../key-health";
+import { mapLimit } from "../storage/cache";
 
 export const adminRouter = new Hono<{ Bindings: Env }>();
 
@@ -142,22 +144,21 @@ adminRouter.post("/actions", async (c) => {
       case "list_users": {
         const users = await listAllUsers(env);
         const { getBalance } = await import("../billing");
-        const safe = await Promise.all(
-          users.map(async (u) => {
-            const bal = await getBalance(env, `user:${u.id}`);
-            return {
-              id: u.id,
-              email: u.email,
-              role: u.role,
-              status: u.status,
-              balance: bal.available ?? 0,
-              frozen: bal.frozen ?? 0,
-              currency: bal.currency ?? "CNY",
-              unlimited: u.role === "superadmin",
-              created_at: u.createdAt,
-            };
-          })
-        );
+        // 有界并发读取钱包，避免一次性打爆 Blob
+        const safe = await mapLimit(users, 8, async (u) => {
+          const bal = await getBalance(env, `user:${u.id}`);
+          return {
+            id: u.id,
+            email: u.email,
+            role: u.role,
+            status: u.status,
+            balance: bal.available ?? 0,
+            frozen: bal.frozen ?? 0,
+            currency: bal.currency ?? "CNY",
+            unlimited: u.role === "superadmin",
+            created_at: u.createdAt,
+          };
+        });
         return json({ ok: true, users: safe });
       }
       case "set_role": {
@@ -259,37 +260,39 @@ adminRouter.post("/actions", async (c) => {
       /* ---- 供应商管理 ---- */
       case "list_providers": {
         const providers = await getProviders(env);
-        const out = [];
-        for (const pr of providers) {
-          const keys = await getProviderKeys(env, pr.id);
-          const health = await readKeyHealth(env, pr.id);
-          out.push({
-            id: pr.id,
-            name: pr.name,
-            slug: pr.slug,
-            kind: pr.kind || (pr.slug === "anthropic" ? "anthropic" : "openai_compat"),
-            auth_scheme: pr.authScheme || (pr.slug === "anthropic" ? "x-api-key" : "bearer"),
-            base_url: pr.baseUrl,
-            status: pr.status,
-            authorization_ref: pr.authorizationRef ?? null,
-            authorization_expires_at: pr.authorizationExpiresAt ?? null,
-            key_count: keys.length,
-            extraHeaders: pr.extraHeaders ? JSON.parse(pr.extraHeaders) : {},
-            keys: keys.map((k) => {
-              const h = health[k.id] || health[k.keyFingerprint];
-              return {
-                id: k.id,
-                label: k.label,
-                fingerprint: k.keyFingerprint,
-                status: k.status,
-                health_status: h?.demotedAt ? "demoted" : (h?.failures ? "unhealthy" : "healthy"),
-                failures: h?.failures || 0,
-                demoted_at: h?.demotedAt || null,
-                created_at: k.createdAt,
-              };
-            }),
-          });
-        }
+        // 各渠道的 Key 池与健康状态并发读取
+        const details = await Promise.all(
+          providers.map(async (pr) => {
+            const [keys, health] = await Promise.all([getProviderKeys(env, pr.id), readKeyHealth(env, pr.id)]);
+            return { pr, keys, health };
+          })
+        );
+        const out = details.map(({ pr, keys, health }) => ({
+          id: pr.id,
+          name: pr.name,
+          slug: pr.slug,
+          kind: pr.kind || (pr.slug === "anthropic" ? "anthropic" : "openai_compat"),
+          auth_scheme: pr.authScheme || (pr.slug === "anthropic" ? "x-api-key" : "bearer"),
+          base_url: pr.baseUrl,
+          status: pr.status,
+          authorization_ref: pr.authorizationRef ?? null,
+          authorization_expires_at: pr.authorizationExpiresAt ?? null,
+          key_count: keys.length,
+          extraHeaders: pr.extraHeaders ? JSON.parse(pr.extraHeaders) : {},
+          keys: keys.map((k) => {
+            const h = health[k.id] || health[k.keyFingerprint];
+            return {
+              id: k.id,
+              label: k.label,
+              fingerprint: k.keyFingerprint,
+              status: k.status,
+              health_status: h?.demotedAt ? "demoted" : (h?.failures ? "unhealthy" : "healthy"),
+              failures: h?.failures || 0,
+              demoted_at: h?.demotedAt || null,
+              created_at: k.createdAt,
+            };
+          }),
+        }));
         return json({ ok: true, providers: out });
       }
       case "upsert_provider": {
@@ -323,20 +326,21 @@ adminRouter.post("/actions", async (c) => {
 
         if (p.key) {
           const rawKeys = String(p.key).split(/[\r\n,]+/).map((s) => s.trim()).filter(Boolean);
-          for (let i = 0; i < rawKeys.length; i++) {
-            const plaintext = rawKeys[i];
+          // 批量加密 + 一次读写落库（万级 Key 导入从 N 轮往返降为 1 轮）
+          const records = await mapLimit(rawKeys, 8, async (plaintext, i) => {
             const encryptedKey = await encryptSecret(env, plaintext);
             const keyFingerprint = (await sha256Hex(plaintext)).slice(0, 16);
-            await upsertProviderKey(env, {
+            return {
               id: uuid(),
               providerId: id,
               label: rawKeys.length > 1 ? `key-${i + 1}` : "default",
               encryptedKey,
               keyFingerprint,
-              status: "active",
+              status: "active" as const,
               createdAt: now,
-            });
-          }
+            };
+          });
+          await bulkUpsertProviderKeys(env, id, records);
         }
         return done({ id }, "provider", id);
       }
@@ -372,23 +376,23 @@ adminRouter.post("/actions", async (c) => {
         if (!rawKeys.length) throw new ApiError(400, ErrorCode.BAD_REQUEST, "请提供有效的 API Key");
 
         const added: { id: string; fingerprint: string }[] = [];
-        for (let i = 0; i < rawKeys.length; i++) {
-          const plaintext = rawKeys[i];
+        const records = await mapLimit(rawKeys, 8, async (plaintext, i) => {
           const encryptedKey = await encryptSecret(env, plaintext);
           const keyFingerprint = (await sha256Hex(plaintext)).slice(0, 16);
           const id = rawKeys.length === 1 && p.id ? String(p.id) : uuid();
           const label = rawKeys.length > 1 && !p.label ? `key-${i + 1}` : String(p.label ?? "prod");
-          await upsertProviderKey(env, {
+          added.push({ id, fingerprint: keyFingerprint });
+          return {
             id,
             providerId: String(p.providerId),
             label,
             encryptedKey,
             keyFingerprint,
-            status: (p.status as "active" | "disabled") ?? "active",
+            status: ((p.status as "active" | "disabled") ?? "active") as "active" | "disabled",
             createdAt: now,
-          });
-          added.push({ id, fingerprint: keyFingerprint });
-        }
+          };
+        });
+        await bulkUpsertProviderKeys(env, String(p.providerId), records);
         return done({ added, count: added.length, fingerprint: added[0]?.fingerprint }, "provider_key", String(p.providerId));
       }
 
@@ -1010,20 +1014,19 @@ adminRouter.get("/usage/trend", async (c) => {
     requireRole(user, ["admin", "auditor"]);
 
     const days = Math.min(Number(c.req.query("days")) || 7, 30);
-    const points = [];
     const now = Date.now();
-
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(now - i * 86400 * 1000).toISOString().slice(0, 10);
-      const s = await getDailyUsage(c.env, d);
-      points.push({
+    const dates = Array.from({ length: days }, (_, i) => new Date(now - (days - 1 - i) * 86400 * 1000).toISOString().slice(0, 10));
+    const summaries = await Promise.all(dates.map((d) => getDailyUsage(c.env, d)));
+    const points = dates.map((d, idx) => {
+      const s = summaries[idx];
+      return {
         date: d,
         requests: s?.requests || 0,
         tokens: (s?.promptTokens || 0) + (s?.completionTokens || 0),
         errors: (s?.requests || 0) - (s?.successRequests || 0),
         cost: s?.totalCostUsd || 0,
-      });
-    }
+      };
+    });
 
     return json({ days, points });
   } catch (err) {
@@ -1038,21 +1041,19 @@ adminRouter.get("/usage/logs", async (c) => {
     const user = await requireUser(hCtx);
     requireRole(user, ["admin", "auditor"]);
 
-    const store = getBlobStore(c.env);
     const limit = Math.min(Math.max(Number(c.req.query("limit")) || 50, 1), 200);
     const status = (c.req.query("status") || "").trim();
     const model = (c.req.query("model") || "").trim();
     const userId = (c.req.query("userId") || "").trim();
 
     let records: any[] = [];
-    const recent = await store.get("usage:recent", { type: "json", consistency: "strong" });
-    if (Array.isArray(recent) && recent.length > 0) {
-      records = recent;
-    } else {
+    records = await getRecentUsageRecords(c.env);
+    if (!records.length) {
       // 兼容历史数据：旧版本没有最近索引，扫描记录 key 并按写入时间倒序
+      const store = getBlobStore(c.env);
       const res = await store.list({ prefix: "usage:record:", paginate: false, consistency: "strong" });
       const loaded = await Promise.all(
-        (res.blobs || []).map((b) => store.get(b.key, { type: "json", consistency: "strong" }).catch(() => null))
+        (res.blobs || []).slice(0, 300).map((b) => store.get(b.key, { type: "json", consistency: "strong" }).catch(() => null))
       );
       records = loaded.filter(Boolean).sort((a: any, b: any) => (b.createdAt || 0) - (a.createdAt || 0));
     }

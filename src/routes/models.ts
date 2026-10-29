@@ -24,9 +24,11 @@ apiModelsRouter.get("/", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
     await requireUser(hCtx);
-    const models = await getModels(c.env);
-    const pricing = await getAllPricing(c.env);
-    const providers = await getProviders(c.env);
+    const [models, pricing, providers] = await Promise.all([
+      getModels(c.env),
+      getAllPricing(c.env),
+      getProviders(c.env),
+    ]);
     const providerMap = new Map(providers.map((p) => [p.id, p]));
 
     const activeProviderIds = new Set(providers.filter((p) => p.status === "active").map((p) => p.id));

@@ -22,28 +22,56 @@ export const KEY_HEALTH_MAX_FAILURES = 3;
 /** 熔断后冷却时间 (毫秒)，60秒后转入试用组探测恢复 */
 export const KEY_HEALTH_COOLDOWN_MS = 60_000;
 
-// 进程内短缓存（5秒），大幅减轻 EdgeOne Blob I/O
+// 进程内短缓存（30 秒，过期后台刷新），大幅减轻 EdgeOne Blob I/O
 const healthCache = new Map<string, { val: HealthMap; at: number }>();
-const CACHE_TTL_MS = 5_000;
+const healthVersions = new Map<string, number>();
+const healthRefreshing = new Set<string>();
+const CACHE_TTL_MS = 30_000;
+
+function cloneHealth(val: HealthMap): HealthMap {
+  const out: HealthMap = {};
+  for (const [key, v] of Object.entries(val)) out[key] = { ...v };
+  return out;
+}
 
 export async function readKeyHealth(env: any, providerId: string): Promise<HealthMap> {
   const now = Date.now();
   const cached = healthCache.get(providerId);
-  if (cached && now - cached.at < CACHE_TTL_MS) {
-    return { ...cached.val };
+  if (cached) {
+    if (now - cached.at >= CACHE_TTL_MS && !healthRefreshing.has(providerId)) {
+      // 先返回旧值，后台刷新，避免每 30 秒有一个请求多等一次 Blob 往返
+      healthRefreshing.add(providerId);
+      const version = healthVersions.get(providerId) || 0;
+      void (async () => {
+        try {
+          const store = getBlobStore(env);
+          const raw = (await store.get(`key_health:${providerId}`, { type: "json", consistency: "strong" })) as HealthMap | null;
+          // 刷新期间有新的失败/成功写入则丢弃本次结果，避免回滚熔断状态
+          if ((healthVersions.get(providerId) || 0) === version) {
+            healthCache.set(providerId, { val: raw || {}, at: Date.now() });
+          }
+        } catch {
+          // ignore
+        } finally {
+          healthRefreshing.delete(providerId);
+        }
+      })();
+    }
+    return cloneHealth(cached.val);
   }
   try {
     const store = getBlobStore(env);
     const raw = (await store.get(`key_health:${providerId}`, { type: "json", consistency: "strong" })) as HealthMap | null;
     const val = raw || {};
     healthCache.set(providerId, { val, at: now });
-    return { ...val };
+    return cloneHealth(val);
   } catch {
     return {};
   }
 }
 
 export async function writeKeyHealth(env: any, providerId: string, health: HealthMap): Promise<void> {
+  healthVersions.set(providerId, (healthVersions.get(providerId) || 0) + 1);
   healthCache.set(providerId, { val: health, at: Date.now() });
   try {
     const store = getBlobStore(env);

@@ -9,7 +9,7 @@
  */
 import type { Env, UserRecord } from "./types";
 import { getBlobStore, type BlobStore } from "./storage/blob-store";
-import { getSession, getUserById, invalidateStorageCaches } from "./storage/db";
+import { getSession, getUserById, invalidateStorageCaches, flushUsageWrites } from "./storage/db";
 import { ApiError, ErrorCode } from "./errors";
 
 export const BACKUP_FORMAT = "edgerelay-backup";
@@ -118,6 +118,8 @@ function countEntries(entries: BackupEntry[]): Record<string, number> {
 
 /** 全量导出：Blob 中的全部业务数据，排除会话、快照自身与瞬时 KV */
 export async function buildBackup(env: Env): Promise<BackupFile> {
+  // 先把内存缓冲中的用量/账本潮写落库，保证导出包含最新数据
+  await flushUsageWrites(env).catch(() => {});
   const store = getBlobStore(env);
   const keys = (await listAllKeys(store)).filter((key) => !isExcluded(key));
   const entries = (await mapLimit(keys, 10, (key) => readEntry(store, key))).filter(Boolean) as BackupEntry[];
@@ -166,6 +168,9 @@ export async function restoreBackupData(
   await mapLimit(entries, 10, (entry) =>
     withRetry(() => (entry.raw ? store.set(entry.key, String(entry.value)) : store.setJSON(entry.key, entry.value)))
   );
+
+  // 恢复后立即清空进程内缓存，后续读取一律以刚写入的 Blob 数据为准
+  invalidateStorageCaches();
 
   // 3. 恢复当前超级管理员：保留当前密码与二次验证状态，避免恢复后无法登录；
   //    昵称、简介等资料仍以备份中的记录为准。

@@ -2,8 +2,11 @@
  * 计费与额度 (EdgeOne Pages + Blob)
  *  - 请求前：按 max_tokens 估算冻结额度（hold），余额不足抛 402
  *  - 响应后：按实际 usage 结算（capture），差额解冻（release）
- *  - 全部变动写 ledger_entries 流水，可对账/导出
+ *  - 全部变动写 ledger 流水，可对账/导出
  *  - Key 级额度在认证层已检查（api_keys.spentUsd）
+ *
+ * 性能：余额与账本都走进程内写穿透缓存，冻结/结算不再阻塞对话响应，
+ *       账本随用量一起批量落库（见 storage/write-behind.ts）。
  */
 import type { HandlerCtx } from "./types";
 import { ApiError, ErrorCode } from "./errors";
@@ -12,10 +15,10 @@ import {
   getAllPricing,
   getOrCreateBalance,
   updateBalance,
+  persistBalanceNow,
   appendLedgerEntry,
-  getApiKeyByHash,
-  updateApiKey,
-  listAllApiKeys,
+  appendLedgerEntryBuffered,
+  touchApiKeyUsage,
 } from "./storage/db";
 
 export type Pricing = {
@@ -23,6 +26,7 @@ export type Pricing = {
   inputPerMillion: number;
   outputPerMillion: number;
   currency: string;
+  rpmLimit?: number | null;
 };
 
 export function estimateCost(p: Pricing, promptTokens: number, completionTokens: number): number {
@@ -38,6 +42,7 @@ export async function getPricing(env: any, publicName: string): Promise<Pricing 
         inputPerMillion: p.inputPerMillion,
         outputPerMillion: p.outputPerMillion,
         currency: p.currency,
+        rpmLimit: p.rpmLimit,
       }
     : null;
 }
@@ -74,7 +79,7 @@ export async function hold(
   bal.frozen += amount;
   await updateBalance(c.env, scope, bal);
 
-  await appendLedgerEntry(c.env, {
+  appendLedgerEntryBuffered(c.env, {
     id: holdId,
     scope,
     type: "hold",
@@ -110,7 +115,7 @@ export async function settle(
   }
 
   // 1. 记 capture（超级管理员虽不占用额度，但仍记录真实用量与费用流水，保证账目清晰）
-  await appendLedgerEntry(c.env, {
+  appendLedgerEntryBuffered(c.env, {
     id: uuid(),
     scope: args.scope,
     userId: args.userId,
@@ -124,7 +129,7 @@ export async function settle(
 
   // 2. 记 release 差额
   if (releaseAmount > 0) {
-    await appendLedgerEntry(c.env, {
+    appendLedgerEntryBuffered(c.env, {
       id: uuid(),
       scope: args.scope,
       userId: args.userId,
@@ -137,15 +142,9 @@ export async function settle(
     });
   }
 
-  // 3. 更新 key 的 spentUsd
-  if (args.apiKeyId) {
-    // 异步更新 key 的花费
-    listAllApiKeys(c.env).then((all) => {
-      const k = all.find((x) => x.id === args.apiKeyId);
-      if (k) {
-        updateApiKey(c.env, k.keyHash, { spentUsd: (k.spentUsd || 0) + args.actualCost }).catch(() => {});
-      }
-    }).catch(() => {});
+  // 3. 更新 key 的 spentUsd（内存立即生效，落库节流合并）
+  if (args.apiKeyId && args.actualCost > 0) {
+    touchApiKeyUsage(c.env, args.apiKeyId, { spentDelta: args.actualCost });
   }
 }
 
@@ -157,7 +156,7 @@ export async function releaseHold(c: HandlerCtx, scope: string, holdId: string, 
   bal.frozen = Math.max(0, bal.frozen - heldAmount);
   await updateBalance(c.env, scope, bal);
 
-  await appendLedgerEntry(c.env, {
+  appendLedgerEntryBuffered(c.env, {
     id: uuid(),
     scope,
     type: "release",
@@ -169,12 +168,12 @@ export async function releaseHold(c: HandlerCtx, scope: string, holdId: string, 
   });
 }
 
-/** 充值/调整（管理员或支付回调调用） */
+/** 充值/调整（管理员或支付回调调用）：立即落库，跨实例立刻可见 */
 export async function topup(c: HandlerCtx, scope: string, amount: number, memo: string): Promise<void> {
   const now = Math.floor(Date.now() / 1000);
   const bal = await getOrCreateBalance(c.env, scope);
   bal.available += amount;
-  await updateBalance(c.env, scope, bal);
+  await persistBalanceNow(c.env, scope, bal);
 
   await appendLedgerEntry(c.env, {
     id: uuid(),

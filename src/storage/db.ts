@@ -2,8 +2,18 @@
  * EdgeRelay 数据访问层（基于 EdgeOne Blob 数据库）
  */
 
-import { getBlobStore, type BlobStore } from "./blob-store";
+import { getBlobStore } from "./blob-store";
 export { getBlobStore };
+import { TtlCache, mapLimit } from "./cache";
+import {
+  enqueueUsageWrite,
+  enqueueLedgerWrite,
+  flushWriteBehind,
+  mergeUsageDeltaInto,
+  pendingDailyDelta,
+  pendingLedgerEntries,
+  pendingUsageRecords,
+} from "./write-behind";
 import {
   type PlatformSettings,
   DEFAULT_SETTINGS,
@@ -27,19 +37,46 @@ import {
 import { sha256Hex, uuid } from "../crypto";
 import { ApiError, ErrorCode } from "../errors";
 
-// 内存热缓存（优化频繁读取的全局配置和供应商列表，30s TTL）
-const CACHE_TTL_MS = 30_000;
-let cachedSettings: { val: PlatformSettings; at: number } | null = null;
-let cachedProviders: { val: ProviderRecord[]; at: number } | null = null;
-let cachedModels: { val: ModelRouteRecord[]; at: number } | null = null;
-let cachedPricing: { val: Record<string, ModelPricingRecord>; at: number } | null = null;
+/**
+ * 进程内热缓存（EdgeOne Blob 单次强一致读写约 100~200ms，热路径必须避免重复读）
+ *  - 管理端写入会同步 set/delete，本实例立即可见
+ *  - 跨实例最多滞后一个 TTL，且过期后 stale-while-revalidate，请求不等待刷新
+ */
+const SETTINGS_TTL = 60_000;
+const CONFIG_TTL = 60_000;
+const AUTH_TTL = 30_000;
+const USER_TTL = 60_000;
+const PROVIDER_KEYS_TTL = 60_000;
+
+const settingsCache = new TtlCache<PlatformSettings>(SETTINGS_TTL, 2);
+const providersCache = new TtlCache<ProviderRecord[]>(CONFIG_TTL, 2);
+const modelsCache = new TtlCache<ModelRouteRecord[]>(CONFIG_TTL, 2);
+const pricingCache = new TtlCache<Record<string, ModelPricingRecord>>(CONFIG_TTL, 2);
+const apiKeyCache = new TtlCache<ApiKeyRecord | null>(AUTH_TTL, 5000);
+const userCache = new TtlCache<UserRecord | null>(USER_TTL, 2000);
+const sessionCache = new TtlCache<SessionRecord | null>(USER_TTL, 2000);
+const providerKeysCache = new TtlCache<ProviderKeyRecord[]>(PROVIDER_KEYS_TTL, 200);
+const announcementCache = new TtlCache<AnnouncementRecord[]>(60_000, 2);
+
+/** keyId -> keyHash 二级索引，避免按 id 反查时全表扫 Key */
+const apiKeyIdIndex = new Map<string, string>();
 
 /** 备份导入/恢复后清空进程内缓存，保证立即读取恢复后的 Blob 数据 */
 export function invalidateStorageCaches(): void {
-  cachedSettings = null;
-  cachedProviders = null;
-  cachedModels = null;
-  cachedPricing = null;
+  settingsCache.clear();
+  providersCache.clear();
+  modelsCache.clear();
+  pricingCache.clear();
+  apiKeyCache.clear();
+  userCache.clear();
+  sessionCache.clear();
+  providerKeysCache.clear();
+  announcementCache.clear();
+  apiKeyIdIndex.clear();
+  balanceCache.clear();
+  apiKeyWriteTimers.clear();
+  auditChainCache = null;
+  freeChannelsSeeded = false;
 }
 
 // ==========================================
@@ -47,22 +84,18 @@ export function invalidateStorageCaches(): void {
 // ==========================================
 
 export async function getSettings(env?: any): Promise<PlatformSettings> {
-  const now = Date.now();
-  if (cachedSettings && now - cachedSettings.at < CACHE_TTL_MS) {
-    return cachedSettings.val;
-  }
-  const store = getBlobStore(env);
-  const stored = await store.get("settings:platform", { type: "json", consistency: "strong" });
-  if (!stored) {
-    // 首次启动，保存默认设置
-    await store.setJSON("settings:platform", DEFAULT_SETTINGS);
-    cachedSettings = { val: DEFAULT_SETTINGS, at: now };
-    return DEFAULT_SETTINGS;
-  }
-  const merged: PlatformSettings = { ...DEFAULT_SETTINGS, ...stored };
-  merged.auditLogRetentionDays = clampAuditRetentionDays(merged.auditLogRetentionDays);
-  cachedSettings = { val: merged, at: now };
-  return merged;
+  return settingsCache.get("platform", async () => {
+    const store = getBlobStore(env);
+    const stored = await store.get("settings:platform", { type: "json", consistency: "strong" });
+    if (!stored) {
+      // 首次启动，保存默认设置
+      await store.setJSON("settings:platform", DEFAULT_SETTINGS);
+      return DEFAULT_SETTINGS;
+    }
+    const merged: PlatformSettings = { ...DEFAULT_SETTINGS, ...stored };
+    merged.auditLogRetentionDays = clampAuditRetentionDays(merged.auditLogRetentionDays);
+    return merged;
+  });
 }
 
 export async function updateSettings(env: any, patch: Partial<PlatformSettings>): Promise<PlatformSettings> {
@@ -71,7 +104,7 @@ export async function updateSettings(env: any, patch: Partial<PlatformSettings>)
   const updated: PlatformSettings = { ...cur, ...patch };
   updated.auditLogRetentionDays = clampAuditRetentionDays(updated.auditLogRetentionDays);
   await store.setJSON("settings:platform", updated);
-  cachedSettings = { val: updated, at: Date.now() };
+  settingsCache.set("platform", updated);
   return updated;
 }
 
@@ -88,8 +121,10 @@ export async function getUserByEmail(env: any, email: string): Promise<UserRecor
 }
 
 export async function getUserById(env: any, id: string): Promise<UserRecord | null> {
-  const store = getBlobStore(env);
-  return await store.get(`user:${id}`, { type: "json", consistency: "strong" });
+  return userCache.get(id, async () => {
+    const store = getBlobStore(env);
+    return await store.get(`user:${id}`, { type: "json", consistency: "strong" });
+  });
 }
 
 export async function createUser(env: any, user: UserRecord): Promise<UserRecord> {
@@ -107,6 +142,7 @@ export async function createUser(env: any, user: UserRecord): Promise<UserRecord
 
   allUsersIdx.unshift(user.id);
   await store.setJSON("idx:users:all", allUsersIdx);
+  userCache.set(user.id, user);
 
   // 初始化个人钱包
   await getOrCreateBalance(env, `user:${user.id}`);
@@ -124,18 +160,16 @@ export async function updateUser(env: any, id: string, updates: Partial<UserReco
     updatedAt: Math.floor(Date.now() / 1000),
   };
   await store.setJSON(`user:${id}`, updated);
+  userCache.set(id, updated);
   return updated;
 }
 
 export async function listAllUsers(env: any): Promise<UserRecord[]> {
   const store = getBlobStore(env);
   const allIds: string[] = (await store.get("idx:users:all", { type: "json", consistency: "strong" })) || [];
-  const users: UserRecord[] = [];
-  for (const id of allIds) {
-    const u = await getUserById(env, id);
-    if (u) users.push(u);
-  }
-  return users;
+  // 并发读取，把 N 轮串行往返压成 N/12 轮
+  const users = await mapLimit(allIds, 12, async (id) => await getUserById(env, id));
+  return users.filter((u): u is UserRecord => !!u);
 }
 
 export async function deleteUser(env: any, id: string): Promise<boolean> {
@@ -152,6 +186,8 @@ export async function deleteUser(env: any, id: string): Promise<boolean> {
   const norm = cur.email.trim().toLowerCase();
   await store.delete(`idx:user:email:${encodeURIComponent(norm)}`);
   await store.delete(`user:${id}`);
+  userCache.set(id, null);
+  userCache.delete(id);
 
   // 3. 撤销该用户全部生效的 API Key
   try {
@@ -195,20 +231,25 @@ export async function syncUserVipStatus(env: any, userId: string, availableBalan
 export async function createSession(env: any, session: SessionRecord): Promise<void> {
   const store = getBlobStore(env);
   await store.setJSON(`session:${session.id}`, session);
+  sessionCache.set(session.id, session);
 }
 
 export async function getSession(env: any, id: string): Promise<SessionRecord | null> {
-  const store = getBlobStore(env);
-  const s = await store.get(`session:${id}`, { type: "json", consistency: "strong" });
+  const s = await sessionCache.get(id, async () => {
+    const store = getBlobStore(env);
+    return await store.get(`session:${id}`, { type: "json", consistency: "strong" });
+  });
   if (!s) return null;
   if (s.expiresAt < Math.floor(Date.now() / 1000)) {
-    await store.delete(`session:${id}`).catch(() => {});
+    sessionCache.delete(id);
+    getBlobStore(env).delete(`session:${id}`).catch(() => {});
     return null;
   }
   return s;
 }
 
 export async function deleteSession(env: any, id: string): Promise<void> {
+  sessionCache.delete(id);
   const store = getBlobStore(env);
   await store.delete(`session:${id}`).catch(() => {});
 }
@@ -218,13 +259,33 @@ export async function deleteSession(env: any, id: string): Promise<void> {
 // ==========================================
 
 export async function getApiKeyByHash(env: any, keyHash: string): Promise<ApiKeyRecord | null> {
-  const store = getBlobStore(env);
-  return await store.get(`key:${keyHash}`, { type: "json", consistency: "strong" });
+  const row = await apiKeyCache.get(keyHash, async () => {
+    const store = getBlobStore(env);
+    return await store.get(`key:${keyHash}`, { type: "json", consistency: "strong" });
+  });
+  if (row?.id) apiKeyIdIndex.set(row.id, row.keyHash);
+  return row;
+}
+
+/** 按 keyId 取记录（命中 hash 索引时零 I/O），用于扣费/最后使用时间更新 */
+async function getApiKeyById(env: any, keyId: string): Promise<ApiKeyRecord | null> {
+  const hash = apiKeyIdIndex.get(keyId);
+  if (hash) {
+    const cached = apiKeyCache.peek(hash);
+    if (cached) return cached;
+    return await getApiKeyByHash(env, hash);
+  }
+  const all = await listAllApiKeys(env);
+  const found = all.find((k) => k.id === keyId) || null;
+  if (found) apiKeyIdIndex.set(found.id, found.keyHash);
+  return found;
 }
 
 export async function createApiKey(env: any, keyRecord: ApiKeyRecord): Promise<ApiKeyRecord> {
   const store = getBlobStore(env);
   await store.setJSON(`key:${keyRecord.keyHash}`, keyRecord);
+  apiKeyCache.set(keyRecord.keyHash, keyRecord);
+  apiKeyIdIndex.set(keyRecord.id, keyRecord.keyHash);
 
   // 用户索引
   const userKeyIds: string[] = (await store.get(`idx:keys:user:${keyRecord.userId}`, { type: "json", consistency: "strong" })) || [];
@@ -242,32 +303,63 @@ export async function createApiKey(env: any, keyRecord: ApiKeyRecord): Promise<A
 export async function listUserApiKeys(env: any, userId: string): Promise<ApiKeyRecord[]> {
   const store = getBlobStore(env);
   const hashes: string[] = (await store.get(`idx:keys:user:${userId}`, { type: "json", consistency: "strong" })) || [];
-  const list: ApiKeyRecord[] = [];
-  for (const h of hashes) {
-    const k = await getApiKeyByHash(env, h);
-    if (k) list.push(k);
-  }
-  return list;
+  const list = await mapLimit(hashes, 12, async (h) => await getApiKeyByHash(env, h));
+  return list.filter((k): k is ApiKeyRecord => !!k);
 }
 
 export async function listAllApiKeys(env: any): Promise<ApiKeyRecord[]> {
   const store = getBlobStore(env);
   const hashes: string[] = (await store.get("idx:keys:all", { type: "json", consistency: "strong" })) || [];
-  const list: ApiKeyRecord[] = [];
-  for (const h of hashes) {
-    const k = await getApiKeyByHash(env, h);
-    if (k) list.push(k);
-  }
-  return list;
+  const list = await mapLimit(hashes, 12, async (h) => await getApiKeyByHash(env, h));
+  return list.filter((k): k is ApiKeyRecord => !!k);
 }
 
 export async function updateApiKey(env: any, keyHash: string, updates: Partial<ApiKeyRecord>): Promise<ApiKeyRecord | null> {
   const store = getBlobStore(env);
-  const cur = await getApiKeyByHash(env, keyHash);
+  const cur = (await getApiKeyByHash(env, keyHash)) || null;
   if (!cur) return null;
   const updated: ApiKeyRecord = { ...cur, ...updates };
   await store.setJSON(`key:${keyHash}`, updated);
+  apiKeyCache.set(keyHash, updated);
+  apiKeyIdIndex.set(updated.id, keyHash);
   return updated;
+}
+
+/**
+ * 热路径专用：在内存里更新 Key 的 lastUsedAt / spentUsd，落库做 4 秒节流合并。
+ * 配额判定读的是内存记录，因此扣费立即可见。
+ */
+export function touchApiKeyUsage(
+  env: any,
+  keyId: string,
+  patch: { lastUsedAt?: number; spentDelta?: number }
+): void {
+  const hash = apiKeyIdIndex.get(keyId);
+  if (!hash) {
+    // 索引缺失时异步补一次（不影响主流程）
+    void getApiKeyById(env, keyId).catch(() => {});
+    return;
+  }
+  const rec = apiKeyCache.peek(hash);
+  if (!rec) return;
+  if (patch.lastUsedAt) rec.lastUsedAt = patch.lastUsedAt;
+  if (patch.spentDelta) rec.spentUsd = (rec.spentUsd || 0) + patch.spentDelta;
+  scheduleApiKeyPersist(env, hash);
+}
+
+const apiKeyWriteTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+function scheduleApiKeyPersist(env: any, keyHash: string): void {
+  if (apiKeyWriteTimers.has(keyHash)) return;
+  const timer = setTimeout(() => {
+    apiKeyWriteTimers.delete(keyHash);
+    const rec = apiKeyCache.peek(keyHash);
+    if (!rec) return;
+    getBlobStore(env)
+      .setJSON(`key:${keyHash}`, { ...rec })
+      .catch(() => {});
+  }, 4000);
+  apiKeyWriteTimers.set(keyHash, timer);
 }
 
 // ==========================================
@@ -275,14 +367,35 @@ export async function updateApiKey(env: any, keyHash: string, updates: Partial<A
 // ==========================================
 
 let freeChannelsSeeded = false;
+let freeChannelsSeedPromise: Promise<void> | null = null;
 
-export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
-  if (freeChannelsSeeded) return;
+/** 冷启动自举：single-flight，避免并发首请求各自跑一轮全量读取 */
+export function ensureFreeChannelsSeeded(env: any): Promise<void> {
+  if (freeChannelsSeeded) return Promise.resolve();
+  if (!freeChannelsSeedPromise) {
+    freeChannelsSeedPromise = seedFreeChannels(env)
+      .catch((err: any) => {
+        console.error("[ensureFreeChannelsSeeded] error:", err?.message);
+      })
+      .finally(() => {
+        freeChannelsSeedPromise = null;
+      });
+  }
+  return freeChannelsSeedPromise;
+}
+
+async function seedFreeChannels(env: any): Promise<void> {
   const store = getBlobStore(env);
   const now = Math.floor(Date.now() / 1000);
 
   try {
-    let providers = (await store.get("providers:all", { type: "json", consistency: "strong" })) || [];
+    // 三份配置一次性并发读取，冷启动从 3 轮串行往返压成 1 轮
+    const [rawProviders, rawModels, rawPricing] = await Promise.all([
+      store.get("providers:all", { type: "json", consistency: "strong" }),
+      store.get("models:all", { type: "json", consistency: "strong" }),
+      store.get("pricing:all", { type: "json", consistency: "strong" }),
+    ]);
+    let providers = rawProviders || [];
     let pChanged = false;
     if (!providers.some((p: any) => p.id === "opencode" || p.slug === "opencode")) {
       providers.push({
@@ -336,7 +449,7 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
     }
     if (pChanged) {
       await store.setJSON("providers:all", providers);
-      cachedProviders = { val: providers, at: Date.now() };
+      providersCache.set("all", providers);
     }
 
     // 自动将首选站长 hackerxiaow@gmail.com 升级为 superadmin 超级管理员
@@ -371,7 +484,7 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
       }
     } catch {}
 
-    let models = (await store.get("models:all", { type: "json", consistency: "strong" })) || [];
+    let models = rawModels || [];
     
     // 严格按规范清洗：OpenCode 仅保留官方免费层模型（全部带 -free 结尾，特例为 big-pickle）
     // 移除不带 -free 的别名项
@@ -427,10 +540,10 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
     }
     if (mChanged) {
       await store.setJSON("models:all", models);
-      cachedModels = { val: models, at: Date.now() };
+      modelsCache.set("all", models);
     }
 
-    let pricing = (await store.get("pricing:all", { type: "json", consistency: "strong" })) || {};
+    let pricing = rawPricing || {};
     let prChanged = false;
     // 清理废弃模型的 pricing 键
     const validPublicNames = new Set(models.map((m: any) => m.publicName));
@@ -455,8 +568,13 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
     }
     if (prChanged) {
       await store.setJSON("pricing:all", pricing);
-      cachedPricing = { val: pricing, at: Date.now() };
+      pricingCache.set("all", pricing);
     }
+
+    // 自举时已经读到最新数据，直接回填缓存，冷启动少一轮读取
+    providersCache.set("all", providers);
+    modelsCache.set("all", models);
+    pricingCache.set("all", pricing);
 
     freeChannelsSeeded = true;
   } catch (err: any) {
@@ -466,24 +584,21 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
 
 export async function getProviders(env: any): Promise<ProviderRecord[]> {
   await ensureFreeChannelsSeeded(env);
-  const now = Date.now();
-  if (cachedProviders && now - cachedProviders.at < CACHE_TTL_MS) {
-    return cachedProviders.val;
-  }
-  const store = getBlobStore(env);
-  let list = await store.get("providers:all", { type: "json", consistency: "strong" });
-  if (!list) {
-    await seedInitialData(env);
-    list = await store.get("providers:all", { type: "json", consistency: "strong" }) || [];
-  }
-  cachedProviders = { val: list, at: now };
-  return list;
+  return providersCache.get("all", async () => {
+    const store = getBlobStore(env);
+    let list = await store.get("providers:all", { type: "json", consistency: "strong" });
+    if (!list) {
+      await seedInitialData(env);
+      list = (await store.get("providers:all", { type: "json", consistency: "strong" })) || [];
+    }
+    return list;
+  });
 }
 
 export async function setProviders(env: any, list: ProviderRecord[]): Promise<void> {
   const store = getBlobStore(env);
   await store.setJSON("providers:all", list);
-  cachedProviders = { val: list, at: Date.now() };
+  providersCache.set("all", list);
 }
 
 export async function upsertProvider(env: any, provider: ProviderRecord): Promise<void> {
@@ -498,24 +613,37 @@ export async function upsertProvider(env: any, provider: ProviderRecord): Promis
 }
 
 export async function getProviderKeys(env: any, providerId: string): Promise<ProviderKeyRecord[]> {
-  const store = getBlobStore(env);
-  return (await store.get(`provider_keys:${providerId}`, { type: "json", consistency: "strong" })) || [];
+  return providerKeysCache.get(providerId, async () => {
+    const store = getBlobStore(env);
+    return (await store.get(`provider_keys:${providerId}`, { type: "json", consistency: "strong" })) || [];
+  });
 }
 
 export async function setProviderKeys(env: any, providerId: string, keys: ProviderKeyRecord[]): Promise<void> {
   const store = getBlobStore(env);
   await store.setJSON(`provider_keys:${providerId}`, keys);
+  providerKeysCache.set(providerId, keys);
 }
 
 export async function upsertProviderKey(env: any, key: ProviderKeyRecord): Promise<void> {
   const keys = await getProviderKeys(env, key.providerId);
   const idx = keys.findIndex((k) => k.id === key.id);
+  const next = keys.slice();
   if (idx >= 0) {
-    keys[idx] = key;
+    next[idx] = key;
   } else {
-    keys.push(key);
+    next.push(key);
   }
-  await setProviderKeys(env, key.providerId, keys);
+  await setProviderKeys(env, key.providerId, next);
+}
+
+/** 批量写入上游 Key：一次读 + 一次写，避免批量导入时 N 轮往返 */
+export async function bulkUpsertProviderKeys(env: any, providerId: string, incoming: ProviderKeyRecord[]): Promise<void> {
+  if (!incoming.length) return;
+  const keys = await getProviderKeys(env, providerId);
+  const byId = new Map(keys.map((k) => [k.id, k]));
+  for (const k of incoming) byId.set(k.id, k);
+  await setProviderKeys(env, providerId, Array.from(byId.values()));
 }
 
 export async function deleteProviderKey(env: any, providerId: string, keyId: string): Promise<void> {
@@ -528,8 +656,9 @@ export async function updateProviderKeyStatus(env: any, providerId: string, keyI
   const keys = await getProviderKeys(env, providerId);
   const idx = keys.findIndex((k) => k.id === keyId || k.keyFingerprint === keyId);
   if (idx >= 0) {
-    keys[idx].status = status;
-    await setProviderKeys(env, providerId, keys);
+    const next = keys.slice();
+    next[idx] = { ...next[idx], status };
+    await setProviderKeys(env, providerId, next);
   }
 }
 
@@ -539,24 +668,21 @@ export async function updateProviderKeyStatus(env: any, providerId: string, keyI
 
 export async function getModels(env: any): Promise<ModelRouteRecord[]> {
   await ensureFreeChannelsSeeded(env);
-  const now = Date.now();
-  if (cachedModels && now - cachedModels.at < CACHE_TTL_MS) {
-    return cachedModels.val;
-  }
-  const store = getBlobStore(env);
-  let list = await store.get("models:all", { type: "json", consistency: "strong" });
-  if (!list) {
-    await seedInitialData(env);
-    list = await store.get("models:all", { type: "json", consistency: "strong" }) || [];
-  }
-  cachedModels = { val: list, at: now };
-  return list;
+  return modelsCache.get("all", async () => {
+    const store = getBlobStore(env);
+    let list = await store.get("models:all", { type: "json", consistency: "strong" });
+    if (!list) {
+      await seedInitialData(env);
+      list = (await store.get("models:all", { type: "json", consistency: "strong" })) || [];
+    }
+    return list;
+  });
 }
 
 export async function setModels(env: any, list: ModelRouteRecord[]): Promise<void> {
   const store = getBlobStore(env);
   await store.setJSON("models:all", list);
-  cachedModels = { val: list, at: Date.now() };
+  modelsCache.set("all", list);
 }
 
 export async function upsertModel(env: any, model: ModelRouteRecord): Promise<void> {
@@ -578,52 +704,162 @@ export async function upsertModel(env: any, model: ModelRouteRecord): Promise<vo
 }
 
 export async function getAllPricing(env: any): Promise<Record<string, ModelPricingRecord>> {
-  const now = Date.now();
-  if (cachedPricing && now - cachedPricing.at < CACHE_TTL_MS) {
-    return cachedPricing.val;
-  }
-  const store = getBlobStore(env);
-  let map = await store.get("pricing:all", { type: "json", consistency: "strong" });
-  if (!map) {
-    await seedInitialData(env);
-    map = await store.get("pricing:all", { type: "json", consistency: "strong" }) || {};
-  }
-  cachedPricing = { val: map, at: now };
-  return map;
+  return pricingCache.get("all", async () => {
+    const store = getBlobStore(env);
+    let map = await store.get("pricing:all", { type: "json", consistency: "strong" });
+    if (!map) {
+      await seedInitialData(env);
+      map = (await store.get("pricing:all", { type: "json", consistency: "strong" })) || {};
+    }
+    return map;
+  });
 }
 
 export async function setPricing(env: any, pricing: ModelPricingRecord): Promise<void> {
   const store = getBlobStore(env);
   const map = await getAllPricing(env);
-  map[pricing.publicName] = pricing;
-  await store.setJSON("pricing:all", map);
-  cachedPricing = { val: map, at: Date.now() };
+  const next = { ...map, [pricing.publicName]: pricing };
+  await store.setJSON("pricing:all", next);
+  pricingCache.set("all", next);
 }
 
 // ==========================================
 // 7. 钱包与记账 (Balances & Ledger)
 // ==========================================
 
-export async function getOrCreateBalance(env: any, scope: string): Promise<BalanceRecord> {
-  const store = getBlobStore(env);
-  const b = await store.get(`balance:${scope}`, { type: "json", consistency: "strong" });
-  if (b) return b;
-  const initial: BalanceRecord = {
-    id: uuid(),
-    scope,
-    available: 0,
-    frozen: 0,
-    currency: "CNY",
-    updatedAt: Math.floor(Date.now() / 1000),
-  };
-  await store.setJSON(`balance:${scope}`, initial);
-  return initial;
+/**
+ * 钱包写穿透缓存：
+ *  - 首次读取后常驻内存，冻结/扣费在内存里原子完成（同一实例内不会丢更新）
+ *  - 落库 800ms 防抖合并，一次对话原本 2~6 次余额写变成一次
+ *  - 空闲 60s 后后台对齐远端，避免长期实例余额过旧
+ */
+type BalanceEntry = {
+  bal: BalanceRecord;
+  at: number;
+  dirty: boolean;
+  timer?: ReturnType<typeof setTimeout>;
+  writing: boolean;
+};
+const balanceCache = new Map<string, BalanceEntry>();
+const balanceLoads = new Map<string, Promise<BalanceRecord>>();
+const BALANCE_REFRESH_MS = 30_000;
+const BALANCE_WRITE_DELAY_MS = 800;
+
+function balanceStoreKey(scope: string): string {
+  return `balance:${scope}`;
 }
 
+export async function getOrCreateBalance(env: any, scope: string): Promise<BalanceRecord> {
+  const cached = balanceCache.get(scope);
+  if (cached) {
+    if (!cached.dirty && !cached.writing && Date.now() - cached.at > BALANCE_REFRESH_MS) {
+      void refreshBalanceFromRemote(env, scope, cached);
+    }
+    return cached.bal;
+  }
+
+  const pending = balanceLoads.get(scope);
+  if (pending) return pending;
+
+  const load = (async () => {
+    const store = getBlobStore(env);
+    const b = await store.get(balanceStoreKey(scope), { type: "json", consistency: "strong" });
+    if (b) {
+      balanceCache.set(scope, { bal: b, at: Date.now(), dirty: false, writing: false });
+      return b as BalanceRecord;
+    }
+    const initial: BalanceRecord = {
+      id: uuid(),
+      scope,
+      available: 0,
+      frozen: 0,
+      currency: "CNY",
+      updatedAt: Math.floor(Date.now() / 1000),
+    };
+    balanceCache.set(scope, { bal: initial, at: Date.now(), dirty: true, writing: false });
+    scheduleBalancePersist(env, scope);
+    return initial;
+  })();
+
+  balanceLoads.set(scope, load);
+  try {
+    return await load;
+  } finally {
+    balanceLoads.delete(scope);
+  }
+}
+
+async function refreshBalanceFromRemote(env: any, scope: string, entry: BalanceEntry): Promise<void> {
+  if (entry.writing || entry.dirty) return;
+  try {
+    const store = getBlobStore(env);
+    const fresh = (await store.get(balanceStoreKey(scope), { type: "json", consistency: "strong" })) as BalanceRecord | null;
+    if (!fresh || entry.dirty) return;
+    entry.bal.available = fresh.available;
+    entry.bal.frozen = fresh.frozen;
+    entry.bal.currency = fresh.currency;
+    entry.at = Date.now();
+  } catch {
+    // 后台刷新失败不影响请求
+  }
+}
+
+/** 标记余额变更并合并落库（热路径调用，不阻塞） */
 export async function updateBalance(env: any, scope: string, balance: BalanceRecord): Promise<void> {
-  const store = getBlobStore(env);
+  const entry = balanceCache.get(scope);
   balance.updatedAt = Math.floor(Date.now() / 1000);
-  await store.setJSON(`balance:${scope}`, balance);
+  if (entry) {
+    entry.bal = balance;
+    entry.dirty = true;
+  } else {
+    balanceCache.set(scope, { bal: balance, at: Date.now(), dirty: true, writing: false });
+  }
+  scheduleBalancePersist(env, scope);
+}
+
+/** 立即落库（充值/管理操作需要跨实例立刻可见） */
+export async function persistBalanceNow(env: any, scope: string, balance: BalanceRecord): Promise<void> {
+  const entry = balanceCache.get(scope);
+  balance.updatedAt = Math.floor(Date.now() / 1000);
+  if (entry) {
+    entry.bal = balance;
+    entry.dirty = false;
+  } else {
+    balanceCache.set(scope, { bal: balance, at: Date.now(), dirty: false, writing: false });
+  }
+  await getBlobStore(env).setJSON(balanceStoreKey(scope), { ...balance });
+  const e = balanceCache.get(scope);
+  if (e) e.at = Date.now();
+}
+
+function scheduleBalancePersist(env: any, scope: string): void {
+  const entry = balanceCache.get(scope);
+  if (!entry || entry.timer || entry.writing) return;
+  entry.timer = setTimeout(() => {
+    entry.timer = undefined;
+    void persistBalance(env, scope);
+  }, BALANCE_WRITE_DELAY_MS);
+}
+
+async function persistBalance(env: any, scope: string): Promise<void> {
+  const entry = balanceCache.get(scope);
+  if (!entry || !entry.dirty || entry.writing) return;
+  entry.dirty = false;
+  entry.writing = true;
+  try {
+    await getBlobStore(env).setJSON(balanceStoreKey(scope), { ...entry.bal });
+    entry.at = Date.now();
+  } catch {
+    entry.dirty = true;
+  } finally {
+    entry.writing = false;
+    if (entry.dirty) scheduleBalancePersist(env, scope);
+  }
+}
+
+/** 热路径账本写入：进内存缓冲，随用量一起批量落库 */
+export function appendLedgerEntryBuffered(env: any, entry: LedgerEntryRecord): void {
+  enqueueLedgerWrite(env, entry);
 }
 
 export async function appendLedgerEntry(env: any, entry: LedgerEntryRecord): Promise<void> {
@@ -637,7 +873,17 @@ export async function appendLedgerEntry(env: any, entry: LedgerEntryRecord): Pro
 export async function getLedgerEntries(env: any, scope: string, limit = 50): Promise<LedgerEntryRecord[]> {
   const store = getBlobStore(env);
   const list: LedgerEntryRecord[] = (await store.get(`ledger:${scope}`, { type: "json", consistency: "strong" })) || [];
-  return list.slice(0, limit);
+  const pending = pendingLedgerEntries(scope);
+  if (!pending.length) return list.slice(0, limit);
+  const seen = new Set<string>();
+  const merged: LedgerEntryRecord[] = [];
+  for (const e of [...pending, ...list]) {
+    if (seen.has(e.id)) continue;
+    seen.add(e.id);
+    merged.push(e);
+    if (merged.length >= limit) break;
+  }
+  return merged;
 }
 
 // ==========================================
@@ -693,16 +939,20 @@ export async function redeemCodeAtomic(
 // 8. 用量日志与聚合统计 (Usage Logs)
 // ==========================================
 
+/**
+ * 热路径写入：只做内存聚合，600ms 窗口内合并成一轮并行写，不阻塞对话响应。
+ * 读取接口会叠加尚未落库的缓冲数据，后台立刻能看到刚产生的用量。
+ */
 export async function addUsageRecord(env: any, record: UsageRecord): Promise<void> {
+  enqueueUsageWrite(env, record);
+}
+
+export async function getDailyUsage(env: any, date: string): Promise<DailyUsageSummary | null> {
   const store = getBlobStore(env);
-  const date = new Date(record.createdAt * 1000).toISOString().slice(0, 10);
-
-  // 1. 保存单次记录
-  await store.setJSON(`usage:record:${record.requestId}`, record);
-
-  // 2. 累加日统计
-  const dailyKey = `usage:daily:${date}`;
-  const daily: DailyUsageSummary = (await store.get(dailyKey, { type: "json", consistency: "strong" })) || {
+  const raw = (await store.get(`usage:daily:${date}`, { type: "json", consistency: "strong" })) as DailyUsageSummary | null;
+  const delta = pendingDailyDelta(date);
+  if (!delta) return raw;
+  const base: DailyUsageSummary = raw || {
     date,
     requests: 0,
     successRequests: 0,
@@ -713,52 +963,31 @@ export async function addUsageRecord(env: any, record: UsageRecord): Promise<voi
     byModel: {},
     byProvider: {},
   };
-
-  daily.requests += 1;
-  if (record.status === "success") daily.successRequests += 1;
-  daily.promptTokens += record.promptTokens || 0;
-  daily.completionTokens += record.completionTokens || 0;
-  daily.totalCostUsd += record.costUsd || 0;
-  daily.totalLatencyMs += record.latencyMs || 0;
-
-  const mName = record.publicModel || "unknown";
-  daily.byModel[mName] = daily.byModel[mName] || { requests: 0, promptTokens: 0, completionTokens: 0, costUsd: 0 };
-  daily.byModel[mName].requests += 1;
-  daily.byModel[mName].promptTokens += record.promptTokens || 0;
-  daily.byModel[mName].completionTokens += record.completionTokens || 0;
-  daily.byModel[mName].costUsd += record.costUsd || 0;
-
-  const pName = record.providerId || "unknown";
-  daily.byProvider[pName] = daily.byProvider[pName] || { requests: 0, promptTokens: 0, completionTokens: 0 };
-  daily.byProvider[pName].requests += 1;
-  daily.byProvider[pName].promptTokens += record.promptTokens || 0;
-  daily.byProvider[pName].completionTokens += record.completionTokens || 0;
-
-  await store.setJSON(dailyKey, daily);
-
-  // 3. 最近记录索引（后台仪表盘只看最近几十条，避免全量扫描记录 key）
-  const recentKey = "usage:recent";
-  const recent: UsageRecord[] = (await store.get(recentKey, { type: "json", consistency: "strong" })) || [];
-  recent.unshift(record);
-  if (recent.length > 200) recent.length = 200;
-  await store.setJSON(recentKey, recent);
-
-  // 4. 用户/日期日用量列表追加（用于前端明细展示）
-  const userDailyKey = `usage:user:${record.userId}:${date}`;
-  const userList: UsageRecord[] = (await store.get(userDailyKey, { type: "json", consistency: "strong" })) || [];
-  userList.unshift(record);
-  if (userList.length > 200) userList.length = 200;
-  await store.setJSON(userDailyKey, userList);
-}
-
-export async function getDailyUsage(env: any, date: string): Promise<DailyUsageSummary | null> {
-  const store = getBlobStore(env);
-  return await store.get(`usage:daily:${date}`, { type: "json", consistency: "strong" });
+  return mergeUsageDeltaInto(base, delta);
 }
 
 export async function getUserUsageRecords(env: any, userId: string, date: string): Promise<UsageRecord[]> {
   const store = getBlobStore(env);
-  return (await store.get(`usage:user:${userId}:${date}`, { type: "json", consistency: "strong" })) || [];
+  const stored: UsageRecord[] = (await store.get(`usage:user:${userId}:${date}`, { type: "json", consistency: "strong" })) || [];
+  const pending = pendingUsageRecords(userId, date);
+  if (!pending.length) return stored;
+  const seen = new Set(pending.map((r) => r.requestId));
+  return pending.concat(stored.filter((r) => !seen.has(r.requestId)));
+}
+
+/** 最近用量记录（含内存缓冲），供后台用量日志使用 */
+export async function getRecentUsageRecords(env: any): Promise<UsageRecord[]> {
+  const store = getBlobStore(env);
+  const stored: UsageRecord[] = (await store.get("usage:recent", { type: "json", consistency: "strong" })) || [];
+  const pending = pendingUsageRecords();
+  if (!pending.length) return stored;
+  const seen = new Set(pending.map((r) => r.requestId));
+  return pending.concat(stored.filter((r) => !seen.has(r.requestId)));
+}
+
+/** 立即把缓冲的用量/账本落库（备份、退出前检查等场景） */
+export async function flushUsageWrites(env: any): Promise<void> {
+  await flushWriteBehind(env);
 }
 
 // ==========================================
@@ -766,6 +995,25 @@ export async function getUserUsageRecords(env: any, userId: string, date: string
 // ==========================================
 
 const AUDIT_GENESIS_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
+
+/** 审计链进程内缓存：管理操作原本每次都要读整条链（可能 1000 条）+ 写回 */
+let auditChainCache: AuditLogRecord[] | null = null;
+let auditChainLoad: Promise<AuditLogRecord[]> | null = null;
+
+async function loadAuditChain(env: any): Promise<AuditLogRecord[]> {
+  if (auditChainCache) return auditChainCache;
+  if (!auditChainLoad) {
+    auditChainLoad = (async () => {
+      const store = getBlobStore(env);
+      const chain: AuditLogRecord[] = (await store.get("audit:chain", { type: "json", consistency: "strong" })) || [];
+      auditChainCache = chain;
+      return chain;
+    })().finally(() => {
+      auditChainLoad = null;
+    });
+  }
+  return auditChainLoad;
+}
 
 /** 从最旧一条开始向新一条推进，重算整条链的 prevHash 与 hash */
 async function rebuildAuditChain(chain: AuditLogRecord[]): Promise<AuditLogRecord[]> {
@@ -783,11 +1031,12 @@ async function rebuildAuditChain(chain: AuditLogRecord[]): Promise<AuditLogRecor
 /** 删除单条审计日志并重建哈希链，返回剩余条数 */
 export async function deleteAuditLog(env: any, id: string): Promise<number> {
   const store = getBlobStore(env);
-  const chain: AuditLogRecord[] = (await store.get("audit:chain", { type: "json", consistency: "strong" })) || [];
+  const chain = await loadAuditChain(env);
   const filtered = chain.filter((l) => l.id !== id);
   if (filtered.length === chain.length) return chain.length;
   const rebuilt = await rebuildAuditChain(filtered);
   await store.setJSON("audit:chain", rebuilt);
+  auditChainCache = rebuilt;
   return rebuilt.length;
 }
 
@@ -795,6 +1044,7 @@ export async function deleteAuditLog(env: any, id: string): Promise<number> {
 export async function clearAuditLogs(env: any): Promise<void> {
   const store = getBlobStore(env);
   await store.setJSON("audit:chain", []);
+  auditChainCache = [];
 }
 
 /**
@@ -823,7 +1073,8 @@ export async function appendAuditLog(
   }
 ): Promise<AuditLogRecord> {
   const store = getBlobStore(env);
-  const chain: AuditLogRecord[] = (await store.get("audit:chain", { type: "json", consistency: "strong" })) || [];
+  const cached = await loadAuditChain(env);
+  const chain = cached.slice();
   const prev = chain.length > 0 ? chain[0] : null;
   const prevHash = prev ? prev.hash : AUDIT_GENESIS_HASH;
 
@@ -852,14 +1103,18 @@ export async function appendAuditLog(
   const retained = await trimAuditChainByRetention(env, chain);
   if (retained.length > 1000) retained.length = 1000;
   await store.setJSON("audit:chain", retained);
+  auditChainCache = retained;
   return log;
 }
 
 export async function getAuditLogs(env: any, limit = 100): Promise<AuditLogRecord[]> {
   const store = getBlobStore(env);
-  const raw: AuditLogRecord[] = (await store.get("audit:chain", { type: "json", consistency: "strong" })) || [];
+  const raw = await loadAuditChain(env);
   const chain = await trimAuditChainByRetention(env, raw);
-  if (chain !== raw) await store.setJSON("audit:chain", chain);
+  if (chain !== raw) {
+    await store.setJSON("audit:chain", chain);
+    auditChainCache = chain;
+  }
   return chain.slice(0, limit);
 }
 
@@ -935,29 +1190,32 @@ export interface AnnouncementRecord {
 }
 
 export async function getAnnouncements(env: any): Promise<AnnouncementRecord[]> {
-  const store = getBlobStore(env);
-  const existing = (await store.get("announcements:all", { type: "json", consistency: "strong" })) as AnnouncementRecord[] | null;
-  if (existing) return existing;
-  // 首次读取时把欢迎公告落库，避免兜底数据的创建时间每次请求都变成"刚刚"
-  const now = Math.floor(Date.now() / 1000);
-  const seeded: AnnouncementRecord[] = [
-    {
-      id: "anno_welcome",
-      title: "欢迎使用 Relay AI API 边缘网关",
-      content: "系统已成功迁移并运行于腾讯云 EdgeOne Pages + Blob 强一致性数据库。",
-      popup: 0,
-      enabled: 1,
-      created_at: now,
-      updated_at: now,
-    },
-  ];
-  await store.setJSON("announcements:all", seeded);
-  return seeded;
+  return announcementCache.get("all", async () => {
+    const store = getBlobStore(env);
+    const existing = (await store.get("announcements:all", { type: "json", consistency: "strong" })) as AnnouncementRecord[] | null;
+    if (existing) return existing;
+    // 首次读取时把欢迎公告落库，避免兜底数据的创建时间每次请求都变成"刚刚"
+    const now = Math.floor(Date.now() / 1000);
+    const seeded: AnnouncementRecord[] = [
+      {
+        id: "anno_welcome",
+        title: "欢迎使用 Relay AI API 边缘网关",
+        content: "系统已成功迁移并运行于腾讯云 EdgeOne Pages + Blob 强一致性数据库。",
+        popup: 0,
+        enabled: 1,
+        created_at: now,
+        updated_at: now,
+      },
+    ];
+    await store.setJSON("announcements:all", seeded);
+    return seeded;
+  });
 }
 
 export async function saveAnnouncements(env: any, list: AnnouncementRecord[]): Promise<void> {
   const store = getBlobStore(env);
   await store.setJSON("announcements:all", list);
+  announcementCache.set("all", list);
 }
 
 // ==========================================

@@ -19,31 +19,20 @@ import { staticRouter } from "./routes/static";
 
 const app = new Hono<{ Bindings: Env }>();
 
-// 1. 全局 CORS 中间件
-app.use("*", async (c, next) => {
-  const origin = c.req.header("origin");
-  const allowStr = c.env?.CORS_ORIGINS ?? "";
-  const allowList = allowStr.split(",").map((s) => s.trim()).filter(Boolean);
-
-  let allowOrigin = "*";
-  if (allowList.length > 0) {
-    if (origin && allowList.includes(origin)) {
-      allowOrigin = origin;
-    } else {
-      allowOrigin = allowList[0];
-    }
-  }
-
-  const corsMiddleware = cors({
-    origin: allowOrigin,
-    allowHeaders: ["authorization", "content-type", "x-request-id", "x-timestamp", "x-signature"],
-    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    maxAge: 86400,
-    credentials: true,
-  });
-
-  return corsMiddleware(c, next);
+// 1. 全局 CORS 中间件（单例，避免每个请求重复构造中间件闭包）
+const corsMiddleware = cors({
+  origin: (origin, c) => {
+    const allowStr = (c.env as any)?.CORS_ORIGINS ?? "";
+    const allowList = allowStr.split(",").map((s: string) => s.trim()).filter(Boolean);
+    if (allowList.length === 0) return origin || "*";
+    return origin && allowList.includes(origin) ? origin : allowList[0];
+  },
+  allowHeaders: ["authorization", "content-type", "x-request-id", "x-timestamp", "x-signature"],
+  allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  maxAge: 86400,
+  credentials: true,
 });
+app.use("*", corsMiddleware);
 
 // 2. 健康检查
 app.get("/health", (c) => c.json({ status: "ok", engine: "edgeone-pages", storage: "edgeone-blob" }));

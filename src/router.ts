@@ -9,6 +9,18 @@ import { ApiError, ErrorCode } from "./errors";
 import { getModels, getProviders, getProviderKeys } from "./storage/db";
 import { readKeyHealth, sortKeysByHealth } from "./key-health";
 
+/** 单渠道每次请求最多参与调度的 Key 数（万级 Key 池只做随机抽样，避免全量洗牌开销） */
+const MAX_KEY_CANDIDATES = 64;
+
+function sampleKeys<T>(keys: T[], size: number): T[] {
+  const pool = keys.slice();
+  for (let i = 0; i < size; i++) {
+    const j = i + Math.floor(Math.random() * (pool.length - i));
+    [pool[i], pool[j]] = [pool[j]!, pool[i]!];
+  }
+  return pool.slice(0, size);
+}
+
 export async function listRoutes(env: any, publicName: string): Promise<UpstreamRoute[]> {
   const allModels = await getModels(env);
   let matched = allModels.filter((m) => m.publicName === publicName && m.enabled === 1);
@@ -72,9 +84,10 @@ export async function listRoutes(env: any, publicName: string): Promise<Upstream
         costWeight: m.costWeight,
       });
     } else {
-      // 多 Key 渠道：读取健康度并按健康/洗牌/试用/降权排序
+      // 多 Key 渠道：健康度排序前先随机抽样，避免万级 Key 池每请求全量洗牌
+      const pool = activeKeys.length > MAX_KEY_CANDIDATES ? sampleKeys(activeKeys, MAX_KEY_CANDIDATES) : activeKeys;
       const health = await readKeyHealth(env, p.id);
-      const sortedKeys = sortKeysByHealth(activeKeys, health);
+      const sortedKeys = sortKeysByHealth(pool, health);
       for (const pk of sortedKeys) {
         routes.push({
           modelId: m.id,

@@ -229,6 +229,109 @@ let apiKeyId = "";
   assert(verifyAfterClear.result.ok === true, "清空后哈希链从 GENESIS 重新校验通过");
 }
 
+// 8.2 对话转发链路（模拟上游，覆盖流式 tee 透传 / 旁路记账 / 用量潮写）
+{
+  const http = await import("node:http");
+  const upstream = http.createServer((req, res) => {
+    let raw = "";
+    req.on("data", (c) => (raw += c));
+    req.on("end", () => {
+      let body = {};
+      try { body = JSON.parse(raw); } catch {}
+      if (body.stream) {
+        res.writeHead(200, { "content-type": "text/event-stream; charset=utf-8" });
+        res.write(`data: ${JSON.stringify({ id: "chatcmpl-mock", choices: [{ index: 0, delta: { role: "assistant" } }] })}\n\n`);
+        res.write(`data: ${JSON.stringify({ id: "chatcmpl-mock", choices: [{ index: 0, delta: { content: "你好，" } }] })}\n\n`);
+        res.write(`data: ${JSON.stringify({ id: "chatcmpl-mock", choices: [{ index: 0, delta: { content: "世界" } }] })}\n\n`);
+        res.write(`data: ${JSON.stringify({ id: "chatcmpl-mock", choices: [{ index: 0, delta: {}, finish_reason: "stop" }], usage: { prompt_tokens: 7, completion_tokens: 5, total_tokens: 12 } })}\n\n`);
+        res.end("data: [DONE]\n\n");
+        return;
+      }
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({
+        id: "chatcmpl-mock",
+        object: "chat.completion",
+        model: body.model,
+        choices: [{ index: 0, message: { role: "assistant", content: "pong" }, finish_reason: "stop" }],
+        usage: { prompt_tokens: 3, completion_tokens: 1, total_tokens: 4 },
+      }));
+    });
+  });
+  await new Promise((resolve) => upstream.listen(0, "127.0.0.1", resolve));
+  const port = upstream.address().port;
+
+  try {
+    const action = (name, payload = {}) => request("/api/admin/actions", {
+      method: "POST",
+      headers: { cookie: adminCookie, "content-type": "application/json" },
+      body: { action: name, payload },
+    });
+
+    const provRes = await action("upsert_provider", {
+      name: "MockUpstream",
+      slug: "mockupstream",
+      kind: "openai_compat",
+      baseUrl: `http://127.0.0.1:${port}`,
+      authScheme: "bearer",
+      key: "mock-upstream-key",
+    });
+    assert(provRes.status === 200, "创建模拟上游渠道 HTTP 200");
+    const provData = await provRes.json();
+
+    const modelRes = await action("upsert_model", {
+      publicName: "mock-model",
+      providerId: provData.result.id,
+      upstreamModel: "mock-upstream-model",
+      inputPerMillion: 0,
+      outputPerMillion: 0,
+    });
+    assert(modelRes.status === 200, "创建模拟模型映射 HTTP 200");
+
+    // 非流式
+    const nonStream = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: { model: "mock-model", messages: [{ role: "user", content: "ping" }], stream: false },
+    });
+    assert(nonStream.status === 200, "非流式对话 HTTP 200");
+    const nonStreamData = await nonStream.json();
+    assert(nonStreamData.choices?.[0]?.message?.content === "pong", "非流式对话内容与上游一致");
+
+    // 流式：确认 tee 透传后客户端能拿到完整 SSE
+    const streamRes = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: { model: "mock-model", messages: [{ role: "user", content: "ping" }], stream: true },
+    });
+    assert(streamRes.status === 200, "流式对话 HTTP 200");
+    assert((streamRes.headers.get("content-type") || "").includes("text/event-stream"), "流式响应 Content-Type 正确");
+    const streamText = await streamRes.text();
+    assert(streamText.includes("你好，") && streamText.includes("世界"), "流式响应完整透传上游增量内容");
+    assert(streamText.trimEnd().endsWith("data: [DONE]"), "流式响应以 [DONE] 正常收尾");
+
+    // 并发请求：确认内存限流与缓存无竞态
+    const parallel = await Promise.all(
+      Array.from({ length: 8 }, (_, i) =>
+        request("/v1/chat/completions", {
+          method: "POST",
+          headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+          body: { model: "mock-model", messages: [{ role: "user", content: `p${i}` }], stream: false },
+        })
+      )
+    );
+    assert(parallel.every((r) => r.status === 200), "8 路并发对话全部 HTTP 200");
+
+    // 等待写后置潮写落库后核对用量统计
+    await new Promise((r) => setTimeout(r, 1200));
+    const logsData = await (await request("/api/admin/usage/logs?limit=20", { headers: { cookie: adminCookie } })).json();
+    const mockLogs = (logsData.logs || []).filter((l) => l.public_model === "mock-model");
+    assert(mockLogs.length >= 10, `用量日志已记录模拟模型调用（${mockLogs.length} 条）`);
+    assert(mockLogs.some((l) => l.status === "success" && l.prompt_tokens === 7 && l.completion_tokens === 5), "流式 usage 统计正确计入（7/5 tokens）");
+  } finally {
+    await new Promise((resolve) => upstream.close(resolve));
+  }
+}
+
 // 9. 超级管理员仪表盘回归：superadmin 必须能读取管理员用量接口
 {
   const regRes = await request("/api/auth/register", {

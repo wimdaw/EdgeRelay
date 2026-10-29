@@ -8,7 +8,7 @@ import type { HandlerCtx, AuthedKey, RateLimits } from "./types";
 import { ApiError, ErrorCode } from "./errors";
 import { hmacHex, sha256Hex, timingSafeEqualHex } from "./crypto";
 import { getSettings } from "./settings";
-import { getSession, getUserById, getApiKeyByHash, updateApiKey, updateUser } from "./storage/db";
+import { getSession, getUserById, getApiKeyByHash, touchApiKeyUsage, updateUser, syncUserVipStatus } from "./storage/db";
 
 export type SessionUser = {
   id: string;
@@ -63,7 +63,6 @@ export async function getSessionUser(c: HandlerCtx): Promise<SessionUser | null>
       updateUser(c.env, user.id, { role: "superadmin" }).catch(() => {});
     }
   } else if (currentRole === "user" || currentRole === "vip") {
-    const { syncUserVipStatus } = await import("./storage/db");
     currentRole = (await syncUserVipStatus(c.env, user.id)) as SessionUser["role"];
   }
 
@@ -149,8 +148,8 @@ export async function authenticateApiKey(c: HandlerCtx): Promise<AuthedKey> {
     } catch {}
   }
 
-  // 异步记录最后使用时间（不阻塞主链路）
-  updateApiKey(c.env, hash, { lastUsedAt: now }).catch(() => {});
+  // 记录最后使用时间：内存即时生效，落库节流合并（原实现每个请求读+写整条 Key）
+  touchApiKeyUsage(c.env, row.id, { lastUsedAt: now });
 
   const settings = await getSettings(c.env);
   const limits: RateLimits = {
@@ -178,7 +177,6 @@ export async function authenticateApiKey(c: HandlerCtx): Promise<AuthedKey> {
   if (user?.email?.toLowerCase() === "hackerxiaow@gmail.com") {
     userRole = "superadmin";
   } else if (userRole === "user" || userRole === "vip") {
-    const { syncUserVipStatus } = await import("./storage/db");
     userRole = (await syncUserVipStatus(c.env, row.userId)) as AuthedKey["userRole"];
   }
 

@@ -5,7 +5,7 @@ import { getStore as edgeoneGetStore } from "@edgeone/pages-blob";
 
 export interface BlobStore {
   get(key: string, options?: { type?: 'text' | 'json' | 'stream'; consistency?: 'strong' | 'eventual' }): Promise<any>;
-  set(key: string, value: string | Buffer | Uint8Array, options?: any): Promise<void>;
+  set(key: string, value: any, options?: any): Promise<void>;
   setJSON(key: string, value: any, options?: any): Promise<void>;
   delete(key: string): Promise<void>;
   list(options?: { prefix?: string; cursor?: string; paginate?: boolean; consistency?: 'strong' | 'eventual' }): Promise<{
