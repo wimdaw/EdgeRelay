@@ -24,7 +24,7 @@ const FEATURES = [
   { icon: Gauge, title: "多模型智能路由与故障转移", desc: "按优先级与成本自动选择上游，主路由异常时毫秒级切换备用供应商，业务无感。" },
   { icon: Coins, title: "用量计费与额度管理", desc: "输入/输出分开计价，请求前冻结、完成后结算，余额、流水、账单导出一应俱全。" },
   { icon: Zap, title: "限流与防滥用", desc: "Key 级 RPM/TPM/并发控制，可选请求签名防重放防篡改，超限返回结构化 429。" },
-  { icon: ScrollText, title: "审计日志与合规支持", desc: "哈希链防篡改的审计日志保留 180 天以上，内容安全审核钩子与人工复核队列。" },
+  { icon: ScrollText, title: "审计日志与合规支持", desc: "哈希链防篡改的审计日志，保留期后台可配（30–180 天，默认 30 天），内容安全审核钩子与人工复核队列。" },
   { icon: Globe, title: "边缘部署，低延迟全球加速", desc: "跑在腾讯云 EdgeOne 全球边缘节点，就近接入、就近转发，天然高可用。" },
 ];
 const PRICING = [
@@ -345,7 +345,7 @@ res = client.chat.completions.create(
             {[
               { icon: Server, title: "合法授权上游", desc: "仅接入持有合法代理、分销或再许可授权的供应商，授权协议编号登记入档并可追溯。" },
               { icon: ShieldCheck, title: "内容安全审核", desc: "可配置的内容审核钩子与敏感词规则，命中请求自动拦截并进入人工复核队列。" },
-              { icon: KeyRound, title: "数据隐私与审计", desc: "默认不记录对话明文；密钥全链路加密；审计日志哈希链防篡改、保留 180 天以上。" },
+              { icon: KeyRound, title: "数据隐私与审计", desc: "默认不记录对话明文；密钥全链路加密；审计日志哈希链防篡改，保留期可配 30–180 天。" },
             ].map(({ icon: Icon, title, desc }) => (
               <div key={title} className="rounded-xl2 border border-line bg-bg p-6 shadow-card">
                 <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-ok/10 text-ok"><Icon size={19} /></span>

@@ -83,6 +83,17 @@ export type PlatformSettings = {
   smtpPassEnc?: string;
 };
 
+/* 审计日志保留天数：最低 30 天，最长 180 天，默认 30 天 */
+export const AUDIT_RETENTION_MIN = 30;
+export const AUDIT_RETENTION_MAX = 180;
+export const AUDIT_RETENTION_DEFAULT = 30;
+
+export function clampAuditRetentionDays(value: unknown): number {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return AUDIT_RETENTION_DEFAULT;
+  return Math.min(AUDIT_RETENTION_MAX, Math.max(AUDIT_RETENTION_MIN, Math.round(n)));
+}
+
 export const DEFAULT_SETTINGS: PlatformSettings = {
   signupsEnabled: true,
   requireTosAcceptance: true,
@@ -93,7 +104,7 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   logContentEnabled: false,
   defaultRpm: 60,
   defaultTpm: 100000,
-  auditLogRetentionDays: 180,
+  auditLogRetentionDays: AUDIT_RETENTION_DEFAULT,
   stepUpDisabled: false,
   persistentSession: false,
   siteName: "Relay",

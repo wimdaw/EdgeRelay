@@ -39,5 +39,5 @@ INSERT INTO settings (key, value, updated_at) VALUES ('platform', json_object(
   'logContentEnabled', false,
   'defaultRpm', 60,
   'defaultTpm', 100000,
-  'auditLogRetentionDays', 180
+  'auditLogRetentionDays', 30
 ), unixepoch());

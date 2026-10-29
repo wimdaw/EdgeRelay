@@ -13,7 +13,7 @@ import {
  *  - API Key 只存 SHA-256 哈希，明文只在创建时返回一次
  *  - 上游供应商密钥 AES-256-GCM 加密存储（密钥材料来自 ENCRYPTION_KEY secret）
  *  - usage_logs 默认不落 prompt/响应内容（log_content 开关默认关闭，开启时也存脱敏摘要）
- *  - audit_logs 使用哈希链（prev_hash -> hash）提供防篡改证据，保留 >= 180 天
+ *  - audit_logs 使用哈希链（prev_hash -> hash）提供防篡改证据，保留 30–180 天（默认 30 天）
  * ============================================================ */
 
 export const users = sqliteTable(

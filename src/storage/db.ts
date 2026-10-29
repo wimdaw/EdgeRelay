@@ -7,6 +7,7 @@ export { getBlobStore };
 import {
   type PlatformSettings,
   DEFAULT_SETTINGS,
+  clampAuditRetentionDays,
   type UserRecord,
   type SessionRecord,
   type ApiKeyRecord,
@@ -51,6 +52,7 @@ export async function getSettings(env?: any): Promise<PlatformSettings> {
     return DEFAULT_SETTINGS;
   }
   const merged: PlatformSettings = { ...DEFAULT_SETTINGS, ...stored };
+  merged.auditLogRetentionDays = clampAuditRetentionDays(merged.auditLogRetentionDays);
   cachedSettings = { val: merged, at: now };
   return merged;
 }
@@ -59,6 +61,7 @@ export async function updateSettings(env: any, patch: Partial<PlatformSettings>)
   const store = getBlobStore(env);
   const cur = await getSettings(env);
   const updated: PlatformSettings = { ...cur, ...patch };
+  updated.auditLogRetentionDays = clampAuditRetentionDays(updated.auditLogRetentionDays);
   await store.setJSON("settings:platform", updated);
   cachedSettings = { val: updated, at: Date.now() };
   return updated;

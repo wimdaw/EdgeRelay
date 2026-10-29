@@ -21,7 +21,7 @@
 
 ## 4. 安全运营
 - [ ] `ENCRYPTION_KEY` / `SESSION_SECRET` 定期轮换方案
-- [ ] 审计日志哈希链每日校验（`verify_audit_chain`）+ R2 冷备（保留 ≥180 天）
+- [ ] 审计日志哈希链每日校验（`verify_audit_chain`）+ R2 冷备（后台可配保留 30–180 天，默认 30 天）
 - [ ] CORS 白名单最小化；管理接口仅限内网/VPN 或加 IP 限制
 - [ ] 管理员账号强制 step-up；定期复审 admin/finance/auditor 角色
 - [ ] 封禁必须有申诉通道（`/api/appeals`）与处理 SLA

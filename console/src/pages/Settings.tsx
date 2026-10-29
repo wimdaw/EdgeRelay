@@ -72,7 +72,17 @@ export default function Settings() {
           </label>
           <Field label="服务条款 URL"><Input value={String(s.termsOfServiceUrl ?? "")} onChange={(e) => set("termsOfServiceUrl", e.target.value)} /></Field>
           <Field label="隐私政策 URL"><Input value={String(s.privacyPolicyUrl ?? "")} onChange={(e) => set("privacyPolicyUrl", e.target.value)} /></Field>
-          <Field label="审计日志保留天数（≥180）"><Input type="number" value={String(s.auditLogRetentionDays ?? 180)} onChange={(e) => set("auditLogRetentionDays", +e.target.value)} /></Field>
+          <Field label="审计日志保留天数（30–180，默认 30）" hint="最短 30 天，最长 180 天">
+            <Input
+              type="number"
+              min={30}
+              max={180}
+              step={1}
+              value={String(s.auditLogRetentionDays ?? 30)}
+              onChange={(e) => set("auditLogRetentionDays", +e.target.value)}
+              onBlur={(e) => set("auditLogRetentionDays", Math.min(180, Math.max(30, Math.round(+e.target.value) || 30)))}
+            />
+          </Field>
         </div>
       </Card>
 
