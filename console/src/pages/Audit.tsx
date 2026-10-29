@@ -43,6 +43,7 @@ export default function Audit() {
           try { await adminAction("clear_audit_logs", {}); toast("已清空"); load(); } catch (e) { toast((e as Error).message, "err"); }
         }}><Trash2 size={14} />清空全部</Button>
       </div>
+      <p className="text-xs text-muted">只展示保留期内的日志。超过后台设置天数（30–180 天，默认 30 天）的最旧记录会在下次写入或查看时自动清理，保留段内的哈希链校验不受影响。</p>
       <Card className="p-4">
         {rows === null ? <div className="flex flex-col gap-2">{[...Array(8)].map((_, i) => <div key={i} className="skeleton h-9" />)}</div> : <DataTable cols={cols} rows={rows} page={20} expand={(r) => <pre className="max-h-40 overflow-auto text-xs">{JSON.stringify(JSON.parse(r.meta ?? "{}"), null, 2)}</pre>} />}
       </Card>

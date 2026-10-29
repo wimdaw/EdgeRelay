@@ -757,6 +757,20 @@ export async function getUserUsageRecords(env: any, userId: string, date: string
 // 9. 哈希链防篡改审计日志 (Audit Logs)
 // ==========================================
 
+/**
+ * 按后台配置的保留天数裁剪最旧的审计日志。
+ * 只从链尾（最旧一端）删除，保留段内的 prevHash 链接关系不受影响。
+ */
+async function trimAuditChainByRetention(env: any, chain: AuditLogRecord[]): Promise<AuditLogRecord[]> {
+  if (chain.length === 0) return chain;
+  const settings = await getSettings(env);
+  const days = clampAuditRetentionDays(settings.auditLogRetentionDays);
+  const cutoff = Math.floor(Date.now() / 1000) - days * 86400;
+  let keep = chain.length;
+  while (keep > 0 && chain[keep - 1].createdAt < cutoff) keep--;
+  return keep === chain.length ? chain : chain.slice(0, keep);
+}
+
 export async function appendAuditLog(
   env: any,
   data: {
@@ -795,14 +809,17 @@ export async function appendAuditLog(
   };
 
   chain.unshift(log);
-  if (chain.length > 1000) chain.length = 1000;
-  await store.setJSON("audit:chain", chain);
+  const retained = await trimAuditChainByRetention(env, chain);
+  if (retained.length > 1000) retained.length = 1000;
+  await store.setJSON("audit:chain", retained);
   return log;
 }
 
 export async function getAuditLogs(env: any, limit = 100): Promise<AuditLogRecord[]> {
   const store = getBlobStore(env);
-  const chain: AuditLogRecord[] = (await store.get("audit:chain", { type: "json", consistency: "strong" })) || [];
+  const raw: AuditLogRecord[] = (await store.get("audit:chain", { type: "json", consistency: "strong" })) || [];
+  const chain = await trimAuditChainByRetention(env, raw);
+  if (chain !== raw) await store.setJSON("audit:chain", chain);
   return chain.slice(0, limit);
 }
 
