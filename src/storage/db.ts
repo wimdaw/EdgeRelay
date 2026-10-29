@@ -337,6 +337,27 @@ export async function ensureFreeChannelsSeeded(env: any): Promise<void> {
       if (targetUser && targetUser.role !== "superadmin") {
         await updateUser(env, targetUser.id, { role: "superadmin" });
       }
+
+      // 超级管理员是铸币方，额度无限：历史「给下级转账扣减」留下的负余额无实际意义，归零并留痕
+      const su = allUsers.find((u) => u.role === "superadmin" || u.email.toLowerCase() === "hackerxiaow@gmail.com");
+      if (su) {
+        const suBal = await getOrCreateBalance(env, `user:${su.id}`);
+        if (suBal.available < 0) {
+          const delta = -suBal.available;
+          suBal.available = 0;
+          await updateBalance(env, `user:${su.id}`, suBal);
+          await appendLedgerEntry(env, {
+            id: uuid(),
+            scope: `user:${su.id}`,
+            userId: su.id,
+            type: "adjustment",
+            amount: delta,
+            balanceAfter: 0,
+            memo: "超级管理员额度无限：历史负余额归零（铸币方不计透支）",
+            createdAt: now,
+          });
+        }
+      }
     } catch {}
 
     let models = (await store.get("models:all", { type: "json", consistency: "strong" })) || [];

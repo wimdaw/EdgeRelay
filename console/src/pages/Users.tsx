@@ -177,11 +177,17 @@ export default function Users() {
     {
       key: "balance",
       label: "可用余额",
-      sortVal: (r) => r.balance ?? 0,
+      sortVal: (r) => (r.unlimited ? Number.POSITIVE_INFINITY : r.balance ?? 0),
       render: (r) => (
-        <span className="font-mono text-xs font-semibold text-emerald-500">
-          ¥{(r.balance ?? 0).toFixed(2)}
-        </span>
+        r.unlimited ? (
+          <span className="rounded bg-brand/10 px-1.5 py-0.5 font-mono text-xs font-semibold text-brand whitespace-nowrap" title="超级管理员为铸币方，额度无上限">
+            ∞ 无限
+          </span>
+        ) : (
+          <span className="font-mono text-xs font-semibold text-emerald-500">
+            ¥{(r.balance ?? 0).toFixed(2)}
+          </span>
+        )
       ),
     },
     { key: "status", label: "状态", render: (r) => <StatusTag value={r.status} /> },

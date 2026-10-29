@@ -172,9 +172,9 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
                 </span>
               </div>
               <div className="font-medium text-ink flex items-center justify-between">
-                <span>{fmtMoney(me.balance.available, me.balance.currency)}</span>
-                {me.user.role === "superadmin" && (
-                  <span className="text-[10px] text-emerald-500 font-semibold font-mono">无限额度</span>
+                <span>{me.unlimited ? "∞ 无限额度" : fmtMoney(me.balance.available, me.balance.currency)}</span>
+                {me.unlimited && (
+                  <span className="text-[10px] text-muted font-normal">铸币方</span>
                 )}
               </div>
             </div>

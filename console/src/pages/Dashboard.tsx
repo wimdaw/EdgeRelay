@@ -56,7 +56,7 @@ export default function Dashboard() {
     { label: "我的成功率（24h）", value: stats ? `${((1 - stats.errorRate) * 100).toFixed(2)}%` : "", icon: Activity, color: "text-ok bg-ok/10" },
     {
       label: isSuperadmin ? "当前余额 (超管无限)" : "当前余额",
-      value: isSuperadmin ? `${fmtMoney(balance, me.balance.currency)} (无限)` : fmtMoney(balance, me.balance.currency),
+      value: isSuperadmin ? "∞ 无限额度" : fmtMoney(balance, me.balance.currency),
       icon: ShieldQuestion,
       color: "text-brand bg-brand/10",
     },
@@ -174,7 +174,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs">
             <span className="text-muted">当前可用余额</span>
             <span className="font-mono text-sm font-bold text-emerald-500">
-              {fmtMoney(balance, me.balance.currency)}
+              {isSuperadmin ? "∞ 无限额度" : fmtMoney(balance, me.balance.currency)}
             </span>
           </div>
 

@@ -47,7 +47,7 @@ export async function getBalance(env: any, scope: string): Promise<{ available: 
   return { available: b.available, frozen: b.frozen, currency: b.currency };
 }
 
-/** 冻结预估额度；超级管理员不限制余额上限，普通/VIP用户不足返回 402 */
+/** 冻结预估额度；超级管理员为铸币方，额度无上限且不做钱包冻结/扣减 */
 export async function hold(
   c: HandlerCtx,
   scope: string,
@@ -55,12 +55,12 @@ export async function hold(
   requestId: string,
   userRole?: string
 ): Promise<{ holdId: string }> {
+  // 超级管理员不占用钱包额度（调用用量仍会通过 settle 写入账本流水）
+  if (userRole === "superadmin") return { holdId: "" };
   if (amount <= 0) return { holdId: "" };
   const bal = await getOrCreateBalance(c.env, scope);
 
-  // 超级管理员拥有无限调用额度，不卡余额不足拦截；调用照常真实扣费记账
-  const isSuperadmin = userRole === "superadmin";
-  if (!isSuperadmin && bal.available - bal.frozen < amount) {
+  if (bal.available - bal.frozen < amount) {
     throw new ApiError(402, ErrorCode.INSUFFICIENT_BALANCE, "余额不足，请充值", {
       available: bal.available,
       frozen: bal.frozen,
@@ -91,32 +91,34 @@ export async function hold(
 /** 结算：按实际费用 capture，并释放剩余冻结 */
 export async function settle(
   c: HandlerCtx,
-  args: { scope: string; holdId: string; heldAmount: number; actualCost: number; requestId: string; userId: string; apiKeyId?: string }
+  args: { scope: string; holdId: string; heldAmount: number; actualCost: number; requestId: string; userId: string; apiKeyId?: string; unlimited?: boolean }
 ): Promise<void> {
   const now = Math.floor(Date.now() / 1000);
   const releaseAmount = Math.max(0, args.heldAmount - args.actualCost);
   const bal = await getOrCreateBalance(c.env, args.scope);
 
-  bal.available -= args.actualCost;
-  bal.frozen = Math.max(0, bal.frozen - args.heldAmount);
-  await updateBalance(c.env, args.scope, bal);
+  if (!args.unlimited) {
+    bal.available -= args.actualCost;
+    bal.frozen = Math.max(0, bal.frozen - args.heldAmount);
+    await updateBalance(c.env, args.scope, bal);
 
-  // 扣费后若余额归零或为负，自动降级为普通用户 (user)
-  if (bal.available <= 0 && args.userId) {
-    const { syncUserVipStatus } = await import("./storage/db");
-    syncUserVipStatus(c.env, args.userId, bal.available).catch(() => {});
+    // 扣费后若余额归零或为负，自动降级为普通用户 (user)
+    if (bal.available <= 0 && args.userId) {
+      const { syncUserVipStatus } = await import("./storage/db");
+      syncUserVipStatus(c.env, args.userId, bal.available).catch(() => {});
+    }
   }
 
-  // 1. 记 capture
+  // 1. 记 capture（超级管理员虽不占用额度，但仍记录真实用量与费用流水，保证账目清晰）
   await appendLedgerEntry(c.env, {
     id: uuid(),
     scope: args.scope,
     userId: args.userId,
     type: "capture",
     amount: args.actualCost,
-    balanceAfter: bal.available,
+    balanceAfter: args.unlimited ? 0 : bal.available,
     requestId: args.requestId,
-    memo: `capture ${args.actualCost.toFixed(6)}`,
+    memo: args.unlimited ? `capture ${args.actualCost.toFixed(6)}（超管无限额度，仅记流水）` : `capture ${args.actualCost.toFixed(6)}`,
     createdAt: now,
   });
 

@@ -280,6 +280,7 @@ chatRouter.post("/", async (c) => {
                   requestId,
                   userId: key.userId,
                   apiKeyId: key.keyId,
+                  unlimited: key.userRole === "superadmin",
                 });
                 await reportTokenUsage(env, key.keyId, promptTokens + completionTokens);
                 await addUsageRecord(env, {
@@ -328,6 +329,7 @@ chatRouter.post("/", async (c) => {
             requestId,
             userId: key.userId,
             apiKeyId: key.keyId,
+            unlimited: key.userRole === "superadmin",
           });
           released = true;
           await releaseConcurrency(env, key.keyId);
@@ -388,6 +390,7 @@ chatRouter.post("/", async (c) => {
                       requestId,
                       userId: key.userId,
                       apiKeyId: key.keyId,
+                      unlimited: key.userRole === "superadmin",
                     });
                     await reportTokenUsage(env, key.keyId, promptTokens + completionTokens);
                     await addUsageRecord(env, {
@@ -479,6 +482,7 @@ chatRouter.post("/", async (c) => {
           requestId,
           userId: key.userId,
           apiKeyId: key.keyId,
+          unlimited: key.userRole === "superadmin",
         });
         released = true;
         await releaseConcurrency(env, key.keyId);

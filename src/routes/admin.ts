@@ -149,6 +149,7 @@ adminRouter.post("/actions", async (c) => {
               balance: bal.available ?? 0,
               frozen: bal.frozen ?? 0,
               currency: bal.currency ?? "CNY",
+              unlimited: u.role === "superadmin",
               created_at: u.createdAt,
             };
           })
@@ -683,11 +684,15 @@ adminRouter.post("/actions", async (c) => {
           }
         }
 
-        // 扣除操作者自身的余额（普通管理员实扣，超级管理员无限额度但照常扣费流水）
+        // 资金流转：
+        //  · 普通管理员：实打实从自身余额转出（余额为 0 或不足直接拒绝）
+        //  · 超级管理员：作为铸币方，不扣自身余额，仅在 system:mint 账本留下发款流水用于对账
         if (amount > 0 && admin.id) {
           const { getOrCreateBalance } = await import("../storage/db");
-          const actorBal = await getOrCreateBalance(env, `user:${admin.id}`);
-          if (admin.role !== "superadmin") {
+          if (admin.role === "superadmin") {
+            await topup(hCtx, "system:mint", -amount, `超级管理员 [${admin.email}] 向 [${targetUser?.email || scope}] 铸币发款`);
+          } else {
+            const actorBal = await getOrCreateBalance(env, `user:${admin.id}`);
             if (actorBal.available <= 0) {
               throw new ApiError(
                 402,
@@ -702,9 +707,8 @@ adminRouter.post("/actions", async (c) => {
                 `您的管理员账户可用余额不足 (当前 ¥${actorBal.available.toFixed(2)})，无法为下级用户充值 ¥${amount.toFixed(2)}`
               );
             }
+            await topup(hCtx, `user:${admin.id}`, -amount, `给下级用户 [${targetUser?.email || scope}] 充值转账扣减`);
           }
-          // 从当前管理员账户转出扣除
-          await topup(hCtx, `user:${admin.id}`, -amount, `给下级用户 [${targetUser?.email || scope}] 充值转账扣减`);
         }
 
         // 记账加款到目标用户

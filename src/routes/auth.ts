@@ -337,6 +337,8 @@ authRouter.get("/me", async (c) => {
         frozen: bal.frozen ?? 0,
         currency: bal.currency ?? "CNY",
       },
+      // 超级管理员为铸币方，额度无上限（负余额无实际意义，前端展示为 ∞）
+      unlimited: u.role === "superadmin",
     });
   } catch (err) {
     return errorResponse(hCtx, err);
