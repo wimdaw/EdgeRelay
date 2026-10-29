@@ -10,17 +10,16 @@ const ALL_ROLES = ["user", "vip", "admin", "superadmin", "finance", "auditor"];
 const NAV = [
   { to: "/dashboard", label: "仪表盘", icon: Gauge, roles: ALL_ROLES },
   { to: "/dashboard/keys", label: "API Keys", icon: KeyRound, roles: ALL_ROLES },
-  { to: "/dashboard/models", label: "模型池", icon: Layers, roles: ALL_ROLES },
-  { to: "/dashboard/usage", label: "用量日志", icon: ScrollText, roles: ALL_ROLES },
-  { to: "/dashboard/invite", label: "邀请", icon: Gift, roles: ALL_ROLES },
-  { to: "/dashboard/profile", label: "个人主页", icon: CircleUser, roles: ALL_ROLES },
-  // 网站治理专属超级管理员
   { to: "/dashboard/providers", label: "供应商", icon: Server, roles: ["superadmin"] },
+  { to: "/dashboard/models", label: "模型池", icon: Layers, roles: ALL_ROLES },
   { to: "/dashboard/pricing", label: "定价", icon: Coins, roles: ["superadmin"] },
   { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ["superadmin", "admin"] },
+  { to: "/dashboard/invite", label: "邀请", icon: Gift, roles: ALL_ROLES },
   { to: "/dashboard/announcements", label: "公告", icon: Megaphone, roles: ["superadmin"] },
-  { to: "/dashboard/settings", label: "设置", icon: SettingsIcon, roles: ["superadmin"] },
+  { to: "/dashboard/usage", label: "用量日志", icon: ScrollText, roles: ALL_ROLES },
   { to: "/dashboard/audit", label: "审计日志", icon: ShieldCheck, roles: ["superadmin", "auditor"] },
+  { to: "/dashboard/profile", label: "个人主页", icon: CircleUser, roles: ALL_ROLES },
+  { to: "/dashboard/settings", label: "设置", icon: SettingsIcon, roles: ["superadmin"] },
 ];
 
 export function useTheme() {
@@ -55,6 +54,12 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
   const navigate = useNavigate();
   const toast = useToast();
   useEffect(() => setDrawer(false), [loc.pathname]);
+
+  // 顶栏标题按最长路径匹配，避免 /dashboard 前缀把子页面全显示成"仪表盘"
+  const activeLabel =
+    NAV.filter((n) => n.roles.includes(me.user.role))
+      .filter((n) => loc.pathname === n.to || loc.pathname.startsWith(`${n.to}/`))
+      .sort((a, b) => b.to.length - a.to.length)[0]?.label ?? "仪表盘";
 
   const [collapsed, setCollapsed] = useState(() => {
     try {
@@ -207,7 +212,7 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
           >
             {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
           </button>
-          <div className="text-sm font-medium">{NAV.filter((n) => n.roles.includes(me.user.role)).find((n) => loc.pathname.startsWith(n.to))?.label ?? "仪表盘"}</div>
+          <div className="text-sm font-medium">{activeLabel}</div>
           <div className="flex-1" />
           <span className="hidden text-xs text-muted sm:block">
             {me.unlimited
