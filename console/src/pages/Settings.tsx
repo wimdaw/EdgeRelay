@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { adminAction, type PlatformSettings, type SiteInfo } from "../lib/api";
 import { Button, Card, Field, Input, useToast } from "../components/ui";
+import Announcements from "./Announcements";
 
 type SmtpCfg = { enabled: boolean; host: string; port: number; username: string; from: string; passwordSet: boolean };
 type OAuthCfg = { github: { enabled: boolean; clientId: string; secretSet: boolean }; google: { enabled: boolean; clientId: string; secretSet: boolean } };
@@ -13,7 +14,7 @@ export default function Settings() {
   const [oauth, setOauth] = useState<OAuthCfg | null>(null);
   const [oauthSecrets, setOauthSecrets] = useState({ gh: "", gg: "" });
   const [webhook, setWebhook] = useState("");
-  const [tab, setTab] = useState<"billing" | "moderation" | "compliance" | "webhook" | "site" | "smtp" | "oauth">("billing");
+  const [tab, setTab] = useState<"billing" | "moderation" | "compliance" | "webhook" | "site" | "smtp" | "oauth" | "announcements">("billing");
   const toast = useToast();
 
   useEffect(() => {
@@ -43,8 +44,9 @@ export default function Settings() {
           ["compliance", "注册与合规"],
           ["webhook", "Webhook 与安全"],
           ["site", "站点信息"],
-          ["smtp", "SMTP 邮件"],
-          ["oauth", "OAuth 登录"],
+          ["smtp", "发件配置"],
+          ["oauth", "第三方登录"],
+          ["announcements", "公告"],
         ] as const).map(([k, l]) => (
           <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
             className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{l}</button>
@@ -260,6 +262,8 @@ export default function Settings() {
         )}
       </Card>
       )}
+
+      {tab === "announcements" && <Announcements />}
 
     </div>
   );

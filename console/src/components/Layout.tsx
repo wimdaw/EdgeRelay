@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Bell, Boxes, CircleUser, DatabaseBackup, Gauge, KeyRound, Layers, LogOut, Megaphone, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, Sun, Users, X } from "lucide-react";
+import { Bell, Boxes, CircleUser, DatabaseBackup, Gauge, KeyRound, Layers, LogOut, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, Sun, Users, X } from "lucide-react";
 import { api, type Me, type SiteInfo } from "../lib/api";
 import { getSeenAnnouncementIds, markAnnouncementsSeen } from "../lib/announcements";
 import { cn, fmtMoney } from "../lib/utils";
@@ -14,11 +14,10 @@ const NAV = [
   { to: "/dashboard/providers", label: "供应商", icon: Server, roles: ["superadmin"] },
   { to: "/dashboard/models", label: "模型与定价", icon: Layers, roles: ALL_ROLES },
   { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ["superadmin", "admin"] },
-  { to: "/dashboard/announcements", label: "公告", icon: Megaphone, roles: ["superadmin"] },
-  { to: "/dashboard/logs", label: "日志", icon: ScrollText, roles: ALL_ROLES },
+  { to: "/dashboard/logs", label: "运行日志", icon: ScrollText, roles: ALL_ROLES },
   { to: "/dashboard/profile", label: "个人主页", icon: CircleUser, roles: ALL_ROLES },
   { to: "/dashboard/backup", label: "数据备份", icon: DatabaseBackup, roles: ["superadmin"] },
-  { to: "/dashboard/settings", label: "设置", icon: SettingsIcon, roles: ["superadmin"] },
+  { to: "/dashboard/settings", label: "网站设置", icon: SettingsIcon, roles: ["superadmin"] },
 ];
 
 export function useTheme() {

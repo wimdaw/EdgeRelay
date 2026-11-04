@@ -17,7 +17,6 @@ const Logs = lazy(() => import("./pages/Logs"));
 const Users = lazy(() => import("./pages/Users"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Backup = lazy(() => import("./pages/Backup"));
-const Announcements = lazy(() => import("./pages/Announcements"));
 const Settings = lazy(() => import("./pages/Settings"));
 
 declare global {
@@ -127,7 +126,7 @@ function Shell() {
         <Route path="/dashboard/providers" element={isSuperadmin ? <Providers /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/users" element={canManageUsers ? <Users /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/settings" element={isSuperadmin ? <Settings /> : <Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard/announcements" element={isSuperadmin ? <Announcements /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard/announcements" element={<Navigate to="/dashboard/settings" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
