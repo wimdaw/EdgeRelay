@@ -118,12 +118,7 @@ export default function Providers() {
 
   const fetchModels = async (providerId: string, providerName: string) => {
     const p = (rows ?? []).find((x) => x.id === providerId);
-    const isKeyless = isKeylessSlug(p?.slug);
-    if (!keyMemo.current[providerId] && !isKeyless) {
-      setImportStep({ providerId, providerName, models: [], picked: new Set(), loading: false,
-        error: "浏览器直拉需要密钥（服务端不保存明文）。请点供应商卡片的「密钥池」重新输入一次，即可直连上游获取模型列表。" });
-      return;
-    }
+    // 有本会话内存密钥时优先浏览器直拉；没有则 pullModels 内部自动回退后端（服务端用密文 Key 拉取）
     await pullModels(providerId, providerName, p?.base_url ?? "", "");
   };
 

@@ -10,6 +10,7 @@ import { uuid, encryptSecret, decryptSecret, sha256Hex } from "../crypto";
 import { getSettings, updateSettings, json } from "../settings";
 import { audit, verifyAuditChain } from "../audit";
 import { topup } from "../billing";
+import { joinApiPath } from "../providers";
 import {
   listAllUsers,
   getUserById,
@@ -513,7 +514,7 @@ adminRouter.post("/actions", async (c) => {
           if (activeKey) {
             try {
               const plainKey = await decryptSecret(env, activeKey.encryptedKey);
-              const mRes = await fetch(`${prov.baseUrl.replace(/\/+$/, "")}/v1/models`, {
+              const mRes = await fetch(joinApiPath(prov.baseUrl, "/v1/models"), {
                 headers: { authorization: `Bearer ${plainKey}` },
                 signal: AbortSignal.timeout(15000),
               });
