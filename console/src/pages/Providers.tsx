@@ -118,7 +118,8 @@ export default function Providers() {
 
   const fetchModels = async (providerId: string, providerName: string) => {
     const p = (rows ?? []).find((x) => x.id === providerId);
-    // 有本会话内存密钥时优先浏览器直拉；没有则 pullModels 内部自动回退后端（服务端用密文 Key 拉取）
+    // 弹窗内先切到 loading，避免旧列表残留；有本会话内存密钥时优先浏览器直拉，否则自动回退后端
+    setImportStep({ providerId, providerName, models: [], picked: new Set(), loading: true });
     await pullModels(providerId, providerName, p?.base_url ?? "", "");
   };
 
@@ -414,9 +415,15 @@ export default function Providers() {
           </div>
         ) : (
           <>
-            <div className="mb-2 flex items-center justify-between">
+            <div className="mb-2 flex items-center justify-between gap-2">
               <span className="text-xs text-muted">候选模型清单（已勾选 {importStep?.picked.size ?? 0} 个）：</span>
-              <button className="text-xs text-brand hover:underline" onClick={() => importStep && setImportStep({ ...importStep, picked: new Set(importStep.models) })}>全选</button>
+              <div className="flex shrink-0 items-center gap-2">
+                <button className="text-xs text-brand hover:underline" onClick={() => importStep && setImportStep({ ...importStep, picked: new Set(importStep.models) })}>全选</button>
+                <Button variant="ghost" className="!h-6 !px-2 text-xs" title="重新从上游拉取模型列表"
+                  onClick={() => importStep && fetchModels(importStep.providerId, importStep.providerName)}>
+                  <RefreshCw size={12} />重新拉取模型
+                </Button>
+              </div>
             </div>
             <div className="max-h-60 space-y-1 overflow-y-auto rounded-lg border border-line p-2">
               {importStep?.models.length === 0 && <p className="py-6 text-center text-xs text-muted">未发现上游模型，可在下方手动输入模型名称添加</p>}
