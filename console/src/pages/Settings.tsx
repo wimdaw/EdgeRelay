@@ -13,6 +13,7 @@ export default function Settings() {
   const [oauth, setOauth] = useState<OAuthCfg | null>(null);
   const [oauthSecrets, setOauthSecrets] = useState({ gh: "", gg: "" });
   const [webhook, setWebhook] = useState("");
+  const [tab, setTab] = useState<"billing" | "moderation" | "compliance" | "webhook" | "site" | "smtp" | "oauth">("billing");
   const toast = useToast();
 
   useEffect(() => {
@@ -34,8 +35,24 @@ export default function Settings() {
   if (!s) return <div className="grid gap-4 md:grid-cols-2">{[...Array(4)].map((_, i) => <div key={i} className="skeleton h-44" />)}</div>;
 
   return (
-    <div className="grid gap-5 lg:grid-cols-2">
-      <Card className="p-5">
+    <div className="flex flex-col gap-4">
+      <div className="flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit" role="tablist">
+        {([
+          ["billing", "计费与限流"],
+          ["moderation", "内容安全"],
+          ["compliance", "注册与合规"],
+          ["webhook", "Webhook 与安全"],
+          ["site", "站点信息"],
+          ["smtp", "SMTP 邮件"],
+          ["oauth", "OAuth 登录"],
+        ] as const).map(([k, l]) => (
+          <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
+            className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{l}</button>
+        ))}
+      </div>
+
+      {tab === "billing" && (
+      <Card className="p-4 sm:p-5">
         <h2 className="mb-4 text-sm font-semibold">计费与限流</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="默认 RPM（每 Key）" hint="填 0 为完全不限">
@@ -47,8 +64,10 @@ export default function Settings() {
         </div>
         <p className="mt-3 text-xs text-muted">超出限制返回 HTTP 429 与 Retry-After。填 0 代表完全不限流；可在「定价」页面为每个大模型单独设置独立 RPM 限流。</p>
       </Card>
+      )}
 
-      <Card className="p-5">
+      {tab === "moderation" && (
+      <Card className="p-4 sm:p-5">
         <h2 className="mb-4 text-sm font-semibold">内容安全</h2>
         <label className="mb-3 flex items-center justify-between text-[13px]">
           启用内容安全审核
@@ -60,8 +79,10 @@ export default function Settings() {
         </label>
         <Field label="外部审核 API（可选，POST {input} → {flagged}）"><Input value={String((s as Record<string, unknown>).MODERATION_API_URL ?? "")} onChange={(e) => set("MODERATION_API_URL", e.target.value)} placeholder="https://..." /></Field>
       </Card>
+      )}
 
-      <Card className="p-5">
+      {tab === "compliance" && (
+      <Card className="p-4 sm:p-5">
         <h2 className="mb-4 text-sm font-semibold">注册与合规文本</h2>
         <div className="flex flex-col gap-3">
           <label className="flex items-center justify-between text-[13px]">开放注册
@@ -85,12 +106,16 @@ export default function Settings() {
           </Field>
         </div>
       </Card>
+      )}
 
-      <div className="lg:col-span-2 flex justify-end">
-        <Button onClick={save}>保存合规与限流设置</Button>
-      </div>
+      {["billing", "moderation", "compliance"].includes(tab) && (
+        <div className="flex justify-end">
+          <Button onClick={save}>保存合规与限流设置</Button>
+        </div>
+      )}
 
-      <Card className="p-5">
+      {tab === "webhook" && (
+      <Card className="p-4 sm:p-5">
         <h2 className="mb-4 text-sm font-semibold">Webhook 与安全</h2>
         <Field label="上游事件 Webhook 地址"><Input value={webhook} onChange={(e) => setWebhook(e.target.value)} placeholder="https://api.obitw.cn/api/webhooks/upstream（X-Webhook-Secret 校验）" /></Field>
         <div className="mt-4 flex flex-col gap-3 border-t border-line pt-4">
@@ -115,9 +140,11 @@ export default function Settings() {
           <li>审计日志哈希链防篡改，建议每日运行「校验链完整性」</li>
         </ul>
       </Card>
+      )}
 
       {/* 站点信息（SEO 与品牌） */}
-      <Card className="p-5 lg:col-span-2">
+      {tab === "site" && (
+      <Card className="p-4 sm:p-5">
         <h2 className="mb-1 text-sm font-semibold">站点信息</h2>
         <p className="mb-4 text-xs text-muted">用于各页面 SEO 与控制台品牌；此卡片独立保存。</p>
         <div className="grid gap-3 md:grid-cols-2">
@@ -165,9 +192,11 @@ export default function Settings() {
         </div>
         <div className="mt-4"><Button onClick={save}>保存站点信息</Button></div>
       </Card>
+      )}
 
       {/* 登录方式：SMTP */}
-      <Card className="p-5">
+      {tab === "smtp" && (
+      <Card className="p-4 sm:p-5">
         <h2 className="mb-1 text-sm font-semibold">SMTP 邮件（密码重置验证码）</h2>
         <p className="mb-4 text-xs text-muted">此卡片独立保存，与「合规与限流」互不影响。</p>
         {smtp === null ? <div className="skeleton h-32" /> : (
@@ -191,9 +220,11 @@ export default function Settings() {
           </div>
         )}
       </Card>
+      )}
 
       {/* 登录方式：OAuth */}
-      <Card className="p-5">
+      {tab === "oauth" && (
+      <Card className="p-4 sm:p-5">
         <h2 className="mb-1 text-sm font-semibold">OAuth 登录（GitHub / Google）</h2>
         <p className="mb-4 text-xs text-muted">此卡片独立保存；密钥加密存储。保存后不会被其他卡片的保存操作覆盖。</p>
         {oauth === null ? <div className="skeleton h-32" /> : (
@@ -228,6 +259,7 @@ export default function Settings() {
           </div>
         )}
       </Card>
+      )}
 
     </div>
   );
