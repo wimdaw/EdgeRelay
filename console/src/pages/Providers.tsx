@@ -116,6 +116,12 @@ export default function Providers() {
     setImportStep({ providerId, providerName, models: models ?? [], picked: new Set(models ?? []), loading: false });
   };
 
+  const openManualAdd = (providerId: string, providerName: string) => {
+    // 直接打开空清单弹窗，走下方「手动输入模型名」流程
+    setCustomModelInput("");
+    setImportStep({ providerId, providerName, models: [], picked: new Set(), loading: false });
+  };
+
   const fetchModels = async (providerId: string, providerName: string) => {
     const p = (rows ?? []).find((x) => x.id === providerId);
     // 弹窗内先切到 loading，避免旧列表残留；有本会话内存密钥时优先浏览器直拉，否则自动回退后端
@@ -285,6 +291,9 @@ export default function Providers() {
               <div className="mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5">
                 <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => fetchModels(p.id, p.name)} title="从上游导入或手动添加模型" aria-label="导入模型">
                   <RefreshCw size={13} />
+                </Button>
+                <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => openManualAdd(p.id, p.name)} title="手动添加模型" aria-label="手动添加模型">
+                  <Plus size={13} />
                 </Button>
                 {!isKeylessSlug(p.slug) && (
                   <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => { setKeyDlg(p); setKeyVal(""); setNewKeyLabel("prod"); }} title={`管理多 Key 轮换池（当前 ${p.key_count} 个）`} aria-label="密钥池">
