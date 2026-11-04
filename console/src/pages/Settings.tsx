@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
-import { adminAction, type PlatformSettings, type SiteInfo } from "../lib/api";
+import { adminAction, adminActionStepUp, type PlatformSettings, type SiteInfo } from "../lib/api";
 import { Button, Card, Field, Input, useToast } from "../components/ui";
 import Announcements from "./Announcements";
 
 type SmtpCfg = { enabled: boolean; host: string; port: number; username: string; from: string; passwordSet: boolean };
 type OAuthCfg = { github: { enabled: boolean; clientId: string; secretSet: boolean }; google: { enabled: boolean; clientId: string; secretSet: boolean } };
+type EpayCfg = { enabled: boolean; gateway: string; pid: string; hasKey: boolean; channels: string[]; minAmount: number; maxAmount: number; productName: string };
+
+/** 易支付支持的支付方式（与后端 set_epay 的白名单一致） */
+const EPAY_CHANNELS: { key: string; label: string }[] = [
+  { key: "alipay", label: "支付宝" },
+  { key: "wxpay", label: "微信支付" },
+  { key: "qqpay", label: "QQ 钱包" },
+  { key: "usdt", label: "USDT" },
+];
 
 export default function Settings() {
   const [s, setS] = useState<PlatformSettings | null>(null);
@@ -14,13 +23,16 @@ export default function Settings() {
   const [oauth, setOauth] = useState<OAuthCfg | null>(null);
   const [oauthSecrets, setOauthSecrets] = useState({ gh: "", gg: "" });
   const [webhook, setWebhook] = useState("");
-  const [tab, setTab] = useState<"billing" | "moderation" | "compliance" | "webhook" | "site" | "smtp" | "oauth" | "announcements">("billing");
+  const [epay, setEpay] = useState<EpayCfg | null>(null);
+  const [epayKey, setEpayKey] = useState("");
+  const [tab, setTab] = useState<"billing" | "moderation" | "compliance" | "webhook" | "site" | "smtp" | "oauth" | "epay" | "announcements">("billing");
   const toast = useToast();
 
   useEffect(() => {
     adminAction<{ settings: PlatformSettings }>("get_settings").then((d) => setS(d.settings)).catch((e) => toast(e.message, "err"));
     adminAction<{ smtp: SmtpCfg }>("get_smtp").then((d) => setSmtp(d.smtp)).catch(() => setSmtp(null));
     adminAction<{ oauth: OAuthCfg }>("get_oauth").then((d) => setOauth(d.oauth)).catch(() => setOauth(null));
+    adminAction<{ epay: EpayCfg }>("get_epay").then((d) => setEpay(d.epay)).catch(() => setEpay(null));
     fetch("/api/site").then((r) => r.json()).then(setSite).catch(() => {});
   }, []);
 
@@ -46,6 +58,7 @@ export default function Settings() {
           ["site", "站点信息"],
           ["smtp", "发件配置"],
           ["oauth", "第三方登录"],
+          ["epay", "支付配置"],
           ["announcements", "公告"],
         ] as const).map(([k, l]) => (
           <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
@@ -258,6 +271,86 @@ export default function Settings() {
                 toast("OAuth 配置已保存"); setOauthSecrets({ gh: "", gg: "" });
               } catch (err) { toast((err as Error).message, "err"); }
             }}>保存 OAuth 配置</Button></div>
+          </div>
+        )}
+      </Card>
+      )}
+
+      {/* 在线支付：易支付协议 */}
+      {tab === "epay" && (
+      <Card className="p-4 sm:p-5">
+        <h2 className="mb-1 text-sm font-semibold">在线支付（易支付协议）</h2>
+        <p className="mb-4 text-xs text-muted">
+          兼容彩虹易支付 <code>mapi.php</code> / <code>submit.php</code> 协议，密钥加密存储。启用后用户可在余额页自助充值，到账由平台异步回调驱动。
+        </p>
+        {epay === null ? <div className="skeleton h-32" /> : (
+          <div className="flex flex-col gap-4">
+            <label className="flex items-center justify-between rounded-lg border border-line px-3 py-2 text-[13px] font-medium">
+              启用在线支付
+              <input type="checkbox" className="h-4 w-4 accent-[#F38020]" checked={epay.enabled} onChange={(e) => setEpay({ ...epay, enabled: e.target.checked })} />
+            </label>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Field label="网关地址" hint="易支付站点根地址，不要带 /submit.php">
+                <Input value={epay.gateway} onChange={(e) => setEpay({ ...epay, gateway: e.target.value })} placeholder="https://epay-pages.pages.dev" />
+              </Field>
+              <Field label="商户 PID" hint="商户中心显示的商户编号">
+                <Input value={epay.pid} onChange={(e) => setEpay({ ...epay, pid: e.target.value })} placeholder="如 1001" />
+              </Field>
+              <Field label={`商户密钥 KEY${epay.hasKey ? "（已设置，留空保持不变）" : ""}`} hint="32 位通信私钥，仅加密存储、不回显">
+                <Input type="password" value={epayKey} onChange={(e) => setEpayKey(e.target.value)} placeholder={epay.hasKey ? "••••••••" : "粘贴商户密钥"} />
+              </Field>
+              <Field label="商品名称" hint="下单时展示给付款人">
+                <Input value={epay.productName} onChange={(e) => setEpay({ ...epay, productName: e.target.value })} placeholder="API 额度充值" />
+              </Field>
+              <Field label="单笔最低金额（元）">
+                <Input type="number" value={String(epay.minAmount)} onChange={(e) => setEpay({ ...epay, minAmount: +e.target.value || 0 })} />
+              </Field>
+              <Field label="单笔最高金额（元）">
+                <Input type="number" value={String(epay.maxAmount)} onChange={(e) => setEpay({ ...epay, maxAmount: +e.target.value || 0 })} />
+              </Field>
+            </div>
+
+            <Field label="启用的支付方式" hint="用户充值时可选的渠道">
+              <div className="flex flex-wrap gap-2 pt-1">
+                {EPAY_CHANNELS.map((ch) => {
+                  const on = epay.channels.includes(ch.key);
+                  return (
+                    <button
+                      key={ch.key}
+                      type="button"
+                      onClick={() => setEpay({ ...epay, channels: on ? epay.channels.filter((x) => x !== ch.key) : [...epay.channels, ch.key] })}
+                      className={`cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${on ? "border-brand/40 bg-brand/10 text-brand" : "border-line text-muted hover:text-ink"}`}
+                    >{ch.label}</button>
+                  );
+                })}
+              </div>
+            </Field>
+
+            <p className="text-xs text-muted">
+              异步回调地址（在易支付商户后台确认该地址可公网访问）：
+              <code className="ml-1">{location.origin}/api/pay/epay/notify</code>
+            </p>
+
+            <div>
+              <Button onClick={async () => {
+                try {
+                  await adminActionStepUp("set_epay", {
+                    enabled: epay.enabled,
+                    gateway: epay.gateway,
+                    pid: epay.pid,
+                    channels: epay.channels,
+                    minAmount: epay.minAmount,
+                    maxAmount: epay.maxAmount,
+                    productName: epay.productName,
+                    ...(epayKey ? { key: epayKey } : {}),
+                  });
+                  toast("支付配置已保存（密钥已加密存储）");
+                  setEpayKey("");
+                  adminAction<{ epay: EpayCfg }>("get_epay").then((d) => setEpay(d.epay)).catch(() => {});
+                } catch (err) { toast((err as Error).message, "err"); }
+              }}>保存支付配置</Button>
+            </div>
           </div>
         )}
       </Card>

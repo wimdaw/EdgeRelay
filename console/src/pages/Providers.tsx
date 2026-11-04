@@ -17,7 +17,7 @@ import {
   Users,
   Globe,
 } from "lucide-react";
-import { adminAction, type Provider } from "../lib/api";
+import { adminAction, adminActionStepUp, type Provider } from "../lib/api";
 import { Button, Card, Dialog, EmptyState, Field, Input, Select, StatusTag, useConfirm, useToast } from "../components/ui";
 import { cn } from "../lib/utils";
 
@@ -158,6 +158,8 @@ type WebMeta = {
   desc: string;
   credHint: string;
   models: string[];
+  /** 支持零凭据运行（匿名），凭据可留空 */
+  anonymous?: boolean;
 };
 
 const WEB_CATALOG: WebMeta[] = [
@@ -184,9 +186,10 @@ const WEB_CATALOG: WebMeta[] = [
     name: "Gemini 网页版",
     slug: "gemini-web",
     baseUrl: "https://gemini.google.com",
-    desc: "Gemini 网页 Cookie 反代（SAPISIDHASH 鉴权）。",
-    credHint: "Cookie 字符串（含 __Secure-1PSID / __Secure-3PSID / SAPISID）",
+    desc: "Gemini 网页 Cookie 反代（SAPISIDHASH 鉴权）；不留凭据可直接匿名使用，额度与模型受限。",
+    credHint: "Cookie 字符串（含 __Secure-1PSID / __Secure-3PSID / SAPISID）；留空即匿名模式",
     models: ["gemini-3.7-flash", "gemini-3.1-pro", "gemini-3.5-flash-thinking"],
+    anonymous: true,
   },
   {
     type: "minimaxweb",
@@ -227,26 +230,8 @@ type WebDialogState = {
   saving?: boolean;
 };
 
-/** 管理操作遇到二次验证时：等待全局验证弹窗完成并自动重试一次 */
-async function adminActionStepUp<T = { ok: true; result?: unknown }>(action: string, payload: Record<string, unknown> = {}): Promise<T> {
-  try {
-    return await adminAction<T>(action, payload);
-  } catch (e) {
-    if ((e as { code?: string })?.code !== "step_up_required") throw e;
-    const ok = await new Promise<boolean>((resolve) => {
-      const done = () => { cleanup(); resolve(true); };
-      const cancel = () => { cleanup(); resolve(false); };
-      const cleanup = () => {
-        window.removeEventListener("gw:stepup-done", done);
-        window.removeEventListener("gw:stepup-cancelled", cancel);
-      };
-      window.addEventListener("gw:stepup-done", done);
-      window.addEventListener("gw:stepup-cancelled", cancel);
-    });
-    if (!ok) throw new Error("已取消管理员二次验证");
-    return await adminAction<T>(action, payload);
-  }
-}
+/** 管理操作遇到二次验证时：等待全局验证弹窗完成并自动重试一次（实现见 lib/api） */
+
 
 export default function Providers() {
   const [rows, setRows] = useState<Provider[] | null>(null);
@@ -613,7 +598,7 @@ export default function Providers() {
   const saveWeb = async () => {
     if (!webDlg) return;
     const d = webDlg;
-    if (!d.credential.trim()) return toast("请粘贴账号凭据", "err");
+    if (!d.provider && !d.credential.trim() && !d.meta.anonymous) return toast("请粘贴账号凭据", "err");
     if (!d.provider) {
       if (!d.name.trim()) return toast("请填写渠道名称", "err");
       if (!d.slug.trim()) return toast("请填写渠道 Slug", "err");
@@ -634,14 +619,14 @@ export default function Providers() {
           slug: d.slug.trim().toLowerCase(),
           kind: `web:${d.meta.type}`,
           baseUrl: d.baseUrl.trim(),
-          key: d.credential.trim(),
+          key: d.credential.trim() || undefined,
         });
         const list = await adminAction<{ providers: Provider[] }>("list_providers");
         providerId = list.providers.find((x) => x.slug === d.slug.trim().toLowerCase())?.id || "";
         setRows(list.providers);
       }
       if (!providerId) throw new Error("Web 渠道创建失败");
-      toast("Web 渠道凭据已加密入库");
+      toast(d.credential.trim() ? "Web 渠道凭据已加密入库" : "Web 渠道已接入（匿名模式，无凭据）");
       setWebDlg(null);
       load();
       setImportStep({ providerId, providerName: d.name, models: [], picked: new Set(), loading: true });
@@ -1273,7 +1258,7 @@ export default function Providers() {
             </div>
           )}
 
-          <Field label={webDlg?.provider ? "追加账号凭据（一行一个）" : "账号凭据（必填，一行一个）"}>
+          <Field label={webDlg?.provider ? "追加账号凭据（一行一个）" : webDlg?.meta.anonymous ? "账号凭据（可选，留空走匿名模式）" : "账号凭据（必填，一行一个）"}>
             <textarea
               value={webDlg?.credential ?? ""}
               onChange={(e) => webDlg && setWebDlg({ ...webDlg, credential: e.target.value })}
@@ -1285,8 +1270,8 @@ export default function Providers() {
 
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line">
             <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setWebDlg(null)}>取消</Button>
-            <Button className="flex-1 sm:flex-initial" onClick={saveWeb} disabled={!!webDlg?.saving || !webDlg?.credential.trim()}>
-              {webDlg?.saving ? "保存中…" : webDlg?.provider ? "保存并追加" : "保存并接入"}
+            <Button className="flex-1 sm:flex-initial" onClick={saveWeb} disabled={!!webDlg?.saving || (!webDlg?.credential.trim() && !(webDlg?.meta.anonymous && !webDlg?.provider))}>
+              {webDlg?.saving ? "保存中…" : webDlg?.provider ? "保存并追加" : webDlg?.credential.trim() ? "保存并接入" : "匿名接入"}
             </Button>
           </div>
         </div>

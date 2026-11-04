@@ -9,6 +9,7 @@ import { requireUser } from "../auth";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
 import { uuid } from "../crypto";
 import { appendAppeal, getAppeals, getAnnouncements } from "../storage/db";
+import { epayReady } from "./pay";
 
 export const siteRouter = new Hono<{ Bindings: Env }>();
 
@@ -39,6 +40,13 @@ siteRouter.get("/site", async (c) => {
       google: !!s.oauthGoogleEnabled,
     },
     smtpEnabled: !!s.smtpEnabled,
+    // 在线支付可用性：前端据此决定是否显示「在线充值」入口
+    payment: {
+      epayEnabled: epayReady(s),
+      channels: Array.isArray(s.epayChannels) && s.epayChannels.length ? s.epayChannels : ["alipay", "wxpay", "qqpay"],
+      minAmount: Number(s.epayMinAmount ?? 1),
+      maxAmount: Number(s.epayMaxAmount ?? 5000),
+    },
   });
 });
 

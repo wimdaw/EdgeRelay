@@ -81,6 +81,15 @@ export type PlatformSettings = {
   smtpUsername?: string;
   smtpFrom?: string;
   smtpPassEnc?: string;
+  /* 在线支付（易支付协议，兼容彩虹易支付 submit.php / mapi.php） */
+  epayEnabled?: boolean;
+  epayGateway?: string;
+  epayPid?: string;
+  epayKeyEnc?: string;
+  epayChannels?: string[];
+  epayMinAmount?: number;
+  epayMaxAmount?: number;
+  epayProductName?: string;
 };
 
 /* 审计日志保留天数：最低 30 天，最长 180 天，默认 30 天 */
@@ -118,6 +127,13 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   icpNumber: "待办理",
   copyrightText: "",
   githubUrl: "https://github.com/wimdaw/EdgeRelay",
+  epayEnabled: false,
+  epayGateway: "https://epay-pages.pages.dev",
+  epayPid: "",
+  epayChannels: ["alipay", "wxpay", "qqpay"],
+  epayMinAmount: 1,
+  epayMaxAmount: 5000,
+  epayProductName: "API 额度充值",
 };
 
 export type RateLimits = { rpm: number; tpm: number; concurrency: number };

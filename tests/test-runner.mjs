@@ -504,6 +504,139 @@ let apiKeyId = "";
   assert(statusAfter.configured === false, "清除后 Telegram 配置状态为未配置");
 }
 
+// 12. 在线支付（易支付协议）
+{
+  const crypto = await import("node:crypto");
+  const md5 = (s) => crypto.createHash("md5").update(s).digest("hex");
+  /** 与后端 buildEpaySign 同算法：过滤 sign/sign_type 与空值 → 升序 → k=v& → 末尾接 KEY */
+  const epaySign = (params, key) =>
+    md5(
+      Object.keys(params)
+        .filter((k) => k !== "sign" && k !== "sign_type" && params[k] !== "")
+        .sort()
+        .map((k) => `${k}=${params[k]}`)
+        .join("&") + key
+    );
+
+  const PAY_KEY = "EPAYkey1234567890abcdefghijklmnop";
+  const headers = { "content-type": "application/json", cookie: adminCookie };
+
+  // 12.1 写入支付配置（易支付的写操作需要二次验证，这里带上管理员密码）
+  const setRes = await request("/api/admin/actions", {
+    method: "POST",
+    headers,
+    body: {
+      action: "set_epay",
+      payload: {
+        enabled: true,
+        gateway: "https://epay-pages.pages.dev",
+        pid: "1001",
+        key: PAY_KEY,
+        channels: ["alipay", "wxpay"],
+        minAmount: 1,
+        maxAmount: 1000,
+        productName: "API 额度充值",
+        password: "StrongPassword123!",
+      },
+    },
+  });
+  assert(setRes.status === 200, "保存易支付配置 HTTP 200");
+
+  const gotRes = await request("/api/admin/actions", {
+    method: "POST",
+    headers,
+    body: { action: "get_epay", payload: {} },
+  });
+  const got = await gotRes.json();
+  assert(got.epay?.pid === "1001", "支付配置 PID 回读正确");
+  assert(got.epay?.hasKey === true, "商户密钥已加密入库（仅返回 hasKey）");
+  assert(!JSON.stringify(got).includes(PAY_KEY), "接口不回显商户密钥明文");
+
+  // 12.2 下单：拦截上游 mapi.php
+  const realFetch = globalThis.fetch;
+  const calls = [];
+  try {
+    globalThis.fetch = async (url, init) => {
+      calls.push({ url: String(url), init });
+      return new Response(JSON.stringify({ code: 1, trade_no: "T20261104001", payurl: "https://pay.example/x", qrcode: "" }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    };
+
+    const createRes = await request("/api/pay/epay/create", {
+      method: "POST",
+      headers,
+      body: { amount: 10, type: "alipay" },
+    });
+    assert(createRes.status === 200, "创建支付订单 HTTP 200");
+    const created = await createRes.json();
+    assert(!!created.outTradeNo, "返回商户订单号");
+    assert(created.payUrl === "https://pay.example/x", "透传平台收银台地址");
+    assert(created.amount === 10, "订单金额正确");
+
+    const call = calls.find((c) => c.url.includes("/mapi.php"));
+    assert(!!call, "下单请求打到 mapi.php");
+    const sent = Object.fromEntries(new URLSearchParams(String(call.init.body)));
+    assert(sent.pid === "1001" && sent.type === "alipay", "下单参数包含 pid 与支付方式");
+    assert(sent.money === "10.00", "金额按两位小数上送");
+    assert(sent.out_trade_no === created.outTradeNo, "上送订单号与返回一致");
+    assert(sent.sign === epaySign(sent, PAY_KEY), "下单签名与独立实现一致");
+    assert(sent.sign_type === "MD5", "签名类型为 MD5");
+
+    // 12.3 异步回调入账
+    const notifyBase = {
+      pid: "1001",
+      trade_no: "T20261104001",
+      out_trade_no: created.outTradeNo,
+      type: "alipay",
+      trade_status: "TRADE_SUCCESS",
+      money: "10.00",
+      name: "API 额度充值",
+    };
+    const notifyUrl = (p) => `/api/pay/epay/notify?${new URLSearchParams({ ...p, sign: epaySign(p, PAY_KEY), sign_type: "MD5" })}`;
+
+    const balBefore = (await (await request("/api/billing/balance", { headers: { cookie: adminCookie } })).json()).balance.available;
+
+    const notifyRes = await request(notifyUrl(notifyBase));
+    assert((await notifyRes.text()).trim() === "success", "合法回调返回纯文本 success");
+
+    const balAfter = (await (await request("/api/billing/balance", { headers: { cookie: adminCookie } })).json()).balance.available;
+    assert(Math.abs(balAfter - balBefore - 10) < 1e-9, "回调后余额增加 ¥10");
+
+    // 12.4 重复回调必须幂等
+    const dupRes = await request(notifyUrl(notifyBase));
+    assert((await dupRes.text()).trim() === "success", "重复回调仍返回 success");
+    const balDup = (await (await request("/api/billing/balance", { headers: { cookie: adminCookie } })).json()).balance.available;
+    assert(Math.abs(balDup - balAfter) < 1e-9, "重复回调未重复加款");
+
+    // 12.5 金额篡改（签名合法但低于订单金额）
+    const lowOrder = await (await request("/api/pay/epay/create", { method: "POST", headers, body: { amount: 10, type: "alipay" } })).json();
+    const lowBase = { ...notifyBase, out_trade_no: lowOrder.outTradeNo, money: "0.01" };
+    const lowRes = await request(notifyUrl(lowBase));
+    assert((await lowRes.text()).trim() === "fail", "金额低于订单的回调被拒绝");
+    const balLow = (await (await request("/api/billing/balance", { headers: { cookie: adminCookie } })).json()).balance.available;
+    assert(Math.abs(balLow - balDup) < 1e-9, "拒绝后余额不变");
+
+    // 12.6 错误密钥签名
+    const badSignUrl = `/api/pay/epay/notify?${new URLSearchParams({ ...notifyBase, sign: epaySign(notifyBase, "WRONGKEY"), sign_type: "MD5" })}`;
+    const badRes = await request(badSignUrl);
+    assert((await badRes.text()).trim() === "fail", "签名错误被拒绝");
+
+    // 12.7 商户号不符
+    const wrongPidBase = { ...notifyBase, pid: "9999" };
+    const wrongPidRes = await request(notifyUrl(wrongPidBase));
+    assert((await wrongPidRes.text()).trim() === "fail", "商户号不符的回调被拒绝");
+
+    // 12.8 订单查询
+    const orderRes = await request(`/api/pay/epay/order/${created.outTradeNo}`, { headers: { cookie: adminCookie } });
+    assert(orderRes.status === 200, "订单查询 HTTP 200");
+    assert((await orderRes.json()).order.status === "paid", "订单状态为已支付");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

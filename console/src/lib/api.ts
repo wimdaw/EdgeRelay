@@ -34,3 +34,24 @@ export type SiteInfo = { siteName: string; siteDescription: string; siteLogoUrl:
 
 export const adminAction = <T = { ok: true; result?: unknown }>(action: string, payload: Record<string, unknown> = {}) =>
   api<T>("/api/admin/actions", "POST", { action, payload });
+
+/** 管理操作遇到二次验证时：等待全局验证弹窗完成并自动重试一次 */
+export async function adminActionStepUp<T = { ok: true; result?: unknown }>(action: string, payload: Record<string, unknown> = {}): Promise<T> {
+  try {
+    return await adminAction<T>(action, payload);
+  } catch (e) {
+    if ((e as { code?: string })?.code !== "step_up_required") throw e;
+    const ok = await new Promise<boolean>((resolve) => {
+      const done = () => { cleanup(); resolve(true); };
+      const cancel = () => { cleanup(); resolve(false); };
+      const cleanup = () => {
+        window.removeEventListener("gw:stepup-done", done);
+        window.removeEventListener("gw:stepup-cancelled", cancel);
+      };
+      window.addEventListener("gw:stepup-done", done);
+      window.addEventListener("gw:stepup-cancelled", cancel);
+    });
+    if (!ok) throw new Error("已取消管理员二次验证");
+    return await adminAction<T>(action, payload);
+  }
+}

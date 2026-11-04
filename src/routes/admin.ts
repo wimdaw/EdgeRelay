@@ -69,6 +69,7 @@ adminRouter.post("/actions", async (c) => {
       "list_audit",
       "get_smtp",
       "get_oauth",
+      "get_epay",
       "list_announcements",
       "list_upstream_models",
       "list_redeem_codes",
@@ -309,12 +310,16 @@ adminRouter.post("/actions", async (c) => {
         const isNew = !p.id;
         const kind = String(p.kind ?? (p.slug === "anthropic" ? "anthropic" : "openai_compat"));
         const isOAuth = kind.startsWith("oauth:");
-        const isKeyless = !isOAuth && (p.slug === "opencode" || p.slug === "duckai" || p.slug === "kilo" || p.kind === "opencode" || p.kind === "duckai" || p.kind === "kilo" || p.authScheme === "none");
+        // Web 反代渠道允许零凭据创建（如 geminiweb 的匿名模式），凭据可以之后再补
+        const isWebKind = kind.startsWith("web:");
+        const isKeyless = !isOAuth && (isWebKind || p.slug === "opencode" || p.slug === "duckai" || p.slug === "kilo" || p.kind === "opencode" || p.kind === "duckai" || p.kind === "kilo" || p.authScheme === "none");
         if (isNew && !p.key && !isKeyless) throw new ApiError(400, ErrorCode.BAD_REQUEST, "添加供应商必须同时录入上游密钥");
         const id = (p.id as string) || uuid();
 
         const isAnthropic = kind === "anthropic" || p.slug === "anthropic";
-        const authScheme = String(p.authScheme ?? (isOAuth ? "oauth" : isAnthropic ? "x-api-key" : isKeyless ? "none" : "bearer"));
+        // Web 渠道的 authScheme 不参与上游鉴权（凭据由各渠道自行拼 header），保持 bearer 以免
+        // 被当成「免 Key 渠道」而忽略已配置的凭据
+        const authScheme = String(p.authScheme ?? (isOAuth ? "oauth" : isAnthropic ? "x-api-key" : isKeyless && !isWebKind ? "none" : "bearer"));
         const extraHeaders = p.extraHeaders
           ? JSON.stringify(p.extraHeaders)
           : isAnthropic
@@ -915,6 +920,61 @@ adminRouter.post("/actions", async (c) => {
         }
         await updateSettings(env, patch);
         return done(null, "settings", "smtp");
+      }
+      case "get_epay": {
+        const s = await getSettings(env);
+        return json({
+          ok: true,
+          epay: {
+            enabled: !!s.epayEnabled,
+            gateway: s.epayGateway ?? "",
+            pid: s.epayPid ?? "",
+            hasKey: !!s.epayKeyEnc,
+            channels: Array.isArray(s.epayChannels) && s.epayChannels.length ? s.epayChannels : ["alipay", "wxpay", "qqpay"],
+            minAmount: Number(s.epayMinAmount ?? 1),
+            maxAmount: Number(s.epayMaxAmount ?? 5000),
+            productName: s.epayProductName ?? "API 额度充值",
+          },
+        });
+      }
+      case "set_epay": {
+        const ALLOWED = ["alipay", "wxpay", "qqpay", "usdt"];
+        const rawChannels = Array.isArray(p.channels)
+          ? (p.channels as unknown[]).map(String)
+          : typeof p.channels === "string"
+          ? String(p.channels).split(/[\s,，]+/)
+          : [];
+        const channels = rawChannels.map((c) => c.trim().toLowerCase()).filter((c) => ALLOWED.includes(c));
+        if (!channels.length) throw new ApiError(400, ErrorCode.BAD_REQUEST, "至少启用一种支付方式");
+
+        const minAmount = Number(p.minAmount ?? 1);
+        const maxAmount = Number(p.maxAmount ?? 5000);
+        if (!Number.isFinite(minAmount) || minAmount <= 0) throw new ApiError(400, ErrorCode.BAD_REQUEST, "最低金额不合法");
+        if (!Number.isFinite(maxAmount) || maxAmount < minAmount) throw new ApiError(400, ErrorCode.BAD_REQUEST, "最高金额不能小于最低金额");
+
+        const gateway = String(p.gateway ?? "").trim().replace(/\/+$/, "");
+        if (gateway && !/^https?:\/\//i.test(gateway)) throw new ApiError(400, ErrorCode.BAD_REQUEST, "网关地址必须是 http(s) 开头");
+
+        const patch: Partial<PlatformSettings> = {
+          epayEnabled: !!p.enabled,
+          epayGateway: gateway,
+          epayPid: String(p.pid ?? "").trim(),
+          epayChannels: channels,
+          epayMinAmount: Math.round(minAmount * 100) / 100,
+          epayMaxAmount: Math.round(maxAmount * 100) / 100,
+          epayProductName: String(p.productName ?? "API 额度充值").trim() || "API 额度充值",
+        };
+        if (p.key) {
+          patch.epayKeyEnc = await encryptSecret(env, String(p.key).trim());
+        }
+        if (p.enabled && (!gateway || !patch.epayPid)) {
+          throw new ApiError(400, ErrorCode.BAD_REQUEST, "启用在线支付必须填写网关地址与商户 PID");
+        }
+        if (p.enabled && !patch.epayKeyEnc && !(await getSettings(env)).epayKeyEnc) {
+          throw new ApiError(400, ErrorCode.BAD_REQUEST, "启用在线支付必须填写商户密钥");
+        }
+        await updateSettings(env, patch);
+        return done(null, "settings", "epay");
       }
       case "get_oauth": {
         const s = await getSettings(env);

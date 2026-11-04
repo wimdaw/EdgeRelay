@@ -30,7 +30,73 @@ export default function Dashboard() {
   const [redeemOpen, setRedeemOpen] = useState(false);
   const [redeemCode, setRedeemCode] = useState("");
   const [redeeming, setRedeeming] = useState(false);
+  // 在线充值（易支付）
+  const [pay, setPay] = useState<{ epayEnabled: boolean; channels: string[]; minAmount: number; maxAmount: number } | null>(null);
+  const [onlineOpen, setOnlineOpen] = useState(false);
+  const [payAmount, setPayAmount] = useState("");
+  const [payChannel, setPayChannel] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [order, setOrder] = useState<{ outTradeNo: string; amount: number; payUrl: string; qrCode: string } | null>(null);
   const toast = useToast();
+
+  const CHANNEL_LABEL: Record<string, string> = { alipay: "支付宝", wxpay: "微信支付", qqpay: "QQ 钱包", usdt: "USDT" };
+
+  useEffect(() => {
+    api<{ payment?: { epayEnabled: boolean; channels: string[]; minAmount: number; maxAmount: number } }>("/api/site")
+      .then((d) => {
+        if (!d.payment?.epayEnabled) return setPay(null);
+        setPay(d.payment);
+        setPayChannel((prev) => prev || d.payment!.channels[0] || "alipay");
+        setPayAmount((prev) => prev || String(d.payment!.minAmount || 10));
+      })
+      .catch(() => setPay(null));
+  }, []);
+
+  const createOrder = async () => {
+    if (!pay) return;
+    const amount = Number(payAmount);
+    if (!Number.isFinite(amount) || amount < pay.minAmount || amount > pay.maxAmount) {
+      return toast(`金额需在 ¥${pay.minAmount} ~ ¥${pay.maxAmount} 之间`, "err");
+    }
+    setCreating(true);
+    try {
+      const res = await api<{ outTradeNo: string; amount: number; payUrl: string; qrCode: string }>("/api/pay/epay/create", "POST", {
+        amount,
+        type: payChannel,
+      });
+      setOrder({ outTradeNo: res.outTradeNo, amount: res.amount, payUrl: res.payUrl, qrCode: res.qrCode });
+      if (res.payUrl) window.open(res.payUrl, "_blank", "noopener");
+    } catch (e) {
+      toast((e as Error).message, "err");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  // 下单后轮询订单状态，到账即刷新余额
+  useEffect(() => {
+    if (!order) return;
+    let stopped = false;
+    const tick = async () => {
+      try {
+        const d = await api<{ order: { status: string; paidAt: number | null } }>(`/api/pay/epay/order/${order.outTradeNo}`);
+        if (stopped) return;
+        if (d.order.status === "paid") {
+          stopped = true;
+          const bal = await api<{ balance: { available: number; currency: string } }>("/api/billing/balance").catch(() => null);
+          if (bal) setBalance(bal.balance.available);
+          toast(`充值成功，已到账 ¥${order.amount.toFixed(2)}`);
+          setOrder(null);
+          setOnlineOpen(false);
+        }
+      } catch {
+        /* 订单未生成或网络抖动，下一轮再试 */
+      }
+    };
+    const timer = window.setInterval(tick, 3000);
+    tick();
+    return () => { stopped = true; window.clearInterval(timer); };
+  }, [order]);
 
   const handleRedeem = async () => {
     if (!redeemCode.trim()) return toast("请输入卡密兑换码", "err");
@@ -94,13 +160,24 @@ export default function Dashboard() {
             <div className="mt-1 text-[11px] text-muted flex items-center justify-between">
               <span>{label.includes("余额") ? (isSuperadmin ? "超管不卡额度 · 真实扣费记账" : "按量真实结算") : "较昨日 —"}</span>
               {label.includes("余额") && (
-                <button
-                  type="button"
-                  onClick={() => setRedeemOpen(true)}
-                  className="rounded bg-brand/10 hover:bg-brand/20 px-2 py-0.5 text-[11px] font-semibold text-brand transition-colors cursor-pointer"
-                >
-                  卡密充值
-                </button>
+                <span className="flex items-center gap-1">
+                  {pay?.epayEnabled && (
+                    <button
+                      type="button"
+                      onClick={() => setOnlineOpen(true)}
+                      className="rounded bg-ok/10 hover:bg-ok/20 px-2 py-0.5 text-[11px] font-semibold text-ok transition-colors cursor-pointer"
+                    >
+                      在线充值
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setRedeemOpen(true)}
+                    className="rounded bg-brand/10 hover:bg-brand/20 px-2 py-0.5 text-[11px] font-semibold text-brand transition-colors cursor-pointer"
+                  >
+                    卡密充值
+                  </button>
+                </span>
               )}
             </div>
           </Card>
@@ -205,6 +282,73 @@ export default function Dashboard() {
               {redeeming ? "核销中…" : "立即兑换加款"}
             </Button>
           </div>
+        </div>
+      </Dialog>
+
+      {/* 在线充值（易支付） */}
+      <Dialog open={onlineOpen} onClose={() => { setOnlineOpen(false); setOrder(null); }} title="在线充值" width={480}>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs">
+            <span className="text-muted">当前可用余额</span>
+            <span className="font-mono text-sm font-bold text-emerald-500">
+              {isSuperadmin ? "∞ 无限额度" : fmtMoney(balance, me.balance.currency)}
+            </span>
+          </div>
+
+          {order ? (
+            <>
+              <div className="rounded-lg border border-line p-4 text-center">
+                <p className="text-xs text-muted">订单号 {order.outTradeNo} · 应付 ¥{order.amount.toFixed(2)}</p>
+                {order.qrCode && /^https?:\/\//i.test(order.qrCode) ? (
+                  <img src={order.qrCode} alt="支付二维码" className="mx-auto mt-3 h-44 w-44 rounded-lg bg-white p-1" />
+                ) : null}
+                <p className="mt-3 text-xs text-muted">已在新窗口打开收银台，支付完成后本页会自动到账，请勿关闭。</p>
+                {order.payUrl ? (
+                  <a href={order.payUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-xs font-medium text-brand underline">
+                    收银台没能打开？点此重新前往
+                  </a>
+                ) : null}
+                <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-muted">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ok" />等待支付结果…
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-2 border-t border-line">
+                <Button variant="ghost" onClick={() => { setOrder(null); }}>换个金额重下</Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <Field label={`充值金额（¥${pay?.minAmount ?? 1} ~ ¥${pay?.maxAmount ?? 5000}）`} hint="到账后可用于所有按量计费模型">
+                <Input type="number" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} placeholder="10" autoFocus />
+              </Field>
+
+              <Field label="支付方式">
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {(pay?.channels ?? []).map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setPayChannel(c)}
+                      className={`cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${payChannel === c ? "border-brand/40 bg-brand/10 text-brand" : "border-line text-muted hover:text-ink"}`}
+                    >
+                      {CHANNEL_LABEL[c] ?? c}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+
+              <p className="text-xs text-muted">
+                由第三方易支付平台收款，支付成功后由平台异步回调入账；若长时间未到账，请携带订单号联系客服。
+              </p>
+
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line">
+                <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setOnlineOpen(false)}>取消</Button>
+                <Button className="flex-1 sm:flex-initial" disabled={creating || !payAmount} onClick={createOrder}>
+                  {creating ? "下单中…" : "前往支付"}
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </Dialog>
     </div>

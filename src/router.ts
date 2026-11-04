@@ -68,6 +68,10 @@ export async function planModelRoutes(env: any, publicName: string): Promise<Rou
 }
 
 export function isKeylessProvider(provider: ProviderRecord): boolean {
+  // Web 反代渠道不在这里判定：它们「有凭据用凭据、无凭据走匿名」，由 buildRoutesFromPlan 分开处理。
+  // 如果这里按 authScheme === "none" 把它们判成免 Key，带 Cookie 的渠道会拿不到加密 Key，
+  // 从而静默退化成匿名请求。
+  if (isWebProvider(provider)) return false;
   return (
     provider.kind === "opencode" ||
     provider.slug === "opencode" ||
@@ -77,6 +81,29 @@ export function isKeylessProvider(provider: ProviderRecord): boolean {
     provider.slug === "kilo" ||
     provider.authScheme === "none"
   );
+}
+
+/** 是否为 Web 反代渠道（web:xxx）。这类渠道允许零凭据运行，凭据只在有 Key 池时注入。 */
+export function isWebProvider(provider: ProviderRecord): boolean {
+  return (provider.kind || "").startsWith("web:");
+}
+
+/** 免 Key 路由：encryptedKey 留空，由渠道内部决定用匿名还是匿名 + 空 Cookie */
+function keylessRoute(m: ModelRouteRecord, p: ProviderRecord): UpstreamRoute {
+  return {
+    modelId: m.id,
+    providerId: p.id,
+    providerSlug: p.slug,
+    providerKind: p.kind,
+    baseUrl: p.baseUrl,
+    authScheme: p.authScheme,
+    extraHeaders: parseExtraHeaders(p.extraHeaders),
+    providerKeyId: "keyless",
+    encryptedKey: "",
+    upstreamModel: m.upstreamModel,
+    priority: m.priority,
+    costWeight: m.costWeight,
+  };
 }
 
 /** 从规划 + 已读取的 Key 池/健康度构建最终路由候选（纯内存） */
@@ -90,26 +117,16 @@ export function buildRoutesFromPlan(
   const p = plan.provider;
   if (isKeylessProvider(p)) {
     // 免 Key 渠道（如 opencode, duckai, kilo）
-    return [
-      {
-        modelId: m.id,
-        providerId: p.id,
-        providerSlug: p.slug,
-        providerKind: p.kind,
-        baseUrl: p.baseUrl,
-        authScheme: p.authScheme,
-        extraHeaders: parseExtraHeaders(p.extraHeaders),
-        providerKeyId: "keyless",
-        encryptedKey: "",
-        upstreamModel: m.upstreamModel,
-        priority: m.priority,
-        costWeight: m.costWeight,
-      },
-    ];
+    return [keylessRoute(m, p)];
   }
 
   const activeKeys = keys.filter((k) => k.status === "active");
-  if (!activeKeys.length) return [];
+  if (!activeKeys.length) {
+    // Web 反代渠道无 Key 时仍要给出路由：geminiweb 等支持匿名访问，
+    // 这里直接放行，凭据留空由渠道内部回退到匿名账号。
+    if (isWebProvider(p)) return [keylessRoute(m, p)];
+    return [];
+  }
 
   // 万级 Key 池：先随机抽样再健康排序，避免每请求全量洗牌
   const pool = activeKeys.length > MAX_KEY_CANDIDATES ? sampleKeys(activeKeys, MAX_KEY_CANDIDATES) : activeKeys;
