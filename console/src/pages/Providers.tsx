@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Plus, RefreshCw, Server, Trash2, Key, CheckCircle2, AlertTriangle, ShieldAlert } from "lucide-react";
+import { Plus, RefreshCw, Server, Trash2, Key, Pencil, Power, CheckCircle2, AlertTriangle, ShieldAlert } from "lucide-react";
 import { adminAction, type Provider } from "../lib/api";
 import { Button, Card, Dialog, EmptyState, Field, Input, Select, StatusTag, useConfirm, useToast } from "../components/ui";
 import { cn } from "../lib/utils";
@@ -287,24 +287,25 @@ export default function Providers() {
               </div>
 
               <div className="mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5">
-                <Button variant="soft" className="flex-1 !h-7 !px-2 text-xs" onClick={() => fetchModels(p.id, p.name)} title="从上游导入或手动添加模型">
-                  <RefreshCw size={12} className="mr-1" />导入
+                <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => fetchModels(p.id, p.name)} title="从上游导入或手动添加模型" aria-label="导入模型">
+                  <RefreshCw size={13} />
                 </Button>
                 {!isKeylessSlug(p.slug) && (
-                  <Button variant="soft" className="!h-7 !px-2 text-xs" onClick={() => { setKeyDlg(p); setKeyVal(""); setNewKeyLabel("prod"); }} title="管理多 Key 轮换池">
-                    <Key size={12} className="mr-1 text-muted" />密钥 ({p.key_count})
+                  <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => { setKeyDlg(p); setKeyVal(""); setNewKeyLabel("prod"); }} title={`管理多 Key 轮换池（当前 ${p.key_count} 个）`} aria-label="密钥池">
+                    <Key size={13} />
                   </Button>
                 )}
                 <Button
                   variant="ghost"
-                  className={cn("!h-7 !px-2 text-xs", p.status === "active" ? "!text-muted hover:!text-err" : "!text-emerald-500 font-semibold")}
+                  className={cn("!h-7 !w-7 !px-0", p.status === "active" ? "!text-muted hover:!text-err" : "!text-emerald-500 font-semibold")}
                   onClick={() => toggleProvider(p)}
-                  title="切换渠道启用/停用状态"
+                  title={`切换渠道启用/停用状态（当前${p.status === "active" ? "启用" : "停用"}）`}
+                  aria-label={p.status === "active" ? "停用渠道" : "启用渠道"}
                 >
-                  {p.status === "active" ? "停用" : "启用"}
+                  <Power size={13} />
                 </Button>
-                <Button variant="ghost" className="!h-7 !px-2 text-xs" onClick={() => openEdit(p)}>编辑</Button>
-                <Button variant="ghost" className="!h-7 !px-1.5 text-xs !text-err" onClick={() => del(p)} aria-label={`删除 ${p.name}`}><Trash2 size={13} /></Button>
+                <Button variant="ghost" className="!h-7 !w-7 !px-0" onClick={() => openEdit(p)} title="编辑供应商" aria-label="编辑供应商"><Pencil size={13} /></Button>
+                <Button variant="ghost" className="!h-7 !w-7 !px-0 !text-err" onClick={() => del(p)} title="删除供应商" aria-label={`删除 ${p.name}`}><Trash2 size={13} /></Button>
               </div>
             </Card>
           ))}
