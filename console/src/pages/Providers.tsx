@@ -41,7 +41,6 @@ type OAuthMeta = {
   slug: string;
   baseUrl: string;
   mode: "redirect" | "device" | "redirect-poll";
-  regionSelect?: boolean;
   desc: string;
   models: string[];
 };
@@ -103,12 +102,20 @@ const OAUTH_CATALOG: OAuthMeta[] = [
   },
   {
     type: "codebuddy",
-    name: "CodeBuddy (腾讯)",
+    name: "CodeBuddy 国内版",
     slug: "codebuddy-oauth",
     baseUrl: "https://copilot.tencent.com",
     mode: "redirect-poll",
-    regionSelect: true,
-    desc: "腾讯 CodeBuddy / WorkBuddy 账号授权（国内版/国际版双域），OpenAI 兼容协议直通。",
+    desc: "腾讯 CodeBuddy 国内版账号授权（copilot.tencent.com / codebuddy.cn），OpenAI 兼容协议直通。",
+    models: ["deepseek-v4.1-flash"],
+  },
+  {
+    type: "codebuddy",
+    name: "CodeBuddy 国际版",
+    slug: "codebuddy-global-oauth",
+    baseUrl: "https://www.workbuddy.ai",
+    mode: "redirect-poll",
+    desc: "WorkBuddy 国际版账号授权（workbuddy.ai），与国内版账号体系完全独立。",
     models: ["deepseek-v4.1-flash"],
   },
   {
@@ -153,7 +160,6 @@ export default function Providers() {
   const [customModelInput, setCustomModelInput] = useState("");
   // OAuth 授权流程
   const [oauthDlg, setOauthDlg] = useState<OAuthDialogState | null>(null);
-  const [cbRegion, setCbRegion] = useState<"cn" | "global">("cn");
   const oauthTimer = useRef<number | null>(null);
   const { confirm, confirmEl } = useConfirm();
   const toast = useToast();
@@ -361,14 +367,8 @@ export default function Providers() {
     catch { toast("复制失败，请手动选择复制", "err"); }
   };
 
-  /** 渠道默认 Base URL（CodeBuddy 由区域选择决定国内版/国际版） */
-  const oauthBaseUrl = (meta: OAuthMeta, existing?: Provider | null) =>
-    existing?.base_url ||
-    (meta.type === "codebuddy"
-      ? cbRegion === "global"
-        ? "https://www.workbuddy.ai"
-        : "https://copilot.tencent.com"
-      : meta.baseUrl);
+  /** 渠道默认 Base URL（CodeBuddy 国内版/国际版各有独立目录项与 baseUrl） */
+  const oauthBaseUrl = (meta: OAuthMeta, existing?: Provider | null) => existing?.base_url || meta.baseUrl;
 
   /** 授权成功后：按需创建渠道 + 加密保存 refresh_token + 自动拉取模型 */
   const finishOAuth = async (meta: OAuthMeta, existing: Provider | null, baseUrl: string, refreshToken: string) => {
@@ -383,7 +383,7 @@ export default function Providers() {
           baseUrl,
         });
         const d = await adminAction<{ providers: Provider[] }>("list_providers");
-        providerId = d.providers.find((x) => x.kind === `oauth:${meta.type}` || x.slug === meta.slug)?.id || "";
+        providerId = d.providers.find((x) => x.slug === meta.slug)?.id || "";
         setRows(d.providers);
       }
       if (!providerId) throw new Error("OAuth 渠道创建失败");
@@ -495,7 +495,7 @@ export default function Providers() {
 
   /* ---------------- 渲染 ---------------- */
 
-  const oauthProviderOf = (meta: OAuthMeta) => (rows ?? []).find((x) => x.kind === `oauth:${meta.type}` || x.slug === meta.slug);
+  const oauthProviderOf = (meta: OAuthMeta) => (rows ?? []).find((x) => x.slug === meta.slug);
 
   return (
     <div className="flex flex-col gap-4">
@@ -638,7 +638,7 @@ export default function Providers() {
               {OAUTH_CATALOG.map((meta) => {
                 const p = oauthProviderOf(meta);
                 return (
-                  <Card key={meta.type} className={cn("p-4 flex flex-col justify-between transition-all", p?.status === "disabled" && "opacity-75 border-dashed bg-surface/50")}>
+                  <Card key={meta.slug} className={cn("p-4 flex flex-col justify-between transition-all", p?.status === "disabled" && "opacity-75 border-dashed bg-surface/50")}>
                     <div>
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex min-w-0 items-center gap-2.5">
@@ -671,31 +671,6 @@ export default function Providers() {
                             {meta.mode === "device" ? "设备码轮询" : meta.mode === "redirect-poll" ? "授权链接 + 轮询" : "PKCE 授权链接"}
                           </span>
                         </div>
-                        {meta.regionSelect && (
-                          <div className="flex min-w-0 items-center justify-between gap-2">
-                            <span className="shrink-0">区域</span>
-                            {p ? (
-                              <span className="text-ink">{/workbuddy\.ai/i.test(p.base_url) ? "国际版 (workbuddy.ai)" : "国内版 (codebuddy.cn)"}</span>
-                            ) : (
-                              <span className="inline-flex gap-1">
-                                <button
-                                  type="button"
-                                  onClick={() => setCbRegion("cn")}
-                                  className={cn("cursor-pointer rounded px-1.5 py-0.5 text-[10px] font-medium", cbRegion === "cn" ? "bg-brand/10 text-brand" : "bg-line/60 text-muted hover:text-ink")}
-                                >
-                                  国内版
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setCbRegion("global")}
-                                  className={cn("cursor-pointer rounded px-1.5 py-0.5 text-[10px] font-medium", cbRegion === "global" ? "bg-brand/10 text-brand" : "bg-line/60 text-muted hover:text-ink")}
-                                >
-                                  国际版
-                                </button>
-                              </span>
-                            )}
-                          </div>
-                        )}
                         <div className="flex min-w-0 justify-between gap-2">
                           <span className="shrink-0">账号</span>
                           <span className="inline-flex items-center gap-1 text-ink">
@@ -913,7 +888,7 @@ export default function Providers() {
           {isOAuthProvider(keyDlg) && (
             <Button className="w-full" variant="soft" onClick={() => {
               const p = keyDlg;
-              const meta = OAUTH_CATALOG.find((m) => `oauth:${m.type}` === p?.kind);
+              const meta = OAUTH_CATALOG.find((m) => m.slug === p?.slug);
               if (!p || !meta) return;
               setKeyDlg(null);
               beginOAuth(meta, p);
