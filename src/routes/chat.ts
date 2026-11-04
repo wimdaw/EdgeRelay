@@ -16,7 +16,7 @@ import { moderate } from "../moderation";
 import { getSettings } from "../settings";
 import { planModelRoutes, buildRoutesFromPlan } from "../router";
 import { getPricing, hold, settle, releaseHold, estimateCost, type Pricing } from "../billing";
-import { buildHeaders, resolveTarget, RETRYABLE_STATUS, estimateTokens } from "../providers";
+import { buildHeaders, resolveTarget, joinApiPath, RETRYABLE_STATUS, estimateTokens } from "../providers";
 import { recordKeySuccess, recordKeyFailure, readKeyHealth } from "../key-health";
 import { uuid, sha256Hex } from "../crypto";
 import {
@@ -399,7 +399,7 @@ chatRouter.post("/", async (c) => {
           const { openAIToAnthropicRequest } = await import("../anthropic-translate");
           const { request: antRequest } = openAIToAnthropicRequest({ ...body, model: route.upstreamModel, stream });
           const base = route.baseUrl.replace(/\/+$/, "");
-          const antUrl = `${base}/v1/messages`;
+          const antUrl = joinApiPath(base, "/v1/messages");
           const headers = await buildHeaders(env, route);
           headers["anthropic-version"] = "2023-06-01";
 

@@ -19,9 +19,23 @@ export function aiGatewayUrl(env: Env, providerSlug: string, upstreamUrl: string
   return `https://gateway.ai.cloudflare.com/v1/${env.CF_ACCOUNT_ID}/${env.AI_GATEWAY_ID}/${gwSlug}`;
 }
 
+/**
+ * 拼接上游 API 路径，兼容 baseUrl 带不带版本前缀两种写法：
+ *  - https://integrate.api.nvidia.com         + /v1/chat/completions => .../v1/chat/completions
+ *  - https://integrate.api.nvidia.com/v1      + /v1/chat/completions => .../v1/chat/completions（不重复 /v1）
+ * 与 ai-gateway-edgeone 的 baseUrl 口径对齐（该口径下 baseUrl 常带 /v1）。
+ */
+export function joinApiPath(baseUrl: string, apiPath: string): string {
+  const base = baseUrl.replace(/\/+$/, "");
+  if (/\/v\d+(?:beta)?$/i.test(base) && /^\/v\d+(?:beta)?\//i.test(apiPath)) {
+    return base + apiPath.replace(/^\/v\d+(?:beta)?/i, "");
+  }
+  return base + apiPath;
+}
+
 export function resolveTarget(env: Env, route: UpstreamRoute, chatPath = "/v1/chat/completions"): { url: string; headers: Record<string, string> } {
   const base = route.baseUrl.replace(/\/+$/, "");
-  const url = aiGatewayUrl(env, route.providerSlug, base) + chatPath;
+  const url = joinApiPath(aiGatewayUrl(env, route.providerSlug, base), chatPath);
   return { url, headers: {} };
 }
 
