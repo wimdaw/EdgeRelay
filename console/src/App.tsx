@@ -12,8 +12,7 @@ import { Dialog, Button } from "./components/ui";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Keys = lazy(() => import("./pages/Keys"));
 const Providers = lazy(() => import("./pages/Providers"));
-const ModelPool = lazy(() => import("./pages/ModelPool"));
-const Pricing = lazy(() => import("./pages/Pricing"));
+const ModelsPricing = lazy(() => import("./pages/ModelsPricing"));
 const Logs = lazy(() => import("./pages/Logs"));
 const Users = lazy(() => import("./pages/Users"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -116,7 +115,8 @@ function Shell() {
       <Route element={me ? <Layout me={me} site={site} onLogout={logout} /> : <Navigate to="/login" replace />}>
         <Route path="/dashboard" element={me ? <Dashboard /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/keys" element={me ? <Keys /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/models" element={me ? <ModelPool me={me} /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/models" element={me ? <ModelsPricing /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/pricing" element={<Navigate to="/dashboard/models" replace />} />
         <Route path="/dashboard/logs" element={me ? <Logs me={me} /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/usage" element={<Navigate to="/dashboard/logs" replace />} />
         <Route path="/dashboard/audit" element={<Navigate to="/dashboard/logs" replace />} />
@@ -125,7 +125,6 @@ function Shell() {
         <Route path="/dashboard/invite" element={<Navigate to="/dashboard/users" replace />} />
         {/* 权限受控页面 */}
         <Route path="/dashboard/providers" element={isSuperadmin ? <Providers /> : <Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard/pricing" element={isSuperadmin && me ? <Pricing me={me} /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/users" element={canManageUsers ? <Users /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/settings" element={isSuperadmin ? <Settings /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/announcements" element={isSuperadmin ? <Announcements /> : <Navigate to="/dashboard" replace />} />
