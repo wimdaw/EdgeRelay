@@ -14,8 +14,7 @@ const Keys = lazy(() => import("./pages/Keys"));
 const Providers = lazy(() => import("./pages/Providers"));
 const ModelPool = lazy(() => import("./pages/ModelPool"));
 const Pricing = lazy(() => import("./pages/Pricing"));
-const Usage = lazy(() => import("./pages/Usage"));
-const Audit = lazy(() => import("./pages/Audit"));
+const Logs = lazy(() => import("./pages/Logs"));
 const Users = lazy(() => import("./pages/Users"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Backup = lazy(() => import("./pages/Backup"));
@@ -104,7 +103,6 @@ function Shell() {
   const role = me?.user.role;
   const isSuperadmin = role === "superadmin";
   const canManageUsers = role === "superadmin" || role === "admin";
-  const canAudit = role === "superadmin" || role === "auditor";
 
   return (
     <>
@@ -120,7 +118,9 @@ function Shell() {
         <Route path="/dashboard" element={me ? <Dashboard /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/keys" element={me ? <Keys /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/models" element={me ? <ModelPool me={me} /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/usage" element={me ? <Usage /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/logs" element={me ? <Logs me={me} /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/usage" element={<Navigate to="/dashboard/logs" replace />} />
+        <Route path="/dashboard/audit" element={<Navigate to="/dashboard/logs" replace />} />
         <Route path="/dashboard/profile" element={me ? <Profile me={me} onRefresh={refresh} /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/backup" element={isSuperadmin ? <Backup /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/invite" element={me ? <Invite me={me} /> : <Navigate to="/login" replace />} />
@@ -130,7 +130,6 @@ function Shell() {
         <Route path="/dashboard/users" element={canManageUsers ? <Users /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/settings" element={isSuperadmin ? <Settings /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/announcements" element={isSuperadmin ? <Announcements /> : <Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard/audit" element={canAudit ? <Audit /> : <Navigate to="/dashboard" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
