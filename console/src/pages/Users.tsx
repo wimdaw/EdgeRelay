@@ -3,7 +3,7 @@ import { Check, Coins, Copy, KeyRound, Plus, Trash2 } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
 import { adminAction, type Me, type UserRow, type Flag, type Appeal } from "../lib/api";
 import { Button, Card, DataTable, Dialog, Field, Input, Select, StatusTag, useConfirm, useToast, type Col } from "../components/ui";
-import { fmtTime } from "../lib/utils";
+import { fmtMoney, fmtTime } from "../lib/utils";
 import Invite from "./Invite";
 
 const ROLE_MAP: Record<string, { label: string; color: string; desc: string; lvl: number }> = {
@@ -31,8 +31,9 @@ type RedeemCodeItem = {
 export default function Users() {
   const { me } = useOutletContext<{ me: Me }>();
   const isSuperadmin = me?.user.role === "superadmin";
+  const isAdmin = isSuperadmin || me?.user.role === "admin";
 
-  const [tab, setTab] = useState<"users" | "invite" | "codes" | "flags" | "appeals">("users");
+  const [tab, setTab] = useState<"mygroup" | "users" | "invite" | "codes" | "flags" | "appeals">(isAdmin ? "users" : "mygroup");
   const [users, setUsers] = useState<UserRow[] | null>(null);
   const [codes, setCodes] = useState<RedeemCodeItem[] | null>(null);
   const [flags, setFlags] = useState<Flag[] | null>(null);
@@ -58,7 +59,7 @@ export default function Users() {
   const loadFlags = () => adminAction<{ flags: Flag[] }>("flags_queue").then((d) => setFlags(d.flags)).catch(() => setFlags([]));
   const loadAppeals = () => adminAction<{ appeals: Appeal[] }>("appeals_list").then((d) => setAppeals(d.appeals)).catch(() => setAppeals([]));
 
-  useEffect(() => { loadUsers(); }, []);
+  useEffect(() => { if (isAdmin) loadUsers(); }, []);
 
   const changeRole = async () => {
     if (!roleDlg.user) return;
@@ -293,16 +294,50 @@ export default function Users() {
 
   const TABS = isSuperadmin
     ? ([["users", "用户与权限"], ["invite", "邀请"], ["codes", "卡密管理"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const)
-    : ([["users", "用户与权限"], ["invite", "邀请"]] as const);
+    : isAdmin
+      ? ([["users", "用户与权限"], ["invite", "邀请"]] as const)
+      : ([["mygroup", "我的用户组"], ["invite", "邀请"]] as const);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit" role="tablist">
         {TABS.map(([k, l]) => (
-          <button key={k} role="tab" aria-selected={tab === k} onClick={() => { setTab(k as any); (k === "invite" ? undefined : k === "flags" ? loadFlags : k === "appeals" ? loadAppeals : k === "codes" ? loadCodes : loadUsers)?.(); }}
+          <button key={k} role="tab" aria-selected={tab === k} onClick={() => { setTab(k as any); (k === "invite" || k === "mygroup" ? undefined : k === "flags" ? loadFlags : k === "appeals" ? loadAppeals : k === "codes" ? loadCodes : loadUsers)?.(); }}
             className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{l}</button>
         ))}
       </div>
+
+      {tab === "mygroup" && (
+        <Card className="p-4 sm:p-5 flex flex-col gap-3.5">
+          <div>
+            <h3 className="text-sm font-semibold text-ink">我的用户组</h3>
+            <p className="mt-0.5 text-xs text-muted">当前账号所属的用户组与权限级别；如需调整用户组或额度，请联系管理员。</p>
+          </div>
+          <div className="rounded-xl border border-line bg-surface2/50 p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${ROLE_MAP[me.user.role]?.color ?? ""}`}>
+                {ROLE_MAP[me.user.role]?.label ?? me.user.role}
+              </span>
+              <span className="text-xs text-muted">权限等级 {ROLE_MAP[me.user.role]?.lvl ?? 0}</span>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-muted">{ROLE_MAP[me.user.role]?.desc ?? "—"}</p>
+            <div className="mt-4 grid grid-cols-1 gap-3 text-xs sm:grid-cols-3">
+              <div>
+                <div className="text-muted">账号邮箱</div>
+                <div className="mt-0.5 font-medium text-ink break-all">{me.user.email}</div>
+              </div>
+              <div>
+                <div className="text-muted">用户组标识</div>
+                <div className="mt-0.5 font-mono font-medium text-ink">{me.user.role}</div>
+              </div>
+              <div>
+                <div className="text-muted">可用余额</div>
+                <div className="mt-0.5 font-medium text-ink">{me.unlimited ? "∞ 无限额度" : fmtMoney(me.balance.available, me.balance.currency)}</div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {tab === "users" && (
         <Card className="p-4 sm:p-5 flex flex-col gap-3.5">

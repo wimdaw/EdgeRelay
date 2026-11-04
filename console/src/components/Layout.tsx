@@ -13,7 +13,7 @@ const NAV = [
   { to: "/dashboard/keys", label: "API Keys", icon: KeyRound, roles: ALL_ROLES },
   { to: "/dashboard/providers", label: "供应商", icon: Server, roles: ["superadmin"] },
   { to: "/dashboard/models", label: "模型与定价", icon: Layers, roles: ALL_ROLES },
-  { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ["superadmin", "admin"] },
+  { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ALL_ROLES },
   { to: "/dashboard/logs", label: "运行日志", icon: ScrollText, roles: ["superadmin", "admin", "auditor"] },
   { to: "/dashboard/profile", label: "个人主页", icon: CircleUser, roles: ALL_ROLES },
   { to: "/dashboard/backup", label: "数据备份", icon: DatabaseBackup, roles: ["superadmin"] },

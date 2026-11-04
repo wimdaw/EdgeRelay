@@ -127,7 +127,7 @@ function Shell() {
         <Route path="/dashboard/invite" element={me ? (canManageUsers ? <Navigate to="/dashboard/users" replace /> : <Invite me={me} />) : <Navigate to="/login" replace />} />
         {/* 权限受控页面 */}
         <Route path="/dashboard/providers" element={isSuperadmin ? <Providers /> : <Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard/users" element={canManageUsers ? <Users /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard/users" element={me ? <Users /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/settings" element={isSuperadmin ? <Settings /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/announcements" element={<Navigate to="/dashboard/settings" replace />} />
       </Route>
