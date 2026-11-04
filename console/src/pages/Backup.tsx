@@ -25,6 +25,7 @@ export default function Backup() {
   const [tgStatus, setTgStatus] = useState<TelegramStatus | null>(null);
   const [tgForm, setTgForm] = useState({ botToken: "", chatId: "" });
   const [tgBusy, setTgBusy] = useState<"" | "save" | "test" | "push" | "clear">("");
+  const [tab, setTab] = useState<"local" | "snapshots" | "telegram">("local");
   const importRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
   const { confirm, confirmEl } = useConfirm();
@@ -227,9 +228,21 @@ export default function Backup() {
   const tgBusyAny = !!tgBusy;
 
   return (
-    <div className="grid max-w-3xl gap-5">
+    <div className="flex flex-col gap-4">
+      <div className="flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit" role="tablist">
+        {([
+          ["local", "本地备份"],
+          ["snapshots", "站内快照"],
+          ["telegram", "Telegram 备份"],
+        ] as const).map(([k, l]) => (
+          <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
+            className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{l}</button>
+        ))}
+      </div>
+
       {/* 本地备份 */}
-      <Card className="p-5">
+      {tab === "local" && (
+      <Card className="p-4 sm:p-5">
         <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold"><DatabaseBackup size={15} />本地备份</h2>
         <p className="mb-4 text-xs text-muted">导出全站数据为 JSON 文件，或用备份文件覆盖恢复。备份包含用户、密钥、渠道、模型、计费、用量与审计日志，不含登录会话。</p>
         <div className="flex flex-wrap gap-2">
@@ -244,9 +257,11 @@ export default function Backup() {
           <code className="mx-1 font-mono text-ink">ENCRYPTION_KEY</code>。
         </div>
       </Card>
+      )}
 
       {/* 站内快照 */}
-      <Card className="p-5">
+      {tab === "snapshots" && (
+      <Card className="p-4 sm:p-5">
         <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold"><RefreshCw size={15} />站内快照</h2>
         <p className="mb-4 text-xs text-muted">快照保存在 EdgeOne Blob 内，最多保留 10 份，不依赖 R2 等外部对象存储。</p>
         <div className="flex flex-wrap gap-2">
@@ -281,9 +296,11 @@ export default function Backup() {
           )}
         </div>
       </Card>
+      )}
 
       {/* Telegram 机器人备份 */}
-      <Card className="p-5">
+      {tab === "telegram" && (
+      <Card className="p-4 sm:p-5">
         <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold"><Bot size={15} />Telegram 机器人备份</h2>
         <p className="mb-4 text-xs text-muted">配置 Telegram Bot 后，可把完整 JSON 备份作为文件推送到指定会话。Bot Token 会加密保存，页面只显示掩码。</p>
 
@@ -325,6 +342,7 @@ export default function Backup() {
           推送内容与「导出数据库」下载的 JSON 文件一致。Telegram 配置保存在站内且不会写进备份文件；推送前请先保存配置。
         </p>
       </Card>
+      )}
 
       {confirmEl}
     </div>
