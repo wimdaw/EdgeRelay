@@ -557,7 +557,7 @@ async function refreshWebToken(refreshToken: string): Promise<{
     { url: 'https://auth.openai.com/oauth/token', clientId: PRIMARY_CLIENT_ID },
     { url: 'https://auth0.openai.com/oauth/token', clientId: LEGACY_CLIENT_ID },
   ]
-  let lastError = ''
+  const errors: string[] = []
   for (const attempt of attempts) {
     try {
       const res = await fetch(attempt.url, {
@@ -584,12 +584,12 @@ async function refreshWebToken(refreshToken: string): Promise<{
           extra: accountId ? { accountId } : undefined,
         }
       }
-      lastError = `HTTP ${res.status}: ${text.slice(0, 240)}`
+      errors.push(`[${attempt.clientId.slice(0, 10)}] HTTP ${res.status}: ${text.slice(0, 180)}`)
     } catch (err) {
-      lastError = (err as Error).message || '网络错误'
+      errors.push(`[${attempt.clientId.slice(0, 10)}] ${(err as Error).message || '网络错误'}`)
     }
   }
-  throw new WebAuthError(`refresh_token 刷新失败: ${lastError || '未知错误'}`)
+  throw new WebAuthError(`refresh_token 刷新失败: ${errors.join(' | ') || '未知错误'}`)
 }
 
 async function resolveAccountToken(env: Env, rawToken: string): Promise<{ token: string; accountId: string }> {
