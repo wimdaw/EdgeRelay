@@ -16,6 +16,7 @@ const ModelsPricing = lazy(() => import("./pages/ModelsPricing"));
 const Logs = lazy(() => import("./pages/Logs"));
 const Users = lazy(() => import("./pages/Users"));
 const Profile = lazy(() => import("./pages/Profile"));
+const Invite = lazy(() => import("./pages/Invite"));
 const Backup = lazy(() => import("./pages/Backup"));
 const Settings = lazy(() => import("./pages/Settings"));
 
@@ -100,6 +101,8 @@ function Shell() {
   const role = me?.user.role;
   const isSuperadmin = role === "superadmin";
   const canManageUsers = role === "superadmin" || role === "admin";
+  // 运行日志读取接口要求 admin/auditor（superadmin 天然放行），普通用户无权限
+  const canViewLogs = role === "superadmin" || role === "admin" || role === "auditor";
 
   return (
     <>
@@ -116,12 +119,12 @@ function Shell() {
         <Route path="/dashboard/keys" element={me ? <Keys /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/models" element={me ? <ModelsPricing /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/pricing" element={<Navigate to="/dashboard/models" replace />} />
-        <Route path="/dashboard/logs" element={me ? <Logs me={me} /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/logs" element={me && canViewLogs ? <Logs me={me} /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/usage" element={<Navigate to="/dashboard/logs" replace />} />
         <Route path="/dashboard/audit" element={<Navigate to="/dashboard/logs" replace />} />
         <Route path="/dashboard/profile" element={me ? <Profile me={me} onRefresh={refresh} /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/backup" element={isSuperadmin ? <Backup /> : <Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard/invite" element={<Navigate to="/dashboard/users" replace />} />
+        <Route path="/dashboard/invite" element={me ? (canManageUsers ? <Navigate to="/dashboard/users" replace /> : <Invite me={me} />) : <Navigate to="/login" replace />} />
         {/* 权限受控页面 */}
         <Route path="/dashboard/providers" element={isSuperadmin ? <Providers /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/users" element={canManageUsers ? <Users /> : <Navigate to="/dashboard" replace />} />

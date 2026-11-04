@@ -9,6 +9,7 @@ type Tab = "usage" | "audit";
 /** 系统日志：用量日志 + 审计日志合并为一个入口，使用与「用户与组织」一致的选项卡 + 卡片布局。 */
 export default function Logs({ me }: { me: Me }) {
   const canAudit = me.user.role === "superadmin" || me.user.role === "auditor";
+  const isSuperadmin = me.user.role === "superadmin";
   const [tab, setTab] = useState<Tab>("usage");
   const [usage, setUsage] = useState<UsageLog[] | null>(null);
   const [usageTotal, setUsageTotal] = useState(0);
@@ -63,13 +64,13 @@ export default function Logs({ me }: { me: Me }) {
     { key: "action", label: "动作", render: (r) => <code className="rounded bg-surface2 px-1.5 py-0.5 text-xs">{r.action}</code> },
     { key: "target", label: "目标", render: (r) => <code className="text-xs text-muted">{r.target_type ? `${r.target_type}:${(r.target_id ?? "").slice(0, 12)}` : "—"}</code> },
     { key: "ip", label: "IP", render: (r) => <code className="text-xs">{r.actor_ip ?? "—"}</code> },
-    { key: "ops", label: "操作", render: (r) => (
+    { key: "ops", label: "操作", render: (r) => isSuperadmin ? (
       <Button variant="ghost" className="!px-2 !py-1 text-xs !text-err" onClick={async (e) => {
         e.stopPropagation();
         if (!(await confirm("删除这条审计日志？删除后将自动重建哈希链。"))) return;
         try { await adminAction("delete_audit_log", { id: r.id }); toast("已删除并重建哈希链"); loadAudit(); } catch (err) { toast((err as Error).message, "err"); }
       }}><Trash2 size={12} />删除</Button>
-    ) },
+    ) : <span className="text-xs text-muted">—</span> },
   ];
 
   const TABS = (canAudit
@@ -99,10 +100,6 @@ export default function Logs({ me }: { me: Me }) {
                 usage.map((r) => [fmtTime(r.created_at), r.user_id, r.public_model, r.status, r.http_status, r.latency_ms, r.prompt_tokens, r.completion_tokens, r.cost_usd, r.request_id]))}>
                 <Download size={14} />导出 CSV
               </Button>
-              <Button variant="ghost" className="!text-err" onClick={async () => {
-                if (!(await confirm("清空全部用量日志？此操作不可恢复（账单流水不受影响）。"))) return;
-                try { await adminAction("clear_usage_logs", {}); toast("已清空"); loadUsage(); } catch (e) { toast((e as Error).message, "err"); }
-              }}><Trash2 size={14} />清空全部</Button>
             </div>
           </div>
 
@@ -138,12 +135,6 @@ export default function Logs({ me }: { me: Me }) {
                   <span>重试/切换：{r.attempts} 次{r.stream ? " · 流式" : ""}</span>
                   <span>IP：{r.ip}</span>
                   <span>供应商：{(r as unknown as { provider_id: string }).provider_id ?? "—"}</span>
-                  <span className="sm:col-span-2">
-                    <Button variant="ghost" className="!px-2 !py-1 text-xs !text-err" onClick={async () => {
-                      if (!(await confirm("删除这条用量日志？"))) return;
-                      try { await adminAction("delete_usage_log", { id: r.id }); toast("已删除"); loadUsage(); } catch (e) { toast((e as Error).message, "err"); }
-                    }}>删除该条</Button>
-                  </span>
                 </div>
               )} />
             </>
@@ -160,11 +151,13 @@ export default function Logs({ me }: { me: Me }) {
             </div>
             <div className="flex flex-wrap gap-2">
               <Button variant="ghost" onClick={loadAudit}><RefreshCw size={14} />刷新</Button>
-              <Button variant="ghost" onClick={verifyChain}><ShieldCheck size={14} />校验链完整性</Button>
+              {isSuperadmin && <Button variant="ghost" onClick={verifyChain}><ShieldCheck size={14} />校验链完整性</Button>}
+              {isSuperadmin && (
               <Button variant="ghost" className="!text-err" onClick={async () => {
                 if (!(await confirm("清空全部审计日志？此操作不可恢复（哈希链将重新从 GENESIS 开始）。"))) return;
                 try { await adminAction("clear_audit_logs", {}); toast("已清空"); loadAudit(); } catch (e) { toast((e as Error).message, "err"); }
               }}><Trash2 size={14} />清空全部</Button>
+              )}
             </div>
           </div>
 

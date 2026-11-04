@@ -293,7 +293,7 @@ export default function Users() {
 
   const TABS = isSuperadmin
     ? ([["users", "用户与权限"], ["invite", "邀请"], ["codes", "卡密管理"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const)
-    : ([["users", "用户与权限"], ["invite", "邀请"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const);
+    : ([["users", "用户与权限"], ["invite", "邀请"]] as const);
 
   return (
     <div className="flex flex-col gap-4">
