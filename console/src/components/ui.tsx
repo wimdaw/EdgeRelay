@@ -53,7 +53,7 @@ export function StatusTag({ value }: { value: string }) {
 }
 
 /* ---------- Dialog（ESC 关闭 + 遮罩模糊） ---------- */
-export function Dialog({ open, onClose, title, children, width = 520 }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; width?: number }) {
+export function Dialog({ open, onClose, title, children, width = 520, zIndex }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; width?: number; zIndex?: number }) {
   useEffect(() => {
     if (!open) return;
     const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -62,7 +62,7 @@ export function Dialog({ open, onClose, title, children, width = 520 }: { open: 
   }, [open, onClose]);
   if (!open) return null;
   return (
-    <div className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm" onMouseDown={(e) => e.target === e.currentTarget && onClose()} role="dialog" aria-modal="true" aria-label={title}>
+    <div className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm" style={zIndex ? { zIndex } : undefined} onMouseDown={(e) => e.target === e.currentTarget && onClose()} role="dialog" aria-modal="true" aria-label={title}>
       <div className="anim-pop w-full rounded-xl2 border border-line bg-surface shadow-pop" style={{ maxWidth: width }}>
         <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
           <h3 className="text-sm font-semibold">{title}</h3>
@@ -234,6 +234,7 @@ export function useStepUp() {
   const [pass, setPass] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  const close = () => { setOpen(false); window.dispatchEvent(new CustomEvent("gw:stepup-cancelled")); };
   useEffect(() => {
     const h = () => { setPass(""); setErr(""); setOpen(true); };
     window.addEventListener("gw:stepup", h);
@@ -246,13 +247,14 @@ export function useStepUp() {
       const { api } = await import("../lib/api");
       await api("/api/auth/stepup", "POST", { password: pass });
       setOpen(false);
+      window.dispatchEvent(new CustomEvent("gw:stepup-done"));
       window.dispatchEvent(new CustomEvent("gw:toast", { detail: { msg: "二次验证通过，10 分钟内有效", type: "ok" } }));
     } catch (e) {
       setErr((e as Error).message || "密码错误");
     } finally { setBusy(false); }
   };
   const el = (
-    <Dialog open={open} onClose={() => setOpen(false)} title="二次验证" width={400}>
+    <Dialog open={open} onClose={close} title="二次验证" width={400} zIndex={70}>
       <form onSubmit={(e) => { e.preventDefault(); submit(); }}>
         <p className="mb-3 text-xs text-muted">该操作涉及敏感变更，请重新输入账号密码确认身份。验证通过后 10 分钟内无需重复验证。</p>
         <Field label="密码">
@@ -261,7 +263,7 @@ export function useStepUp() {
         </Field>
         {err && <p className="mt-2 text-xs text-err" role="alert">{err}</p>}
         <div className="mt-5 flex justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={() => setOpen(false)}>取消</Button>
+          <Button type="button" variant="ghost" onClick={close}>取消</Button>
           <Button type="submit" disabled={busy}>{busy ? "验证中…" : "确认身份"}</Button>
         </div>
       </form>

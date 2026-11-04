@@ -227,6 +227,27 @@ type WebDialogState = {
   saving?: boolean;
 };
 
+/** 管理操作遇到二次验证时：等待全局验证弹窗完成并自动重试一次 */
+async function adminActionStepUp<T = { ok: true; result?: unknown }>(action: string, payload: Record<string, unknown> = {}): Promise<T> {
+  try {
+    return await adminAction<T>(action, payload);
+  } catch (e) {
+    if ((e as { code?: string })?.code !== "step_up_required") throw e;
+    const ok = await new Promise<boolean>((resolve) => {
+      const done = () => { cleanup(); resolve(true); };
+      const cancel = () => { cleanup(); resolve(false); };
+      const cleanup = () => {
+        window.removeEventListener("gw:stepup-done", done);
+        window.removeEventListener("gw:stepup-cancelled", cancel);
+      };
+      window.addEventListener("gw:stepup-done", done);
+      window.addEventListener("gw:stepup-cancelled", cancel);
+    });
+    if (!ok) throw new Error("已取消管理员二次验证");
+    return await adminAction<T>(action, payload);
+  }
+}
+
 export default function Providers() {
   const [rows, setRows] = useState<Provider[] | null>(null);
   const [tab, setTab] = useState<"direct" | "oauth" | "web">("direct");
@@ -459,7 +480,7 @@ export default function Providers() {
     try {
       let providerId = existing?.id || "";
       if (!providerId) {
-        await adminAction("upsert_provider", {
+        await adminActionStepUp("upsert_provider", {
           name: meta.name,
           slug: meta.slug,
           kind: `oauth:${meta.type}`,
@@ -470,7 +491,7 @@ export default function Providers() {
         setRows(d.providers);
       }
       if (!providerId) throw new Error("OAuth 渠道创建失败");
-      const r = await adminAction<{ result?: { fingerprint?: string } }>("upsert_provider_key", {
+      const r = await adminActionStepUp<{ result?: { fingerprint?: string } }>("upsert_provider_key", {
         providerId,
         key: refreshToken,
         label: `account-${(existing?.key_count ?? 0) + 1}`,
@@ -526,7 +547,7 @@ export default function Providers() {
       codeInput: "",
     });
     try {
-      const r = await adminAction<any>("oauth_start", { provider: meta.type, baseUrl });
+      const r = await adminActionStepUp<any>("oauth_start", { provider: meta.type, baseUrl });
       const d = r.result ?? {};
       const mode = (d.mode as "redirect" | "device" | "redirect-poll") || meta.mode;
       setOauthDlg({
@@ -557,7 +578,7 @@ export default function Providers() {
     if (!oauthDlg.codeInput.trim()) return toast("请粘贴授权返回的 code 或整段回调地址", "err");
     setOauthDlg({ ...oauthDlg, busy: true, message: "正在换取 access_token…" });
     try {
-      const r = await adminAction<any>("oauth_complete", {
+      const r = await adminActionStepUp<any>("oauth_complete", {
         provider: oauthDlg.meta.type,
         code: oauthDlg.codeInput.trim(),
         state: oauthDlg.state,
@@ -602,13 +623,13 @@ export default function Providers() {
     try {
       let providerId = d.provider?.id || "";
       if (providerId) {
-        await adminAction("upsert_provider_key", {
+        await adminActionStepUp("upsert_provider_key", {
           providerId,
           key: d.credential.trim(),
           label: `account-${(d.provider?.key_count ?? 0) + 1}`,
         });
       } else {
-        await adminAction("upsert_provider", {
+        await adminActionStepUp("upsert_provider", {
           name: d.name.trim(),
           slug: d.slug.trim().toLowerCase(),
           kind: `web:${d.meta.type}`,
