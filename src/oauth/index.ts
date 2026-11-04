@@ -3,7 +3,8 @@
  *
  * 全部实现移植自 CLIProxyAPI（经 ai-gateway-edgeone 的 OAuth 反代模块）：
  *  - claude / codex / antigravity：PKCE + loopback 回调，用户粘贴 code 完成授权
- *  - kimi / qwen / grok：RFC 8628 设备码授权，前端轮询换取 refresh_token
+ *  - kimi / qwen / grok / cline：RFC 8628 设备码授权，前端轮询换取 refresh_token
+ *  - codebuddy：服务端签发 state + 授权链接，浏览器登录后前端轮询换取 refresh_token
  *
  * 凭据（refresh_token）沿用渠道的 Key 池加密存储（AES-256-GCM），
  * access_token 由 common.resolveAccessToken 缓存并自动续期。
@@ -28,8 +29,16 @@ import {
 } from "./kimi";
 import { startQwenDeviceFlow, pollQwenDeviceFlow, testQwen, fetchQwenModels, handleQwenRequest } from "./qwen";
 import { startGrokDeviceFlow, pollGrokDeviceFlow, testGrok, handleGrokRequest } from "./grok";
+import {
+  startCodebuddyDeviceFlow,
+  pollCodebuddyDeviceFlow,
+  testCodebuddy,
+  fetchCodebuddyModels,
+  handleCodebuddyRequest,
+} from "./codebuddy";
+import { startClineDeviceFlow, pollClineDeviceFlow, testCline, fetchClineModels, handleClineRequest, CLINE_BUILTIN_MODELS } from "./cline";
 
-export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok";
+export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok" | "codebuddy" | "cline";
 
 export type OAuthProviderMeta = {
   type: OAuthProviderType;
@@ -39,8 +48,10 @@ export type OAuthProviderMeta = {
   slug: string;
   /** 默认上游基址 */
   baseUrl: string;
-  /** 授权模式：redirect = 粘贴 code；device = 设备码轮询 */
-  mode: "redirect" | "device";
+  /** 授权模式：redirect = 粘贴 code；device = 设备码轮询；redirect-poll = 授权链接 + 轮询 */
+  mode: "redirect" | "device" | "redirect-poll";
+  /** 是否需要在授权前选择区域（CodeBuddy 国内版/国际版） */
+  regionSelect?: boolean;
   /** 一句话说明 */
   desc: string;
   /** 渠道未配置模型时的兜底模型清单 */
@@ -102,6 +113,25 @@ export const OAUTH_PROVIDERS: Record<OAuthProviderType, OAuthProviderMeta> = {
     desc: "使用 xAI 账号设备码授权，请求自动翻译为 Responses 协议。",
     defaultModels: ["grok-4.6", "grok-4.5", "grok-code-fast-1"],
   },
+  codebuddy: {
+    type: "codebuddy",
+    name: "CodeBuddy (腾讯)",
+    slug: "codebuddy-oauth",
+    baseUrl: "https://copilot.tencent.com",
+    mode: "redirect-poll",
+    regionSelect: true,
+    desc: "腾讯 CodeBuddy / WorkBuddy 账号授权（国内版/国际版双域），OpenAI 兼容协议直通。",
+    defaultModels: ["deepseek-v4.1-flash"],
+  },
+  cline: {
+    type: "cline",
+    name: "Cline",
+    slug: "cline-oauth",
+    baseUrl: "https://api.cline.bot",
+    mode: "device",
+    desc: "Cline 账号 WorkOS 设备码授权，自动适配免费通道与「账号×模型」冷却。",
+    defaultModels: CLINE_BUILTIN_MODELS.slice(0, 6),
+  },
 };
 
 export const OAUTH_KIND_PREFIX = "oauth:";
@@ -119,6 +149,7 @@ export function isOAuthType(value: string): value is OAuthProviderType {
 
 export type OAuthStartResult =
   | { mode: "redirect"; url: string; state: string }
+  | { mode: "redirect-poll"; url: string; state: string; realm?: string }
   | { mode: "device"; state: string; verification_uri: string; verification_uri_complete?: string; user_code: string; interval: number; expires_in?: number };
 
 /** 发起授权：redirect 返回授权链接，device 返回设备码信息 */
@@ -135,11 +166,17 @@ export async function startOAuth(env: Env, type: OAuthProviderType, baseUrl?: st
     const { url, state } = await buildAntigravityAuthUrl(env);
     return { mode: "redirect", url, state };
   }
+  if (type === "codebuddy") {
+    const flow = await startCodebuddyDeviceFlow(env, baseUrl);
+    return { mode: "redirect-poll", url: flow.authUrl, state: flow.state, realm: flow.realm };
+  }
   const flow =
     type === "kimi"
       ? await startKimiDeviceFlow(env, baseUrl)
       : type === "qwen"
       ? await startQwenDeviceFlow(env)
+      : type === "cline"
+      ? await startClineDeviceFlow(env)
       : await startGrokDeviceFlow(env);
   return {
     mode: "device",
@@ -165,16 +202,29 @@ export async function completeOAuth(env: Env, type: OAuthProviderType, code: str
   if (type === "antigravity") {
     return exchangeAntigravityCode(env, code, state);
   }
-  throw new Error(`${type} 渠道使用设备码授权，请使用轮询接口`);
+  throw new Error(`${type} 渠道使用设备码/授权链接轮询，请使用轮询接口`);
 }
 
-export type OAuthPollResult = { status: "pending" | "ok" | "error"; message?: string; refreshToken?: string };
+export type OAuthPollResult = {
+  status: "pending" | "ok" | "error";
+  message?: string;
+  refreshToken?: string;
+  /** Cline 授权返回的账号邮箱 */
+  email?: string;
+  /** CodeBuddy 授权返回的账号信息 */
+  account?: { uid?: string; enterpriseId?: string; nickname?: string; domain?: string };
+};
 
-/** device 模式：轮询设备码授权状态 */
+/** 设备码 / 授权链接模式：轮询授权状态 */
 export async function pollOAuth(env: Env, type: OAuthProviderType, state: string): Promise<OAuthPollResult> {
   if (type === "kimi") return pollKimiDeviceFlow(env, state);
   if (type === "qwen") return pollQwenDeviceFlow(env, state);
   if (type === "grok") return pollGrokDeviceFlow(env, state);
+  if (type === "codebuddy") return pollCodebuddyDeviceFlow(env, state);
+  if (type === "cline") {
+    const r = await pollClineDeviceFlow(env, state);
+    return { status: r.status, message: r.message, refreshToken: r.refreshToken, email: r.email };
+  }
   throw new Error(`${type} 渠道使用授权链接，请使用 complete 接口`);
 }
 
@@ -202,6 +252,14 @@ export async function fetchOAuthModels(
     if (type === "qwen") {
       return { models: fetchQwenModels().models };
     }
+    if (type === "codebuddy") {
+      const r = await fetchCodebuddyModels(env, refreshToken, baseUrl);
+      return r.success && r.models.length ? { models: r.models } : { models: fallback, message: r.message };
+    }
+    if (type === "cline") {
+      const r = await fetchClineModels(env, refreshToken);
+      return r.success && r.models.length ? { models: r.models } : { models: fallback, message: r.message };
+    }
   } catch (err: any) {
     return { models: fallback, message: err?.message || String(err) };
   }
@@ -221,6 +279,8 @@ export async function testOAuth(
   if (type === "antigravity") return testAntigravity(env, refreshToken, modelId);
   if (type === "kimi") return testKimi(env, refreshToken, modelId, baseUrl);
   if (type === "qwen") return testQwen(env, refreshToken, modelId);
+  if (type === "codebuddy") return testCodebuddy(env, refreshToken, modelId, baseUrl);
+  if (type === "cline") return testCline(env, refreshToken, modelId);
   return testGrok(env, refreshToken, modelId);
 }
 
@@ -263,6 +323,10 @@ export async function handleOAuthChat(args: OAuthChatArgs): Promise<Response> {
       return handleQwenRequest(p);
     case "grok":
       return handleGrokRequest(p, "");
+    case "codebuddy":
+      return handleCodebuddyRequest(p, args.baseUrl);
+    case "cline":
+      return handleClineRequest(p);
     default:
       return new Response(JSON.stringify({ error: { message: `未知 OAuth 渠道: ${args.type}` } }), {
         status: 400,

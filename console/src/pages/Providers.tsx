@@ -35,7 +35,18 @@ const isOAuthKind = (kind?: string | null) => !!kind && kind.startsWith("oauth:"
 const isOAuthProvider = (p?: Provider | null) => isOAuthKind(p?.kind);
 
 /** OAuth 渠道目录（与后端 src/oauth/index.ts 保持一致） */
-const OAUTH_CATALOG = [
+type OAuthMeta = {
+  type: string;
+  name: string;
+  slug: string;
+  baseUrl: string;
+  mode: "redirect" | "device" | "redirect-poll";
+  regionSelect?: boolean;
+  desc: string;
+  models: string[];
+};
+
+const OAUTH_CATALOG: OAuthMeta[] = [
   {
     type: "claude",
     name: "Claude (Anthropic)",
@@ -90,14 +101,32 @@ const OAUTH_CATALOG = [
     desc: "xAI 设备码授权，自动翻译为 Responses 协议。",
     models: ["grok-4.6", "grok-4.5"],
   },
+  {
+    type: "codebuddy",
+    name: "CodeBuddy (腾讯)",
+    slug: "codebuddy-oauth",
+    baseUrl: "https://copilot.tencent.com",
+    mode: "redirect-poll",
+    regionSelect: true,
+    desc: "腾讯 CodeBuddy / WorkBuddy 账号授权（国内版/国际版双域），OpenAI 兼容协议直通。",
+    models: ["deepseek-v4.1-flash"],
+  },
+  {
+    type: "cline",
+    name: "Cline",
+    slug: "cline-oauth",
+    baseUrl: "https://api.cline.bot",
+    mode: "device",
+    desc: "Cline 账号 WorkOS 设备码授权，自动适配免费通道与「账号×模型」冷却。",
+    models: ["cline-free/mimo-v2.6-flash", "cline-free/nemotron-3.5-super-vl", "nvidia/nemotron-3.5-lightning:free"],
+  },
 ];
-
-type OAuthMeta = (typeof OAUTH_CATALOG)[number];
 
 type OAuthDialogState = {
   meta: OAuthMeta;
   provider: Provider | null;
-  mode: "redirect" | "device";
+  mode: "redirect" | "device" | "redirect-poll";
+  baseUrl: string;
   url: string;
   state: string;
   userCode?: string;
@@ -124,6 +153,7 @@ export default function Providers() {
   const [customModelInput, setCustomModelInput] = useState("");
   // OAuth 授权流程
   const [oauthDlg, setOauthDlg] = useState<OAuthDialogState | null>(null);
+  const [cbRegion, setCbRegion] = useState<"cn" | "global">("cn");
   const oauthTimer = useRef<number | null>(null);
   const { confirm, confirmEl } = useConfirm();
   const toast = useToast();
@@ -331,8 +361,17 @@ export default function Providers() {
     catch { toast("复制失败，请手动选择复制", "err"); }
   };
 
+  /** 渠道默认 Base URL（CodeBuddy 由区域选择决定国内版/国际版） */
+  const oauthBaseUrl = (meta: OAuthMeta, existing?: Provider | null) =>
+    existing?.base_url ||
+    (meta.type === "codebuddy"
+      ? cbRegion === "global"
+        ? "https://www.workbuddy.ai"
+        : "https://copilot.tencent.com"
+      : meta.baseUrl);
+
   /** 授权成功后：按需创建渠道 + 加密保存 refresh_token + 自动拉取模型 */
-  const finishOAuth = async (meta: OAuthMeta, existing: Provider | null, refreshToken: string) => {
+  const finishOAuth = async (meta: OAuthMeta, existing: Provider | null, baseUrl: string, refreshToken: string) => {
     setOauthDlg((d) => (d ? { ...d, busy: true, message: "正在保存账号凭据…" } : d));
     try {
       let providerId = existing?.id || "";
@@ -341,7 +380,7 @@ export default function Providers() {
           name: meta.name,
           slug: meta.slug,
           kind: `oauth:${meta.type}`,
-          baseUrl: meta.baseUrl,
+          baseUrl,
         });
         const d = await adminAction<{ providers: Provider[] }>("list_providers");
         providerId = d.providers.find((x) => x.kind === `oauth:${meta.type}` || x.slug === meta.slug)?.id || "";
@@ -359,7 +398,7 @@ export default function Providers() {
       const updated = await adminAction<{ providers: Provider[] }>("list_providers");
       setRows(updated.providers);
       setImportStep({ providerId, providerName: meta.name, models: [], picked: new Set(), loading: true });
-      await pullModels(providerId, meta.name, meta.baseUrl, "");
+      await pullModels(providerId, meta.name, baseUrl, "");
     } catch (e) {
       const msg = (e as Error).message;
       toast(msg, "err");
@@ -367,13 +406,14 @@ export default function Providers() {
     }
   };
 
-  const startOAuthPoll = (meta: OAuthMeta, existing: Provider | null, state: string, intervalSec: number) => {
+  const startOAuthPoll = (meta: OAuthMeta, existing: Provider | null, baseUrl: string, state: string, intervalSec: number) => {
     const poll = async () => {
       try {
         const r = await adminAction<any>("oauth_poll", { provider: meta.type, state });
         const res = r.result ?? r;
-        if (res.status === "ok" && res.refresh_token) {
-          await finishOAuth(meta, existing, res.refresh_token as string);
+        const token = res.refresh_token || res.refreshToken;
+        if (res.status === "ok" && token) {
+          await finishOAuth(meta, existing, baseUrl, token as string);
           return;
         }
         if (res.status === "error") {
@@ -391,35 +431,38 @@ export default function Providers() {
 
   const beginOAuth = async (meta: OAuthMeta, existing?: Provider) => {
     stopOAuthPoll();
+    const baseUrl = oauthBaseUrl(meta, existing ?? null);
     setOauthDlg({
       meta,
       provider: existing ?? null,
       mode: meta.mode,
+      baseUrl,
       url: "",
       state: "",
       step: "loading",
       codeInput: "",
     });
     try {
-      const r = await adminAction<any>("oauth_start", { provider: meta.type, baseUrl: meta.baseUrl });
+      const r = await adminAction<any>("oauth_start", { provider: meta.type, baseUrl });
       const d = r.result ?? {};
-      const mode = (d.mode as "redirect" | "device") || meta.mode;
+      const mode = (d.mode as "redirect" | "device" | "redirect-poll") || meta.mode;
       setOauthDlg({
         meta,
         provider: existing ?? null,
         mode,
+        baseUrl,
         url: d.url ?? "",
         state: d.state ?? "",
         userCode: d.user_code,
         verificationUri: d.verification_uri,
         verificationUriComplete: d.verification_uri_complete,
         interval: Number(d.interval) || 5,
-        step: mode === "device" ? "polling" : "ready",
+        step: mode === "redirect" ? "ready" : "polling",
         codeInput: "",
-        message: mode === "device" ? "等待你在浏览器中确认授权…" : undefined,
+        message: mode === "device" ? "等待你在浏览器中确认授权…" : mode === "redirect-poll" ? "等待你在浏览器中完成登录…" : undefined,
       });
-      if (mode === "device" && d.state) {
-        startOAuthPoll(meta, existing ?? null, d.state as string, Number(d.interval) || 5);
+      if (mode !== "redirect" && d.state) {
+        startOAuthPoll(meta, existing ?? null, baseUrl, d.state as string, Number(d.interval) || 5);
       }
     } catch (e) {
       setOauthDlg((d) => (d ? { ...d, step: "error", message: (e as Error).message } : d));
@@ -438,7 +481,7 @@ export default function Providers() {
       });
       const token = r.result?.refreshToken;
       if (!token) throw new Error("上游未返回 refresh_token");
-      await finishOAuth(oauthDlg.meta, oauthDlg.provider, token);
+      await finishOAuth(oauthDlg.meta, oauthDlg.provider, oauthDlg.baseUrl, token);
     } catch (e) {
       toast((e as Error).message, "err");
       setOauthDlg((d) => (d ? { ...d, step: "error", message: (e as Error).message, busy: false } : d));
@@ -588,7 +631,7 @@ export default function Providers() {
 
           {rows === null ? (
             <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-40 rounded-xl2" />)}
+              {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-40 rounded-xl2" />)}
             </div>
           ) : (
             <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -624,8 +667,35 @@ export default function Providers() {
                       <dl className="mt-2.5 space-y-1.5 text-[11px] text-muted">
                         <div className="flex min-w-0 justify-between gap-2">
                           <span className="shrink-0">授权方式</span>
-                          <span className="text-ink">{meta.mode === "device" ? "设备码轮询" : "PKCE 授权链接"}</span>
+                          <span className="text-ink">
+                            {meta.mode === "device" ? "设备码轮询" : meta.mode === "redirect-poll" ? "授权链接 + 轮询" : "PKCE 授权链接"}
+                          </span>
                         </div>
+                        {meta.regionSelect && (
+                          <div className="flex min-w-0 items-center justify-between gap-2">
+                            <span className="shrink-0">区域</span>
+                            {p ? (
+                              <span className="text-ink">{/workbuddy\.ai/i.test(p.base_url) ? "国际版 (workbuddy.ai)" : "国内版 (codebuddy.cn)"}</span>
+                            ) : (
+                              <span className="inline-flex gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => setCbRegion("cn")}
+                                  className={cn("cursor-pointer rounded px-1.5 py-0.5 text-[10px] font-medium", cbRegion === "cn" ? "bg-brand/10 text-brand" : "bg-line/60 text-muted hover:text-ink")}
+                                >
+                                  国内版
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setCbRegion("global")}
+                                  className={cn("cursor-pointer rounded px-1.5 py-0.5 text-[10px] font-medium", cbRegion === "global" ? "bg-brand/10 text-brand" : "bg-line/60 text-muted hover:text-ink")}
+                                >
+                                  国际版
+                                </button>
+                              </span>
+                            )}
+                          </div>
+                        )}
                         <div className="flex min-w-0 justify-between gap-2">
                           <span className="shrink-0">账号</span>
                           <span className="inline-flex items-center gap-1 text-ink">
@@ -957,6 +1027,30 @@ export default function Providers() {
               <Button onClick={retryOAuth}><RefreshCw size={14} />重新发起授权</Button>
             </div>
           </div>
+        ) : oauthDlg?.mode === "redirect-poll" ? (
+          <div className="space-y-4">
+            <p className="text-xs leading-relaxed text-muted">
+              请在浏览器中打开下方授权页，登录 {oauthDlg.meta.name} 账号并确认授权。完成后本弹窗会自动获取并保存凭据。
+            </p>
+            <div className="flex items-center gap-2">
+              <Input readOnly value={oauthDlg.url} className="!py-1 flex-1 text-[11px] font-mono" />
+              <Button variant="soft" className="!h-[34px] !px-2.5 shrink-0" onClick={() => copyText(oauthDlg.url)} title="复制授权链接"><Copy size={12} /></Button>
+              <Button className="!h-[34px] !px-3 shrink-0" onClick={() => window.open(oauthDlg.url, "_blank", "noopener,noreferrer")}>
+                <ExternalLink size={12} />打开授权页
+              </Button>
+            </div>
+            <div className="flex items-center gap-2 rounded-lg border border-line bg-surface p-3 text-xs text-muted">
+              <RefreshCw size={13} className="animate-spin text-brand" />
+              <span>{oauthDlg.message || "等待你在浏览器中完成登录…"}</span>
+              <span className="ml-auto text-[10px]">每 {oauthDlg.interval || 5}s 轮询</span>
+            </div>
+            <p className="text-[11px] text-muted">
+              授权链接由 {oauthDlg.meta.name} 官方签发，有效期约 1 小时。如需为同一渠道添加第二个账号，建议使用无痕窗口打开授权页。
+            </p>
+            <div className="flex justify-end">
+              <Button variant="ghost" onClick={closeOAuth}>取消授权</Button>
+            </div>
+          </div>
         ) : oauthDlg?.mode === "device" ? (
           <div className="space-y-4">
             <p className="text-xs text-muted leading-relaxed">
@@ -987,6 +1081,9 @@ export default function Providers() {
               <span>{oauthDlg.message || "等待你在浏览器中确认授权…"}</span>
               {oauthDlg.interval ? <span className="ml-auto text-[10px]">每 {oauthDlg.interval}s 轮询</span> : null}
             </div>
+            <p className="text-[11px] text-muted">
+              如需为同一渠道添加第二个账号，请使用无痕窗口打开授权页，避免浏览器复用已登录会话。
+            </p>
             <div className="flex justify-end">
               <Button variant="ghost" onClick={closeOAuth}>取消授权</Button>
             </div>
