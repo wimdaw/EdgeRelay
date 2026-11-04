@@ -260,7 +260,7 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
             </div>
           </>
         )}
-        <main className="mx-auto w-full max-w-[1280px] flex-1 overflow-auto p-4 sm:p-6">
+        <main className="w-full flex-1 overflow-auto p-4 sm:p-6">
           <Outlet context={{ me }} />
         </main>
       </div>
