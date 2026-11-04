@@ -18,7 +18,6 @@ const Logs = lazy(() => import("./pages/Logs"));
 const Users = lazy(() => import("./pages/Users"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Backup = lazy(() => import("./pages/Backup"));
-const Invite = lazy(() => import("./pages/Invite"));
 const Announcements = lazy(() => import("./pages/Announcements"));
 const Settings = lazy(() => import("./pages/Settings"));
 
@@ -123,7 +122,7 @@ function Shell() {
         <Route path="/dashboard/audit" element={<Navigate to="/dashboard/logs" replace />} />
         <Route path="/dashboard/profile" element={me ? <Profile me={me} onRefresh={refresh} /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/backup" element={isSuperadmin ? <Backup /> : <Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard/invite" element={me ? <Invite me={me} /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/invite" element={<Navigate to="/dashboard/users" replace />} />
         {/* 权限受控页面 */}
         <Route path="/dashboard/providers" element={isSuperadmin ? <Providers /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/pricing" element={isSuperadmin && me ? <Pricing me={me} /> : <Navigate to="/dashboard" replace />} />

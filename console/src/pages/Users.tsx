@@ -4,6 +4,7 @@ import { useOutletContext } from "react-router-dom";
 import { adminAction, type Me, type UserRow, type Flag, type Appeal } from "../lib/api";
 import { Button, Card, DataTable, Dialog, Field, Input, Select, StatusTag, useConfirm, useToast, type Col } from "../components/ui";
 import { fmtTime } from "../lib/utils";
+import Invite from "./Invite";
 
 const ROLE_MAP: Record<string, { label: string; color: string; desc: string; lvl: number }> = {
   superadmin: { label: "超级管理员", color: "bg-red-500/10 text-red-500 font-bold border border-red-500/30", desc: "最高站长权限，全站管理，额度无限真实扣费", lvl: 100 },
@@ -31,7 +32,7 @@ export default function Users() {
   const { me } = useOutletContext<{ me: Me }>();
   const isSuperadmin = me?.user.role === "superadmin";
 
-  const [tab, setTab] = useState<"users" | "codes" | "flags" | "appeals">("users");
+  const [tab, setTab] = useState<"users" | "invite" | "codes" | "flags" | "appeals">("users");
   const [users, setUsers] = useState<UserRow[] | null>(null);
   const [codes, setCodes] = useState<RedeemCodeItem[] | null>(null);
   const [flags, setFlags] = useState<Flag[] | null>(null);
@@ -291,14 +292,14 @@ export default function Users() {
   ];
 
   const TABS = isSuperadmin
-    ? ([["users", "用户与权限"], ["codes", "卡密管理"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const)
-    : ([["users", "用户与权限"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const);
+    ? ([["users", "用户与权限"], ["invite", "邀请"], ["codes", "卡密管理"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const)
+    : ([["users", "用户与权限"], ["invite", "邀请"], ["flags", "内容复核队列"], ["appeals", "申诉"]] as const);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit" role="tablist">
         {TABS.map(([k, l]) => (
-          <button key={k} role="tab" aria-selected={tab === k} onClick={() => { setTab(k as any); (k === "flags" ? loadFlags : k === "appeals" ? loadAppeals : k === "codes" ? loadCodes : loadUsers)(); }}
+          <button key={k} role="tab" aria-selected={tab === k} onClick={() => { setTab(k as any); (k === "invite" ? undefined : k === "flags" ? loadFlags : k === "appeals" ? loadAppeals : k === "codes" ? loadCodes : loadUsers)?.(); }}
             className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{l}</button>
         ))}
       </div>
@@ -334,6 +335,8 @@ export default function Users() {
           {users === null ? <div className="flex flex-col gap-2">{[...Array(5)].map((_, i) => <div key={i} className="skeleton h-9" />)}</div> : <DataTable cols={userCols} rows={users} />}
         </Card>
       )}
+
+      {tab === "invite" && <Invite me={me} />}
 
       {tab === "codes" && isSuperadmin && (
         <div className="flex flex-col gap-4">
