@@ -12,6 +12,7 @@ import { Dialog, Button } from "./components/ui";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Keys = lazy(() => import("./pages/Keys"));
 const Providers = lazy(() => import("./pages/Providers"));
+const AccountPool = lazy(() => import("./pages/AccountPool"));
 const ModelsPricing = lazy(() => import("./pages/ModelsPricing"));
 const Logs = lazy(() => import("./pages/Logs"));
 const Users = lazy(() => import("./pages/Users"));
@@ -127,6 +128,7 @@ function Shell() {
         <Route path="/dashboard/invite" element={me ? (canManageUsers ? <Navigate to="/dashboard/users" replace /> : <Invite me={me} />) : <Navigate to="/login" replace />} />
         {/* 权限受控页面 */}
         <Route path="/dashboard/providers" element={isSuperadmin ? <Providers /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard/accounts" element={isSuperadmin ? <AccountPool /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/users" element={me ? <Users /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/settings" element={isSuperadmin ? <Settings /> : <Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/announcements" element={<Navigate to="/dashboard/settings" replace />} />

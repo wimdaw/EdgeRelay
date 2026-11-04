@@ -83,6 +83,9 @@ adminRouter.post("/actions", async (c) => {
     } else if (action === "oauth_poll") {
       // 授权轮询不要求二次验证，但仅限超级管理员
       requireRole(user, ["superadmin"]);
+    } else if (action === "account_pool") {
+      // 账号池会解密凭据并查询上游额度，仅限超级管理员
+      requireRole(user, ["superadmin"]);
     } else if (READ_ACTIONS.has(action)) {
       requireRole(user, ["superadmin", "admin", "auditor"]);
     } else {
@@ -402,6 +405,18 @@ adminRouter.post("/actions", async (c) => {
         });
         await bulkUpsertProviderKeys(env, String(p.providerId), records);
         return done({ added, count: added.length, fingerprint: added[0]?.fingerprint }, "provider_key", String(p.providerId));
+      }
+
+      /* ---- 账号池 ---- */
+      case "account_pool": {
+        const providers = await getProviders(env);
+        const providerId = String(p.providerId || "");
+        const list = providers
+          .filter((pr) => (pr.kind || "").startsWith("oauth:") || (pr.kind || "").startsWith("web:"))
+          .filter((pr) => !providerId || pr.id === providerId || pr.slug === providerId);
+        const { buildAccountPool } = await import("../account-pool");
+        const rows = await buildAccountPool(env, list);
+        return json({ ok: true, providers: rows });
       }
 
       /* ---- OAuth 渠道授权 ---- */

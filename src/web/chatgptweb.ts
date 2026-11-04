@@ -604,6 +604,45 @@ async function resolveAccountToken(env: Env, rawToken: string): Promise<{ token:
   return { token: cached.accessToken, accountId }
 }
 
+/** 账号池：读取账号邮箱 / 套餐（只读本地 access_token JWT，不触发刷新/轮换） */
+export async function fetchChatgptWebAccountInfo(
+  env: Env,
+  rawToken: string,
+): Promise<{ ok: boolean; email?: string; name?: string; plan?: string; accountId?: string; note?: string; error?: string }> {
+  try {
+    const raw = extractRefreshToken(rawToken)
+    if (!raw) return { ok: false, error: '凭据为空' }
+    let token = ''
+    if (isJwt(raw)) {
+      token = raw
+    } else {
+      const cachedRaw = await getKV(env).get(AT_PREFIX + (await sha256Hex(raw))).catch(() => null)
+      if (cachedRaw) {
+        try { token = JSON.parse(cachedRaw).accessToken || '' } catch { /* ignore */ }
+      }
+    }
+    if (!token) return { ok: true, note: '首次调用后显示账号信息' }
+
+    let payload: any = {}
+    try {
+      const parts = token.split('.')
+      if (parts.length >= 2) payload = JSON.parse(base64UrlDecode(parts[1]))
+    } catch { return { ok: true, note: '账号信息解析失败' } }
+
+    const profile = payload?.['https://api.openai.com/profile'] || {}
+    const auth = payload?.['https://api.openai.com/auth'] || {}
+    return {
+      ok: true,
+      email: typeof profile?.email === 'string' ? profile.email : (typeof payload?.email === 'string' ? payload.email : ''),
+      name: typeof profile?.name === 'string' ? profile.name : '',
+      plan: typeof auth?.chatgpt_plan_type === 'string' ? auth.chatgpt_plan_type : '',
+      accountId: typeof auth?.user_id === 'string' ? auth.user_id : '',
+    }
+  } catch (err) {
+    return { ok: false, error: (err as Error)?.message || '账号信息查询失败' }
+  }
+}
+
 // =====================================================================
 // 请求头
 // =====================================================================
