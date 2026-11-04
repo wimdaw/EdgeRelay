@@ -1,5 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { Plus, RefreshCw, Server, Trash2, Key, Pencil, Power, CheckCircle2, AlertTriangle, ShieldAlert } from "lucide-react";
+import {
+  Plus,
+  RefreshCw,
+  Server,
+  Trash2,
+  Key,
+  Pencil,
+  Power,
+  CheckCircle2,
+  AlertTriangle,
+  ShieldAlert,
+  ShieldCheck,
+  LogIn,
+  Copy,
+  ExternalLink,
+  Users,
+} from "lucide-react";
 import { adminAction, type Provider } from "../lib/api";
 import { Button, Card, Dialog, EmptyState, Field, Input, Select, StatusTag, useConfirm, useToast } from "../components/ui";
 import { cn } from "../lib/utils";
@@ -15,9 +31,88 @@ const PRESETS: Record<string, { name: string; slug: string; kind: string; url: s
 };
 
 const isKeylessSlug = (slug?: string) => slug === "opencode" || slug === "duckai" || slug === "kilo";
+const isOAuthKind = (kind?: string | null) => !!kind && kind.startsWith("oauth:");
+const isOAuthProvider = (p?: Provider | null) => isOAuthKind(p?.kind);
+
+/** OAuth 渠道目录（与后端 src/oauth/index.ts 保持一致） */
+const OAUTH_CATALOG = [
+  {
+    type: "claude",
+    name: "Claude (Anthropic)",
+    slug: "claude-oauth",
+    baseUrl: "https://api.anthropic.com",
+    mode: "redirect" as const,
+    desc: "Claude Code OAuth 授权，自动翻译为 Anthropic Messages 协议。",
+    models: ["claude-sonnet-4-5", "claude-opus-4-5", "claude-haiku-4-5"],
+  },
+  {
+    type: "codex",
+    name: "ChatGPT (Codex)",
+    slug: "codex-oauth",
+    baseUrl: "https://chatgpt.com/backend-api/codex",
+    mode: "redirect" as const,
+    desc: "ChatGPT 账号授权（Codex CLI），自动翻译为 Responses 协议。",
+    models: ["gpt-5.5", "gpt-5.4", "gpt-5.3-codex"],
+  },
+  {
+    type: "antigravity",
+    name: "Antigravity (Google)",
+    slug: "antigravity-oauth",
+    baseUrl: "https://daily-cloudcode-pa.googleapis.com",
+    mode: "redirect" as const,
+    desc: "Google 账号授权（Antigravity 客户端），自动翻译为 Gemini 协议。",
+    models: ["gemini-3.7-flash", "gemini-3.1-pro"],
+  },
+  {
+    type: "kimi",
+    name: "Kimi (Moonshot)",
+    slug: "kimi-oauth",
+    baseUrl: "https://api.kimi.ai/coding",
+    mode: "device" as const,
+    desc: "Kimi 设备码授权，OpenAI 兼容协议直通（国际站/中国站自动识别）。",
+    models: ["kimi-for-coding", "kimi-for-coding-highspeed"],
+  },
+  {
+    type: "qwen",
+    name: "Qwen (通义千问)",
+    slug: "qwen-oauth",
+    baseUrl: "https://portal.qwen.ai/v1",
+    mode: "device" as const,
+    desc: "Qwen 设备码授权，OpenAI 兼容协议直通。",
+    models: ["coder-model", "qwen3-coder-plus"],
+  },
+  {
+    type: "grok",
+    name: "Grok (xAI)",
+    slug: "grok-oauth",
+    baseUrl: "https://cli-chat-proxy.grok.com/v1",
+    mode: "device" as const,
+    desc: "xAI 设备码授权，自动翻译为 Responses 协议。",
+    models: ["grok-4.6", "grok-4.5"],
+  },
+];
+
+type OAuthMeta = (typeof OAUTH_CATALOG)[number];
+
+type OAuthDialogState = {
+  meta: OAuthMeta;
+  provider: Provider | null;
+  mode: "redirect" | "device";
+  url: string;
+  state: string;
+  userCode?: string;
+  verificationUri?: string;
+  verificationUriComplete?: string;
+  interval?: number;
+  step: "loading" | "ready" | "polling" | "error";
+  message?: string;
+  codeInput: string;
+  busy?: boolean;
+};
 
 export default function Providers() {
   const [rows, setRows] = useState<Provider[] | null>(null);
+  const [tab, setTab] = useState<"direct" | "oauth">("direct");
   const [dlg, setDlg] = useState(false);
   const [form, setForm] = useState({ id: "", name: "DeepSeek", slug: "deepseek", kind: "openai_compat", url: "https://api.deepseek.com", key: "" });
   const [saving, setSaving] = useState(false);
@@ -27,11 +122,15 @@ export default function Providers() {
   // 模型导入流程
   const [importStep, setImportStep] = useState<{ providerId: string; providerName: string; models: string[]; picked: Set<string>; loading: boolean; error?: string } | null>(null);
   const [customModelInput, setCustomModelInput] = useState("");
+  // OAuth 授权流程
+  const [oauthDlg, setOauthDlg] = useState<OAuthDialogState | null>(null);
+  const oauthTimer = useRef<number | null>(null);
   const { confirm, confirmEl } = useConfirm();
   const toast = useToast();
 
   const load = () => adminAction<{ providers: Provider[] }>("list_providers").then((d) => setRows(d.providers)).catch((e) => toast(e.message, "err"));
   useEffect(() => { load(); }, []);
+  useEffect(() => () => stopOAuthPoll(), []);
 
   const openNew = () => {
     setForm({ id: "", name: "DeepSeek", slug: "deepseek", kind: "openai_compat", url: "https://api.deepseek.com", key: "" });
@@ -158,9 +257,9 @@ export default function Providers() {
       const r = await adminAction<{ result?: { fingerprint?: string } }>("upsert_provider_key", {
         providerId: keyDlg.id,
         key: keyVal.trim(),
-        label: newKeyLabel.trim() || "prod",
+        label: newKeyLabel.trim() || (isOAuthProvider(keyDlg) ? `account-${(keyDlg.key_count ?? 0) + 1}` : "prod"),
       });
-      toast(`密钥已加密入库（指纹 ${r.result?.fingerprint ?? ""}）`);
+      toast(isOAuthProvider(keyDlg) ? `账号凭据已加密入库（指纹 ${r.result?.fingerprint ?? ""}）` : `密钥已加密入库（指纹 ${r.result?.fingerprint ?? ""}）`);
       const keyInput = keyVal.trim();
       setKeyVal("");
       const updated = await adminAction<{ providers: Provider[] }>("list_providers");
@@ -168,7 +267,7 @@ export default function Providers() {
       const targetP = updated.providers.find((x) => x.id === keyDlg.id);
       if (targetP) setKeyDlg(targetP);
       // 首次录入后自动尝试拉取上游模型列表
-      if (!targetP || (targetP.keys && targetP.keys.length <= 1)) {
+      if (!isOAuthProvider(keyDlg) && (!targetP || (targetP.keys && targetP.keys.length <= 1))) {
         setImportStep({ providerId: keyDlg.id, providerName: keyDlg.name, models: [], picked: new Set(), loading: true });
         await pullModels(keyDlg.id, keyDlg.name, keyDlg.base_url, keyInput);
       }
@@ -176,10 +275,10 @@ export default function Providers() {
   };
 
   const delKey = async (providerId: string, keyId: string) => {
-    if (!(await confirm("确认删除该密钥？该密钥将从多 Key 调度池中彻底移除。"))) return;
+    if (!(await confirm("确认删除该凭据？该凭据将从多 Key 调度池中彻底移除。"))) return;
     try {
       await adminAction("delete_provider_key", { providerId, keyId });
-      toast("密钥已从池中删除");
+      toast("凭据已从池中删除");
       const updated = await adminAction<{ providers: Provider[] }>("list_providers");
       setRows(updated.providers);
       const targetP = updated.providers.find((x) => x.id === providerId);
@@ -191,7 +290,7 @@ export default function Providers() {
     const nextStatus = currentStatus === "active" ? "disabled" : "active";
     try {
       await adminAction("toggle_provider_key", { providerId, keyId, status: nextStatus });
-      toast(`密钥已${nextStatus === "active" ? "启用" : "停用"}`);
+      toast(`账号已${nextStatus === "active" ? "启用" : "停用"}`);
       const updated = await adminAction<{ providers: Provider[] }>("list_providers");
       setRows(updated.providers);
       const targetP = updated.providers.find((x) => x.id === providerId);
@@ -209,111 +308,373 @@ export default function Providers() {
   };
 
   const del = async (p: Provider) => {
-    if (!(await confirm(`删除供应商「${p.name}」？其模型映射与上游密钥将一并删除，不可恢复。`))) return;
+    if (!(await confirm(`删除供应商「${p.name}」？其模型映射与上游凭据将一并删除，不可恢复。`))) return;
     try {
       await adminAction("delete_provider", { id: p.id });
       toast("已删除"); load();
     } catch (e) { toast((e as Error).message, "err"); }
   };
 
+  /* ---------------- OAuth 授权流程 ---------------- */
+
+  const stopOAuthPoll = () => {
+    if (oauthTimer.current !== null) {
+      window.clearTimeout(oauthTimer.current);
+      oauthTimer.current = null;
+    }
+  };
+
+  const closeOAuth = () => { stopOAuthPoll(); setOauthDlg(null); };
+
+  const copyText = async (text: string) => {
+    try { await navigator.clipboard.writeText(text); toast("已复制到剪贴板"); }
+    catch { toast("复制失败，请手动选择复制", "err"); }
+  };
+
+  /** 授权成功后：按需创建渠道 + 加密保存 refresh_token + 自动拉取模型 */
+  const finishOAuth = async (meta: OAuthMeta, existing: Provider | null, refreshToken: string) => {
+    setOauthDlg((d) => (d ? { ...d, busy: true, message: "正在保存账号凭据…" } : d));
+    try {
+      let providerId = existing?.id || "";
+      if (!providerId) {
+        await adminAction("upsert_provider", {
+          name: meta.name,
+          slug: meta.slug,
+          kind: `oauth:${meta.type}`,
+          baseUrl: meta.baseUrl,
+        });
+        const d = await adminAction<{ providers: Provider[] }>("list_providers");
+        providerId = d.providers.find((x) => x.kind === `oauth:${meta.type}` || x.slug === meta.slug)?.id || "";
+        setRows(d.providers);
+      }
+      if (!providerId) throw new Error("OAuth 渠道创建失败");
+      const r = await adminAction<{ result?: { fingerprint?: string } }>("upsert_provider_key", {
+        providerId,
+        key: refreshToken,
+        label: `account-${(existing?.key_count ?? 0) + 1}`,
+      });
+      toast(`授权成功，账号已加密入库（指纹 ${r.result?.fingerprint ?? ""}）`);
+      stopOAuthPoll();
+      setOauthDlg(null);
+      const updated = await adminAction<{ providers: Provider[] }>("list_providers");
+      setRows(updated.providers);
+      setImportStep({ providerId, providerName: meta.name, models: [], picked: new Set(), loading: true });
+      await pullModels(providerId, meta.name, meta.baseUrl, "");
+    } catch (e) {
+      const msg = (e as Error).message;
+      toast(msg, "err");
+      setOauthDlg((d) => (d ? { ...d, step: "error", message: msg, busy: false } : d));
+    }
+  };
+
+  const startOAuthPoll = (meta: OAuthMeta, existing: Provider | null, state: string, intervalSec: number) => {
+    const poll = async () => {
+      try {
+        const r = await adminAction<any>("oauth_poll", { provider: meta.type, state });
+        const res = r.result ?? r;
+        if (res.status === "ok" && res.refresh_token) {
+          await finishOAuth(meta, existing, res.refresh_token as string);
+          return;
+        }
+        if (res.status === "error") {
+          setOauthDlg((d) => (d ? { ...d, step: "error", message: res.message || "授权失败" } : d));
+          return;
+        }
+        setOauthDlg((d) => (d ? { ...d, message: "等待你在浏览器中确认授权…" } : d));
+        oauthTimer.current = window.setTimeout(poll, Math.max(2, intervalSec) * 1000);
+      } catch (e) {
+        setOauthDlg((d) => (d ? { ...d, step: "error", message: (e as Error).message } : d));
+      }
+    };
+    oauthTimer.current = window.setTimeout(poll, Math.max(2, intervalSec) * 1000);
+  };
+
+  const beginOAuth = async (meta: OAuthMeta, existing?: Provider) => {
+    stopOAuthPoll();
+    setOauthDlg({
+      meta,
+      provider: existing ?? null,
+      mode: meta.mode,
+      url: "",
+      state: "",
+      step: "loading",
+      codeInput: "",
+    });
+    try {
+      const r = await adminAction<any>("oauth_start", { provider: meta.type, baseUrl: meta.baseUrl });
+      const d = r.result ?? {};
+      const mode = (d.mode as "redirect" | "device") || meta.mode;
+      setOauthDlg({
+        meta,
+        provider: existing ?? null,
+        mode,
+        url: d.url ?? "",
+        state: d.state ?? "",
+        userCode: d.user_code,
+        verificationUri: d.verification_uri,
+        verificationUriComplete: d.verification_uri_complete,
+        interval: Number(d.interval) || 5,
+        step: mode === "device" ? "polling" : "ready",
+        codeInput: "",
+        message: mode === "device" ? "等待你在浏览器中确认授权…" : undefined,
+      });
+      if (mode === "device" && d.state) {
+        startOAuthPoll(meta, existing ?? null, d.state as string, Number(d.interval) || 5);
+      }
+    } catch (e) {
+      setOauthDlg((d) => (d ? { ...d, step: "error", message: (e as Error).message } : d));
+    }
+  };
+
+  const completeOAuthNow = async () => {
+    if (!oauthDlg) return;
+    if (!oauthDlg.codeInput.trim()) return toast("请粘贴授权返回的 code 或整段回调地址", "err");
+    setOauthDlg({ ...oauthDlg, busy: true, message: "正在换取 access_token…" });
+    try {
+      const r = await adminAction<any>("oauth_complete", {
+        provider: oauthDlg.meta.type,
+        code: oauthDlg.codeInput.trim(),
+        state: oauthDlg.state,
+      });
+      const token = r.result?.refreshToken;
+      if (!token) throw new Error("上游未返回 refresh_token");
+      await finishOAuth(oauthDlg.meta, oauthDlg.provider, token);
+    } catch (e) {
+      toast((e as Error).message, "err");
+      setOauthDlg((d) => (d ? { ...d, step: "error", message: (e as Error).message, busy: false } : d));
+    }
+  };
+
+  const retryOAuth = () => {
+    if (!oauthDlg) return;
+    beginOAuth(oauthDlg.meta, oauthDlg.provider ?? undefined);
+  };
+
+  /* ---------------- 渲染 ---------------- */
+
+  const oauthProviderOf = (meta: OAuthMeta) => (rows ?? []).find((x) => x.kind === `oauth:${meta.type}` || x.slug === meta.slug);
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <Button onClick={openNew}><Plus size={14} />添加供应商</Button>
+      <div className="flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit" role="tablist">
+        {([
+          ["direct", "API 直连"],
+          ["oauth", "OAuth 授权"],
+        ] as const).map(([k, l]) => (
+          <button
+            key={k}
+            role="tab"
+            aria-selected={tab === k}
+            onClick={() => setTab(k)}
+            className={cn(
+              "rounded-md px-4 py-1.5 text-xs font-medium transition-colors",
+              tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"
+            )}
+          >
+            {l}
+          </button>
+        ))}
       </div>
 
-      {rows === null ? (
-        <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-36 rounded-xl2" />)}
-        </div>
-      ) : rows.length === 0 ? (
-        <Card><EmptyState icon={<Server size={32} />} title="还没有上游供应商" hint="添加你持有授权的供应商并录入密钥，即可一键导入模型列表。" action={<Button className="mt-2" onClick={openNew}>添加供应商</Button>} /></Card>
-      ) : (
-        <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {rows.map((p) => (
-            <Card key={p.id} className={cn("p-4 flex flex-col justify-between transition-all", p.status === "disabled" && "opacity-75 border-dashed bg-surface/50")}>
-              <div>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex min-w-0 items-center gap-2.5">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-sm font-bold text-brand">{p.name[0]}</div>
-                    <div className="min-w-0">
-                      <div className="truncate text-xs font-semibold leading-tight">{p.name}</div>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <code className="text-[10px] text-muted font-mono">{p.slug}</code>
-                        <span className="text-[9px] rounded bg-line px-1 text-muted">
-                          {p.slug === "anthropic" || p.kind === "anthropic" ? "Anthropic 原生" : isKeylessSlug(p.slug) ? "免 Key" : "OpenAI 兼容"}
-                        </span>
+      {tab === "direct" && (
+        <>
+          <div className="flex justify-end">
+            <Button onClick={openNew}><Plus size={14} />添加供应商</Button>
+          </div>
+
+          {rows === null ? (
+            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-36 rounded-xl2" />)}
+            </div>
+          ) : rows.filter((p) => !isOAuthProvider(p)).length === 0 ? (
+            <Card><EmptyState icon={<Server size={32} />} title="还没有上游供应商" hint="添加你持有授权的供应商并录入密钥，即可一键导入模型列表。" action={<Button className="mt-2" onClick={openNew}>添加供应商</Button>} /></Card>
+          ) : (
+            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {rows.filter((p) => !isOAuthProvider(p)).map((p) => (
+                <Card key={p.id} className={cn("p-4 flex flex-col justify-between transition-all", p.status === "disabled" && "opacity-75 border-dashed bg-surface/50")}>
+                  <div>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex min-w-0 items-center gap-2.5">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-sm font-bold text-brand">{p.name[0]}</div>
+                        <div className="min-w-0">
+                          <div className="truncate text-xs font-semibold leading-tight">{p.name}</div>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <code className="text-[10px] text-muted font-mono">{p.slug}</code>
+                            <span className="text-[9px] rounded bg-line px-1 text-muted">
+                              {p.slug === "anthropic" || p.kind === "anthropic" ? "Anthropic 原生" : isKeylessSlug(p.slug) ? "免 Key" : "OpenAI 兼容"}
+                            </span>
+                          </div>
+                        </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => toggleProvider(p)}
+                        title={`点击${p.status === "active" ? "停用" : "启用"}该渠道（停用后相应模型在模型池与定价中隐藏）`}
+                        className="cursor-pointer transition-transform hover:scale-105 shrink-0"
+                      >
+                        <StatusTag value={p.status} />
+                      </button>
                     </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => toggleProvider(p)}
-                    title={`点击${p.status === "active" ? "停用" : "启用"}该渠道（停用后相应模型在模型池与定价中隐藏）`}
-                    className="cursor-pointer transition-transform hover:scale-105 shrink-0"
-                  >
-                    <StatusTag value={p.status} />
-                  </button>
-                </div>
-                <dl className="mt-3 space-y-1.5 text-[11px] text-muted">
-                  <div className="flex min-w-0 justify-between gap-2">
-                    <span className="shrink-0 text-muted">端点</span>
-                    <code className="truncate text-ink max-w-[140px]" title={p.base_url}>{p.base_url}</code>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>密钥</span>
-                    <span className="text-ink truncate">
-                      {isKeylessSlug(p.slug) ? (
-                        <span className="text-emerald-500 font-medium">免 Key</span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1">
-                          {p.key_count} 个
-                          {p.key_count === 0 ? (
-                            <span className="text-warn">（未录）</span>
-                          ) : p.keys?.some((k) => k.health_status === "demoted") ? (
-                            <span className="text-err font-medium text-[10px]">有熔断</span>
+                    <dl className="mt-3 space-y-1.5 text-[11px] text-muted">
+                      <div className="flex min-w-0 justify-between gap-2">
+                        <span className="shrink-0 text-muted">端点</span>
+                        <code className="truncate text-ink max-w-[140px]" title={p.base_url}>{p.base_url}</code>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>密钥</span>
+                        <span className="text-ink truncate">
+                          {isKeylessSlug(p.slug) ? (
+                            <span className="text-emerald-500 font-medium">免 Key</span>
                           ) : (
-                            <span className="text-emerald-500 font-medium text-[10px]">就绪</span>
+                            <span className="inline-flex items-center gap-1">
+                              {p.key_count} 个
+                              {p.key_count === 0 ? (
+                                <span className="text-warn">（未录）</span>
+                              ) : p.keys?.some((k) => k.health_status === "demoted") ? (
+                                <span className="text-err font-medium text-[10px]">有熔断</span>
+                              ) : (
+                                <span className="text-emerald-500 font-medium text-[10px]">就绪</span>
+                              )}
+                            </span>
                           )}
                         </span>
+                      </div>
+                      {p.authorization_expires_at && (
+                        <div className="flex justify-between">
+                          <span>授权到期</span>
+                          <span className="text-ink">{new Date(p.authorization_expires_at * 1000).toLocaleDateString("zh-CN")}</span>
+                        </div>
                       )}
-                    </span>
+                    </dl>
                   </div>
-                  {p.authorization_expires_at && (
-                    <div className="flex justify-between">
-                      <span>授权到期</span>
-                      <span className="text-ink">{new Date(p.authorization_expires_at * 1000).toLocaleDateString("zh-CN")}</span>
-                    </div>
-                  )}
-                </dl>
-              </div>
 
-              <div className="mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5">
-                <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => fetchModels(p.id, p.name)} title="从上游导入或手动添加模型" aria-label="导入模型">
-                  <RefreshCw size={13} />
-                </Button>
-                <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => openManualAdd(p.id, p.name)} title="手动添加模型" aria-label="手动添加模型">
-                  <Plus size={13} />
-                </Button>
-                {!isKeylessSlug(p.slug) && (
-                  <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => { setKeyDlg(p); setKeyVal(""); setNewKeyLabel("prod"); }} title={`管理多 Key 轮换池（当前 ${p.key_count} 个）`} aria-label="密钥池">
-                    <Key size={13} />
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  className={cn("!h-7 !w-7 !px-0", p.status === "active" ? "!text-muted hover:!text-err" : "!text-emerald-500 font-semibold")}
-                  onClick={() => toggleProvider(p)}
-                  title={`切换渠道启用/停用状态（当前${p.status === "active" ? "启用" : "停用"}）`}
-                  aria-label={p.status === "active" ? "停用渠道" : "启用渠道"}
-                >
-                  <Power size={13} />
-                </Button>
-                <Button variant="ghost" className="!h-7 !w-7 !px-0" onClick={() => openEdit(p)} title="编辑供应商" aria-label="编辑供应商"><Pencil size={13} /></Button>
-                <Button variant="ghost" className="!h-7 !w-7 !px-0 !text-err" onClick={() => del(p)} title="删除供应商" aria-label={`删除 ${p.name}`}><Trash2 size={13} /></Button>
-              </div>
-            </Card>
-          ))}
+                  <div className="mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5">
+                    <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => fetchModels(p.id, p.name)} title="从上游导入或手动添加模型" aria-label="导入模型">
+                      <RefreshCw size={13} />
+                    </Button>
+                    <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => openManualAdd(p.id, p.name)} title="手动添加模型" aria-label="手动添加模型">
+                      <Plus size={13} />
+                    </Button>
+                    {!isKeylessSlug(p.slug) && (
+                      <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => { setKeyDlg(p); setKeyVal(""); setNewKeyLabel("prod"); }} title={`管理多 Key 轮换池（当前 ${p.key_count} 个）`} aria-label="密钥池">
+                        <Key size={13} />
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      className={cn("!h-7 !w-7 !px-0", p.status === "active" ? "!text-muted hover:!text-err" : "!text-emerald-500 font-semibold")}
+                      onClick={() => toggleProvider(p)}
+                      title={`切换渠道启用/停用状态（当前${p.status === "active" ? "启用" : "停用"}）`}
+                      aria-label={p.status === "active" ? "停用渠道" : "启用渠道"}
+                    >
+                      <Power size={13} />
+                    </Button>
+                    <Button variant="ghost" className="!h-7 !w-7 !px-0" onClick={() => openEdit(p)} title="编辑供应商" aria-label="编辑供应商"><Pencil size={13} /></Button>
+                    <Button variant="ghost" className="!h-7 !w-7 !px-0 !text-err" onClick={() => del(p)} title="删除供应商" aria-label={`删除 ${p.name}`}><Trash2 size={13} /></Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {tab === "oauth" && (
+        <div className="flex flex-col gap-4">
+          <div className="rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed">
+            OAuth 渠道通过账号授权接入（实现移植自 CLIProxyAPI）：refresh_token 经 AES-256-GCM 加密后存入渠道凭据池，
+            access_token 自动刷新；同一渠道可授权多个账号，自动轮换、遇 429/401 自动熔断冷却。
+          </div>
+
+          {rows === null ? (
+            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-40 rounded-xl2" />)}
+            </div>
+          ) : (
+            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {OAUTH_CATALOG.map((meta) => {
+                const p = oauthProviderOf(meta);
+                return (
+                  <Card key={meta.type} className={cn("p-4 flex flex-col justify-between transition-all", p?.status === "disabled" && "opacity-75 border-dashed bg-surface/50")}>
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand">
+                            <ShieldCheck size={16} />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="truncate text-xs font-semibold leading-tight">{meta.name}</div>
+                            <div className="mt-0.5 flex items-center gap-1.5">
+                              <code className="text-[10px] text-muted font-mono">{meta.slug}</code>
+                              <span className="rounded bg-brand/10 px-1 text-[9px] font-medium text-brand">OAuth</span>
+                            </div>
+                          </div>
+                        </div>
+                        {p ? (
+                          <button type="button" onClick={() => toggleProvider(p)} title="点击切换启用/停用" className="shrink-0 cursor-pointer transition-transform hover:scale-105">
+                            <StatusTag value={p.status} />
+                          </button>
+                        ) : (
+                          <span className="shrink-0 rounded bg-line px-1.5 py-0.5 text-[10px] text-muted">未接入</span>
+                        )}
+                      </div>
+
+                      <p className="mt-2.5 text-[11px] leading-relaxed text-muted">{meta.desc}</p>
+
+                      <dl className="mt-2.5 space-y-1.5 text-[11px] text-muted">
+                        <div className="flex min-w-0 justify-between gap-2">
+                          <span className="shrink-0">授权方式</span>
+                          <span className="text-ink">{meta.mode === "device" ? "设备码轮询" : "PKCE 授权链接"}</span>
+                        </div>
+                        <div className="flex min-w-0 justify-between gap-2">
+                          <span className="shrink-0">账号</span>
+                          <span className="inline-flex items-center gap-1 text-ink">
+                            <Users size={11} className="text-muted" />
+                            {p ? `${p.key_count} 个` : "—"}
+                            {p && p.key_count > 0 && (
+                              p.keys?.some((k) => k.health_status === "demoted")
+                                ? <span className="text-[10px] font-medium text-err">有熔断</span>
+                                : <span className="text-[10px] font-medium text-emerald-500">就绪</span>
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex min-w-0 justify-between gap-2">
+                          <span className="shrink-0">候选模型</span>
+                          <code className="truncate text-ink max-w-[170px]" title={meta.models.join(", ")}>{meta.models[0]} 等 {meta.models.length} 个</code>
+                        </div>
+                      </dl>
+                    </div>
+
+                    <div className="mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5">
+                      <Button variant="soft" className="!h-7 !px-2.5 text-[11px]" onClick={() => beginOAuth(meta, p)}>
+                        <LogIn size={12} />{p ? "授权新账号" : "授权并添加"}
+                      </Button>
+                      {p && (
+                        <>
+                          <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => fetchModels(p.id, p.name)} title="拉取/导入模型" aria-label="模型管理">
+                            <RefreshCw size={13} />
+                          </Button>
+                          <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => { setKeyDlg(p); setKeyVal(""); setNewKeyLabel(`account-${p.key_count + 1}`); }} title="管理授权账号" aria-label="账号管理">
+                            <Key size={13} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            className={cn("!h-7 !w-7 !px-0 ml-auto", p.status === "active" ? "!text-muted hover:!text-err" : "!text-emerald-500 font-semibold")}
+                            onClick={() => toggleProvider(p)}
+                            title={p.status === "active" ? "停用渠道" : "启用渠道"}
+                            aria-label={p.status === "active" ? "停用渠道" : "启用渠道"}
+                          >
+                            <Power size={13} />
+                          </Button>
+                          <Button variant="ghost" className="!h-7 !w-7 !px-0 !text-err" onClick={() => del(p)} title="删除渠道" aria-label="删除渠道"><Trash2 size={13} /></Button>
+                        </>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -470,25 +831,39 @@ export default function Providers() {
         )}
       </Dialog>
 
-      {/* 密钥池管理 */}
-      <Dialog open={!!keyDlg} onClose={() => setKeyDlg(null)} title={`密钥池管理 — ${keyDlg?.name ?? ""}`} width={560}>
+      {/* 凭据池 / 授权账号管理 */}
+      <Dialog open={!!keyDlg} onClose={() => setKeyDlg(null)} title={`${isOAuthProvider(keyDlg) ? "授权账号管理" : "密钥池管理"} — ${keyDlg?.name ?? ""}`} width={560}>
         <div className="space-y-4">
           <p className="text-xs text-muted">
-            已开启多 Key 负载均衡与健康熔断。网关使用 Fisher-Yates 随机打散实现均匀轮换分流；遇 429 自动降权跳过并轮换下一个 Key，60 秒后自动试用自愈。
+            {isOAuthProvider(keyDlg)
+              ? "每个账号对应一条 refresh_token（AES-256-GCM 加密存储），网关自动刷新 access_token 并随机轮换；遇 429/401 自动降权冷却，到期自动恢复。"
+              : "已开启多 Key 负载均衡与健康熔断。网关使用 Fisher-Yates 随机打散实现均匀轮换分流；遇 429 自动降权跳过并轮换下一个 Key，60 秒后自动试用自愈。"}
           </p>
+
+          {isOAuthProvider(keyDlg) && (
+            <Button className="w-full" variant="soft" onClick={() => {
+              const p = keyDlg;
+              const meta = OAUTH_CATALOG.find((m) => `oauth:${m.type}` === p?.kind);
+              if (!p || !meta) return;
+              setKeyDlg(null);
+              beginOAuth(meta, p);
+            }}>
+              <LogIn size={13} />授权新账号
+            </Button>
+          )}
 
           <div className="space-y-2">
             <div className="text-xs font-semibold text-ink flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <Key size={13} className="text-brand" />
-                当前轮换 Key 列表（{keyDlg?.keys?.length ?? 0} 个）
+                {isOAuthProvider(keyDlg) ? `已授权账号（${keyDlg?.keys?.length ?? 0} 个）` : `当前轮换 Key 列表（${keyDlg?.keys?.length ?? 0} 个）`}
               </span>
-              <span className="text-[11px] text-muted">支持无缝挂载任意多个 Key</span>
+              <span className="text-[11px] text-muted">{isOAuthProvider(keyDlg) ? "支持多账号自动轮换" : "支持无缝挂载任意多个 Key"}</span>
             </div>
 
             {(!keyDlg?.keys || keyDlg.keys.length === 0) ? (
               <div className="rounded-lg border border-line p-3 text-center text-xs text-muted">
-                暂无密钥，请在下方录入或批量粘贴 Key
+                {isOAuthProvider(keyDlg) ? "暂无已授权账号，请点击上方「授权新账号」" : "暂无密钥，请在下方录入或批量粘贴 Key"}
               </div>
             ) : (
               <div className="max-h-52 space-y-1.5 overflow-y-auto rounded-lg border border-line p-2">
@@ -509,7 +884,7 @@ export default function Providers() {
                         </span>
                       ) : (
                         <span className="flex items-center gap-0.5 rounded bg-emerald-500/10 px-1 py-0.5 text-[10px] font-medium text-emerald-500">
-                          <CheckCircle2 size={10} /> 轮换就绪
+                          <CheckCircle2 size={10} /> {isOAuthProvider(keyDlg) ? "账号就绪" : "轮换就绪"}
                         </span>
                       )}
                     </div>
@@ -536,12 +911,12 @@ export default function Providers() {
           </div>
 
           <div className="rounded-lg border border-dashed border-line p-3 space-y-2.5 bg-surface/50">
-            <div className="text-xs font-semibold text-ink">批量追加新密钥</div>
+            <div className="text-xs font-semibold text-ink">{isOAuthProvider(keyDlg) ? "手动追加 refresh_token" : "批量追加新密钥"}</div>
             <div className="space-y-1">
               <textarea
                 value={keyVal}
                 onChange={(e) => setKeyVal(e.target.value)}
-                placeholder={"支持单个或批量粘贴多个 Key，一行一个，例如：\nsk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy"}
+                placeholder={isOAuthProvider(keyDlg) ? "粘贴 refresh_token，一行一个，例如：\nrt_xxxxxxxxxxxxxxxx\nrt_yyyyyyyyyyyyyyyy" : "支持单个或批量粘贴多个 Key，一行一个，例如：\nsk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy"}
                 rows={3}
                 className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
               />
@@ -553,16 +928,101 @@ export default function Providers() {
                   className="!py-1 flex-1 sm:!w-28 text-xs"
                   value={newKeyLabel}
                   onChange={(e) => setNewKeyLabel(e.target.value)}
-                  placeholder="如 prod-2"
+                  placeholder={isOAuthProvider(keyDlg) ? "如 account-2" : "如 prod-2"}
                 />
               </div>
               <div className="flex items-center justify-end gap-2">
                 <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setKeyDlg(null)}>关闭</Button>
-                <Button className="flex-1 sm:flex-initial" onClick={saveKey} disabled={!keyVal.trim()}>保存并追加至池</Button>
+                <Button className="flex-1 sm:flex-initial" onClick={saveKey} disabled={!keyVal.trim()}>{isOAuthProvider(keyDlg) ? "保存账号凭据" : "保存并追加至池"}</Button>
               </div>
             </div>
           </div>
         </div>
+      </Dialog>
+
+      {/* OAuth 授权弹窗 */}
+      <Dialog open={!!oauthDlg} onClose={closeOAuth} title={`OAuth 授权 — ${oauthDlg?.meta.name ?? ""}`} width={560}>
+        {oauthDlg?.step === "loading" ? (
+          <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted">
+            <RefreshCw size={16} className="animate-spin" />正在向 {oauthDlg.meta.name} 发起授权请求…
+          </div>
+        ) : oauthDlg?.step === "error" ? (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-err/30 bg-err/5 p-3 text-xs text-err leading-relaxed">{oauthDlg.message}</div>
+            <p className="text-[11px] text-muted">
+              提示：授权链接有效期约 10 分钟；若使用了代理/无痕窗口，请保持同一浏览器完成授权。也可在下方手动粘贴 refresh_token。
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={closeOAuth}>关闭</Button>
+              <Button onClick={retryOAuth}><RefreshCw size={14} />重新发起授权</Button>
+            </div>
+          </div>
+        ) : oauthDlg?.mode === "device" ? (
+          <div className="space-y-4">
+            <p className="text-xs text-muted leading-relaxed">
+              请在浏览器中打开下方授权页，登录 {oauthDlg.meta.name} 账号并确认设备码：
+            </p>
+            <div className="rounded-xl border border-line bg-surface2/60 p-3 text-center">
+              <div className="text-[11px] text-muted">设备码 / User Code</div>
+              <div className="mt-1 font-mono text-2xl font-bold tracking-widest text-brand">{oauthDlg.userCode || "—"}</div>
+              <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+                <Button variant="soft" className="!h-7 !px-2.5 text-[11px]" onClick={() => copyText(oauthDlg.userCode || "")}>
+                  <Copy size={11} />复制设备码
+                </Button>
+                <Button
+                  className="!h-7 !px-2.5 text-[11px]"
+                  onClick={() => window.open(oauthDlg.verificationUriComplete || oauthDlg.verificationUri || oauthDlg.url, "_blank", "noopener,noreferrer")}
+                >
+                  <ExternalLink size={11} />打开授权页
+                </Button>
+              </div>
+              {(oauthDlg.verificationUriComplete || oauthDlg.verificationUri) && (
+                <div className="mt-2 truncate text-[10px] text-muted" title={oauthDlg.verificationUriComplete || oauthDlg.verificationUri}>
+                  {oauthDlg.verificationUriComplete || oauthDlg.verificationUri}
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2 rounded-lg border border-line bg-surface p-3 text-xs text-muted">
+              <RefreshCw size={13} className="animate-spin text-brand" />
+              <span>{oauthDlg.message || "等待你在浏览器中确认授权…"}</span>
+              {oauthDlg.interval ? <span className="ml-auto text-[10px]">每 {oauthDlg.interval}s 轮询</span> : null}
+            </div>
+            <div className="flex justify-end">
+              <Button variant="ghost" onClick={closeOAuth}>取消授权</Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-xs leading-relaxed text-muted">
+              1. 点击下方按钮打开 {oauthDlg?.meta.name} 授权页并登录；<br />
+              2. 授权后浏览器会跳转到 <code className="rounded bg-line px-1">localhost</code> 回调地址（页面打不开属正常现象）；<br />
+              3. 复制地址栏 <code className="rounded bg-line px-1">code=</code> 后的整段内容（或整段回调 URL）粘贴到下方。
+            </p>
+            <div className="flex items-center gap-2">
+              <Input readOnly value={oauthDlg?.url ?? ""} className="!py-1 flex-1 text-[11px] font-mono" />
+              <Button variant="soft" className="!h-[34px] !px-2.5 shrink-0" onClick={() => copyText(oauthDlg?.url ?? "")} title="复制授权链接"><Copy size={12} /></Button>
+              <Button className="!h-[34px] !px-3 shrink-0" onClick={() => window.open(oauthDlg?.url ?? "", "_blank", "noopener,noreferrer")}>
+                <ExternalLink size={12} />打开
+              </Button>
+            </div>
+            <Field label="授权 code 或整段回调地址">
+              <textarea
+                value={oauthDlg?.codeInput ?? ""}
+                onChange={(e) => oauthDlg && setOauthDlg({ ...oauthDlg, codeInput: e.target.value })}
+                rows={3}
+                placeholder="粘贴 code 或 http://localhost:xxxxx/callback?code=..."
+                className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
+              />
+            </Field>
+            {oauthDlg?.message && <div className="text-[11px] text-muted">{oauthDlg.message}</div>}
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={closeOAuth}>取消</Button>
+              <Button onClick={completeOAuthNow} disabled={oauthDlg?.busy || !oauthDlg?.codeInput.trim()}>
+                {oauthDlg?.busy ? "正在验证…" : "完成授权"}
+              </Button>
+            </div>
+          </div>
+        )}
       </Dialog>
       {confirmEl}
     </div>

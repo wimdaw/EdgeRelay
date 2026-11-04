@@ -18,7 +18,7 @@ import { planModelRoutes, buildRoutesFromPlan } from "../router";
 import { getPricing, hold, settle, releaseHold, estimateCost, type Pricing } from "../billing";
 import { buildHeaders, resolveTarget, joinApiPath, RETRYABLE_STATUS, estimateTokens } from "../providers";
 import { recordKeySuccess, recordKeyFailure, readKeyHealth } from "../key-health";
-import { uuid, sha256Hex } from "../crypto";
+import { uuid, sha256Hex, decryptSecret } from "../crypto";
 import {
   getApiKeyByHash,
   getApiKeyById,
@@ -377,9 +377,23 @@ chatRouter.post("/", async (c) => {
         const isOpencode = route.providerKind === "opencode" || route.providerSlug === "opencode";
         const isDuckai = route.providerKind === "duckai" || route.providerSlug === "duckai";
         const isAnthropic = route.providerKind === "anthropic" || route.providerSlug === "anthropic";
+        const oauthType = route.providerKind?.startsWith("oauth:") ? route.providerKind.slice("oauth:".length) : "";
 
         let resp: Response | null = null;
-        if (isOpencode) {
+        if (oauthType) {
+          const { handleOAuthChat } = await import("../oauth");
+          const refreshToken = route.encryptedKey ? await decryptSecret(env, route.encryptedKey) : "";
+          resp = await handleOAuthChat({
+            env,
+            type: oauthType as any,
+            providerId: route.providerId,
+            baseUrl: route.baseUrl,
+            upstreamModel: route.upstreamModel,
+            requestedModel: publicModel,
+            body: body as Record<string, any>,
+            refreshToken,
+          });
+        } else if (isOpencode) {
           const { proxyOpenCodeRequest, resolveOpenCodeUrls, resolveOpenCodeRelay } = await import("../opencode");
           const mirrors = resolveOpenCodeUrls(env);
           const relay = resolveOpenCodeRelay(env);

@@ -80,6 +80,9 @@ adminRouter.post("/actions", async (c) => {
       requireRole(user, ["superadmin", "auditor"]);
     } else if (action === "list_pricing") {
       requireRole(user, ["superadmin", "finance", "auditor"]);
+    } else if (action === "oauth_poll") {
+      // 授权轮询不要求二次验证，但仅限超级管理员
+      requireRole(user, ["superadmin"]);
     } else if (READ_ACTIONS.has(action)) {
       requireRole(user, ["superadmin", "admin", "auditor"]);
     } else {
@@ -104,6 +107,9 @@ adminRouter.post("/actions", async (c) => {
         "generate_redeem_codes",
         "delete_redeem_code",
         "save_announcements",
+        "oauth_start",
+        "oauth_complete",
+        "oauth_test",
       ]);
       if (SUPERADMIN_ONLY_ACTIONS.has(action)) {
         requireRole(admin, ["superadmin"]);
@@ -111,7 +117,7 @@ adminRouter.post("/actions", async (c) => {
     }
 
     // 审计元数据脱敏：禁止把管理员密码等敏感字段写入不可篡改的审计链
-    const REDACT_KEYS = new Set(["password", "apiKey", "key", "secret", "token"]);
+    const REDACT_KEYS = new Set(["password", "apiKey", "key", "keys", "secret", "token", "code"]);
     const auditMeta: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(p)) {
       if (REDACT_KEYS.has(k)) {
@@ -298,13 +304,14 @@ adminRouter.post("/actions", async (c) => {
       }
       case "upsert_provider": {
         const isNew = !p.id;
-        const isKeyless = p.slug === "opencode" || p.slug === "duckai" || p.slug === "kilo" || p.kind === "opencode" || p.kind === "duckai" || p.kind === "kilo" || p.authScheme === "none";
+        const kind = String(p.kind ?? (p.slug === "anthropic" ? "anthropic" : "openai_compat"));
+        const isOAuth = kind.startsWith("oauth:");
+        const isKeyless = !isOAuth && (p.slug === "opencode" || p.slug === "duckai" || p.slug === "kilo" || p.kind === "opencode" || p.kind === "duckai" || p.kind === "kilo" || p.authScheme === "none");
         if (isNew && !p.key && !isKeyless) throw new ApiError(400, ErrorCode.BAD_REQUEST, "添加供应商必须同时录入上游密钥");
         const id = (p.id as string) || uuid();
 
-        const kind = String(p.kind ?? (p.slug === "anthropic" ? "anthropic" : "openai_compat"));
         const isAnthropic = kind === "anthropic" || p.slug === "anthropic";
-        const authScheme = String(p.authScheme ?? (isAnthropic ? "x-api-key" : isKeyless ? "none" : "bearer"));
+        const authScheme = String(p.authScheme ?? (isOAuth ? "oauth" : isAnthropic ? "x-api-key" : isKeyless ? "none" : "bearer"));
         const extraHeaders = p.extraHeaders
           ? JSON.stringify(p.extraHeaders)
           : isAnthropic
@@ -397,11 +404,69 @@ adminRouter.post("/actions", async (c) => {
         return done({ added, count: added.length, fingerprint: added[0]?.fingerprint }, "provider_key", String(p.providerId));
       }
 
+      /* ---- OAuth 渠道授权 ---- */
+      case "oauth_start": {
+        const type = String(p.provider || "");
+        const { startOAuth, isOAuthType } = await import("../oauth");
+        if (!isOAuthType(type)) throw new ApiError(400, ErrorCode.BAD_REQUEST, `不支持的 OAuth 渠道: ${type}`);
+        const result = await startOAuth(env, type, p.baseUrl ? String(p.baseUrl) : undefined);
+        return done(result, "oauth", type);
+      }
+      case "oauth_complete": {
+        const type = String(p.provider || "");
+        const { completeOAuth, isOAuthType } = await import("../oauth");
+        if (!isOAuthType(type)) throw new ApiError(400, ErrorCode.BAD_REQUEST, `不支持的 OAuth 渠道: ${type}`);
+        if (!p.code || !p.state) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 code 或 state");
+        const { refreshToken } = await completeOAuth(env, type, String(p.code), String(p.state));
+        return done({ refreshToken }, "oauth", type);
+      }
+      case "oauth_poll": {
+        const type = String(p.provider || "");
+        const { pollOAuth, isOAuthType } = await import("../oauth");
+        if (!isOAuthType(type)) throw new ApiError(400, ErrorCode.BAD_REQUEST, `不支持的 OAuth 渠道: ${type}`);
+        if (!p.state) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 state");
+        const r = await pollOAuth(env, type, String(p.state));
+        return json({ ok: true, result: r, status: r.status, refresh_token: r.refreshToken ?? null, message: r.message ?? null });
+      }
+      case "oauth_test": {
+        const providerId = String(p.providerId || "");
+        const providers = await getProviders(env);
+        const prov = providers.find((x) => x.id === providerId || x.slug === providerId);
+        if (!prov) throw new ApiError(404, ErrorCode.NOT_FOUND, "渠道不存在");
+        const { parseOAuthKind, testOAuth, OAUTH_PROVIDERS } = await import("../oauth");
+        const type = parseOAuthKind(prov.kind);
+        if (!type) throw new ApiError(400, ErrorCode.BAD_REQUEST, "该渠道不是 OAuth 渠道");
+        const keys = await getProviderKeys(env, prov.id);
+        const keyId = String(p.keyId || "");
+        const key = keyId ? keys.find((k) => k.id === keyId) : keys.find((k) => k.status === "active") || keys[0];
+        if (!key) throw new ApiError(400, ErrorCode.BAD_REQUEST, "该渠道还没有已授权的账号");
+        const token = await decryptSecret(env, key.encryptedKey);
+        const model = String(p.model || OAUTH_PROVIDERS[type].defaultModels[0]);
+        const result = await testOAuth(env, type, token, model, prov.baseUrl);
+        return done(result, "oauth_account", key.id);
+      }
+
       /* ---- 模型管理 ---- */
       case "list_upstream_models": {
         const providerId = String(p.providerId || "");
         const providers = await getProviders(env);
         const prov = providers.find((x) => x.id === providerId || x.slug === providerId);
+        const provKind = prov?.kind || "";
+        if (provKind.startsWith("oauth:")) {
+          const type = provKind.slice("oauth:".length);
+          const { fetchOAuthModels, OAUTH_PROVIDERS } = await import("../oauth");
+          const keys = prov ? await getProviderKeys(env, prov.id) : [];
+          const activeKey = keys.find((k) => k.status === "active") || keys[0];
+          if (activeKey) {
+            try {
+              const token = await decryptSecret(env, activeKey.encryptedKey);
+              const r = await fetchOAuthModels(env, type as any, token, prov?.baseUrl);
+              return json({ ok: true, models: r.models, note: r.message });
+            } catch {}
+          }
+          const meta = OAUTH_PROVIDERS[type as keyof typeof OAUTH_PROVIDERS];
+          return json({ ok: true, models: meta?.defaultModels ?? [] });
+        }
         const slug = prov?.slug || prov?.kind || providerId;
         if (slug === "opencode") {
           // 对齐 ai-gateway-edgeone 原理：请求 OpenCode /models 端点并通过 filterOpenCodeModels 严格筛选免费层模型
