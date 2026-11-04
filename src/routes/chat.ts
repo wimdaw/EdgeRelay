@@ -378,9 +378,23 @@ chatRouter.post("/", async (c) => {
         const isDuckai = route.providerKind === "duckai" || route.providerSlug === "duckai";
         const isAnthropic = route.providerKind === "anthropic" || route.providerSlug === "anthropic";
         const oauthType = route.providerKind?.startsWith("oauth:") ? route.providerKind.slice("oauth:".length) : "";
+        const webType = route.providerKind?.startsWith("web:") ? route.providerKind.slice("web:".length) : "";
 
         let resp: Response | null = null;
-        if (oauthType) {
+        if (webType) {
+          const { handleWebChat } = await import("../web");
+          const credential = route.encryptedKey ? await decryptSecret(env, route.encryptedKey) : "";
+          resp = await handleWebChat({
+            env,
+            type: webType as any,
+            providerId: route.providerId,
+            baseUrl: route.baseUrl,
+            upstreamModel: route.upstreamModel,
+            requestedModel: publicModel,
+            body: body as Record<string, any>,
+            credential,
+          });
+        } else if (oauthType) {
           const { handleOAuthChat } = await import("../oauth");
           const refreshToken = route.encryptedKey ? await decryptSecret(env, route.encryptedKey) : "";
           resp = await handleOAuthChat({

@@ -452,6 +452,21 @@ adminRouter.post("/actions", async (c) => {
         const providers = await getProviders(env);
         const prov = providers.find((x) => x.id === providerId || x.slug === providerId);
         const provKind = prov?.kind || "";
+        if (provKind.startsWith("web:")) {
+          const type = provKind.slice("web:".length);
+          const { fetchWebModels, WEB_PROVIDERS } = await import("../web");
+          const keys = prov ? await getProviderKeys(env, prov.id) : [];
+          const activeKey = keys.find((k) => k.status === "active") || keys[0];
+          if (activeKey && type !== "geminiweb") {
+            try {
+              const credential = await decryptSecret(env, activeKey.encryptedKey);
+              const r = await fetchWebModels(env, type as any, credential, prov?.baseUrl);
+              return json({ ok: true, models: r.models, note: r.message });
+            } catch {}
+          }
+          const meta = WEB_PROVIDERS[type as keyof typeof WEB_PROVIDERS];
+          return json({ ok: true, models: meta?.defaultModels ?? [] });
+        }
         if (provKind.startsWith("oauth:")) {
           const type = provKind.slice("oauth:".length);
           const { fetchOAuthModels, OAUTH_PROVIDERS } = await import("../oauth");

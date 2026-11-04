@@ -186,7 +186,11 @@ export default function ModelPool({ me: _me }: { me: Me }) {
               provider.kind === "duckai";
 
             const protocolLabel =
-              provider.slug === "anthropic" || provider.kind === "anthropic"
+              provider.kind?.startsWith("oauth:")
+                ? "OAuth 授权"
+                : provider.kind?.startsWith("web:")
+                ? "Web 反代"
+                : provider.slug === "anthropic" || provider.kind === "anthropic"
                 ? "Anthropic 官方协议"
                 : isKeyless
                 ? "免 Key 直连"

@@ -15,6 +15,7 @@ import {
   Copy,
   ExternalLink,
   Users,
+  Globe,
 } from "lucide-react";
 import { adminAction, type Provider } from "../lib/api";
 import { Button, Card, Dialog, EmptyState, Field, Input, Select, StatusTag, useConfirm, useToast } from "../components/ui";
@@ -32,7 +33,9 @@ const PRESETS: Record<string, { name: string; slug: string; kind: string; url: s
 
 const isKeylessSlug = (slug?: string) => slug === "opencode" || slug === "duckai" || slug === "kilo";
 const isOAuthKind = (kind?: string | null) => !!kind && kind.startsWith("oauth:");
+const isWebKind = (kind?: string | null) => !!kind && kind.startsWith("web:");
 const isOAuthProvider = (p?: Provider | null) => isOAuthKind(p?.kind);
+const isWebProvider = (p?: Provider | null) => isWebKind(p?.kind);
 
 /** OAuth 渠道目录（与后端 src/oauth/index.ts 保持一致） */
 type OAuthMeta = {
@@ -146,9 +149,87 @@ type OAuthDialogState = {
   busy?: boolean;
 };
 
+/** Web 反代渠道目录（与后端 src/web/index.ts 保持一致） */
+type WebMeta = {
+  type: string;
+  name: string;
+  slug: string;
+  baseUrl: string;
+  desc: string;
+  credHint: string;
+  models: string[];
+};
+
+const WEB_CATALOG: WebMeta[] = [
+  {
+    type: "deepseek",
+    name: "DeepSeek 网页版",
+    slug: "deepseek-web",
+    baseUrl: "https://chat.deepseek.com/api/v0",
+    desc: "网页 userToken 反代，自动解 PoW；token 约 24h 有效。",
+    credHint: "userToken（chat.deepseek.com 登录后 localStorage 里的 JWT）或官方 API Key（sk- 开头）",
+    models: ["deepseek-v4-flash", "deepseek-v4-pro", "deepseek-v4-flash-search"],
+  },
+  {
+    type: "kimiweb",
+    name: "Kimi 网页版",
+    slug: "kimi-web",
+    baseUrl: "https://www.kimi.ai",
+    desc: "Kimi 网页 Connect-RPC 协议反代，refresh_token 自动续期。",
+    credHint: "access_token(JWT) 或 refresh_token（www.kimi.ai 登录后 Local Storage）",
+    models: ["k3", "k3-agent-ultra", "k2d6", "k2d6-search"],
+  },
+  {
+    type: "geminiweb",
+    name: "Gemini 网页版",
+    slug: "gemini-web",
+    baseUrl: "https://gemini.google.com",
+    desc: "Gemini 网页 Cookie 反代（SAPISIDHASH 鉴权）。",
+    credHint: "Cookie 字符串（含 __Secure-1PSID / __Secure-3PSID / SAPISID）",
+    models: ["gemini-3.7-flash", "gemini-3.1-pro", "gemini-3.5-flash-thinking"],
+  },
+  {
+    type: "minimaxweb",
+    name: "MiniMax Agent 网页版",
+    slug: "minimax-web",
+    baseUrl: "https://agent.minimaxi.com",
+    desc: "MiniMax Agent 网页 SSE 反代，需要网页会话签名参数。",
+    credHint: "token|agentId|uuid|deviceId|userId（token 为 JWT，其余可从 HAR 取，至少填 token）",
+    models: ["MiniMax-M3", "MiniMax-M3-thinking", "MiniMax-M2.1"],
+  },
+  {
+    type: "lingxi",
+    name: "灵犀网页版（中国移动）",
+    slug: "lingxi-web",
+    baseUrl: "https://ai.yun.139.com",
+    desc: "中国移动灵犀网页反代，Basic 授权 + userId。",
+    credHint: "authorization|userId|sourceChannel（authorization 形如 Basic xxx）",
+    models: ["lingxi-default", "qwen-3.7-plus", "deepseek-4.0-pro"],
+  },
+  {
+    type: "chatgptweb",
+    name: "ChatGPT 网页版",
+    slug: "chatgpt-web",
+    baseUrl: "https://chatgpt.com",
+    desc: "ChatGPT 网页/App 协议反代（sentinel + PoW），适合 Free 账号。",
+    credHint: "refresh_token（rt_xxx / rt.1.xxx；也支持发货整行自动提取）",
+    models: ["gpt-5-5", "gpt-5-4", "gpt-5-3"],
+  },
+];
+
+type WebDialogState = {
+  meta: WebMeta;
+  provider: Provider | null;
+  name: string;
+  slug: string;
+  baseUrl: string;
+  credential: string;
+  saving?: boolean;
+};
+
 export default function Providers() {
   const [rows, setRows] = useState<Provider[] | null>(null);
-  const [tab, setTab] = useState<"direct" | "oauth">("direct");
+  const [tab, setTab] = useState<"direct" | "oauth" | "web">("direct");
   const [dlg, setDlg] = useState(false);
   const [form, setForm] = useState({ id: "", name: "DeepSeek", slug: "deepseek", kind: "openai_compat", url: "https://api.deepseek.com", key: "" });
   const [saving, setSaving] = useState(false);
@@ -161,6 +242,8 @@ export default function Providers() {
   // OAuth 授权流程
   const [oauthDlg, setOauthDlg] = useState<OAuthDialogState | null>(null);
   const oauthTimer = useRef<number | null>(null);
+  // Web 反代接入流程
+  const [webDlg, setWebDlg] = useState<WebDialogState | null>(null);
   const { confirm, confirmEl } = useConfirm();
   const toast = useToast();
 
@@ -293,9 +376,9 @@ export default function Providers() {
       const r = await adminAction<{ result?: { fingerprint?: string } }>("upsert_provider_key", {
         providerId: keyDlg.id,
         key: keyVal.trim(),
-        label: newKeyLabel.trim() || (isOAuthProvider(keyDlg) ? `account-${(keyDlg.key_count ?? 0) + 1}` : "prod"),
+        label: newKeyLabel.trim() || (isOAuthProvider(keyDlg) || isWebProvider(keyDlg) ? `account-${(keyDlg.key_count ?? 0) + 1}` : "prod"),
       });
-      toast(isOAuthProvider(keyDlg) ? `账号凭据已加密入库（指纹 ${r.result?.fingerprint ?? ""}）` : `密钥已加密入库（指纹 ${r.result?.fingerprint ?? ""}）`);
+      toast(isOAuthProvider(keyDlg) || isWebProvider(keyDlg) ? `账号凭据已加密入库（指纹 ${r.result?.fingerprint ?? ""}）` : `密钥已加密入库（指纹 ${r.result?.fingerprint ?? ""}）`);
       const keyInput = keyVal.trim();
       setKeyVal("");
       const updated = await adminAction<{ providers: Provider[] }>("list_providers");
@@ -305,7 +388,7 @@ export default function Providers() {
       // 首次录入后自动尝试拉取上游模型列表
       if (!isOAuthProvider(keyDlg) && (!targetP || (targetP.keys && targetP.keys.length <= 1))) {
         setImportStep({ providerId: keyDlg.id, providerName: keyDlg.name, models: [], picked: new Set(), loading: true });
-        await pullModels(keyDlg.id, keyDlg.name, keyDlg.base_url, keyInput);
+        await pullModels(keyDlg.id, keyDlg.name, keyDlg.base_url, isWebProvider(keyDlg) ? "" : keyInput);
       }
     } catch (e) { toast((e as Error).message, "err"); }
   };
@@ -493,9 +576,67 @@ export default function Providers() {
     beginOAuth(oauthDlg.meta, oauthDlg.provider ?? undefined);
   };
 
+  /* ---------------- Web 反代接入流程 ---------------- */
+
+  const beginWebAdd = (meta: WebMeta, existing?: Provider) => {
+    setWebDlg({
+      meta,
+      provider: existing ?? null,
+      name: existing?.name ?? meta.name,
+      slug: existing?.slug ?? meta.slug,
+      baseUrl: existing?.base_url ?? meta.baseUrl,
+      credential: "",
+    });
+  };
+
+  const saveWeb = async () => {
+    if (!webDlg) return;
+    const d = webDlg;
+    if (!d.credential.trim()) return toast("请粘贴账号凭据", "err");
+    if (!d.provider) {
+      if (!d.name.trim()) return toast("请填写渠道名称", "err");
+      if (!d.slug.trim()) return toast("请填写渠道 Slug", "err");
+      if (!d.baseUrl.trim()) return toast("请填写 Base URL", "err");
+    }
+    setWebDlg({ ...d, saving: true });
+    try {
+      let providerId = d.provider?.id || "";
+      if (providerId) {
+        await adminAction("upsert_provider_key", {
+          providerId,
+          key: d.credential.trim(),
+          label: `account-${(d.provider?.key_count ?? 0) + 1}`,
+        });
+      } else {
+        await adminAction("upsert_provider", {
+          name: d.name.trim(),
+          slug: d.slug.trim().toLowerCase(),
+          kind: `web:${d.meta.type}`,
+          baseUrl: d.baseUrl.trim(),
+          key: d.credential.trim(),
+        });
+        const list = await adminAction<{ providers: Provider[] }>("list_providers");
+        providerId = list.providers.find((x) => x.slug === d.slug.trim().toLowerCase())?.id || "";
+        setRows(list.providers);
+      }
+      if (!providerId) throw new Error("Web 渠道创建失败");
+      toast("Web 渠道凭据已加密入库");
+      setWebDlg(null);
+      load();
+      setImportStep({ providerId, providerName: d.name, models: [], picked: new Set(), loading: true });
+      await pullModels(providerId, d.name, d.baseUrl, "");
+    } catch (e) {
+      toast((e as Error).message, "err");
+      setWebDlg((s) => (s ? { ...s, saving: false } : s));
+    }
+  };
+
   /* ---------------- 渲染 ---------------- */
 
   const oauthProviderOf = (meta: OAuthMeta) => (rows ?? []).find((x) => x.slug === meta.slug);
+  const webProviderOf = (meta: WebMeta) => (rows ?? []).find((x) => x.slug === meta.slug);
+  const webMetaOf = (p?: Provider | null) => (p ? WEB_CATALOG.find((m) => m.slug === p.slug) : undefined);
+  const keyWebMeta = webMetaOf(keyDlg);
 
   return (
     <div className="flex flex-col gap-4">
@@ -503,6 +644,7 @@ export default function Providers() {
         {([
           ["direct", "API 直连"],
           ["oauth", "OAuth 授权"],
+          ["web", "Web 反代"],
         ] as const).map(([k, l]) => (
           <button
             key={k}
@@ -529,11 +671,11 @@ export default function Providers() {
             <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-36 rounded-xl2" />)}
             </div>
-          ) : rows.filter((p) => !isOAuthProvider(p)).length === 0 ? (
+          ) : rows.filter((p) => !isOAuthProvider(p) && !isWebProvider(p)).length === 0 ? (
             <Card><EmptyState icon={<Server size={32} />} title="还没有上游供应商" hint="添加你持有授权的供应商并录入密钥，即可一键导入模型列表。" action={<Button className="mt-2" onClick={openNew}>添加供应商</Button>} /></Card>
           ) : (
             <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {rows.filter((p) => !isOAuthProvider(p)).map((p) => (
+              {rows.filter((p) => !isOAuthProvider(p) && !isWebProvider(p)).map((p) => (
                 <Card key={p.id} className={cn("p-4 flex flex-col justify-between transition-all", p.status === "disabled" && "opacity-75 border-dashed bg-surface/50")}>
                   <div>
                     <div className="flex items-start justify-between gap-2">
@@ -723,6 +865,105 @@ export default function Providers() {
         </div>
       )}
 
+      {tab === "web" && (
+        <div className="flex flex-col gap-4">
+          <div className="rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed">
+            Web 反代渠道使用浏览器网页会话凭据（Cookie / userToken / refresh_token），无需官方 API Key；
+            凭据经 AES-256-GCM 加密后存入渠道凭据池，多账号自动轮换，遇 401/429 自动熔断。
+          </div>
+
+          {rows === null ? (
+            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-40 rounded-xl2" />)}
+            </div>
+          ) : (
+            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {WEB_CATALOG.map((meta) => {
+                const p = webProviderOf(meta);
+                return (
+                  <Card key={meta.slug} className={cn("p-4 flex flex-col justify-between transition-all", p?.status === "disabled" && "opacity-75 border-dashed bg-surface/50")}>
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand">
+                            <Globe size={16} />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="truncate text-xs font-semibold leading-tight">{meta.name}</div>
+                            <div className="mt-0.5 flex items-center gap-1.5">
+                              <code className="text-[10px] text-muted font-mono">{meta.slug}</code>
+                              <span className="rounded bg-amber-500/10 px-1 text-[9px] font-medium text-amber-500">Web</span>
+                            </div>
+                          </div>
+                        </div>
+                        {p ? (
+                          <button type="button" onClick={() => toggleProvider(p)} title="点击切换启用/停用" className="shrink-0 cursor-pointer transition-transform hover:scale-105">
+                            <StatusTag value={p.status} />
+                          </button>
+                        ) : (
+                          <span className="shrink-0 rounded bg-line px-1.5 py-0.5 text-[10px] text-muted">未接入</span>
+                        )}
+                      </div>
+
+                      <p className="mt-2.5 text-[11px] leading-relaxed text-muted">{meta.desc}</p>
+
+                      <dl className="mt-2.5 space-y-1.5 text-[11px] text-muted">
+                        <div className="flex min-w-0 justify-between gap-2">
+                          <span className="shrink-0">凭据</span>
+                          <code className="truncate text-ink max-w-[190px]" title={meta.credHint}>{meta.credHint}</code>
+                        </div>
+                        <div className="flex min-w-0 justify-between gap-2">
+                          <span className="shrink-0">账号</span>
+                          <span className="inline-flex items-center gap-1 text-ink">
+                            <Users size={11} className="text-muted" />
+                            {p ? `${p.key_count} 个` : "—"}
+                            {p && p.key_count > 0 && (
+                              p.keys?.some((k) => k.health_status === "demoted")
+                                ? <span className="text-[10px] font-medium text-err">有熔断</span>
+                                : <span className="text-[10px] font-medium text-emerald-500">就绪</span>
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex min-w-0 justify-between gap-2">
+                          <span className="shrink-0">候选模型</span>
+                          <code className="truncate text-ink max-w-[170px]" title={meta.models.join(", ")}>{meta.models[0]} 等 {meta.models.length} 个</code>
+                        </div>
+                      </dl>
+                    </div>
+
+                    <div className="mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5">
+                      <Button variant="soft" className="!h-7 !px-2.5 text-[11px]" onClick={() => beginWebAdd(meta, p)}>
+                        <Plus size={12} />{p ? "添加账号" : "接入并添加"}
+                      </Button>
+                      {p && (
+                        <>
+                          <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => fetchModels(p.id, p.name)} title="拉取/导入模型" aria-label="模型管理">
+                            <RefreshCw size={13} />
+                          </Button>
+                          <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => { setKeyDlg(p); setKeyVal(""); setNewKeyLabel(`account-${p.key_count + 1}`); }} title="管理账号凭据" aria-label="账号管理">
+                            <Key size={13} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            className={cn("!h-7 !w-7 !px-0 ml-auto", p.status === "active" ? "!text-muted hover:!text-err" : "!text-emerald-500 font-semibold")}
+                            onClick={() => toggleProvider(p)}
+                            title={p.status === "active" ? "停用渠道" : "启用渠道"}
+                            aria-label={p.status === "active" ? "停用渠道" : "启用渠道"}
+                          >
+                            <Power size={13} />
+                          </Button>
+                          <Button variant="ghost" className="!h-7 !w-7 !px-0 !text-err" onClick={() => del(p)} title="删除渠道" aria-label="删除渠道"><Trash2 size={13} /></Button>
+                        </>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* 添加/编辑供应商 */}
       <Dialog open={dlg} onClose={() => setDlg(false)} title={form.id ? "编辑供应商" : "添加供应商"} width={560}>
         <div className="space-y-3.5">
@@ -877,11 +1118,13 @@ export default function Providers() {
       </Dialog>
 
       {/* 凭据池 / 授权账号管理 */}
-      <Dialog open={!!keyDlg} onClose={() => setKeyDlg(null)} title={`${isOAuthProvider(keyDlg) ? "授权账号管理" : "密钥池管理"} — ${keyDlg?.name ?? ""}`} width={560}>
+      <Dialog open={!!keyDlg} onClose={() => setKeyDlg(null)} title={`${isOAuthProvider(keyDlg) ? "授权账号管理" : isWebProvider(keyDlg) ? "Web 账号凭据管理" : "密钥池管理"} — ${keyDlg?.name ?? ""}`} width={560}>
         <div className="space-y-4">
           <p className="text-xs text-muted">
             {isOAuthProvider(keyDlg)
               ? "每个账号对应一条 refresh_token（AES-256-GCM 加密存储），网关自动刷新 access_token 并随机轮换；遇 429/401 自动降权冷却，到期自动恢复。"
+              : isWebProvider(keyDlg)
+              ? `${keyWebMeta?.credHint ?? "网页会话凭据"}。每个账号一条凭据（AES-256-GCM 加密存储），随机轮换；遇 401/429 自动熔断冷却。`
               : "已开启多 Key 负载均衡与健康熔断。网关使用 Fisher-Yates 随机打散实现均匀轮换分流；遇 429 自动降权跳过并轮换下一个 Key，60 秒后自动试用自愈。"}
           </p>
 
@@ -901,14 +1144,14 @@ export default function Providers() {
             <div className="text-xs font-semibold text-ink flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <Key size={13} className="text-brand" />
-                {isOAuthProvider(keyDlg) ? `已授权账号（${keyDlg?.keys?.length ?? 0} 个）` : `当前轮换 Key 列表（${keyDlg?.keys?.length ?? 0} 个）`}
+                {isOAuthProvider(keyDlg) ? `已授权账号（${keyDlg?.keys?.length ?? 0} 个）` : isWebProvider(keyDlg) ? `已接入账号（${keyDlg?.keys?.length ?? 0} 个）` : `当前轮换 Key 列表（${keyDlg?.keys?.length ?? 0} 个）`}
               </span>
-              <span className="text-[11px] text-muted">{isOAuthProvider(keyDlg) ? "支持多账号自动轮换" : "支持无缝挂载任意多个 Key"}</span>
+              <span className="text-[11px] text-muted">{isOAuthProvider(keyDlg) || isWebProvider(keyDlg) ? "支持多账号自动轮换" : "支持无缝挂载任意多个 Key"}</span>
             </div>
 
             {(!keyDlg?.keys || keyDlg.keys.length === 0) ? (
               <div className="rounded-lg border border-line p-3 text-center text-xs text-muted">
-                {isOAuthProvider(keyDlg) ? "暂无已授权账号，请点击上方「授权新账号」" : "暂无密钥，请在下方录入或批量粘贴 Key"}
+                {isOAuthProvider(keyDlg) ? "暂无已授权账号，请点击上方「授权新账号」" : isWebProvider(keyDlg) ? "暂无账号凭据，请在下方粘贴" : "暂无密钥，请在下方录入或批量粘贴 Key"}
               </div>
             ) : (
               <div className="max-h-52 space-y-1.5 overflow-y-auto rounded-lg border border-line p-2">
@@ -929,7 +1172,7 @@ export default function Providers() {
                         </span>
                       ) : (
                         <span className="flex items-center gap-0.5 rounded bg-emerald-500/10 px-1 py-0.5 text-[10px] font-medium text-emerald-500">
-                          <CheckCircle2 size={10} /> {isOAuthProvider(keyDlg) ? "账号就绪" : "轮换就绪"}
+                          <CheckCircle2 size={10} /> {isOAuthProvider(keyDlg) || isWebProvider(keyDlg) ? "账号就绪" : "轮换就绪"}
                         </span>
                       )}
                     </div>
@@ -956,12 +1199,12 @@ export default function Providers() {
           </div>
 
           <div className="rounded-lg border border-dashed border-line p-3 space-y-2.5 bg-surface/50">
-            <div className="text-xs font-semibold text-ink">{isOAuthProvider(keyDlg) ? "手动追加 refresh_token" : "批量追加新密钥"}</div>
+            <div className="text-xs font-semibold text-ink">{isOAuthProvider(keyDlg) ? "手动追加 refresh_token" : isWebProvider(keyDlg) ? "追加账号凭据" : "批量追加新密钥"}</div>
             <div className="space-y-1">
               <textarea
                 value={keyVal}
                 onChange={(e) => setKeyVal(e.target.value)}
-                placeholder={isOAuthProvider(keyDlg) ? "粘贴 refresh_token，一行一个，例如：\nrt_xxxxxxxxxxxxxxxx\nrt_yyyyyyyyyyyyyyyy" : "支持单个或批量粘贴多个 Key，一行一个，例如：\nsk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy"}
+                placeholder={isOAuthProvider(keyDlg) ? "粘贴 refresh_token，一行一个，例如：\nrt_xxxxxxxxxxxxxxxx\nrt_yyyyyyyyyyyyyyyy" : isWebProvider(keyDlg) ? `每行一个账号凭据，格式：\n${keyWebMeta?.credHint ?? ""}` : "支持单个或批量粘贴多个 Key，一行一个，例如：\nsk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy"}
                 rows={3}
                 className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
               />
@@ -978,9 +1221,52 @@ export default function Providers() {
               </div>
               <div className="flex items-center justify-end gap-2">
                 <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setKeyDlg(null)}>关闭</Button>
-                <Button className="flex-1 sm:flex-initial" onClick={saveKey} disabled={!keyVal.trim()}>{isOAuthProvider(keyDlg) ? "保存账号凭据" : "保存并追加至池"}</Button>
+                <Button className="flex-1 sm:flex-initial" onClick={saveKey} disabled={!keyVal.trim()}>{isOAuthProvider(keyDlg) ? "保存账号凭据" : isWebProvider(keyDlg) ? "保存账号凭据" : "保存并追加至池"}</Button>
               </div>
             </div>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Web 反代接入 / 追加账号 */}
+      <Dialog open={!!webDlg} onClose={() => setWebDlg(null)} title={`${webDlg?.provider ? "添加账号" : "接入 Web 反代"} — ${webDlg?.meta.name ?? ""}`} width={560}>
+        <div className="space-y-4">
+          <div className="rounded-lg border border-line bg-surface2/50 p-3 text-[11px] text-muted leading-relaxed">
+            凭据从浏览器网页会话获取：<span className="text-ink">{webDlg?.meta.credHint}</span><br />
+            每行一个账号，粘贴多个会自动进入轮换池；凭据仅加密存储，不会回显。
+          </div>
+
+          {!webDlg?.provider && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="渠道名称">
+                <Input value={webDlg?.name ?? ""} onChange={(e) => webDlg && setWebDlg({ ...webDlg, name: e.target.value })} />
+              </Field>
+              <Field label="渠道 Slug">
+                <Input value={webDlg?.slug ?? ""} onChange={(e) => webDlg && setWebDlg({ ...webDlg, slug: e.target.value })} />
+              </Field>
+              <div className="col-span-1 sm:col-span-2">
+                <Field label="Base URL">
+                  <Input value={webDlg?.baseUrl ?? ""} onChange={(e) => webDlg && setWebDlg({ ...webDlg, baseUrl: e.target.value })} />
+                </Field>
+              </div>
+            </div>
+          )}
+
+          <Field label={webDlg?.provider ? "追加账号凭据（一行一个）" : "账号凭据（必填，一行一个）"}>
+            <textarea
+              value={webDlg?.credential ?? ""}
+              onChange={(e) => webDlg && setWebDlg({ ...webDlg, credential: e.target.value })}
+              rows={4}
+              placeholder={webDlg?.meta.credHint}
+              className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
+            />
+          </Field>
+
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line">
+            <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setWebDlg(null)}>取消</Button>
+            <Button className="flex-1 sm:flex-initial" onClick={saveWeb} disabled={!!webDlg?.saving || !webDlg?.credential.trim()}>
+              {webDlg?.saving ? "保存中…" : webDlg?.provider ? "保存并追加" : "保存并接入"}
+            </Button>
           </div>
         </div>
       </Dialog>
