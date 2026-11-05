@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Bell, Boxes, CircleUser, DatabaseBackup, Film, Gauge, KeyRound, Layers, LogOut, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, Sun, Users, Wallet, X } from "lucide-react";
+import { Bell, Boxes, CircleUser, DatabaseBackup, Film, Gauge, KeyRound, Layers, LogOut, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, Play, ScrollText, Server, Settings as SettingsIcon, Sun, Users, Wallet, X } from "lucide-react";
 import { api, type Me, type SiteInfo } from "../lib/api";
 import { getSeenAnnouncementIds, markAnnouncementsSeen } from "../lib/announcements";
 import { cn, fmtMoney } from "../lib/utils";
@@ -15,6 +15,7 @@ const NAV = [
   { to: "/dashboard/accounts", label: "账号池", icon: Wallet, roles: ["superadmin"] },
   { to: "/dashboard/models", label: "模型与定价", icon: Layers, roles: ALL_ROLES },
   { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ALL_ROLES },
+  { to: "/dashboard/playground", label: "操练场", icon: Play, roles: ALL_ROLES },
   { to: "/dashboard/videos", label: "视频任务", icon: Film, roles: ALL_ROLES },
   { to: "/dashboard/logs", label: "运行日志", icon: ScrollText, roles: ["superadmin", "admin", "auditor"] },
   { to: "/dashboard/profile", label: "个人主页", icon: CircleUser, roles: ALL_ROLES },

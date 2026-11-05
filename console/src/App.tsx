@@ -12,6 +12,7 @@ import { Dialog, Button } from "./components/ui";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Keys = lazy(() => import("./pages/Keys"));
 const VideoTasks = lazy(() => import("./pages/VideoTasks"));
+const Playground = lazy(() => import("./pages/Playground"));
 const Providers = lazy(() => import("./pages/Providers"));
 const AccountPool = lazy(() => import("./pages/AccountPool"));
 const ModelsPricing = lazy(() => import("./pages/ModelsPricing"));
@@ -119,6 +120,7 @@ function Shell() {
       <Route element={me ? <Layout me={me} site={site} onLogout={logout} /> : <Navigate to="/login" replace />}>
         <Route path="/dashboard" element={me ? <Dashboard /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/keys" element={me ? <Keys /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/playground" element={me ? <Playground me={me} /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/videos" element={me ? <VideoTasks me={me} /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/models" element={me ? <ModelsPricing /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/pricing" element={<Navigate to="/dashboard/models" replace />} />
