@@ -44,12 +44,16 @@ export type VideoTaskRecord = {
   updatedAt: number;
 };
 
-/** 该路由是否走 agnes 异步视频协议：渠道为 agnes / agnes_video，或模型名以 agnes-video 开头 */
+/** 该路由是否走 agnes 异步视频协议：渠道显式声明 agnes_video，或上游模型名以 agnes-video 开头
+ *
+ * 注意：不能只看渠道 slug 是否为 agnes —— agnes 同时提供对话/图片/视频模型，
+ * 用 slug 判定会把 agnes-2.5-flash 这类对话模型也送进 /videos 接口（上游会 400）。
+ */
 export function isAgnesVideoRoute(route: Pick<UpstreamRoute, "providerKind" | "providerSlug" | "upstreamModel">): boolean {
   const kind = (route.providerKind || "").toLowerCase();
-  const slug = (route.providerSlug || "").toLowerCase();
   const model = (route.upstreamModel || "").toLowerCase();
-  return kind === "agnes_video" || kind === "agnes-video" || slug === "agnes" || /^agnes-video/.test(model);
+  if (kind === "agnes_video" || kind === "agnes-video") return true;
+  return /^agnes-video/.test(model);
 }
 
 /** 上游状态归一（agnes 同一状态可能返回多种写法） */
