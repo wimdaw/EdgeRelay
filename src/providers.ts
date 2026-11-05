@@ -65,3 +65,41 @@ export const RETRYABLE_STATUS = new Set([408, 409, 425, 429, 500, 502, 503, 504]
 export function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
+
+/**
+ * 清理发往 OpenAI 兼容上游的请求体：
+ * 针对严格校验参数白名单的上游（如 NVIDIA NIM 等），剥离客户端（如 ZCode）注入的非标参数，
+ * 避免因 enable_thinking / reasoning 等字段触发上游 400 Validation 错误。
+ */
+export function sanitizeUpstreamBody(
+  body: Record<string, unknown>,
+  route: UpstreamRoute,
+  stream?: boolean
+): Record<string, unknown> {
+  const upstreamBody: Record<string, unknown> = { ...body, model: route.upstreamModel };
+  if (stream) upstreamBody.stream_options = { include_usage: true };
+
+  // 顶层 extra_body 是部分客户端 SDK（如 Python/TS openai-sdk）的残留内部字段，所有上游均不接受
+  delete upstreamBody.extra_body;
+
+  const isNvidia =
+    route.providerSlug === "nvidia" ||
+    route.providerId === "nvidia" ||
+    (typeof route.baseUrl === "string" && route.baseUrl.includes("nvidia.com"));
+
+  if (isNvidia) {
+    // NVIDIA NIM 严格校验 OpenAPI 参数白名单，客户端（如 ZCode）注入的非标思考参数会导致 400：
+    // "Validation: Unsupported parameter(s): enable_thinking, reasoning"
+    // （底层模型如 MiniMax-M3.1-Flash 已原生默认输出 reasoning_content，无需也不支持这些非标字段）
+    delete upstreamBody.enable_thinking;
+    delete upstreamBody.reasoning;
+    delete upstreamBody.thinking_budget;
+    delete upstreamBody.max_thinking_tokens;
+    // reasoning_effort 必须为 string（"low" | "medium" | "high"），若为数字或布尔则移除，防止反序列化 400
+    if (typeof upstreamBody.reasoning_effort === "number" || typeof upstreamBody.reasoning_effort === "boolean") {
+      delete upstreamBody.reasoning_effort;
+    }
+  }
+
+  return upstreamBody;
+}

@@ -16,7 +16,7 @@ import { moderate } from "../moderation";
 import { getSettings } from "../settings";
 import { planModelRoutes, buildRoutesFromPlan } from "../router";
 import { getPricing, hold, settle, releaseHold, estimateCost, type Pricing } from "../billing";
-import { buildHeaders, resolveTarget, joinApiPath, RETRYABLE_STATUS, estimateTokens } from "../providers";
+import { buildHeaders, resolveTarget, joinApiPath, RETRYABLE_STATUS, estimateTokens, sanitizeUpstreamBody } from "../providers";
 import { recordKeySuccess, recordKeyFailure, readKeyHealth } from "../key-health";
 import { uuid, sha256Hex, decryptSecret } from "../crypto";
 import {
@@ -453,8 +453,7 @@ chatRouter.post("/", async (c) => {
         } else {
           const { url } = resolveTarget(env, route);
           const headers = await buildHeaders(env, route);
-          const upstreamBody: Record<string, unknown> = { ...body, model: route.upstreamModel };
-          if (stream) upstreamBody.stream_options = { include_usage: true };
+          const upstreamBody = sanitizeUpstreamBody(body as Record<string, unknown>, route, stream);
 
           resp = await fetchWithRetry(
             () =>
