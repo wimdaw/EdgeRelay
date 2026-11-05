@@ -426,7 +426,8 @@ adminRouter.post("/actions", async (c) => {
         const days = Math.min(365, Math.max(1, Number(p.days ?? 30) || 30));
         const ttl = days * 86_400;
         const token = await signVideoToken(env, VIDEO_MONITOR_SUBJECT, ttl);
-        const origin = new URL(hCtx.req.url).origin;
+        const { publicOrigin } = await import("../public-url");
+        const origin = publicOrigin({ req: { header: (n: string) => hCtx.req.header(n) } }, env);
         return json({
           ok: true,
           result: {

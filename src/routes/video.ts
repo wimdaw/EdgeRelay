@@ -16,6 +16,7 @@ import { Hono } from "hono";
 import type { Env, UpstreamRoute } from "../types";
 import { ApiError, ErrorCode, openAiError, errorResponse } from "../errors";
 import { authenticateSkGwKey, assertModelAllowed } from "../api-auth";
+import { publicOrigin } from "../public-url";
 import { planModelRoutes, buildRoutesFromPlan } from "../router";
 import { getPricing } from "../billing";
 import { checkRateLimit, releaseConcurrency, commitRateLimits } from "../ratelimit";
@@ -308,7 +309,7 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
       ip: auth.ip,
     });
 
-    const origin = new URL(c.req.url).origin;
+    const origin = publicOrigin(c, env);
     const pollUrl = `${origin}/v1/videos/${record.id}`;
     const watchToken = await signVideoToken(env, record.id);
     const watchUrl = `${origin}/v1/videos/${record.id}/watch?token=${encodeURIComponent(watchToken)}`;
@@ -349,7 +350,7 @@ videoRouter.post("/generations", async (c) => {
 });
 
 function taskUrls(c: any, id: string, watchToken?: string): { poll_url: string; watch_url?: string } {
-  const origin = new URL(c.req.url).origin;
+  const origin = publicOrigin(c, c.env);
   const out: { poll_url: string; watch_url?: string } = { poll_url: `${origin}/v1/videos/${id}` };
   if (watchToken) out.watch_url = `${origin}/v1/videos/${id}/watch?token=${encodeURIComponent(watchToken)}`;
   return out;
@@ -362,7 +363,7 @@ videoRouter.get("/", async (c) => {
     const auth = await authenticateSkGwKey(c);
     const limit = Number(c.req.query("limit") ?? 20);
     const tasks = await listVideoTasks(env, { userId: auth.userId, limit });
-    const origin = new URL(c.req.url).origin;
+    const origin = publicOrigin(c, env);
     return new Response(
       JSON.stringify({
         object: "list",
@@ -445,7 +446,7 @@ videoRouter.post("/:id/share", async (c) => {
 
     const ttlSec = Math.min(86_400, Math.max(60, Number(c.req.query("ttl") ?? 86_400) || 86_400));
     const token = await signVideoToken(env, id, ttlSec);
-    const origin = new URL(c.req.url).origin;
+    const origin = publicOrigin(c, env);
     return new Response(
       JSON.stringify({
         id,
