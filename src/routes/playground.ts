@@ -56,6 +56,8 @@ playgroundRouter.get("/models", async (c) => {
     const [models, providers] = await Promise.all([getModels(c.env), getProviders(c.env)]);
     const activeProviders = new Map(providers.filter((p) => p.status === "active").map((p) => [p.id, p]));
 
+    // 操练场只做对话，过滤掉图片/视频/语音/向量等非对话模型
+    const NON_CHAT = /(^|[-_/])(image|video|tts|whisper|speech|embedding|embed|rerank|moderation)([-_/]|$)/i;
     const rows: { id: string; provider: string; paid: boolean }[] = [];
     const seen = new Set<string>();
     for (const m of models) {
@@ -63,6 +65,7 @@ playgroundRouter.get("/models", async (c) => {
       const p = activeProviders.get(m.providerId);
       if (!p) continue;
       if (seen.has(m.publicName)) continue;
+      if (NON_CHAT.test(m.publicName) || NON_CHAT.test(m.upstreamModel)) continue;
       const pricing = await getPricing(c.env, m.publicName);
       const paid = !!pricing && (pricing.inputPerMillion > 0 || pricing.outputPerMillion > 0);
       if (paid && !isAdminRole(user.role)) continue; // 普通用户不给付费模型
