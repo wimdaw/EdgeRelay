@@ -643,8 +643,8 @@ export default function Providers() {
   /* ---------------- 渲染 ---------------- */
 
   const oauthProviderOf = (meta: OAuthMeta) => (rows ?? []).find((x) => x.slug === meta.slug);
-  const webProviderOf = (meta: WebMeta) => (rows ?? []).find((x) => x.slug === meta.slug);
-  const webMetaOf = (p?: Provider | null) => (p ? WEB_CATALOG.find((m) => m.slug === p.slug) : undefined);
+  const webProviderOf = (meta: WebMeta) => (rows ?? []).find((x) => x.slug === meta.slug || x.kind === `web:${meta.type}`);
+  const webMetaOf = (p?: Provider | null) => (p ? WEB_CATALOG.find((m) => m.slug === p.slug || p.kind === `web:${m.type}`) : undefined);
   const keyWebMeta = webMetaOf(keyDlg);
 
   return (
