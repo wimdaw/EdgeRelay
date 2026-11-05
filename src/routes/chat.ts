@@ -357,10 +357,6 @@ chatRouter.post("/", async (c) => {
     let lastUpstreamError = "";
     let lastUpstreamStatus = 0;
     const candidateRoutes = routes.slice(0, 5);
-    // 413 上下文超限的渠道：换 Key 无济于事（是渠道协议上限，不是凭据问题），
-    // 跳过该渠道剩余路由，并从后备路由补位尝试其它渠道（如网页版 ~26k → Codex 400k）
-    const overflowProviders = new Set<string>();
-    let overflowNextIdx = candidateRoutes.length;
 
     const recordFailure = async (route: UpstreamRoute, status?: number) => {
       if (route.providerKeyId && route.providerKeyId !== "keyless") {
@@ -376,13 +372,6 @@ chatRouter.post("/", async (c) => {
     };
 
     for (const route of candidateRoutes) {
-      // 跳过已确认上下文超限的渠道，同时从后备路由补一个其它渠道进来
-      // （数组迭代器可见循环内 push 的新元素）
-      if (overflowProviders.has(route.providerId)) {
-        while (overflowNextIdx < routes.length && overflowProviders.has(routes[overflowNextIdx].providerId)) overflowNextIdx++;
-        if (overflowNextIdx < routes.length) candidateRoutes.push(routes[overflowNextIdx++]);
-        continue;
-      }
       attempts++;
       try {
         const isOpencode = route.providerKind === "opencode" || route.providerSlug === "opencode";
@@ -475,11 +464,6 @@ chatRouter.post("/", async (c) => {
         if (!resp.ok) {
           lastUpstreamError = `status ${resp.status}`;
           lastUpstreamStatus = resp.status;
-          // 413 上下文超限：不是凭据问题，不计入 Key 健康度；换 Key 无用，标记后直接换渠道
-          if (resp.status === 413) {
-            overflowProviders.add(route.providerId);
-            continue;
-          }
           await recordFailure(route, resp.status);
           const isAuthOrQuota = resp.status === 401 || resp.status === 402;
           if (RETRYABLE_STATUS.has(resp.status) || (isAuthOrQuota && attempts < candidateRoutes.length)) {
