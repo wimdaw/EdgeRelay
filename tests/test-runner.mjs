@@ -664,6 +664,20 @@ let apiKeyId = "";
     headers: { authorization: `Bearer ${apiKeyPlaintext}` },
   });
   assert(getUnknown.status === 404, "不存在的视频任务返回 404");
+
+  const waitUnknown = await request("/v1/videos/video_not_exists/wait?timeout=5", {
+    headers: { authorization: `Bearer ${apiKeyPlaintext}` },
+  });
+  assert(waitUnknown.status === 404, "自动轮询接口对未知任务返回 404");
+
+  const shareNoAuth = await request("/v1/videos/video_not_exists/share", { method: "POST" });
+  assert(shareNoAuth.status === 401, "分享链接接口未带 Key 返回 401");
+
+  const statusNoToken = await request("/v1/videos/video_not_exists/status");
+  assert(statusNoToken.status === 403, "免 Key 状态查询缺 token 返回 403");
+
+  const watchNoToken = await request("/v1/videos/video_not_exists/watch");
+  assert(watchNoToken.status === 403, "观看页缺 token 返回 403");
 }
 
 // 14. 图片接口 /v1/images/generations

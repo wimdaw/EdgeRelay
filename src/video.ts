@@ -412,3 +412,113 @@ export function isQueueFullError(code?: string, message?: string): boolean {
   const m = (message || "").toLowerCase();
   return c.includes("queue_full") || m.includes("queue is full") || m.includes("queue_full");
 }
+
+/* ==================================================================== */
+/* 免 Key 分享链接：签名 token（浏览器可直接打开，24h 有效）                 */
+/* ==================================================================== */
+
+function tokenEncoder(): TextEncoder {
+  return new TextEncoder();
+}
+
+async function hmacHex(env: Env, payload: string): Promise<string> {
+  const secret = String((env as any).SESSION_SECRET || "edgerelay-default-session-secret-32b");
+  const key = await crypto.subtle.importKey(
+    "raw",
+    tokenEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, tokenEncoder().encode(payload));
+  return Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/** 生成视频查询 token：{exp}.{hmac} */
+export async function signVideoToken(env: Env, videoId: string, ttlSeconds = TASK_TTL_SECONDS): Promise<string> {
+  const exp = Math.floor(Date.now() / 1000) + ttlSeconds;
+  const sig = await hmacHex(env, `${videoId}|${exp}`);
+  return `${exp}.${sig}`;
+}
+
+/** 校验 token（过期或签名不符一律 false） */
+export async function verifyVideoToken(env: Env, videoId: string, token?: string | null): Promise<boolean> {
+  if (!token) return false;
+  const dot = token.indexOf(".");
+  if (dot <= 0) return false;
+  const exp = Number(token.slice(0, dot));
+  const sig = token.slice(dot + 1);
+  if (!Number.isFinite(exp) || exp < Math.floor(Date.now() / 1000)) return false;
+  const expect = await hmacHex(env, `${videoId}|${exp}`);
+  if (expect.length !== sig.length) return false;
+  let diff = 0;
+  for (let i = 0; i < expect.length; i++) diff |= expect.charCodeAt(i) ^ sig.charCodeAt(i);
+  return diff === 0;
+}
+
+/** 浏览器端「自动轮询」页面：不依赖任何外部资源，5s 拉一次状态，完成后直接播放 */
+export function renderVideoWatchPage(videoId: string, initial: Record<string, unknown>): string {
+  const safeId = videoId.replace(/[^a-zA-Z0-9_-]/g, "");
+  const bootstrap = JSON.stringify(initial).replace(/</g, "\\u003c");
+  return `<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>视频任务 ${safeId}</title>
+<style>
+  :root{color-scheme:dark}
+  body{margin:0;background:#0b0b0f;color:#e7e7ea;font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;display:flex;justify-content:center;padding:24px}
+  .card{width:100%;max-width:720px;background:#14141a;border:1px solid #23232c;border-radius:14px;padding:20px}
+  h1{font-size:15px;margin:0 0 4px}
+  .muted{color:#8b8b96;font-size:12px}
+  .row{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .pill{padding:2px 8px;border-radius:999px;font-size:11px;background:#23232c;color:#b9b9c4}
+  .pill.ok{background:rgba(16,185,129,.15);color:#34d399}
+  .pill.err{background:rgba(239,68,68,.15);color:#f87171}
+  .bar{height:6px;background:#23232c;border-radius:999px;overflow:hidden;margin-top:12px}
+  .bar>i{display:block;height:100%;width:0;background:#6366f1;transition:width .4s}
+  video{width:100%;border-radius:10px;margin-top:14px;background:#000}
+  a.btn{display:inline-block;margin-top:12px;padding:8px 14px;border-radius:8px;background:#6366f1;color:#fff;text-decoration:none;font-size:13px}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#9ca3af;word-break:break-all}
+</style></head>
+<body><div class="card">
+  <h1>视频生成任务</h1>
+  <div class="muted"><code>${safeId}</code></div>
+  <div class="row"><span id="status" class="pill">加载中…</span><span id="progressText" class="muted">0%</span></div>
+  <div class="bar"><i id="bar"></i></div>
+  <div id="err" class="muted" style="margin-top:10px"></div>
+  <div id="media"></div>
+  <div class="muted" id="hint" style="margin-top:14px">页面每 5 秒自动刷新，生成完成后会直接显示视频与下载链接，可以保持打开。</div>
+</div>
+<script>
+const ID=${JSON.stringify(safeId)};
+const state=${bootstrap};
+const token=new URLSearchParams(location.search).get('token')||'';
+const $=(id)=>document.getElementById(id);
+function paint(v){
+  const st=v.status||'queued';
+  const pill=$('status');
+  pill.textContent=({queued:'排队中',in_progress:'生成中',completed:'已完成',failed:'生成失败',cancelled:'已取消'})[st]||st;
+  pill.className='pill'+(st==='completed'?' ok':(st==='failed'||st==='cancelled')?' err':'');
+  const p=Math.max(0,Math.min(100,Number(v.progress)||0));
+  $('bar').style.width=p+'%';
+  $('progressText').textContent=p+'%';
+  if(v.error&&v.error.message){$('err').textContent='错误：'+v.error.message}
+  if(v.url&&!$('media').dataset.done){
+    $('media').dataset.done='1';
+    $('media').innerHTML='<video controls autoplay muted playsinline src="'+v.url+'"></video><a class="btn" href="'+v.url+'" target="_blank" rel="noopener">打开 / 下载视频</a>';
+    $('hint').textContent='生成完成，链接可能有时效，请及时保存。';
+  }
+}
+paint(state);
+async function tick(){
+  try{
+    const r=await fetch('/v1/videos/'+encodeURIComponent(ID)+'/status?token='+encodeURIComponent(token),{cache:'no-store'});
+    if(r.ok){const v=await r.json();paint(v);if(v.status==='completed'||v.status==='failed'||v.status==='cancelled'){return}}
+  }catch(e){}
+  setTimeout(tick,5000);
+}
+if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelled'){setTimeout(tick,3000)}
+</script></body></html>`;
+}

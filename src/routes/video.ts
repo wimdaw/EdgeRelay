@@ -33,6 +33,9 @@ import {
   getKeyCooldown,
   setKeyCooldown,
   toOpenAiVideoObject,
+  signVideoToken,
+  verifyVideoToken,
+  renderVideoWatchPage,
   type VideoTaskRecord,
 } from "../video";
 
@@ -303,7 +306,10 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
       ip: auth.ip,
     });
 
-    const pollUrl = `${new URL(c.req.url).origin}/v1/videos/${record.id}`;
+    const origin = new URL(c.req.url).origin;
+    const pollUrl = `${origin}/v1/videos/${record.id}`;
+    const watchToken = await signVideoToken(env, record.id);
+    const watchUrl = `${origin}/v1/videos/${record.id}/watch?token=${encodeURIComponent(watchToken)}`;
 
     if (waitMs > 0) {
       // one-api 风格：data[0].url
@@ -314,6 +320,7 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
           status: record.status,
           progress: record.progress,
           poll_url: pollUrl,
+          watch_url: watchUrl,
           ...(record.url ? { data: [{ url: record.url }] } : { data: [] }),
           ...(record.error ? { error: { message: record.error } } : {}),
         }),
@@ -321,7 +328,7 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
       );
     }
 
-    return new Response(JSON.stringify({ ...toOpenAiVideoObject(record), poll_url: pollUrl }), {
+    return new Response(JSON.stringify({ ...toOpenAiVideoObject(record), poll_url: pollUrl, watch_url: watchUrl }), {
       headers: { "content-type": "application/json; charset=utf-8" },
     });
   } catch (err) {
@@ -339,31 +346,147 @@ videoRouter.post("/generations", async (c) => {
   return createVideo(c, waitMsFromBody(body));
 });
 
-/** 查询任务：终态直接返回缓存，未完成则实时回查上游 */
+/** 刷新任务状态：未完成时实时回查上游并落库（终态不再打上游） */
+async function refreshVideoTask(env: Env, rec: VideoTaskRecord): Promise<VideoTaskRecord> {
+  if (isTerminalVideoStatus(rec.status)) return rec;
+  const upstreamKey = await keyOf(env, rec);
+  if (!upstreamKey) return rec;
+  const poll = await pollAgnesVideo(rec.baseUrl, upstreamKey, rec.upstreamTaskId, rec.upstreamModel);
+  if (poll.ok) {
+    rec.status = poll.status;
+    rec.progress = poll.progress;
+    if (poll.url) rec.url = poll.url;
+    if (poll.error) rec.error = poll.error;
+  }
+  rec.updatedAt = Math.floor(Date.now() / 1000);
+  await saveVideoTask(env, rec);
+  return rec;
+}
+
+function taskUrls(c: any, id: string, watchToken?: string): { poll_url: string; watch_url?: string } {
+  const origin = new URL(c.req.url).origin;
+  const out: { poll_url: string; watch_url?: string } = { poll_url: `${origin}/v1/videos/${id}` };
+  if (watchToken) out.watch_url = `${origin}/v1/videos/${id}/watch?token=${encodeURIComponent(watchToken)}`;
+  return out;
+}
+
+/** 查询任务（需 API Key）：终态直接返回缓存，未完成则实时回查上游 */
 videoRouter.get("/:id", async (c) => {
   const env = c.env;
   try {
     const auth = await authenticateSkGwKey(c);
-    const rec = await loadVideoTask(env, c.req.param("id"));
+    const id = c.req.param("id");
+    const rec = await loadVideoTask(env, id);
     if (!rec || rec.userId !== auth.userId) throw new ApiError(404, ErrorCode.NOT_FOUND, "视频任务不存在或已过期");
 
-    if (!isTerminalVideoStatus(rec.status)) {
-      const upstreamKey = await keyOf(env, rec);
-      if (upstreamKey) {
-        const poll = await pollAgnesVideo(rec.baseUrl, upstreamKey, rec.upstreamTaskId, rec.upstreamModel);
-        if (poll.ok) {
-          rec.status = poll.status;
-          rec.progress = poll.progress;
-          if (poll.url) rec.url = poll.url;
-          if (poll.error) rec.error = poll.error;
-        }
-        rec.updatedAt = Math.floor(Date.now() / 1000);
-        await saveVideoTask(env, rec);
-      }
+    const updated = await refreshVideoTask(env, rec);
+    const token = await signVideoToken(env, id);
+    return new Response(JSON.stringify({ ...toOpenAiVideoObject(updated), ...taskUrls(c, id, token) }), {
+      headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+    });
+  } catch (err) {
+    return errorResponse(c, err);
+  }
+});
+
+/**
+ * 自动轮询到完成（需 API Key）
+ * GET /v1/videos/{id}/wait?timeout=100
+ *  - 完成：200 + url
+ *  - 超时未完成：202 + 当前状态 + poll_url（继续调用即可，任务不会丢）
+ */
+videoRouter.get("/:id/wait", async (c) => {
+  const env = c.env;
+  try {
+    const auth = await authenticateSkGwKey(c);
+    const id = c.req.param("id");
+    const rec = await loadVideoTask(env, id);
+    if (!rec || rec.userId !== auth.userId) throw new ApiError(404, ErrorCode.NOT_FOUND, "视频任务不存在或已过期");
+
+    // 云函数上限 120s，留出收尾余量
+    const timeoutSec = Math.min(110, Math.max(5, Number(c.req.query("timeout") ?? 100) || 100));
+    const deadline = Date.now() + timeoutSec * 1000;
+    let current = rec;
+
+    while (!isTerminalVideoStatus(current.status)) {
+      current = await refreshVideoTask(env, current);
+      if (isTerminalVideoStatus(current.status)) break;
+      if (Date.now() + 3000 >= deadline) break;
+      await new Promise((r) => setTimeout(r, 3000));
     }
 
-    return new Response(JSON.stringify(toOpenAiVideoObject(rec)), {
-      headers: { "content-type": "application/json; charset=utf-8" },
+    const token = await signVideoToken(env, id);
+    const body = JSON.stringify({ ...toOpenAiVideoObject(current), ...taskUrls(c, id, token) });
+    return new Response(body, {
+      status: isTerminalVideoStatus(current.status) ? 200 : 202,
+      headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+    });
+  } catch (err) {
+    return errorResponse(c, err);
+  }
+});
+
+/** 生成免 Key 分享链接（需 API Key）：浏览器直接打开，页面自己轮询到完成 */
+videoRouter.post("/:id/share", async (c) => {
+  const env = c.env;
+  try {
+    const auth = await authenticateSkGwKey(c);
+    const id = c.req.param("id");
+    const rec = await loadVideoTask(env, id);
+    if (!rec || rec.userId !== auth.userId) throw new ApiError(404, ErrorCode.NOT_FOUND, "视频任务不存在或已过期");
+
+    const ttlSec = Math.min(86_400, Math.max(60, Number(c.req.query("ttl") ?? 86_400) || 86_400));
+    const token = await signVideoToken(env, id, ttlSec);
+    const origin = new URL(c.req.url).origin;
+    return new Response(
+      JSON.stringify({
+        id,
+        watch_url: `${origin}/v1/videos/${id}/watch?token=${encodeURIComponent(token)}`,
+        status_url: `${origin}/v1/videos/${id}/status?token=${encodeURIComponent(token)}`,
+        expires_at: Math.floor(Date.now() / 1000) + ttlSec,
+      }),
+      { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } }
+    );
+  } catch (err) {
+    return errorResponse(c, err);
+  }
+});
+
+/** 免 Key 状态查询（凭签名 token）：页面轮询用 */
+videoRouter.get("/:id/status", async (c) => {
+  const env = c.env;
+  try {
+    const id = c.req.param("id");
+    if (!(await verifyVideoToken(env, id, c.req.query("token")))) {
+      throw new ApiError(403, ErrorCode.FORBIDDEN, "分享链接无效或已过期");
+    }
+    const rec = await loadVideoTask(env, id);
+    if (!rec) throw new ApiError(404, ErrorCode.NOT_FOUND, "视频任务不存在或已过期");
+    const updated = await refreshVideoTask(env, rec);
+    return new Response(JSON.stringify(toOpenAiVideoObject(updated)), {
+      headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+    });
+  } catch (err) {
+    return errorResponse(c, err);
+  }
+});
+
+/** 免 Key 观看页（凭签名 token）：自动轮询并在完成后直接播放 */
+videoRouter.get("/:id/watch", async (c) => {
+  const env = c.env;
+  try {
+    const id = c.req.param("id");
+    if (!(await verifyVideoToken(env, id, c.req.query("token")))) {
+      throw new ApiError(403, ErrorCode.FORBIDDEN, "分享链接无效或已过期");
+    }
+    const rec = await loadVideoTask(env, id);
+    if (!rec) throw new ApiError(404, ErrorCode.NOT_FOUND, "视频任务不存在或已过期");
+    const updated = await refreshVideoTask(env, rec);
+    const html = renderVideoWatchPage(id, {
+      ...toOpenAiVideoObject(updated),
+    } as Record<string, unknown>);
+    return new Response(html, {
+      headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" },
     });
   } catch (err) {
     return errorResponse(c, err);
@@ -375,7 +498,8 @@ videoRouter.get("/:id/content", async (c) => {
   const env = c.env;
   try {
     const auth = await authenticateSkGwKey(c);
-    const rec = await loadVideoTask(env, c.req.param("id"));
+    const id = c.req.param("id");
+    const rec = await loadVideoTask(env, id);
     if (!rec || rec.userId !== auth.userId) throw new ApiError(404, ErrorCode.NOT_FOUND, "视频任务不存在或已过期");
     if (!rec.url) throw new ApiError(409, ErrorCode.BAD_REQUEST, "视频尚未生成完成");
     return new Response(null, { status: 302, headers: { location: rec.url, "cache-control": "no-store" } });
