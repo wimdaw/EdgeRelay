@@ -100,12 +100,36 @@ function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);
 }
 
+/** agnes 支持的画幅（官方文档：21:9 / 16:9 / 4:3 / 1:1 / 3:4 / 9:16） */
+const VALID_ASPECT_RATIOS = new Set(["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"]);
+
+/** 把任意 WxH 映射到最接近的合法画幅 */
+function nearestAspectRatio(w: number, h: number): string {
+  if (!(w > 0 && h > 0)) return "16:9";
+  const ratio = w / h;
+  let best = "16:9";
+  let bestDiff = Number.POSITIVE_INFINITY;
+  for (const key of VALID_ASPECT_RATIOS) {
+    const [rw, rh] = key.split(":").map(Number);
+    const diff = Math.abs(ratio - rw / rh);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      best = key;
+    }
+  }
+  return best;
+}
+
 /** 把客户端请求体裁剪成 agnes 认识的提交参数
  *
- * agnes 的真实字段约束（2026-11 实测）：
- *  - 必填：model、prompt、mode（文生视频固定 "text"）
- *  - 可选：seconds（整数秒）、aspect_ratio（如 "16:9"）、size（仅接受 "720P"）
- *  - 不接受：duration、resolution —— 传了会直接 400
+ * 官方文档（Agnes Video 2.5 / 2.5 Flash，2026-11）：
+ *  - 必填：model、prompt、mode（text / keyframe / reference）
+ *  - seconds：**字符串** "4"–"12"，默认 "5"
+ *  - size：Flash 固定 "720P"；2.5 另支持 1080P / 1K / 2K
+ *  - aspect_ratio：21:9 / 16:9 / 4:3 / 1:1 / 3:4 / 9:16，默认 16:9
+ *  - n：当前仅支持 1
+ *  - keyframe 模式需 first_frame / last_frame；reference 模式需 images / audios
+ *  - 不接受 duration、resolution 等非标字段（上游直接 400）
  */
 export function buildAgnesVideoBody(body: Record<string, any>): Record<string, any> {
   const out: Record<string, any> = {};
@@ -113,37 +137,53 @@ export function buildAgnesVideoBody(body: Record<string, any>): Record<string, a
   const prompt = body.prompt ?? body.input;
   if (typeof prompt === "string") out.prompt = prompt;
 
-  // mode 必填：默认文生视频；客户端显式传 image 类模式时原样透传
+  // mode 必填：默认文生视频
   const mode = typeof body.mode === "string" && body.mode ? body.mode : "text";
   out.mode = mode;
 
+  // seconds 必须是字符串，且限制在 4~12
   const rawSeconds = body.seconds ?? body.duration;
   if (rawSeconds !== undefined && rawSeconds !== null && rawSeconds !== "") {
     const n = typeof rawSeconds === "number" ? rawSeconds : parseInt(String(rawSeconds), 10);
-    if (Number.isFinite(n) && n > 0) out.seconds = Math.round(n);
+    if (Number.isFinite(n) && n > 0) out.seconds = String(Math.min(12, Math.max(4, Math.round(n))));
   }
 
-  // size 只认 "720P"；OpenAI Sora 风格的 "1280x720" 等按宽高换算成 aspect_ratio
+  // size：只透传合法分辨率档位；WxH 之类的按画幅换算
   if (typeof body.size === "string" && body.size) {
     const raw = body.size.trim();
-    if (/^720p$/i.test(raw)) {
-      out.size = "720P";
+    if (/^(720P|1080P|1K|2K)$/i.test(raw)) {
+      out.size = raw.toUpperCase().replace(/^1K$/, "1K").replace(/^2K$/, "2K");
     } else if (SIZE_TO_RATIO[raw.toLowerCase()]) {
       out.aspect_ratio = SIZE_TO_RATIO[raw.toLowerCase()];
     } else if (/^\d+\s*[x×]\s*\d+$/i.test(raw)) {
       const [w, h] = raw.split(/[x×]/i).map((s) => parseInt(s.trim(), 10));
-      if (w > 0 && h > 0) {
-        const g = gcd(w, h);
-        out.aspect_ratio = `${w / g}:${h / g}`;
-      }
-    } else {
-      out.aspect_ratio = raw;
+      out.aspect_ratio = nearestAspectRatio(w, h);
     }
   }
-  if (typeof body.aspect_ratio === "string" && body.aspect_ratio) out.aspect_ratio = body.aspect_ratio;
-  if (typeof body.image === "string" && body.image) out.image = body.image;
-  if (typeof body.negative_prompt === "string" && body.negative_prompt) out.negative_prompt = body.negative_prompt;
-  if (typeof body.seed === "number") out.seed = body.seed;
+
+  const ratio = typeof body.aspect_ratio === "string" ? body.aspect_ratio.trim() : "";
+  if (ratio && VALID_ASPECT_RATIOS.has(ratio)) out.aspect_ratio = ratio;
+
+  // Flash 只有 720P 一档，传 1080P/1K/2K 会被上游 400，这里直接归一
+  if (/flash/i.test(String(out.model || ""))) out.size = "720P";
+
+  // 首尾帧 / 参考素材（按官方字段名透传，数量按 Flash 限制截断）
+  if (typeof body.first_frame === "string" && body.first_frame) out.first_frame = body.first_frame;
+  if (typeof body.last_frame === "string" && body.last_frame) out.last_frame = body.last_frame;
+  if (Array.isArray(body.images)) {
+    const images = body.images.filter((x: unknown) => typeof x === "string" && x).slice(0, 5);
+    if (images.length) out.images = images;
+  }
+  if (Array.isArray(body.audios)) {
+    const audios = body.audios.filter((x: unknown) => typeof x === "string" && x).slice(0, 3);
+    if (audios.length) out.audios = audios;
+  }
+
+  // seed 为官方支持的可选参数
+  if (typeof body.seed === "number" && Number.isFinite(body.seed)) out.seed = Math.trunc(body.seed);
+
+  // n 当前仅支持 1
+  out.n = 1;
   return out;
 }
 
@@ -187,14 +227,22 @@ export async function submitAgnesVideo(
         raw: payload,
       };
     }
-    const taskId = payload?.task_id || payload?.video_id || payload?.id || payload?.data?.task_id || payload?.data?.id || "";
+    // 官方文档：video_id 才是用于查询的 ID，id / task_id 只是任务 ID
+    const taskId =
+      payload?.video_id ||
+      payload?.data?.video_id ||
+      payload?.task_id ||
+      payload?.id ||
+      payload?.data?.task_id ||
+      payload?.data?.id ||
+      "";
     if (!taskId) {
       // 少数情况下上游直接同步返回视频地址
       const url = extractVideoUrl(payload);
       if (url) {
         return { ok: true, httpStatus: 200, taskId: "", status: "completed", url, raw: payload };
       }
-      return { ok: false, httpStatus: 502, error: "上游未返回 task_id", raw: payload };
+      return { ok: false, httpStatus: 502, error: "上游未返回 video_id", raw: payload };
     }
     return {
       ok: true,
@@ -209,43 +257,68 @@ export async function submitAgnesVideo(
   }
 }
 
-/** 轮询 agnes 视频任务 */
+/** baseUrl（https://apihub.agnes-ai.com/v1）→ 查询接口根地址（https://apihub.agnes-ai.com） */
+function agnesRoot(baseUrl: string): string {
+  return baseUrl.replace(/\/+$/, "").replace(/\/v1$/i, "");
+}
+
+/**
+ * 轮询 agnes 视频任务
+ *
+ * 官方推荐：GET /agnesapi?video_id=<VIDEO_ID>&model_name=<MODEL>
+ * 兼容回退：GET /v1/videos/<ID>（旧路径，部分账号仍可用）
+ */
 export async function pollAgnesVideo(
   baseUrl: string,
   apiKey: string,
-  taskId: string
+  videoId: string,
+  modelName?: string
 ): Promise<{ ok: boolean; httpStatus: number; status: VideoTaskStatus; progress: number; url?: string; error?: string; raw?: any }> {
   const cleanBase = baseUrl.replace(/\/+$/, "");
-  try {
-    const resp = await fetch(`${cleanBase}/videos/${encodeURIComponent(taskId)}`, {
-      headers: { authorization: `Bearer ${apiKey}` },
-      signal: AbortSignal.timeout(POLL_TIMEOUT_MS),
-    });
-    const text = await resp.text();
-    let payload: any = null;
+  const query = new URLSearchParams({ video_id: videoId });
+  if (modelName) query.set("model_name", modelName);
+  const urls = [`${agnesRoot(baseUrl)}/agnesapi?${query.toString()}`, `${cleanBase}/videos/${encodeURIComponent(videoId)}`];
+
+  let lastError = "";
+  let lastStatus = 0;
+
+  for (const url of urls) {
     try {
-      payload = text ? JSON.parse(text) : null;
-    } catch {
-      payload = null;
+      const resp = await fetch(url, {
+        headers: { authorization: `Bearer ${apiKey}` },
+        signal: AbortSignal.timeout(POLL_TIMEOUT_MS),
+      });
+      const text = await resp.text();
+      if (!resp.ok) {
+        lastStatus = resp.status;
+        lastError = text.slice(0, 500) || `上游查询失败 (${resp.status})`;
+        continue;
+      }
+      let payload: any = null;
+      try {
+        payload = text ? JSON.parse(text) : null;
+      } catch {
+        payload = null;
+      }
+      const status = mapVideoStatus(payload?.status);
+      const progressRaw = Number(payload?.progress);
+      const progress = Number.isFinite(progressRaw) ? Math.max(0, Math.min(100, Math.round(progressRaw))) : status === "completed" ? 100 : 0;
+      return {
+        ok: true,
+        httpStatus: 200,
+        status,
+        progress,
+        url: extractVideoUrl(payload) || undefined,
+        error: status === "failed" ? JSON.stringify(payload?.error || payload?.message || "上游生成失败").slice(0, 500) : undefined,
+        raw: payload,
+      };
+    } catch (err) {
+      lastError = (err as Error)?.message || "视频任务查询超时";
+      lastStatus = 504;
     }
-    if (!resp.ok) {
-      return { ok: false, httpStatus: resp.status, status: "failed", progress: 0, error: text.slice(0, 500) || `上游查询失败 (${resp.status})` };
-    }
-    const status = mapVideoStatus(payload?.status);
-    const progressRaw = Number(payload?.progress);
-    const progress = Number.isFinite(progressRaw) ? Math.max(0, Math.min(100, Math.round(progressRaw))) : status === "completed" ? 100 : 0;
-    return {
-      ok: true,
-      httpStatus: 200,
-      status,
-      progress,
-      url: extractVideoUrl(payload) || undefined,
-      error: status === "failed" ? JSON.stringify(payload?.error || payload?.message || "上游生成失败").slice(0, 500) : undefined,
-      raw: payload,
-    };
-  } catch (err) {
-    return { ok: false, httpStatus: 504, status: "in_progress", progress: 0, error: (err as Error)?.message || "视频任务查询超时" };
   }
+
+  return { ok: false, httpStatus: lastStatus || 502, status: "in_progress", progress: 0, error: lastError || "视频任务查询失败" };
 }
 
 /** 归一为 OpenAI 兼容视频对象（Sora 的 GET /v1/videos/{id} 口径） */

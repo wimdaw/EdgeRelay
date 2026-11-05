@@ -274,7 +274,7 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
         await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
         const upstreamKey = await keyOf(env, record);
         if (!upstreamKey) break;
-        const poll = await pollAgnesVideo(record.baseUrl, upstreamKey, record.upstreamTaskId);
+        const poll = await pollAgnesVideo(record.baseUrl, upstreamKey, record.upstreamTaskId, record.upstreamModel);
         if (poll.ok) {
           record.status = poll.status;
           record.progress = poll.progress;
@@ -346,7 +346,7 @@ videoRouter.get("/:id", async (c) => {
     if (!isTerminalVideoStatus(rec.status)) {
       const upstreamKey = await keyOf(env, rec);
       if (upstreamKey) {
-        const poll = await pollAgnesVideo(rec.baseUrl, upstreamKey, rec.upstreamTaskId);
+        const poll = await pollAgnesVideo(rec.baseUrl, upstreamKey, rec.upstreamTaskId, rec.upstreamModel);
         if (poll.ok) {
           rec.status = poll.status;
           rec.progress = poll.progress;
