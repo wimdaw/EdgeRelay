@@ -34,6 +34,7 @@ const AG_SCOPES = [
   'https://www.googleapis.com/auth/cloud-platform',
   'https://www.googleapis.com/auth/userinfo.email',
   'https://www.googleapis.com/auth/userinfo.profile',
+  'https://www.googleapis.com/auth/aicode',
   'https://www.googleapis.com/auth/cclog',
   'https://www.googleapis.com/auth/experimentsandconfigs',
 ]
@@ -46,10 +47,58 @@ const AG_REDIRECT_URI = 'http://localhost:51121/oauth-callback'
 const AG_GEN_BASE = 'https://daily-cloudcode-pa.googleapis.com'
 const AG_PROD_BASE = 'https://cloudcode-pa.googleapis.com'
 const AG_API_VERSION = 'v1internal'
-// Cloud Code 会拒绝低于 2.9.0 版本客户端请求较新模型，故 UA 版本不低于此
-const AG_UA = 'antigravity/hub/2.9.1 darwin/arm64'
-const AG_IDE_VERSION = '2.9.1'
 const AG_GOOG_API_CLIENT = 'gl-node/22.21.1'
+
+// ===== Antigravity Hub 客户端版本（对齐 CLIProxyAPI misc/antigravity_version.go）=====
+// Cloud Code 拒绝低于 2.23.0 客户端请求较新模型，fallback 不得低于该地板
+const AG_HUB_MANIFEST_URL = 'https://antigravity-hub-auto-updater-974169037036.us-central1.run.app/manifest/latest-arm64-mac.yml'
+const AG_FALLBACK_VERSION = '2.29.0'
+const AG_HUB_PLATFORM = 'os_type=darwin; arch=arm64'
+const AG_VERSION_TTL_MS = 6 * 60 * 60 * 1000
+const AG_NODE_API_CLIENT_UA = 'google-api-nodejs-client/10.3.0'
+/** 已知 release 的 changelist；未知版本保持线上版本号，不冒认其它 build 的 CL */
+const AG_HUB_CHANGELISTS: Record<string, string> = {
+  '2.23.0': '998057262',
+  '2.24.0': '1000335682',
+  '2.29.0': '1013060670',
+}
+let agVersionCache: { version: string; at: number } | null = null
+let agVersionRefreshing = false
+
+/** 解析 Hub 客户端版本：进程内 6 小时缓存 + 后台刷新（永不阻塞请求），拉不到用 fallback */
+function resolveAgVersion(): string {
+  if (agVersionCache && Date.now() - agVersionCache.at < AG_VERSION_TTL_MS) return agVersionCache.version
+  if (!agVersionRefreshing) {
+    agVersionRefreshing = true
+    void (async () => {
+      try {
+        const res = await fetch(AG_HUB_MANIFEST_URL, { signal: AbortSignal.timeout(10000) })
+        if (res.ok) {
+          const text = await res.text()
+          const m = /version:\s*([0-9][0-9.]*)/.exec(text)
+          if (m?.[1]) agVersionCache = { version: m[1], at: Date.now() }
+        }
+      } catch { /* 拉不到 manifest 就继续用当前值 */ } finally {
+        agVersionRefreshing = false
+      }
+    })()
+  }
+  return agVersionCache?.version ?? AG_FALLBACK_VERSION
+}
+
+/** 生成 / loadCodeAssist 的运行时 UA（对齐 CLIProxyAPI AntigravityUserAgent） */
+function agUserAgent(): string {
+  const version = resolveAgVersion()
+  let metadata = `aidev_client; ${AG_HUB_PLATFORM}`
+  const cl = AG_HUB_CHANGELISTS[version]
+  if (cl) metadata += `; cl=${cl}`
+  return `antigravity/hub/${version} (${metadata})`
+}
+
+/** onboardUser 的长 UA（控制面，对齐 CLIProxyAPI AntigravityOnboardUserUserAgent） */
+function agOnboardUserAgent(): string {
+  return `${agUserAgent()} ${AG_NODE_API_CLIENT_UA}`
+}
 
 const AG_AT_PREFIX = 'antigravity:at:'
 const AG_PJ_PREFIX = 'antigravity:pj:'
@@ -88,7 +137,7 @@ function agHeaders(accessToken: string): Record<string, string> {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${accessToken}`,
     Accept: '*/*',
-    'User-Agent': AG_UA,
+    'User-Agent': agUserAgent(),
     'X-Goog-Api-Client': AG_GOOG_API_CLIENT,
   }
 }
@@ -239,10 +288,22 @@ async function resolveProjectId(env: Env, accessToken: string, tokenHash: string
   let projectId = extractProjectFromLoad(load)
   if (!projectId) {
     const tierId = defaultTierId(load)
+    // onboardUser 走控制面长 UA（对齐 CLIProxyAPI nodeUserAgent），ide_version 用解析出的 Hub 版本
+    const onboardHeaders = (): Record<string, string> => ({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+      Accept: '*/*',
+      'User-Agent': agOnboardUserAgent(),
+      'X-Goog-Api-Client': AG_GOOG_API_CLIENT,
+    })
+    const onboardBody = JSON.stringify({
+      tier_id: tierId,
+      metadata: { ide_type: 'ANTIGRAVITY', ide_version: resolveAgVersion(), ide_name: 'antigravity' },
+    })
     let op: any = await fetch(`${AG_GEN_BASE}/${AG_API_VERSION}:onboardUser`, {
       method: 'POST',
-      headers: agHeaders(accessToken),
-      body: JSON.stringify({ tier_id: tierId, metadata: { ide_type: 'ANTIGRAVITY', ide_version: AG_IDE_VERSION, ide_name: 'antigravity' } }),
+      headers: onboardHeaders(),
+      body: onboardBody,
       signal: AbortSignal.timeout(30000),
     }).then((r) => r.json()).catch(() => null)
     for (let i = 0; i < 5 && op && op.done !== true; i++) {
@@ -250,8 +311,8 @@ async function resolveProjectId(env: Env, accessToken: string, tokenHash: string
       // 轮询用同一端点重试
       op = await fetch(`${AG_GEN_BASE}/${AG_API_VERSION}:onboardUser`, {
         method: 'POST',
-        headers: agHeaders(accessToken),
-        body: JSON.stringify({ tier_id: tierId, metadata: { ide_type: 'ANTIGRAVITY', ide_version: AG_IDE_VERSION, ide_name: 'antigravity' } }),
+        headers: onboardHeaders(),
+        body: onboardBody,
         signal: AbortSignal.timeout(30000),
       }).then((r) => r.json()).catch(() => null)
     }
@@ -276,14 +337,41 @@ function firstUserText(request: Record<string, any>): string {
   return ''
 }
 
+/** 随机 sessionId 兜底（对齐 CLIProxyAPI generateSessionID："-" + int63 十进制） */
+function randomSessionId(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(8))
+  const hex = [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('')
+  return '-' + (BigInt('0x' + hex) & 0x7fffffffffffffffn).toString()
+}
+
+/**
+ * 稳定 sessionId（对齐 CLIProxyAPI generateStableSessionIDFromContents）：
+ * 首条用户文本 sha256 前 8 字节 big-endian int63 → "-" + 十进制。
+ * 多轮对话派生出同一 ID，利于上游会话缓存。
+ */
+async function stableSessionId(geminiRequest: Record<string, any>): Promise<string> {
+  const contents: any[] = Array.isArray(geminiRequest?.contents) ? geminiRequest.contents : []
+  for (const c of contents) {
+    if (c?.role === 'user' && Array.isArray(c.parts)) {
+      const text = c.parts[0]?.text
+      if (typeof text === 'string' && text) {
+        const digest = await sha256Hex(text)
+        return '-' + (BigInt('0x' + digest.slice(0, 16)) & 0x7fffffffffffffffn).toString()
+      }
+    }
+  }
+  return randomSessionId()
+}
+
 /** 把 Gemini 请求套进 Antigravity 信封（删除 safetySettings，补 userAgent / requestType / requestId / sessionId） */
-function buildEnvelope(modelId: string, projectId: string, geminiRequest: Record<string, any>): Record<string, unknown> {
+async function buildEnvelope(modelId: string, projectId: string, geminiRequest: Record<string, any>): Promise<Record<string, unknown>> {
   const request: Record<string, any> = { ...geminiRequest }
   delete request.safetySettings
   const isImage = /image/i.test(modelId)
-  // sessionId：Stable 派生自首条用户文本（利于上游会话缓存）
-  request.sessionId = isImage ? undefined : `-${randomHex(8)}`
-  if (request.sessionId === undefined) delete request.sessionId
+  // sessionId：稳定派生自首条用户文本（对齐 CLIProxyAPI，利于上游会话缓存）
+  const sessionId = isImage ? undefined : await stableSessionId(request)
+  if (sessionId === undefined) delete request.sessionId
+  else request.sessionId = sessionId
   return {
     model: modelId,
     project: projectId,
@@ -495,7 +583,7 @@ export async function handleAntigravityRequest(p: AntigravityCallParams): Promis
       const accessToken = await getAccessToken(p.env, refreshToken)
       // 账号自己带的 project 优先，其次才是渠道级 project
       const projectId = await resolveProjectId(p.env, accessToken, hash, accountProject || p.project)
-      const envelope = buildEnvelope(p.modelId, projectId, geminiRequest)
+      const envelope = await buildEnvelope(p.modelId, projectId, geminiRequest)
       const url = `${AG_GEN_BASE}/${AG_API_VERSION}:${wantStream ? 'streamGenerateContent?alt=sse' : 'generateContent'}`
       const upstream = await fetch(url, {
         method: 'POST',
@@ -586,7 +674,7 @@ export async function testAntigravity(
     const accessToken = await getAccessToken(env, token)
     const projectId = await resolveProjectId(env, accessToken, hash, accountProject || project)
     const { request: geminiRequest } = openAIToGeminiRequest({ messages: [{ role: 'user', content: 'hi' }], max_tokens: 1 })
-    const envelope = buildEnvelope(modelId, projectId, geminiRequest)
+    const envelope = await buildEnvelope(modelId, projectId, geminiRequest)
     const res = await fetch(`${AG_GEN_BASE}/${AG_API_VERSION}:generateContent`, {
       method: 'POST',
       headers: agHeaders(accessToken),
