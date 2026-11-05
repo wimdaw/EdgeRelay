@@ -355,7 +355,10 @@ function pickQuotaWindow(raw: any): CodexQuotaWindow | null {
 /** 查询 Codex/ChatGPT 账号额度（GET wham/usage），任何失败都降级为 ok:false，不抛异常 */
 export async function fetchCodexQuota(env: Env, refreshToken: string): Promise<CodexQuotaResult> {
   try {
-    const { token, accountId, email: cachedEmail } = await getAccessToken(env, refreshToken)
+    // 存储的 Key 可能是纯 RT，也可能是四段发货行 / CPA JSON，先统一提取
+    const parsedRefreshToken = extractCodexRefreshToken(refreshToken)
+    if (!parsedRefreshToken) return { ok: false, windows: [], error: '未从凭据中识别到 refresh_token' }
+    const { token, accountId, email: cachedEmail } = await getAccessToken(env, parsedRefreshToken)
     if (!token) return { ok: false, windows: [], error: '账号缺少可用的 access_token' }
     const res = await fetch(CODEX_USAGE_URL, {
       headers: apiHeaders(token, accountId, false),
@@ -403,7 +406,10 @@ export async function fetchCodexQuota(env: Env, refreshToken: string): Promise<C
 /** 拉取 Codex 当前可用模型目录（GET backend-api/codex/models），失败返回 ok:false 供调用方回退 */
 export async function fetchCodexModels(env: Env, refreshToken: string): Promise<{ ok: boolean; models: string[]; error?: string }> {
   try {
-    const { token, accountId } = await getAccessToken(env, refreshToken)
+    // 存储的 Key 可能是纯 RT，也可能是四段发货行 / CPA JSON，先统一提取
+    const parsedRefreshToken = extractCodexRefreshToken(refreshToken)
+    if (!parsedRefreshToken) return { ok: false, models: [], error: '未从凭据中识别到 refresh_token' }
+    const { token, accountId } = await getAccessToken(env, parsedRefreshToken)
     if (!token) return { ok: false, models: [], error: '账号缺少可用的 access_token' }
     const res = await fetch(`${CODEX_MODELS_URL}?client_version=0.156.1`, {
       headers: apiHeaders(token, accountId, false),
