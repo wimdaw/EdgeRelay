@@ -637,6 +637,35 @@ let apiKeyId = "";
   }
 }
 
+// 13. 视频接口 /v1/videos（agnes 异步任务适配）
+{
+  const unauth = await request("/v1/videos", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: { model: "agnes-video-2.5", prompt: "海边日落" },
+  });
+  assert(unauth.status === 401, "视频创建接口未带 Key 返回 401");
+
+  const unknownModel = await request("/v1/videos", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "no-such-video-model", prompt: "海边日落" },
+  });
+  assert([400, 404].includes(unknownModel.status), "未知视频模型被正确拒绝");
+
+  const missingPrompt = await request("/v1/videos", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "agnes-video-2.5" },
+  });
+  assert(missingPrompt.status === 400, "缺少 prompt 返回 400");
+
+  const getUnknown = await request("/v1/videos/video_not_exists", {
+    headers: { authorization: `Bearer ${apiKeyPlaintext}` },
+  });
+  assert(getUnknown.status === 404, "不存在的视频任务返回 404");
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

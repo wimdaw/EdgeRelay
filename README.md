@@ -97,6 +97,10 @@ npm run deploy
 |---|---|---|
 | `/health` | GET | 健康检查（包含引擎与存储标识） |
 | `/v1/chat/completions` | POST | OpenAI 兼容对话（流式 SSE、故障转移、计费） |
+| `/v1/videos` | POST | 创建视频任务（agnes 异步模式，立即返回任务对象） |
+| `/v1/videos/{id}` | GET | 查询视频任务进度，完成后返回 `url` |
+| `/v1/videos/{id}/content` | GET | 302 跳转到视频文件 |
+| `/v1/videos/generations` | POST | 旧版 one-api 同步视频端点（最多等待 100s） |
 | `/v1/models` | GET | 对外模型列表（OpenAI 格式） |
 | `/api/auth/register` | POST | 用户注册（首位注册者自动成为 admin） |
 | `/api/auth/login` | POST | 用户登录（颁发 Session Cookie） |

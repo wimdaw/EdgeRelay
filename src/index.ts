@@ -16,6 +16,7 @@ import { usageRouter } from "./routes/usage";
 import { inviteRouter } from "./routes/invite";
 import { profileRouter } from "./routes/profile";
 import { siteRouter } from "./routes/site";
+import { videoRouter } from "./routes/video";
 import { staticRouter } from "./routes/static";
 
 const app = new Hono<{ Bindings: Env }>();
@@ -53,6 +54,7 @@ app.get("/health", (c) =>
 
 // 3. 核心 API 路由
 app.route("/v1/chat/completions", chatRouter);
+app.route("/v1/videos", videoRouter);
 app.route("/v1/models", modelsRouter);
 app.route("/api/models", apiModelsRouter);
 app.route("/api/auth", authRouter);
