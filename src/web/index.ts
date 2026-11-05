@@ -32,6 +32,8 @@ export type WebProviderMeta = {
   /** 凭据格式说明（前端弹窗提示） */
   credHint: string;
   defaultModels: string[];
+  /** 支持零凭据匿名运行（无 Key 时不进账号池） */
+  anonymous?: boolean;
 };
 
 export const WEB_PROVIDERS: Record<WebProviderType, WebProviderMeta> = {
@@ -61,6 +63,7 @@ export const WEB_PROVIDERS: Record<WebProviderType, WebProviderMeta> = {
     desc: "Gemini 网页 Cookie 反代（SAPISIDHASH 鉴权）；留空凭据可走匿名模式。",
     credHint: "Cookie 字符串（含 __Secure-1PSID / __Secure-3PSID / SAPISID）",
     defaultModels: Object.keys(GEMINI_WEB_MODELS),
+    anonymous: true,
   },
   minimaxweb: {
     type: "minimaxweb",

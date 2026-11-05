@@ -14,6 +14,7 @@ import { getProviderKeys, updateProviderKeyEmail } from "./storage/db";
 import { readKeyHealth } from "./key-health";
 import { decryptSecret } from "./crypto";
 import { mapLimit } from "./storage/cache";
+import { WEB_PROVIDERS, type WebProviderType } from "./web";
 
 export type AccountQuota = {
   type: "antigravity" | "cline" | "codebuddy" | "chatgptweb" | "codex" | "unknown";
@@ -66,6 +67,13 @@ export async function buildAccountPool(env: Env, providers: ProviderRecord[]): P
     const info = kindType(provider.kind);
     if (!info) continue;
     const keys = await getProviderKeys(env, provider.id);
+
+    // 匿名 Web 渠道（如 geminiweb）不使用账号凭据，零 Key 时不进账号池；
+    // 一旦补了凭据则照常展示
+    if (info.scope === "web" && keys.length === 0 && WEB_PROVIDERS[info.type as WebProviderType]?.anonymous) {
+      continue;
+    }
+
     const health = await readKeyHealth(env, provider.id);
 
     // 解密凭据（同进程内有明文缓存）
