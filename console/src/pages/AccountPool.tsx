@@ -6,7 +6,7 @@ import { cn } from "../lib/utils";
 
 type QuotaModel = { id: string; name?: string; remaining: number | null; resetTime?: string; recommended?: boolean };
 type AccountQuota = {
-  type: "antigravity" | "cline" | "codebuddy" | "chatgptweb" | "unknown";
+  type: "antigravity" | "cline" | "codebuddy" | "chatgptweb" | "codex" | "unknown";
   ok: boolean;
   email?: string;
   name?: string;
@@ -19,6 +19,8 @@ type AccountQuota = {
   size?: number;
   requestsToday?: number;
   models?: QuotaModel[];
+  windows?: Array<{ label: string; usedPercent: number; remainPercent: number; windowMinutes?: number; resetTime?: string }>;
+  credits?: { hasCredits: boolean; balance?: number; unlimited?: boolean };
 };
 type PoolAccount = {
   id: string;
@@ -132,6 +134,34 @@ function QuotaView({ q }: { q: AccountQuota | null }) {
             <span className="text-[11px] text-muted">剩余积分 <b className="font-mono text-ink">{remain ?? "—"}</b></span>
           )}
           {q.used != null && <span className="text-[10px] text-muted">已用 <b className="font-mono text-ink">{q.used}</b></span>}
+        </div>
+      </div>
+    );
+  }
+
+  if (q.type === "codex") {
+    return (
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted">
+          {q.email && <span className="inline-flex items-center gap-1 text-ink"><Mail size={11} />{q.email}</span>}
+          {q.plan && <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand">{q.plan}</span>}
+          {q.credits && (
+            <span className="rounded bg-surface2 px-2 py-0.5 text-[10px]">
+              Credits {q.credits.unlimited ? "不限" : q.credits.hasCredits ? (q.credits.balance == null ? "可用" : q.credits.balance.toLocaleString()) : "无"}
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+          {(q.windows || []).map((w) => (
+            <div key={w.label} className="rounded-lg bg-surface2/50 px-2.5 py-1.5">
+              <Progress value={w.remainPercent / 100} label={w.label} />
+              <div className="mt-1 flex items-center gap-1 text-[10px] text-muted">
+                <Clock size={10} />
+                {w.resetTime ? `重置 ${new Date(w.resetTime).toLocaleString("zh-CN", { hour12: false })}` : "未返回重置时间"}
+              </div>
+            </div>
+          ))}
+          {(q.windows || []).length === 0 && <span className="text-[11px] text-muted">上游未返回额度窗口</span>}
         </div>
       </div>
     );

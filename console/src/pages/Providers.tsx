@@ -243,7 +243,7 @@ export default function Providers() {
   const [keyVal, setKeyVal] = useState("");
   const [newKeyLabel, setNewKeyLabel] = useState("prod");
   // 模型导入流程
-  const [importStep, setImportStep] = useState<{ providerId: string; providerName: string; models: string[]; picked: Set<string>; loading: boolean; error?: string } | null>(null);
+  const [importStep, setImportStep] = useState<{ providerId: string; providerName: string; models: string[]; picked: Set<string>; loading: boolean; error?: string; note?: string } | null>(null);
   const [customModelInput, setCustomModelInput] = useState("");
   // OAuth 授权流程
   const [oauthDlg, setOauthDlg] = useState<OAuthDialogState | null>(null);
@@ -315,6 +315,7 @@ export default function Providers() {
     if (key) keyMemo.current[providerId] = key;
     const effectiveKey = key || keyMemo.current[providerId] || "";
     let models: string[] | null = null;
+    let note = "";
     if (effectiveKey && baseUrl) {
       try {
         const resp = await fetch(`${baseUrl.replace(/\/+$/, "")}/v1/models`, {
@@ -330,14 +331,15 @@ export default function Providers() {
     }
     if (models === null) {
       try {
-        const r = await adminAction<{ models: string[] }>("list_upstream_models", { providerId });
+        const r = await adminAction<{ models: string[]; note?: string; degraded?: boolean }>("list_upstream_models", { providerId });
         models = r.models;
+        if (r.note) note = r.degraded ? `上游模型目录不可用，已回退兜底清单：${r.note}` : r.note;
       } catch (e) {
         setImportStep({ providerId, providerName, models: [], picked: new Set(), loading: false, error: (e as Error).message });
         return;
       }
     }
-    setImportStep({ providerId, providerName, models: models ?? [], picked: new Set(models ?? []), loading: false });
+    setImportStep({ providerId, providerName, models: models ?? [], picked: new Set(models ?? []), loading: false, note: note || undefined });
   };
 
   const openManualAdd = (providerId: string, providerName: string) => {
@@ -1087,6 +1089,9 @@ export default function Providers() {
                 </Button>
               </div>
             </div>
+            {importStep?.note && (
+              <p className="mb-2 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-600">{importStep.note}</p>
+            )}
             <div className="max-h-60 space-y-1 overflow-y-auto rounded-lg border border-line p-2">
               {importStep?.models.length === 0 && <p className="py-6 text-center text-xs text-muted">未发现上游模型，可在下方手动输入模型名称添加</p>}
               {importStep?.models.map((m) => (

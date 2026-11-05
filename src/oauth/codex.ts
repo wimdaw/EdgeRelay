@@ -35,6 +35,8 @@ const CODEX_REDIRECT_URI = 'http://localhost:1455/auth/callback'
 const CODEX_SCOPE = 'openid email profile offline_access'
 
 const CODEX_API_BASE = 'https://chatgpt.com/backend-api/codex'
+const CODEX_USAGE_URL = 'https://chatgpt.com/backend-api/wham/usage'
+const CODEX_MODELS_URL = CODEX_API_BASE + '/models'
 const CODEX_UA = 'codex-tui/0.156.1 (Mac OS 26.5.2; arm64) iTerm.app/3.6.11 (codex-tui; 0.156.1)'
 const CODEX_ORIGINATOR = 'codex-tui'
 
@@ -264,6 +266,130 @@ function apiHeaders(accessToken: string, accountId: string, stream: boolean): Re
   }
   if (accountId) headers['Chatgpt-Account-Id'] = accountId
   return headers
+}
+
+// =====================================================================
+// 额度与模型目录（只读，不消耗模型额度）
+// =====================================================================
+
+export type CodexQuotaWindow = {
+  label: string
+  usedPercent: number
+  remainPercent: number
+  windowMinutes?: number
+  resetTime?: string
+}
+
+export type CodexQuotaResult = {
+  ok: boolean
+  plan?: string
+  email?: string
+  windows: CodexQuotaWindow[]
+  credits?: { hasCredits: boolean; balance?: number; unlimited?: boolean }
+  error?: string
+}
+
+function pickQuotaWindow(raw: any, label: string): CodexQuotaWindow | null {
+  if (!raw || typeof raw !== 'object') return null
+  const used = Number(raw.used_percent ?? raw.usedPercent)
+  if (!Number.isFinite(used)) return null
+  const usedPercent = Math.max(0, Math.min(100, used))
+  const minutes = Number(
+    raw.window_minutes ??
+    raw.windowMinutes ??
+    (raw.limit_window_seconds != null ? Math.round(Number(raw.limit_window_seconds) / 60) : NaN)
+  )
+  let resetTime: string | undefined
+  const resetAt = Number(raw.reset_at ?? raw.resetAt)
+  if (Number.isFinite(resetAt) && resetAt > 0) {
+    resetTime = new Date(resetAt * 1000).toISOString()
+  } else {
+    const afterSeconds = Number(raw.reset_after_seconds ?? raw.resetAfterSeconds)
+    if (Number.isFinite(afterSeconds) && afterSeconds >= 0) {
+      resetTime = new Date(Date.now() + afterSeconds * 1000).toISOString()
+    }
+  }
+  const win: CodexQuotaWindow = { label, usedPercent, remainPercent: Math.max(0, 100 - usedPercent) }
+  if (Number.isFinite(minutes) && minutes > 0) win.windowMinutes = minutes
+  if (resetTime) win.resetTime = resetTime
+  return win
+}
+
+/** 查询 Codex/ChatGPT 账号额度（GET wham/usage），任何失败都降级为 ok:false，不抛异常 */
+export async function fetchCodexQuota(env: Env, refreshToken: string): Promise<CodexQuotaResult> {
+  try {
+    const { token, accountId } = await getAccessToken(env, refreshToken)
+    if (!token) return { ok: false, windows: [], error: '账号缺少可用的 access_token' }
+    const res = await fetch(CODEX_USAGE_URL, {
+      headers: apiHeaders(token, accountId, false),
+      signal: AbortSignal.timeout(20000),
+    })
+    if (!res.ok) {
+      return { ok: false, windows: [], error: `额度接口返回 HTTP ${res.status}` }
+    }
+    const text = await res.text()
+    let body: any
+    try {
+      body = JSON.parse(text)
+    } catch {
+      // 上游非 JSON 时不把响应体透出，避免泄露 HTML/调试信息
+      return { ok: false, windows: [], error: `额度接口返回非 JSON（HTTP ${res.status}）` }
+    }
+    const rateLimit = body?.rate_limit ?? body?.rateLimit ?? {}
+    const windows: CodexQuotaWindow[] = []
+    const primary = pickQuotaWindow(rateLimit.primary_window ?? rateLimit.primaryWindow, '5 小时窗口')
+    if (primary) windows.push(primary)
+    const secondary = pickQuotaWindow(rateLimit.secondary_window ?? rateLimit.secondaryWindow, '周窗口')
+    if (secondary) windows.push(secondary)
+
+    const creditsRaw = body?.credits
+    let credits: CodexQuotaResult['credits']
+    if (creditsRaw && typeof creditsRaw === 'object') {
+      const balance = Number(creditsRaw.balance ?? creditsRaw.remaining)
+      credits = { hasCredits: Boolean(creditsRaw.has_credits ?? creditsRaw.hasCredits) }
+      if (Number.isFinite(balance)) credits.balance = balance
+      if (creditsRaw.unlimited != null) credits.unlimited = Boolean(creditsRaw.unlimited)
+    }
+
+    return {
+      ok: true,
+      plan: String(body?.plan_type ?? body?.planType ?? '') || undefined,
+      email: parseJwtClaim(token, 'email') || undefined,
+      windows,
+      credits,
+    }
+  } catch {
+    return { ok: false, windows: [], error: '额度查询失败（凭据刷新或网络异常）' }
+  }
+}
+
+/** 拉取 Codex 当前可用模型目录（GET backend-api/codex/models），失败返回 ok:false 供调用方回退 */
+export async function fetchCodexModels(env: Env, refreshToken: string): Promise<{ ok: boolean; models: string[]; error?: string }> {
+  try {
+    const { token, accountId } = await getAccessToken(env, refreshToken)
+    if (!token) return { ok: false, models: [], error: '账号缺少可用的 access_token' }
+    const res = await fetch(`${CODEX_MODELS_URL}?client_version=0.156.1`, {
+      headers: apiHeaders(token, accountId, false),
+      signal: AbortSignal.timeout(20000),
+    })
+    if (!res.ok) return { ok: false, models: [], error: `模型目录接口返回 HTTP ${res.status}` }
+    const text = await res.text()
+    let body: any
+    try {
+      body = JSON.parse(text)
+    } catch {
+      return { ok: false, models: [], error: `模型目录接口返回非 JSON（HTTP ${res.status}）` }
+    }
+    const rows = Array.isArray(body?.models) ? body.models : []
+    const slugs: string[] = rows
+      .filter((m: any) => m && typeof m.slug === 'string' && m.slug && m.visibility !== 'hide')
+      .map((m: any) => String(m.slug))
+    const models = [...new Set<string>(slugs)]
+    if (models.length === 0) return { ok: false, models: [], error: '上游未返回可用模型' }
+    return { ok: true, models }
+  } catch {
+    return { ok: false, models: [], error: '模型目录查询失败（凭据刷新或网络异常）' }
+  }
 }
 
 // =====================================================================

@@ -6,6 +6,7 @@
  *  - cline：官方 /users/me + balance，返回 Credit 余额与今日调用量
  *  - codebuddy：官方积分接口，返回剩余/已用/总量
  *  - chatgptweb：读取 access_token JWT，返回账号邮箱与套餐
+ *  - codex：ChatGPT wham/usage，返回套餐、5 小时/周窗口与 Credits
  *  - 其余渠道：无额度接口，仅展示账号与健康状态
  */
 import type { Env, ProviderRecord } from "./types";
@@ -15,7 +16,7 @@ import { decryptSecret } from "./crypto";
 import { mapLimit } from "./storage/cache";
 
 export type AccountQuota = {
-  type: "antigravity" | "cline" | "codebuddy" | "chatgptweb" | "unknown";
+  type: "antigravity" | "cline" | "codebuddy" | "chatgptweb" | "codex" | "unknown";
   ok: boolean;
   email?: string;
   name?: string;
@@ -28,6 +29,8 @@ export type AccountQuota = {
   size?: number;
   requestsToday?: number;
   models?: Array<{ id: string; name?: string; remaining: number | null; resetTime?: string; recommended?: boolean }>;
+  windows?: Array<{ label: string; usedPercent: number; remainPercent: number; windowMinutes?: number; resetTime?: string }>;
+  credits?: { hasCredits: boolean; balance?: number; unlimited?: boolean };
 };
 
 export type AccountPoolAccount = {
@@ -130,6 +133,24 @@ export async function buildAccountPool(env: Env, providers: ProviderRecord[]): P
             size: r.size,
             note: r.packs ? `${r.packs} 个套餐` : undefined,
             error: r.ok ? undefined : r.message || "查询失败",
+          };
+        });
+      } else if (info.type === "codex") {
+        const { fetchCodexQuota } = await import("./oauth/codex");
+        const pairs = keys.map((k, i) => ({ key: k, token: plaintexts[i]! })).filter((x) => x.token);
+        const rows = await mapLimit(pairs, 4, async (x) => fetchCodexQuota(env, x.token));
+        const byId = new Map(pairs.map((x, idx) => [x.key.id, rows[idx]]));
+        quotas = keys.map((k) => {
+          const r = byId.get(k.id);
+          if (!r) return null;
+          return {
+            type: "codex" as const,
+            ok: r.ok,
+            email: r.email,
+            plan: r.plan,
+            error: r.error,
+            windows: r.windows,
+            credits: r.credits,
           };
         });
       } else if (info.type === "chatgptweb") {

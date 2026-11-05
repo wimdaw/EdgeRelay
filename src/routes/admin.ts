@@ -497,7 +497,7 @@ adminRouter.post("/actions", async (c) => {
             try {
               const token = await decryptSecret(env, activeKey.encryptedKey);
               const r = await fetchOAuthModels(env, type as any, token, prov?.baseUrl);
-              return json({ ok: true, models: r.models, note: r.message });
+              return json({ ok: true, models: r.models, note: r.message, degraded: r.degraded === true });
             } catch {}
           }
           const meta = OAUTH_PROVIDERS[type as keyof typeof OAUTH_PROVIDERS];

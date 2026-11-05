@@ -12,7 +12,7 @@
 import type { Env } from "../types";
 import type { OAuthCallParams } from "./common";
 import { buildClaudeAuthUrl, exchangeClaudeCode, testClaude, fetchClaudeModels, handleClaudeRequest } from "./claude";
-import { buildCodexAuthUrl, exchangeCodexCode, testCodex, handleCodexRequest } from "./codex";
+import { buildCodexAuthUrl, exchangeCodexCode, testCodex, fetchCodexModels, handleCodexRequest } from "./codex";
 import {
   buildAntigravityAuthUrl,
   exchangeAntigravityCode,
@@ -75,7 +75,9 @@ export const OAUTH_PROVIDERS: Record<OAuthProviderType, OAuthProviderMeta> = {
     baseUrl: "https://chatgpt.com/backend-api/codex",
     mode: "redirect",
     desc: "使用 ChatGPT 账号授权（Codex CLI OAuth），请求翻译为 Responses 协议。",
-    defaultModels: ["gpt-5.5", "gpt-5.4", "gpt-5.3-codex", "codex-mini-latest"],
+    // 仅作动态目录拉取失败时的兜底；gpt-5.4 / gpt-5.3-codex / codex-mini-latest 已不在上游目录，移除。
+    // gpt-5.5 仍保留：上游 catalog 里它作为 GPT-6.1-Sol 的兼容 slug 存在。
+    defaultModels: ["gpt-6.1-sol", "gpt-6-astra", "gpt-6.1-terra", "gpt-6-sol", "gpt-6-luna", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-5.5"],
   },
   antigravity: {
     type: "antigravity",
@@ -234,9 +236,15 @@ export async function fetchOAuthModels(
   type: OAuthProviderType,
   refreshToken: string,
   baseUrl?: string
-): Promise<{ models: string[]; message?: string }> {
+): Promise<{ models: string[]; message?: string; degraded?: boolean }> {
   const fallback = OAUTH_PROVIDERS[type].defaultModels;
   try {
+    if (type === "codex") {
+      const r = await fetchCodexModels(env, refreshToken);
+      return r.ok && r.models.length
+        ? { models: r.models }
+        : { models: fallback, message: r.error || "模型目录拉取失败，已回退静态兜底清单", degraded: true };
+    }
     if (type === "claude") {
       const r = await fetchClaudeModels(env, refreshToken);
       return r.success && r.models.length ? { models: r.models } : { models: fallback, message: r.message };
@@ -261,7 +269,7 @@ export async function fetchOAuthModels(
       return r.success && r.models.length ? { models: r.models } : { models: fallback, message: r.message };
     }
   } catch (err: any) {
-    return { models: fallback, message: err?.message || String(err) };
+    return { models: fallback, message: err?.message || String(err), degraded: true };
   }
   return { models: fallback };
 }
