@@ -71,8 +71,9 @@ async function resolveRoutes(env: Env, publicModel: string): Promise<UpstreamRou
 }
 
 function waitMsFromBody(body: VideoBody): number {
+  // 默认立即返回任务 + poll_url，由客户端自行轮询；只有显式传 wait 才同步等待
   const raw = body.wait;
-  if (raw === undefined || raw === null || raw === false) return DEFAULT_WAIT_MS;
+  if (raw === undefined || raw === null || raw === false) return 0;
   if (raw === true) return DEFAULT_WAIT_MS;
   const n = Number(raw);
   if (!Number.isFinite(n) || n <= 0) return DEFAULT_WAIT_MS;
@@ -302,6 +303,8 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
       ip: auth.ip,
     });
 
+    const pollUrl = `${new URL(c.req.url).origin}/v1/videos/${record.id}`;
+
     if (waitMs > 0) {
       // one-api 风格：data[0].url
       return new Response(
@@ -310,6 +313,7 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
           id: record.id,
           status: record.status,
           progress: record.progress,
+          poll_url: pollUrl,
           ...(record.url ? { data: [{ url: record.url }] } : { data: [] }),
           ...(record.error ? { error: { message: record.error } } : {}),
         }),
@@ -317,7 +321,7 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
       );
     }
 
-    return new Response(JSON.stringify(toOpenAiVideoObject(record)), {
+    return new Response(JSON.stringify({ ...toOpenAiVideoObject(record), poll_url: pollUrl }), {
       headers: { "content-type": "application/json; charset=utf-8" },
     });
   } catch (err) {
