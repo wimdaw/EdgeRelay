@@ -311,8 +311,9 @@ adminRouter.post("/actions", async (c) => {
         const kind = String(p.kind ?? (p.slug === "anthropic" ? "anthropic" : "openai_compat"));
         const isOAuth = kind.startsWith("oauth:");
         // Web 反代渠道允许零凭据创建（如 geminiweb 的匿名模式），凭据可以之后再补
+        // OAuth 渠道同样先建渠道、授权成功后再通过 upsert_provider_key 存入 refresh_token
         const isWebKind = kind.startsWith("web:");
-        const isKeyless = !isOAuth && (isWebKind || p.slug === "opencode" || p.slug === "duckai" || p.slug === "kilo" || p.kind === "opencode" || p.kind === "duckai" || p.kind === "kilo" || p.authScheme === "none");
+        const isKeyless = isOAuth || isWebKind || p.slug === "opencode" || p.slug === "duckai" || p.slug === "kilo" || p.kind === "opencode" || p.kind === "duckai" || p.kind === "kilo" || p.authScheme === "none";
         if (isNew && !p.key && !isKeyless) throw new ApiError(400, ErrorCode.BAD_REQUEST, "添加供应商必须同时录入上游密钥");
         const id = (p.id as string) || uuid();
 
