@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CheckCircle2, Clock, Copy, ExternalLink, Film, RefreshCw, Trash2, Users, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, Copy, ExternalLink, Film, RefreshCw, Trash2, XCircle } from "lucide-react";
 import { api, type Me } from "../lib/api";
 import { Button, Card, EmptyState, useConfirm, useToast } from "../components/ui";
 import { cn, fmtTime } from "../lib/utils";
@@ -20,7 +20,14 @@ type VideoTaskRow = {
   updated_at: number;
 };
 
-type TasksResp = { ok: boolean; scope: "all" | "own"; role: string; refreshed_at: number; tasks: VideoTaskRow[] };
+type TasksResp = {
+  ok: boolean;
+  scope: "all" | "own";
+  can_view_all: boolean;
+  role: string;
+  refreshed_at: number;
+  tasks: VideoTaskRow[];
+};
 
 const POLL_MS = 60_000;
 
@@ -67,6 +74,7 @@ function Progress({ value }: { value: number }) {
 
 export default function VideoTasks({ me }: { me: Me }) {
   const [data, setData] = useState<TasksResp | null>(null);
+  const [scope, setScope] = useState<"own" | "all">("own");
   const [loading, setLoading] = useState(false);
   const [auto, setAuto] = useState(true);
   const [countdown, setCountdown] = useState(POLL_MS / 1000);
@@ -74,10 +82,10 @@ export default function VideoTasks({ me }: { me: Me }) {
   const { confirm, confirmEl } = useConfirm();
   const timer = useRef<number | null>(null);
 
-  const load = async (silent = false) => {
+  const load = async (silent = false, nextScope: "own" | "all" = scope) => {
     if (!silent) setLoading(true);
     try {
-      const r = await api<TasksResp>("/api/video/tasks?limit=100");
+      const r = await api<TasksResp>(`/api/video/tasks?limit=100&scope=${nextScope}`);
       setData(r);
     } catch (e) {
       if (!silent) toast((e as Error).message, "err");
@@ -88,20 +96,20 @@ export default function VideoTasks({ me }: { me: Me }) {
   };
 
   useEffect(() => {
-    load();
+    load(false, scope);
     // 自动轮询：页面隐藏时暂停，回到前台立即刷新一次
     const tick = window.setInterval(() => {
       if (!auto || document.hidden) return;
       setCountdown((n) => {
         if (n <= 1) {
-          load(true);
+          load(true, scope);
           return POLL_MS / 1000;
         }
         return n - 1;
       });
     }, 1000);
     const onVisible = () => {
-      if (!document.hidden && auto) load(true);
+      if (!document.hidden && auto) load(true, scope);
     };
     document.addEventListener("visibilitychange", onVisible);
     return () => {
@@ -109,7 +117,7 @@ export default function VideoTasks({ me }: { me: Me }) {
       document.removeEventListener("visibilitychange", onVisible);
       if (timer.current) window.clearTimeout(timer.current);
     };
-  }, [auto]);
+  }, [auto, scope]);
 
   const copy = async (text: string, label: string) => {
     try {
@@ -125,14 +133,15 @@ export default function VideoTasks({ me }: { me: Me }) {
     try {
       await api(`/api/video/tasks/${row.id}`, "DELETE");
       toast("已删除");
-      load();
+      load(false, scope);
     } catch (e) {
       toast((e as Error).message, "err");
     }
   };
 
   const tasks = data?.tasks ?? [];
-  const isAdminView = data?.scope === "all";
+  const canViewAll = data?.can_view_all === true;
+  const isAdminView = scope === "all";
   const running = tasks.filter((t) => t.status === "in_progress" || t.status === "queued").length;
   const done = tasks.filter((t) => t.status === "completed").length;
   const failed = tasks.filter((t) => t.status === "failed" || t.status === "cancelled").length;
@@ -150,22 +159,41 @@ export default function VideoTasks({ me }: { me: Me }) {
               <h1 className="text-base font-bold text-ink">视频任务</h1>
               <p className="mt-0.5 text-xs text-muted">
                 {isAdminView
-                  ? "管理员视图：可查看全部用户发起的视频任务，并清理任意任务记录。"
-                  : "仅显示你通过 API 发起的视频任务，生成完成后可直接播放或下载。"}
+                  ? "全部任务视图：可查看所有用户发起的视频任务，并清理任意记录。"
+                  : "默认仅显示你自己发起的任务；生成完成后可直接播放或下载。"}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span
-              className={cn(
-                "inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] font-medium",
-                isAdminView ? "bg-brand/10 text-brand" : "bg-surface2 text-muted"
-              )}
-            >
-              {isAdminView ? <Users size={11} /> : <Film size={11} />}
-              {isAdminView ? "全部任务" : "我的任务"}
-            </span>
-            <Button variant="soft" onClick={() => load()} disabled={loading}>
+            {canViewAll ? (
+              <div className="inline-flex overflow-hidden rounded-lg border border-line">
+                <button
+                  type="button"
+                  onClick={() => setScope("own")}
+                  className={cn(
+                    "px-2.5 py-1 text-[11px] font-medium transition-colors",
+                    scope === "own" ? "bg-brand/15 text-brand" : "text-muted hover:bg-surface2"
+                  )}
+                >
+                  我的任务
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScope("all")}
+                  className={cn(
+                    "px-2.5 py-1 text-[11px] font-medium transition-colors",
+                    scope === "all" ? "bg-brand/15 text-brand" : "text-muted hover:bg-surface2"
+                  )}
+                >
+                  全部任务
+                </button>
+              </div>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded bg-surface2 px-2 py-1 text-[11px] font-medium text-muted">
+                <Film size={11} /> 我的任务
+              </span>
+            )}
+            <Button variant="soft" onClick={() => load(false, scope)} disabled={loading}>
               <RefreshCw size={14} className={cn(loading && "animate-spin")} />
               {loading ? "刷新中…" : "刷新"}
             </Button>

@@ -54,10 +54,16 @@ videoManageRouter.get("/tasks", async (c) => {
   try {
     const user = await requireUser(hCtx);
     const admin = canManageAll(user.role);
-    const limitParam = Number(new URL(c.req.url).searchParams.get("limit") ?? 50);
+    const url = new URL(c.req.url);
+    const limitParam = Number(url.searchParams.get("limit") ?? 50);
     const limit = Math.min(200, Math.max(1, Number.isFinite(limitParam) ? limitParam : 50));
 
-    const tasks = await listVideoTasks(c.env, { userId: admin ? undefined : user.id, limit });
+    // 默认只看自己的任务；只有管理员显式传 scope=all 才放开全量
+    const wantAll = url.searchParams.get("scope") === "all";
+    if (wantAll && !admin) {
+      throw new ApiError(403, ErrorCode.FORBIDDEN, "仅管理员可查看全部任务");
+    }
+    const tasks = await listVideoTasks(c.env, { userId: wantAll ? undefined : user.id, limit });
 
     // 刷新未完成任务（并发上限 3，总量上限 6）
     const pending = tasks.filter((t) => !isTerminalVideoStatus(t.status)).slice(0, MAX_REFRESH_PER_POLL);
@@ -71,7 +77,8 @@ videoManageRouter.get("/tasks", async (c) => {
 
     return json({
       ok: true,
-      scope: admin ? "all" : "own",
+      scope: wantAll ? "all" : "own",
+      can_view_all: admin,
       role: user.role,
       refreshed_at: Math.floor(Date.now() / 1000),
       tasks: tasks.map(toRow),
