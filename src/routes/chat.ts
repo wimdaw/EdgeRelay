@@ -521,7 +521,32 @@ chatRouter.post("/", async (c) => {
               completionTokens = u.completionTokens || completionTokens;
               await finalize({ route, promptTokens, completionTokens, streamFlag: 1, status: "success", httpStatus: 200 });
             });
-            return new Response(antStream, {
+            // 与 OpenAI 直通路径同款收尾保障：tee 出旁路分支持续消费，
+            // 客户端提前断开时翻译器仍能读完上游并触发 onUsage 结算
+            const [clientBody, tapBody] = antStream.tee();
+            const tapDone = drainStreamForUsage(tapBody, estPrompt, async (p, c) => {
+              promptTokens = p;
+              completionTokens = c;
+            }).catch(async () => {
+              if (!released) {
+                released = true;
+                await releaseHold(hCtx, scope, holdId, estCost, requestId);
+                await releaseConcurrency(env, keyId);
+              }
+            });
+            // 客户端提前断开时，由 tap 兜底结算
+            void tapDone.then(() => {
+              if (!released) {
+                void finalize({ route, promptTokens, completionTokens, streamFlag: 1, status: "success", httpStatus: 200 });
+              }
+            });
+            const passthrough = new TransformStream<Uint8Array, Uint8Array>({
+              async flush() {
+                await tapDone;
+                await finalize({ route, promptTokens, completionTokens, streamFlag: 1, status: "success", httpStatus: 200 });
+              },
+            });
+            return new Response(clientBody.pipeThrough(passthrough), {
               headers: {
                 "content-type": "text/event-stream; charset=utf-8",
                 "cache-control": "no-cache, no-transform",
