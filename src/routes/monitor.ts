@@ -27,9 +27,19 @@ monitorRouter.get("/video", async (c) => {
     const all = await listVideoTasks(env, { limit: 50 });
     const pending = all.filter((t) => !isTerminalVideoStatus(t.status)).slice(0, 15);
     const completed: any[] = [];
+    const refreshed: any[] = [];
 
     for (const t of pending) {
       const r = await refreshVideoTask(env, t);
+      refreshed.push({
+        id: r.id,
+        model: r.model,
+        status: r.status,
+        progress: r.progress,
+        url: r.url ?? null,
+        error: r.error ?? null,
+        created_at: r.createdAt,
+      });
       if (isTerminalVideoStatus(r.status)) {
         completed.push({
           id: r.id,
@@ -48,6 +58,20 @@ monitorRouter.get("/video", async (c) => {
         scanned: all.length,
         pending: pending.length - completed.length,
         newly_completed: completed,
+        tasks: all.slice(0, 20).map((t) => {
+          const fresh = refreshed.find((x) => x.id === t.id);
+          return (
+            fresh ?? {
+              id: t.id,
+              model: t.model,
+              status: t.status,
+              progress: t.progress,
+              url: t.url ?? null,
+              error: t.error ?? null,
+              created_at: t.createdAt,
+            }
+          );
+        }),
         checked_at: Math.floor(Date.now() / 1000),
       }),
       { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } }
