@@ -300,6 +300,121 @@ function cleanText(text: string): string {
     .replace(/\s+$/, '')
 }
 
+/**
+ * 已知「生成失败」罐头文案（Google 前端常量，多语言）。
+ * 匿名模式限流 / 上游生成失败时，Google 不返回错误状态码，而是把这些文案
+ * 当作正常消息下发（实测 2026-11：持续调用下 4/5 命中）。必须精确识别，
+ * 否则网关把失败当 200 成功透传，客户端无从感知。
+ */
+const KNOWN_FAILURE_TEXTS = [
+  'I encountered an error doing what you asked',
+  'I seem to be encountering an error',
+  "I'm having a hard time fulfilling your request",
+  '请恕我爱莫能助，我只是一个语言模型',
+  '由于程序代码的局限，我没法办到',
+  '我只是一个语言模型，不具备这方面的信息或能力',
+  '我是一个语言模型，这超出了我的设计用途',
+  '身为一个语言模型，我没办法提供这方面的帮助',
+  '我只是一个文本 AI，在这方面没法帮到你',
+]
+
+function isKnownFailureText(text: string): boolean {
+  const t = (text || '').trim()
+  if (!t) return false
+  if (KNOWN_FAILURE_TEXTS.some((prefix) => t.startsWith(prefix))) return true
+  // 简短且明确为模型拒答/无法处理模板句（长度 <= 60 且含典型特征）
+  if (t.length <= 60 && (
+    t.includes('超出了我的设计用途') ||
+    t.includes('没法提供这方面的帮助') ||
+    t.includes('不具备这方面的信息或能力') ||
+    t.includes('程序代码的局限')
+  )) {
+    return true
+  }
+  return false
+}
+
+/**
+ * 流式首包窥探：读到第一条可提取文本的 wr.fr 行为止。
+ * 返回 null 表示流读取异常；text 为 null 表示流结束仍无快照（空/错误响应）。
+ * remainder 完整重放所有已读字节，交给 SSE 转换器重新消费，客户端不丢首块内容。
+ */
+async function peekFirstSnapshot(
+  body: ReadableStream<Uint8Array>,
+): Promise<{ text: string | null; remainder: ReadableStream<Uint8Array> } | null> {
+  const reader = body.getReader()
+  let joined = new Uint8Array(0)
+  let consumed = 0
+  const decoder = new TextDecoder()
+  const findNewline = (from: number): number => {
+    for (let i = from; i < joined.length; i++) if (joined[i] === 0x0a) return i
+    return -1
+  }
+  try {
+    for (;;) {
+      let nl = findNewline(consumed)
+      while (nl >= 0) {
+        const lineStart = consumed
+        const line = decoder.decode(joined.subarray(lineStart, nl)).replace(/\r$/, '')
+        consumed = nl + 1
+        const text = extractLineText(line)
+        if (text !== null) {
+          return { text, remainder: concatWithRest(reader, joined) }
+        }
+        nl = findNewline(consumed)
+      }
+      const { done, value } = await reader.read()
+      if (done) {
+        const tail = decoder.decode(joined.subarray(consumed)).replace(/\r$/, '')
+        return { text: extractLineText(tail), remainder: concatWithRest(reader, joined) }
+      }
+      const merged = new Uint8Array(joined.length + value.byteLength)
+      merged.set(joined)
+      merged.set(value, joined.length)
+      joined = merged
+      // 防御：2MB 内没有任何快照就放弃窥探，按失败处理并取消上游（正常首快照很小）
+      if (joined.length > 2_000_000) {
+        void reader.cancel().catch(() => {})
+        return { text: null, remainder: new ReadableStream<Uint8Array>({ start(c) { c.close() } }) }
+      }
+    }
+  } catch {
+    return null
+  }
+}
+
+/** 先吐 pending 字节、再接力 reader 剩余内容的流 */
+function concatWithRest(reader: ReadableStreamDefaultReader<Uint8Array>, pending: Uint8Array): ReadableStream<Uint8Array> {
+  return new ReadableStream<Uint8Array>({
+    async start(controller) {
+      if (pending.byteLength > 0) {
+        try {
+          controller.enqueue(pending)
+        } catch {
+          return
+        }
+      }
+      try {
+        for (;;) {
+          const { done, value } = await reader.read()
+          if (done) break
+          try {
+            controller.enqueue(value)
+          } catch {
+            break
+          }
+        }
+      } catch {
+        // 读取异常直接关闭，交给下游按流结束处理
+      }
+      try { controller.close() } catch { /* already closed */ }
+    },
+    cancel() {
+      void reader.cancel().catch(() => {})
+    },
+  })
+}
+
 // =====================================================================
 // OpenAI SSE
 // =====================================================================
@@ -691,8 +806,28 @@ export async function handleGeminiWebRequest(p: OAuthCallParams): Promise<Respon
     }
 
     if (stream) {
-      // 流式必须原样透传，不做整体缓冲
-      const [toClient, forUsage] = upstream.body.tee()
+      // 先窥探首个快照：生成失败时上游把罐头文案当正常消息返回，
+      // 必须在流式提交（返回 200）之前识别，否则客户端收到假成功
+      const peeked = await peekFirstSnapshot(upstream.body)
+      if (peeked === null) {
+        lastStatus = 502
+        lastError = '上游流读取失败'
+        continue
+      }
+      if (peeked.text === null) {
+        void peeked.remainder.cancel().catch(() => {})
+        lastStatus = 502
+        lastError = '上游未返回任何内容'
+        continue
+      }
+      if (isKnownFailureText(peeked.text)) {
+        // 匿名模式限流/生成失败：按失败换下一个账号重试
+        void peeked.remainder.cancel().catch(() => {})
+        lastStatus = 429
+        lastError = `Gemini 生成失败: ${peeked.text.slice(0, 80)}`
+        continue
+      }
+      const [toClient, forUsage] = peeked.remainder.tee()
       const usageReader = forUsage.getReader()
       defer(p, (async () => {
         let chars = 0
@@ -717,8 +852,6 @@ export async function handleGeminiWebRequest(p: OAuthCallParams): Promise<Respon
 
     // 非流式：读完整响应再聚合
     const raw = await new Response(upstream.body).text()
-    // TEMP-DEBUG: 把原始响应截断放进头，生产观察成功/失败协议结构差异
-    const debugRaw = raw.length > 1800 ? raw.slice(0, 900) + '...[SNIP]...' + raw.slice(-900) : raw
     const explicit = checkUpstreamError(raw)
     if (explicit) {
       lastError = explicit
@@ -728,6 +861,12 @@ export async function handleGeminiWebRequest(p: OAuthCallParams): Promise<Respon
     for (const line of raw.split('\n')) {
       const full = extractLineText(line)
       if (full) content = full
+    }
+    // 罐头失败文案按上游失败处理（匿名模式限流最常见），换下一个账号
+    if (isKnownFailureText(content)) {
+      lastStatus = 429
+      lastError = `Gemini 生成失败: ${content.slice(0, 80)}`
+      continue
     }
     const completionTokens = Math.ceil(content.length / 4)
     // 模型可能回的是 ```tool_call``` 代码块，剥出来转成 OpenAI tool_calls
@@ -750,11 +889,19 @@ export async function handleGeminiWebRequest(p: OAuthCallParams): Promise<Respon
       usage: { prompt_tokens: 0, completion_tokens: completionTokens, total_tokens: completionTokens },
     }
     defer(p, recordOAuthUsage(p, { promptTokens: 0, completionTokens }, true, 200))
-    ;(json as Record<string, any>).debug_raw = debugRaw
     return new Response(JSON.stringify(json), {
       status: 200,
       headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
     })
+  }
+
+  const isAnonymous = useList.length === 1 && !useList[0].cookie && !useList[0].sapisid
+  if (isAnonymous && lastStatus === 429) {
+    return oauthErrorResponse(
+      `Gemini 网页版当前为匿名模式，触发了 Google 出口 IP 频次限制（上游生成失败）。建议在「供应商」页为该渠道配置 Google 账号 Cookie 凭据解除限制。最后一次错误: ${lastError}`,
+      429,
+      'rate_limit_exceeded',
+    )
   }
 
   return oauthErrorResponse(
