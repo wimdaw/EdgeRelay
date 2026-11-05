@@ -21,7 +21,7 @@ import { getPricing } from "../billing";
 import { checkRateLimit, releaseConcurrency, commitRateLimits } from "../ratelimit";
 import { readKeyHealth, recordKeySuccess, recordKeyFailure } from "../key-health";
 import { uuid, decryptSecret } from "../crypto";
-import { getProviderKeys, addUsageRecord, commitApiKeyUsage } from "../storage/db";
+import { getProviderKeys, getProviderKeysAll, addUsageRecord, commitApiKeyUsage } from "../storage/db";
 import {
   isAgnesVideoRoute,
   isTerminalVideoStatus,
@@ -127,7 +127,7 @@ async function logUsage(
 /** 取指定任务对应的上游明文 Key */
 async function keyOf(env: Env, rec: VideoTaskRecord): Promise<string> {
   try {
-    const keys = await getProviderKeys(env, rec.providerId);
+    const keys = await getProviderKeysAll(env, rec.providerId);
     const k = keys.find((x) => x.id === rec.providerKeyId);
     if (!k) return "";
     return await decryptSecret(env, k.encryptedKey);

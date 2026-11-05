@@ -22,6 +22,7 @@ import {
   upsertProvider,
   deleteProvider,
   getProviderKeys,
+  getProviderKeysAll,
   bulkUpsertProviderKeys,
   deleteProviderKey,
   updateProviderKeyStatus,
@@ -271,10 +272,12 @@ adminRouter.post("/actions", async (c) => {
       /* ---- 供应商管理 ---- */
       case "list_providers": {
         const providers = await getProviders(env);
-        // 各渠道的 Key 池与健康状态并发读取
+        // 万级 Key 池（如 agnes 1w+）全量返回会把后台响应推到 2MB / 15s，
+        // 这里只回传前 500 条用于展示与健康标记，完整数量走 key_count。
+        const KEY_LIST_CAP = 500;
         const details = await Promise.all(
           providers.map(async (pr) => {
-            const [keys, health] = await Promise.all([getProviderKeys(env, pr.id), readKeyHealth(env, pr.id)]);
+            const [keys, health] = await Promise.all([getProviderKeysAll(env, pr.id), readKeyHealth(env, pr.id)]);
             return { pr, keys, health };
           })
         );
@@ -289,8 +292,9 @@ adminRouter.post("/actions", async (c) => {
           authorization_ref: pr.authorizationRef ?? null,
           authorization_expires_at: pr.authorizationExpiresAt ?? null,
           key_count: keys.length,
+          keys_truncated: keys.length > KEY_LIST_CAP,
           extraHeaders: pr.extraHeaders ? JSON.parse(pr.extraHeaders) : {},
-          keys: keys.map((k) => {
+          keys: keys.slice(0, KEY_LIST_CAP).map((k) => {
             const h = health[k.id] || health[k.keyFingerprint];
             return {
               id: k.id,
@@ -415,9 +419,17 @@ adminRouter.post("/actions", async (c) => {
         return done({ added, count: added.length, fingerprint: added[0]?.fingerprint }, "provider_key", String(p.providerId));
       }
 
+      /* ---- Key 池分片迁移（万级 Key 渠道一次性迁移，幂等） ---- */
+      case "migrate_provider_keys": {
+        const providerId = String(p.providerId || "");
+        if (!providerId) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 providerId");
+        const { migrateProviderKeysToShards } = await import("../storage/db");
+        const result = await migrateProviderKeysToShards(env, providerId);
+        return json({ ok: true, result });
+      }
+
       /* ---- 账号池 ---- */
-      case "account_pool": {
-        const providers = await getProviders(env);
+      case "account_pool": {        const providers = await getProviders(env);
         const providerId = String(p.providerId || "");
         const list = providers
           .filter((pr) => (pr.kind || "").startsWith("oauth:") || (pr.kind || "").startsWith("web:"))
@@ -459,7 +471,7 @@ adminRouter.post("/actions", async (c) => {
         const { parseOAuthKind, testOAuth, OAUTH_PROVIDERS } = await import("../oauth");
         const type = parseOAuthKind(prov.kind);
         if (!type) throw new ApiError(400, ErrorCode.BAD_REQUEST, "该渠道不是 OAuth 渠道");
-        const keys = await getProviderKeys(env, prov.id);
+        const keys = await getProviderKeysAll(env, prov.id);
         const keyId = String(p.keyId || "");
         const key = keyId ? keys.find((k) => k.id === keyId) : keys.find((k) => k.status === "active") || keys[0];
         if (!key) throw new ApiError(400, ErrorCode.BAD_REQUEST, "该渠道还没有已授权的账号");
@@ -478,7 +490,7 @@ adminRouter.post("/actions", async (c) => {
         if (provKind.startsWith("web:")) {
           const type = provKind.slice("web:".length);
           const { fetchWebModels, WEB_PROVIDERS } = await import("../web");
-          const keys = prov ? await getProviderKeys(env, prov.id) : [];
+          const keys = prov ? await getProviderKeysAll(env, prov.id) : [];
           const activeKey = keys.find((k) => k.status === "active") || keys[0];
           if (activeKey && type !== "geminiweb") {
             try {
@@ -493,7 +505,7 @@ adminRouter.post("/actions", async (c) => {
         if (provKind.startsWith("oauth:")) {
           const type = provKind.slice("oauth:".length);
           const { fetchOAuthModels, OAUTH_PROVIDERS } = await import("../oauth");
-          const keys = prov ? await getProviderKeys(env, prov.id) : [];
+          const keys = prov ? await getProviderKeysAll(env, prov.id) : [];
           const activeKey = keys.find((k) => k.status === "active") || keys[0];
           if (activeKey) {
             try {
@@ -582,7 +594,7 @@ adminRouter.post("/actions", async (c) => {
         }
         if (slug === "anthropic") {
           try {
-            const keys = await getProviderKeys(env, prov?.id || "anthropic");
+            const keys = await getProviderKeysAll(env, prov?.id || "anthropic");
             const activeKey = keys.find((k) => k.status === "active");
             if (activeKey) {
               const plainKey = await decryptSecret(env, activeKey.encryptedKey);
@@ -612,7 +624,7 @@ adminRouter.post("/actions", async (c) => {
           });
         }
         if (prov?.baseUrl) {
-          const keys = await getProviderKeys(env, prov.id);
+          const keys = await getProviderKeysAll(env, prov.id);
           const activeKey = keys.find((k) => k.status === "active");
           if (activeKey) {
             try {

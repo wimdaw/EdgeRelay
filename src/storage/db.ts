@@ -38,6 +38,9 @@ const apiKeyCache = new TtlCache<ApiKeyRecord | null>(30_000, 5000);
 const userCache = new TtlCache<UserRecord | null>(30_000, 2000);
 const sessionCache = new TtlCache<SessionRecord | null>(30_000, 2000);
 const providerKeysCache = new TtlCache<ProviderKeyRecord[]>(30_000, 200);
+/** 分片 Key 池：meta（分片数/总数）与单个分片各自缓存 */
+const providerKeyMetaCache = new TtlCache<ProviderKeyMeta | null>(60_000, 300);
+const providerKeyShardCache = new TtlCache<ProviderKeyRecord[]>(120_000, 4000);
 const announcementCache = new TtlCache<AnnouncementRecord[]>(30_000, 2);
 const configCache = new TtlCache<ConfigSnapshot>(30_000, 2);
 
@@ -51,6 +54,8 @@ export function invalidateStorageCaches(): void {
   userCache.clear();
   sessionCache.clear();
   providerKeysCache.clear();
+  providerKeyMetaCache.clear();
+  providerKeyShardCache.clear();
   announcementCache.clear();
   apiKeyIdIndex.clear();
   apiKeyDirty.clear();
@@ -468,21 +473,144 @@ export async function commitApiKeyUsage(env: any): Promise<void> {
 // 5. 供应商与密钥 (Providers & Keys)
 // ==========================================
 
-export async function getProviderKeys(env: any, providerId: string): Promise<ProviderKeyRecord[]> {
-  return providerKeysCache.get(providerId, async () => {
+/**
+ * Key 池分片存储
+ *
+ * EdgeOne 每次请求都是新进程，缓存无法跨请求复用：万级 Key 池若存单一 blob，
+ * 每个对话请求都要强一致读 3~5s，直接把首字延迟拖到 7s。
+ * 分片后：
+ *  - meta：provider_keys:{id}:m      { shards, count }
+ *  - 分片：provider_keys:{id}:s{i}    每片 <= 250 条
+ *  - 热路径只随机读 1 个分片（约 60KB），路由再从中抽样 64 个；分片随机轮换覆盖全池
+ *  - 旧版单 blob（provider_keys:{id}）保留兼容，迁移后删除
+ */
+const PROVIDER_KEY_SHARD_SIZE = 250;
+/** 热路径每次随机读取的分片数（1 片已足够抽样 64 个候选） */
+const HOT_SHARD_READS = 1;
+
+export type ProviderKeyMeta = { shards: number; count: number };
+
+function legacyKeysKey(providerId: string) {
+  return `provider_keys:${providerId}`;
+}
+function keyMetaKey(providerId: string) {
+  return `provider_keys:${providerId}:m`;
+}
+function keyShardKey(providerId: string, index: number) {
+  return `provider_keys:${providerId}:s${index}`;
+}
+
+async function readLegacyKeys(env: any, providerId: string): Promise<ProviderKeyRecord[]> {
+  const store = getBlobStore(env);
+  return (await store.get(legacyKeysKey(providerId), { type: "json", consistency: "strong" })) || [];
+}
+
+/** 是否已分片（null 表示仍在使用旧版单 blob） */
+export async function getProviderKeyMeta(env: any, providerId: string): Promise<ProviderKeyMeta | null> {
+  return providerKeyMetaCache.get(providerId, async () => {
     const store = getBlobStore(env);
-    return (await store.get(`provider_keys:${providerId}`, { type: "json", consistency: "strong" })) || [];
+    const raw = await store.get(keyMetaKey(providerId), { type: "json", consistency: "strong" });
+    if (!raw || typeof raw.shards !== "number") return null;
+    return { shards: raw.shards, count: typeof raw.count === "number" ? raw.count : 0 };
   });
 }
 
+async function readKeyShard(env: any, providerId: string, index: number): Promise<ProviderKeyRecord[]> {
+  return providerKeyShardCache.get(`${providerId}:${index}`, async () => {
+    const store = getBlobStore(env);
+    return (await store.get(keyShardKey(providerId, index), { type: "json", consistency: "strong" })) || [];
+  });
+}
+
+async function writeKeyShard(env: any, providerId: string, index: number, rows: ProviderKeyRecord[]): Promise<void> {
+  const store = getBlobStore(env);
+  await store.setJSON(keyShardKey(providerId, index), rows);
+  providerKeyShardCache.set(`${providerId}:${index}`, rows);
+}
+
+async function writeKeyMeta(env: any, providerId: string, meta: ProviderKeyMeta): Promise<void> {
+  const store = getBlobStore(env);
+  await store.setJSON(keyMetaKey(providerId), meta);
+  providerKeyMetaCache.set(providerId, meta);
+}
+
+/** 热路径：随机读 1 个分片（未迁移时退回整池） */
+export async function getProviderKeys(env: any, providerId: string): Promise<ProviderKeyRecord[]> {
+  const meta = await getProviderKeyMeta(env, providerId);
+  if (!meta || meta.shards <= 0) {
+    return providerKeysCache.get(providerId, () => readLegacyKeys(env, providerId));
+  }
+  const picks: number[] = [];
+  const want = Math.min(HOT_SHARD_READS, meta.shards);
+  while (picks.length < want) {
+    const i = Math.floor(Math.random() * meta.shards);
+    if (!picks.includes(i)) picks.push(i);
+  }
+  const rows = await Promise.all(picks.map((i) => readKeyShard(env, providerId, i)));
+  return rows.flat();
+}
+
+/** 管理端 / 账号池：读取全部分片 */
+export async function getProviderKeysAll(env: any, providerId: string): Promise<ProviderKeyRecord[]> {
+  const meta = await getProviderKeyMeta(env, providerId);
+  if (!meta || meta.shards <= 0) return readLegacyKeys(env, providerId);
+  const indexes = Array.from({ length: meta.shards }, (_, i) => i);
+  const rows = await mapLimit(indexes, 8, (i) => readKeyShard(env, providerId, i));
+  return rows.flat();
+}
+
+/** 旧版整池写入（仅未迁移的渠道使用） */
 export async function setProviderKeys(env: any, providerId: string, keys: ProviderKeyRecord[]): Promise<void> {
   const store = getBlobStore(env);
-  await store.setJSON(`provider_keys:${providerId}`, keys);
+  await store.setJSON(legacyKeysKey(providerId), keys);
   providerKeysCache.set(providerId, keys);
 }
 
+/** 全量重写分片（单条增删改用） */
+export async function rewriteProviderKeyShards(env: any, providerId: string, keys: ProviderKeyRecord[]): Promise<void> {
+  const chunks: ProviderKeyRecord[][] = [];
+  for (let i = 0; i < keys.length; i += PROVIDER_KEY_SHARD_SIZE) {
+    chunks.push(keys.slice(i, i + PROVIDER_KEY_SHARD_SIZE));
+  }
+  const prev = await getProviderKeyMeta(env, providerId);
+  await Promise.all(chunks.map((rows, i) => writeKeyShard(env, providerId, i, rows)));
+  if (prev && prev.shards > chunks.length) {
+    const store = getBlobStore(env);
+    for (let i = chunks.length; i < prev.shards; i++) {
+      await store.delete(keyShardKey(providerId, i)).catch(() => {});
+      providerKeyShardCache.delete(`${providerId}:${i}`);
+    }
+  }
+  await writeKeyMeta(env, providerId, { shards: chunks.length, count: keys.length });
+}
+
+/** 旧版单 blob → 分片迁移（幂等；已迁移直接返回） */
+export async function migrateProviderKeysToShards(
+  env: any,
+  providerId: string
+): Promise<{ migrated: boolean; shards: number; count: number }> {
+  const meta = await getProviderKeyMeta(env, providerId);
+  if (meta) return { migrated: false, shards: meta.shards, count: meta.count };
+  const keys = await readLegacyKeys(env, providerId);
+  if (!keys.length) return { migrated: false, shards: 0, count: 0 };
+  await rewriteProviderKeyShards(env, providerId, keys);
+  const store = getBlobStore(env);
+  await store.delete(legacyKeysKey(providerId)).catch(() => {});
+  providerKeysCache.delete(providerId);
+  return { migrated: true, shards: Math.ceil(keys.length / PROVIDER_KEY_SHARD_SIZE), count: keys.length };
+}
+
+async function saveAllKeys(env: any, providerId: string, keys: ProviderKeyRecord[]): Promise<void> {
+  const meta = await getProviderKeyMeta(env, providerId);
+  if (!meta) {
+    await setProviderKeys(env, providerId, keys);
+    return;
+  }
+  await rewriteProviderKeyShards(env, providerId, keys);
+}
+
 export async function upsertProviderKey(env: any, key: ProviderKeyRecord): Promise<void> {
-  const keys = await getProviderKeys(env, key.providerId);
+  const keys = await getProviderKeysAll(env, key.providerId);
   const idx = keys.findIndex((k) => k.id === key.id);
   const next = keys.slice();
   if (idx >= 0) {
@@ -490,41 +618,66 @@ export async function upsertProviderKey(env: any, key: ProviderKeyRecord): Promi
   } else {
     next.push(key);
   }
-  await setProviderKeys(env, key.providerId, next);
+  await saveAllKeys(env, key.providerId, next);
 }
 
-/** 批量写入上游 Key：一次读 + 一次写，避免批量导入时 N 轮往返 */
+/** 批量写入上游 Key：分片模式下只追加末尾分片，避免每次重写整池 */
 export async function bulkUpsertProviderKeys(env: any, providerId: string, incoming: ProviderKeyRecord[]): Promise<void> {
   if (!incoming.length) return;
-  const keys = await getProviderKeys(env, providerId);
-  const byId = new Map(keys.map((k) => [k.id, k]));
-  for (const k of incoming) byId.set(k.id, k);
-  await setProviderKeys(env, providerId, Array.from(byId.values()));
+  const meta = await getProviderKeyMeta(env, providerId);
+  if (!meta || meta.shards <= 0) {
+    const keys = await readLegacyKeys(env, providerId);
+    const byId = new Map(keys.map((k) => [k.id, k]));
+    for (const k of incoming) byId.set(k.id, k);
+    await setProviderKeys(env, providerId, Array.from(byId.values()));
+    return;
+  }
+
+  let shards = meta.shards;
+  let idx = Math.max(0, shards - 1);
+  let buf = shards > 0 ? await readKeyShard(env, providerId, idx) : [];
+  if (shards === 0) shards = 1;
+  const dirty = new Map<number, ProviderKeyRecord[]>();
+
+  for (const k of incoming) {
+    if (buf.length >= PROVIDER_KEY_SHARD_SIZE) {
+      dirty.set(idx, buf);
+      idx = shards;
+      shards += 1;
+      buf = [];
+    }
+    buf.push(k);
+  }
+  if (buf.length) dirty.set(idx, buf);
+
+  await Promise.all([...dirty.entries()].map(([i, rows]) => writeKeyShard(env, providerId, i, rows)));
+  await writeKeyMeta(env, providerId, { shards, count: meta.count + incoming.length });
 }
 
 export async function deleteProviderKey(env: any, providerId: string, keyId: string): Promise<void> {
-  const keys = await getProviderKeys(env, providerId);
+  const keys = await getProviderKeysAll(env, providerId);
   const filtered = keys.filter((k) => k.id !== keyId && k.keyFingerprint !== keyId);
-  await setProviderKeys(env, providerId, filtered);
+  if (filtered.length === keys.length) return;
+  await saveAllKeys(env, providerId, filtered);
 }
 
 /** 仅当记录尚无邮箱时写入：供老账号在额度查询/刷新后回填，不覆盖已有值 */
 export async function updateProviderKeyEmail(env: any, providerId: string, keyId: string, email: string): Promise<void> {
-  const keys = await getProviderKeys(env, providerId);
+  const keys = await getProviderKeysAll(env, providerId);
   const idx = keys.findIndex((k) => k.id === keyId);
   if (idx < 0 || keys[idx]!.email) return;
   const next = keys.slice();
   next[idx] = { ...next[idx]!, email };
-  await setProviderKeys(env, providerId, next);
+  await saveAllKeys(env, providerId, next);
 }
 
 export async function updateProviderKeyStatus(env: any, providerId: string, keyId: string, status: "active" | "disabled"): Promise<void> {
-  const keys = await getProviderKeys(env, providerId);
+  const keys = await getProviderKeysAll(env, providerId);
   const idx = keys.findIndex((k) => k.id === keyId || k.keyFingerprint === keyId);
   if (idx >= 0) {
     const next = keys.slice();
     next[idx] = { ...next[idx]!, status };
-    await setProviderKeys(env, providerId, next);
+    await saveAllKeys(env, providerId, next);
   }
 }
 

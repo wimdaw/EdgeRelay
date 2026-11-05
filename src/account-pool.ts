@@ -10,7 +10,7 @@
  *  - 其余渠道：无额度接口，仅展示账号与健康状态
  */
 import type { Env, ProviderRecord } from "./types";
-import { getProviderKeys, updateProviderKeyEmail } from "./storage/db";
+import { getProviderKeysAll, updateProviderKeyEmail } from "./storage/db";
 import { readKeyHealth } from "./key-health";
 import { decryptSecret } from "./crypto";
 import { mapLimit } from "./storage/cache";
@@ -66,7 +66,7 @@ export async function buildAccountPool(env: Env, providers: ProviderRecord[]): P
   for (const provider of providers) {
     const info = kindType(provider.kind);
     if (!info) continue;
-    const keys = await getProviderKeys(env, provider.id);
+    const keys = await getProviderKeysAll(env, provider.id);
 
     // 匿名 Web 渠道（如 geminiweb）不使用账号凭据，零 Key 时不进账号池；
     // 一旦补了凭据则照常展示

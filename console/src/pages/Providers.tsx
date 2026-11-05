@@ -1156,9 +1156,9 @@ export default function Providers() {
             <div className="text-xs font-semibold text-ink flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <Key size={13} className="text-brand" />
-                {isOAuthProvider(keyDlg) ? `已授权账号（${keyDlg?.keys?.length ?? 0} 个）` : isWebProvider(keyDlg) ? `已接入账号（${keyDlg?.keys?.length ?? 0} 个）` : `当前轮换 Key 列表（${keyDlg?.keys?.length ?? 0} 个）`}
+                {isOAuthProvider(keyDlg) ? `已授权账号（${keyDlg?.key_count ?? keyDlg?.keys?.length ?? 0} 个）` : isWebProvider(keyDlg) ? `已接入账号（${keyDlg?.key_count ?? keyDlg?.keys?.length ?? 0} 个）` : `当前轮换 Key 列表（${keyDlg?.key_count ?? keyDlg?.keys?.length ?? 0} 个）`}
               </span>
-              <span className="text-[11px] text-muted">{isOAuthProvider(keyDlg) || isWebProvider(keyDlg) ? "支持多账号自动轮换" : "支持无缝挂载任意多个 Key"}</span>
+              <span className="text-[11px] text-muted">{keyDlg?.keys_truncated ? `仅展示前 ${keyDlg?.keys?.length ?? 0} 个，共 ${keyDlg?.key_count ?? 0} 个` : isOAuthProvider(keyDlg) || isWebProvider(keyDlg) ? "支持多账号自动轮换" : "支持无缝挂载任意多个 Key"}</span>
             </div>
 
             {(!keyDlg?.keys || keyDlg.keys.length === 0) ? (
