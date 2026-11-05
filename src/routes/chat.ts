@@ -122,7 +122,11 @@ async function fetchWithRetry(doFetch: () => Promise<Response>, maxRetries: numb
 /** 用量 + Key 记录 + 限流计数 一次批量落库（必须 await，请求生命周期内完成） */
 async function commitBatch(env: Env, record: Parameters<typeof addUsageRecord>[1], keyId: string): Promise<void> {
   let apiKeyWrite: { keyHash: string; record: any } | undefined;
-  const krec = await getApiKeyById(env, keyId);
+  // 收尾读取 Key 记录失败不应中断用量落库（热路径上通常是进程内缓存命中）
+  let krec: any = null;
+  try {
+    krec = await getApiKeyById(env, keyId);
+  } catch {}
   if (krec) apiKeyWrite = { keyHash: krec.keyHash, record: krec };
   await Promise.all([
     addUsageRecord(env, record, apiKeyWrite ? { apiKeyWrite } : undefined),
@@ -291,14 +295,8 @@ chatRouter.post("/", async (c) => {
       }
     }
 
-    /* ---- 计费预检（付费模型冻结；免费模型零开销跳过） ---- */
-    const effectivePricing: Pricing | null = pricing || (plans[0] ? await getPricing(env, plans[0].model.upstreamModel) : null);
-    const estPrompt = estimateTokens(promptText);
-    const estCompletion = body.max_tokens ?? 1024;
-    const estCost = effectivePricing ? estimateCost(effectivePricing, estPrompt, estCompletion) : 0;
-    const { holdId } = await hold(hCtx, scope, estCost, requestId, userRole);
-
-    /* ---- 组装路由候选（Key 池已在 RTT2 读取，纯内存） ---- */
+    /* ---- 组装路由候选（Key 池已在 RTT2 读取，纯内存；须在计费冻结之前，
+      否则「暂无可用上游」的 404 会带着已冻结额度逃逸，永久占用余额） ---- */
     const routes: UpstreamRoute[] = [];
     for (const { plan, keys, health } of providerResults) {
       routes.push(...buildRoutesFromPlan(env, plan, keys, health));
@@ -306,6 +304,13 @@ chatRouter.post("/", async (c) => {
     if (!routes.length) {
       throw new ApiError(404, ErrorCode.MODEL_NOT_FOUND, `模型 ${publicModel} 不存在或暂无可用上游`);
     }
+
+    /* ---- 计费预检（付费模型冻结；免费模型零开销跳过） ---- */
+    const effectivePricing: Pricing | null = pricing || (plans[0] ? await getPricing(env, plans[0].model.upstreamModel) : null);
+    const estPrompt = estimateTokens(promptText);
+    const estCompletion = body.max_tokens ?? 1024;
+    const estCost = effectivePricing ? estimateCost(effectivePricing, estPrompt, estCompletion) : 0;
+    const { holdId } = await hold(hCtx, scope, estCost, requestId, userRole);
 
     const finalize = async (args: {
       route: UpstreamRoute;
@@ -371,8 +376,12 @@ chatRouter.post("/", async (c) => {
       }
     };
 
-    for (const route of candidateRoutes) {
+    for (let routeIdx = 0; routeIdx < candidateRoutes.length; routeIdx++) {
+      const route = candidateRoutes[routeIdx];
       attempts++;
+      // 429 原地退避重试只在「最后一条路由」上保留：还有候选路由（多 Key 池）时
+      // 换下一个 Key 比原地等待 1.5s/3s 快得多，故障转移延迟从 ~4.5s/路由降到 ~0
+      const routeRetries = routeIdx + 1 < candidateRoutes.length ? 1 : PER_ROUTE_RETRIES;
       try {
         const isOpencode = route.providerKind === "opencode" || route.providerSlug === "opencode";
         const isDuckai = route.providerKind === "duckai" || route.providerSlug === "duckai";
@@ -439,7 +448,7 @@ chatRouter.post("/", async (c) => {
                 body: JSON.stringify(antRequest),
                 signal: AbortSignal.timeout(120_000),
               }),
-            PER_ROUTE_RETRIES
+            routeRetries
           );
         } else {
           const { url } = resolveTarget(env, route);
@@ -455,7 +464,7 @@ chatRouter.post("/", async (c) => {
                 body: JSON.stringify(upstreamBody),
                 signal: AbortSignal.timeout(120_000),
               }),
-            PER_ROUTE_RETRIES
+            routeRetries
           );
         }
 
