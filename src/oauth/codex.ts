@@ -97,14 +97,28 @@ function base64UrlDecode(data: string): string {
   return atob(data.replace(/-/g, '+').replace(/_/g, '/') + pad)
 }
 
-function parseJwtClaim(token: string, claim: string): string {
+function parseJwtPayload(token: string): Record<string, any> | null {
   try {
     const parts = token.split('.')
-    if (parts.length < 2) return ''
-    const payload = JSON.parse(base64UrlDecode(parts[1])) as Record<string, unknown>
-    const value = payload?.[claim]
-    return typeof value === 'string' ? value : ''
-  } catch { return '' }
+    if (parts.length < 2) return null
+    return JSON.parse(base64UrlDecode(parts[1])) as Record<string, any>
+  } catch { return null }
+}
+
+function parseJwtClaim(token: string, claim: string): string {
+  const value = parseJwtPayload(token)?.[claim]
+  return typeof value === 'string' ? value : ''
+}
+
+/** 邮箱：优先根级 email，其次嵌套 https://api.openai.com/profile.email（与 chatgptweb 一致） */
+function parseJwtEmail(token: string): string {
+  const payload = parseJwtPayload(token)
+  if (!payload) return ''
+  const profile = payload['https://api.openai.com/profile']
+  const nested = profile && typeof profile === 'object' ? profile.email : ''
+  if (typeof nested === 'string' && nested.trim()) return nested.trim()
+  const root = payload.email
+  return typeof root === 'string' ? root.trim() : ''
 }
 
 function looksLikeJwt(value: string): boolean {
@@ -184,7 +198,7 @@ function extractCode(input: string): string {
   return match ? decodeURIComponent(match[1]) : text
 }
 
-export async function exchangeCodexCode(env: Env, codeOrUrl: string, state: string): Promise<{ refreshToken: string; accessToken: string; expiresIn: number; accountId: string }> {
+export async function exchangeCodexCode(env: Env, codeOrUrl: string, state: string): Promise<{ refreshToken: string; accessToken: string; expiresIn: number; accountId: string; email?: string }> {
   const raw = await getKV(env).get(STATE_PREFIX + state)
   if (!raw) throw new Error('授权会话不存在或已过期（10 分钟），请重新点击「用 ChatGPT 账号授权」')
   await getKV(env).delete(STATE_PREFIX + state).catch(() => {})
@@ -211,7 +225,10 @@ export async function exchangeCodexCode(env: Env, codeOrUrl: string, state: stri
   if (!json.refresh_token) throw new Error('OpenAI 未返回 refresh_token，请重新授权')
   const accessToken = json.access_token as string
   const accountId = parseJwtClaim(accessToken, 'chatgpt_account_id')
-  return { refreshToken: json.refresh_token, accessToken, expiresIn: Number(json.expires_in) || 3600, accountId }
+  // 邮箱只用于管理端展示：优先 id_token（通常带嵌套 profile claim），回退 access_token
+  const idToken = typeof json.id_token === 'string' ? json.id_token : ''
+  const email = parseJwtEmail(idToken) || parseJwtEmail(accessToken)
+  return { refreshToken: json.refresh_token, accessToken, expiresIn: Number(json.expires_in) || 3600, accountId, email: email || undefined }
 }
 
 // =====================================================================
@@ -236,18 +253,25 @@ async function refreshCodexToken(refreshToken: string): Promise<{ accessToken: s
   try { json = JSON.parse(text) } catch { throw new CodexAuthError(`Codex OAuth 刷新返回非 JSON: ${text.slice(0, 200)}`) }
   if (!res.ok || !json.access_token) throw new CodexAuthError(`Codex OAuth 刷新失败 HTTP ${res.status}: ${text.slice(0, 300)}`)
   const accountId = parseJwtClaim(json.access_token, 'chatgpt_account_id')
+  // 刷新响应可能带 id_token，解析出的邮箱随 extra 缓存，供额度查询回填老账号
+  const idToken = typeof json.id_token === 'string' ? json.id_token : ''
+  const email = parseJwtEmail(idToken) || parseJwtEmail(json.access_token)
+  const extra: Record<string, string> = {}
+  if (accountId) extra.accountId = accountId
+  if (email) extra.email = email
   return {
     accessToken: json.access_token,
     expiresIn: Number(json.expires_in) || 3600,
     refreshToken: json.refresh_token || undefined,
-    extra: accountId ? { accountId } : undefined,
+    extra: Object.keys(extra).length ? extra : undefined,
   }
 }
 
-async function getAccessToken(env: Env, refreshToken: string): Promise<{ token: string; accountId: string }> {
+async function getAccessToken(env: Env, refreshToken: string): Promise<{ token: string; accountId: string; email: string }> {
   const cached = await resolveAccessToken(env, AT_PREFIX, refreshToken, refreshCodexToken)
   const accountId = cached.extra?.accountId || ''
-  return { token: cached.accessToken, accountId }
+  const email = cached.extra?.email || ''
+  return { token: cached.accessToken, accountId, email }
 }
 
 // =====================================================================
@@ -289,7 +313,19 @@ export type CodexQuotaResult = {
   error?: string
 }
 
-function pickQuotaWindow(raw: any, label: string): CodexQuotaWindow | null {
+/** 窗口长度 → 标签：300→5 小时、1440→日、10080→周、≥25920（18 天）→月；未知长度用中性文案 */
+function formatWindowLabel(minutes?: number): string {
+  if (!minutes || !Number.isFinite(minutes) || minutes <= 0) return '额度窗口'
+  if (minutes >= 25920) return '月窗口'
+  if (minutes >= 1440) {
+    const days = Math.round(minutes / 1440)
+    if (days === 1) return '日窗口'
+    return days === 7 ? '周窗口' : `${days} 天窗口`
+  }
+  return `${Math.max(1, Math.round(minutes / 60))} 小时窗口`
+}
+
+function pickQuotaWindow(raw: any): CodexQuotaWindow | null {
   if (!raw || typeof raw !== 'object') return null
   const used = Number(raw.used_percent ?? raw.usedPercent)
   if (!Number.isFinite(used)) return null
@@ -309,8 +345,9 @@ function pickQuotaWindow(raw: any, label: string): CodexQuotaWindow | null {
       resetTime = new Date(Date.now() + afterSeconds * 1000).toISOString()
     }
   }
-  const win: CodexQuotaWindow = { label, usedPercent, remainPercent: Math.max(0, 100 - usedPercent) }
-  if (Number.isFinite(minutes) && minutes > 0) win.windowMinutes = minutes
+  const windowMinutes = Number.isFinite(minutes) && minutes > 0 ? minutes : undefined
+  const win: CodexQuotaWindow = { label: formatWindowLabel(windowMinutes), usedPercent, remainPercent: Math.max(0, 100 - usedPercent) }
+  if (windowMinutes) win.windowMinutes = windowMinutes
   if (resetTime) win.resetTime = resetTime
   return win
 }
@@ -318,7 +355,7 @@ function pickQuotaWindow(raw: any, label: string): CodexQuotaWindow | null {
 /** 查询 Codex/ChatGPT 账号额度（GET wham/usage），任何失败都降级为 ok:false，不抛异常 */
 export async function fetchCodexQuota(env: Env, refreshToken: string): Promise<CodexQuotaResult> {
   try {
-    const { token, accountId } = await getAccessToken(env, refreshToken)
+    const { token, accountId, email: cachedEmail } = await getAccessToken(env, refreshToken)
     if (!token) return { ok: false, windows: [], error: '账号缺少可用的 access_token' }
     const res = await fetch(CODEX_USAGE_URL, {
       headers: apiHeaders(token, accountId, false),
@@ -337,9 +374,9 @@ export async function fetchCodexQuota(env: Env, refreshToken: string): Promise<C
     }
     const rateLimit = body?.rate_limit ?? body?.rateLimit ?? {}
     const windows: CodexQuotaWindow[] = []
-    const primary = pickQuotaWindow(rateLimit.primary_window ?? rateLimit.primaryWindow, '5 小时窗口')
+    const primary = pickQuotaWindow(rateLimit.primary_window ?? rateLimit.primaryWindow)
     if (primary) windows.push(primary)
-    const secondary = pickQuotaWindow(rateLimit.secondary_window ?? rateLimit.secondaryWindow, '周窗口')
+    const secondary = pickQuotaWindow(rateLimit.secondary_window ?? rateLimit.secondaryWindow)
     if (secondary) windows.push(secondary)
 
     const creditsRaw = body?.credits
@@ -354,7 +391,7 @@ export async function fetchCodexQuota(env: Env, refreshToken: string): Promise<C
     return {
       ok: true,
       plan: String(body?.plan_type ?? body?.planType ?? '') || undefined,
-      email: parseJwtClaim(token, 'email') || undefined,
+      email: parseJwtEmail(token) || cachedEmail || undefined,
       windows,
       credits,
     }

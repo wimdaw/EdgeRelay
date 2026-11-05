@@ -392,6 +392,7 @@ adminRouter.post("/actions", async (c) => {
           : String(p.key).split(/[\r\n,]+/).map((s) => s.trim()).filter(Boolean);
         if (!rawKeys.length) throw new ApiError(400, ErrorCode.BAD_REQUEST, "请提供有效的 API Key");
 
+        const email = typeof p.email === "string" && p.email.trim() ? p.email.trim() : undefined;
         const added: { id: string; fingerprint: string }[] = [];
         const records = await mapLimit(rawKeys, 8, async (plaintext, i) => {
           const encryptedKey = await encryptSecret(env, plaintext);
@@ -405,6 +406,7 @@ adminRouter.post("/actions", async (c) => {
             label,
             encryptedKey,
             keyFingerprint,
+            ...(email ? { email } : {}),
             status: ((p.status as "active" | "disabled") ?? "active") as "active" | "disabled",
             createdAt: now,
           };
@@ -438,8 +440,8 @@ adminRouter.post("/actions", async (c) => {
         const { completeOAuth, isOAuthType } = await import("../oauth");
         if (!isOAuthType(type)) throw new ApiError(400, ErrorCode.BAD_REQUEST, `不支持的 OAuth 渠道: ${type}`);
         if (!p.code || !p.state) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 code 或 state");
-        const { refreshToken } = await completeOAuth(env, type, String(p.code), String(p.state));
-        return done({ refreshToken }, "oauth", type);
+        const { refreshToken, email } = await completeOAuth(env, type, String(p.code), String(p.state));
+        return done({ refreshToken, email }, "oauth", type);
       }
       case "oauth_poll": {
         const type = String(p.provider || "");

@@ -240,6 +240,8 @@ export interface ProviderKeyRecord {
   providerId: string;
   label: string;
   encryptedKey: string;
+  /** 账号邮箱（仅管理端展示，OAuth 授权/刷新时解析，不写日志） */
+  email?: string;
   keyFingerprint?: string | null;
   status: "active" | "disabled";
   createdAt: number;

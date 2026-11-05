@@ -192,14 +192,14 @@ export async function startOAuth(env: Env, type: OAuthProviderType, baseUrl?: st
 }
 
 /** redirect 模式：用 code + state 换取 refresh_token */
-export async function completeOAuth(env: Env, type: OAuthProviderType, code: string, state: string): Promise<{ refreshToken: string }> {
+export async function completeOAuth(env: Env, type: OAuthProviderType, code: string, state: string): Promise<{ refreshToken: string; email?: string }> {
   if (type === "claude") {
     const { refreshToken } = await exchangeClaudeCode(env, code, state);
     return { refreshToken };
   }
   if (type === "codex") {
-    const { refreshToken } = await exchangeCodexCode(env, code, state);
-    return { refreshToken };
+    const { refreshToken, email } = await exchangeCodexCode(env, code, state);
+    return { refreshToken, email };
   }
   if (type === "antigravity") {
     return exchangeAntigravityCode(env, code, state);

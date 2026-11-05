@@ -6,11 +6,11 @@
  *  - cline：官方 /users/me + balance，返回 Credit 余额与今日调用量
  *  - codebuddy：官方积分接口，返回剩余/已用/总量
  *  - chatgptweb：读取 access_token JWT，返回账号邮箱与套餐
- *  - codex：ChatGPT wham/usage，返回套餐、5 小时/周窗口与 Credits
+ *  - codex：ChatGPT wham/usage，返回套餐、按上游 window_minutes 换算的窗口与 Credits
  *  - 其余渠道：无额度接口，仅展示账号与健康状态
  */
 import type { Env, ProviderRecord } from "./types";
-import { getProviderKeys } from "./storage/db";
+import { getProviderKeys, updateProviderKeyEmail } from "./storage/db";
 import { readKeyHealth } from "./key-health";
 import { decryptSecret } from "./crypto";
 import { mapLimit } from "./storage/cache";
@@ -146,13 +146,18 @@ export async function buildAccountPool(env: Env, providers: ProviderRecord[]): P
           return {
             type: "codex" as const,
             ok: r.ok,
-            email: r.email,
+            email: k.email || r.email,
             plan: r.plan,
             error: r.error,
             windows: r.windows,
             credits: r.credits,
           };
         });
+        // 老账号（授权时未存邮箱）在本次额度查询拿到邮箱后回填一次，后续直接读记录
+        for (const k of keys) {
+          const email = byId.get(k.id)?.email;
+          if (email && !k.email) await updateProviderKeyEmail(env, provider.id, k.id, email);
+        }
       } else if (info.type === "chatgptweb") {
         const { fetchChatgptWebAccountInfo } = await import("./web/chatgptweb");
         const pairs = keys.map((k, i) => ({ key: k, token: plaintexts[i]! })).filter((x) => x.token);

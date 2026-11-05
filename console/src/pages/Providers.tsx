@@ -462,7 +462,7 @@ export default function Providers() {
   const oauthBaseUrl = (meta: OAuthMeta, existing?: Provider | null) => existing?.base_url || meta.baseUrl;
 
   /** 授权成功后：按需创建渠道 + 加密保存 refresh_token + 自动拉取模型 */
-  const finishOAuth = async (meta: OAuthMeta, existing: Provider | null, baseUrl: string, refreshToken: string) => {
+  const finishOAuth = async (meta: OAuthMeta, existing: Provider | null, baseUrl: string, refreshToken: string, email?: string) => {
     setOauthDlg((d) => (d ? { ...d, busy: true, message: "正在保存账号凭据…" } : d));
     try {
       let providerId = existing?.id || "";
@@ -482,6 +482,7 @@ export default function Providers() {
         providerId,
         key: refreshToken,
         label: `account-${(existing?.key_count ?? 0) + 1}`,
+        ...(email ? { email } : {}),
       });
       toast(`授权成功，账号已加密入库（指纹 ${r.result?.fingerprint ?? ""}）`);
       stopOAuthPoll();
@@ -504,7 +505,7 @@ export default function Providers() {
         const res = r.result ?? r;
         const token = res.refresh_token || res.refreshToken;
         if (res.status === "ok" && token) {
-          await finishOAuth(meta, existing, baseUrl, token as string);
+          await finishOAuth(meta, existing, baseUrl, token as string, res.email);
           return;
         }
         if (res.status === "error") {
@@ -572,7 +573,7 @@ export default function Providers() {
       });
       const token = r.result?.refreshToken;
       if (!token) throw new Error("上游未返回 refresh_token");
-      await finishOAuth(oauthDlg.meta, oauthDlg.provider, oauthDlg.baseUrl, token);
+      await finishOAuth(oauthDlg.meta, oauthDlg.provider, oauthDlg.baseUrl, token, r.result?.email);
     } catch (e) {
       toast((e as Error).message, "err");
       setOauthDlg((d) => (d ? { ...d, step: "error", message: (e as Error).message, busy: false } : d));

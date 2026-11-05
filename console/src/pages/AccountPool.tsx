@@ -42,6 +42,19 @@ type PoolProvider = {
 
 const kindLabel = (kind: string) => (kind.startsWith("oauth:") ? "OAuth 授权" : kind.startsWith("web:") ? "Web 反代" : kind);
 
+/** 与后端 codex.ts 一致：按窗口分钟数生成标签；后端已给 label 时直接用 */
+function windowLabel(minutes: number | undefined, label?: string) {
+  if (label) return label;
+  if (!minutes || minutes <= 0) return "额度窗口";
+  if (minutes >= 25920) return "月窗口";
+  if (minutes >= 1440) {
+    const days = Math.round(minutes / 1440);
+    if (days === 1) return "日窗口";
+    return days === 7 ? "周窗口" : `${days} 天窗口`;
+  }
+  return `${Math.max(1, Math.round(minutes / 60))} 小时窗口`;
+}
+
 function HealthTag({ a }: { a: PoolAccount }) {
   if (a.status === "disabled") return <span className="rounded bg-zinc-500/10 px-1.5 py-0.5 text-[10px] text-zinc-400">已停用</span>;
   if (a.health === "demoted") return <span className="flex items-center gap-0.5 rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-500"><ShieldAlert size={10} />熔断冷却</span>;
@@ -143,7 +156,11 @@ function QuotaView({ q }: { q: AccountQuota | null }) {
     return (
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted">
-          {q.email && <span className="inline-flex items-center gap-1 text-ink"><Mail size={11} />{q.email}</span>}
+          {q.email ? (
+            <span className="inline-flex items-center gap-1 text-ink"><Mail size={11} />{q.email}</span>
+          ) : (
+            <span className="inline-flex items-center gap-1"><Mail size={11} />未返回邮箱</span>
+          )}
           {q.plan && <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand">{q.plan}</span>}
           {q.credits && (
             <span className="rounded bg-surface2 px-2 py-0.5 text-[10px]">
@@ -152,9 +169,9 @@ function QuotaView({ q }: { q: AccountQuota | null }) {
           )}
         </div>
         <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-          {(q.windows || []).map((w) => (
-            <div key={w.label} className="rounded-lg bg-surface2/50 px-2.5 py-1.5">
-              <Progress value={w.remainPercent / 100} label={w.label} />
+          {(q.windows || []).map((w, i) => (
+            <div key={`${w.label}-${i}`} className="rounded-lg bg-surface2/50 px-2.5 py-1.5">
+              <Progress value={w.remainPercent / 100} label={windowLabel(w.windowMinutes, w.label)} />
               <div className="mt-1 flex items-center gap-1 text-[10px] text-muted">
                 <Clock size={10} />
                 {w.resetTime ? `重置 ${new Date(w.resetTime).toLocaleString("zh-CN", { hour12: false })}` : "未返回重置时间"}

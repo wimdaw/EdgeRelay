@@ -508,6 +508,16 @@ export async function deleteProviderKey(env: any, providerId: string, keyId: str
   await setProviderKeys(env, providerId, filtered);
 }
 
+/** 仅当记录尚无邮箱时写入：供老账号在额度查询/刷新后回填，不覆盖已有值 */
+export async function updateProviderKeyEmail(env: any, providerId: string, keyId: string, email: string): Promise<void> {
+  const keys = await getProviderKeys(env, providerId);
+  const idx = keys.findIndex((k) => k.id === keyId);
+  if (idx < 0 || keys[idx]!.email) return;
+  const next = keys.slice();
+  next[idx] = { ...next[idx]!, email };
+  await setProviderKeys(env, providerId, next);
+}
+
 export async function updateProviderKeyStatus(env: any, providerId: string, keyId: string, status: "active" | "disabled"): Promise<void> {
   const keys = await getProviderKeys(env, providerId);
   const idx = keys.findIndex((k) => k.id === keyId || k.keyFingerprint === keyId);
