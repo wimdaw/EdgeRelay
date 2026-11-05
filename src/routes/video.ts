@@ -14,21 +14,14 @@
  */
 import { Hono } from "hono";
 import type { Env, UpstreamRoute } from "../types";
-import { clientIp } from "../auth";
 import { ApiError, ErrorCode, openAiError, errorResponse } from "../errors";
-import { getSettings } from "../settings";
+import { authenticateSkGwKey, assertModelAllowed } from "../api-auth";
 import { planModelRoutes, buildRoutesFromPlan } from "../router";
 import { getPricing } from "../billing";
 import { checkRateLimit, releaseConcurrency, commitRateLimits } from "../ratelimit";
 import { readKeyHealth, recordKeySuccess, recordKeyFailure } from "../key-health";
-import { uuid, sha256Hex, decryptSecret } from "../crypto";
-import {
-  getApiKeyByHash,
-  getProviderKeys,
-  addUsageRecord,
-  touchApiKeyUsage,
-  commitApiKeyUsage,
-} from "../storage/db";
+import { uuid, decryptSecret } from "../crypto";
+import { getProviderKeys, addUsageRecord, commitApiKeyUsage } from "../storage/db";
 import {
   isAgnesVideoRoute,
   isTerminalVideoStatus,
@@ -64,73 +57,6 @@ type VideoBody = {
   seed?: number;
   wait?: number | boolean;
 };
-
-type AuthCtx = {
-  keyId: string;
-  userId: string;
-  row: { modelWhitelist?: string | null };
-  limits: { rpm: number; tpm: number; concurrency: number };
-  ip: string;
-};
-
-/** API Key 认证（与 /v1/chat/completions 同一套校验口径） */
-async function authenticate(c: any): Promise<AuthCtx> {
-  const env = c.env as Env;
-  const authHeader = c.req.header("authorization") ?? "";
-  const am = authHeader.match(/^Bearer\s+(sk-gw-\S+)$/i);
-  if (!am) throw new ApiError(401, ErrorCode.AUTH_REQUIRED, "缺少 Bearer API Key");
-
-  const keyHash = await sha256Hex(am[1]!);
-  const nowSec = Math.floor(Date.now() / 1000);
-  const [row, settings] = await Promise.all([getApiKeyByHash(env, keyHash), getSettings(env)]);
-  if (!row) throw new ApiError(401, ErrorCode.AUTH_INVALID, "API Key 无效");
-  if (row.status === "revoked") throw new ApiError(401, ErrorCode.KEY_REVOKED, "API Key 已撤销");
-  if (row.expiresAt && row.expiresAt < nowSec) throw new ApiError(401, ErrorCode.KEY_EXPIRED, "API Key 已过期");
-  if (row.quotaUsd !== null && row.quotaUsd !== undefined && row.spentUsd >= row.quotaUsd) {
-    throw new ApiError(429, ErrorCode.KEY_QUOTA_EXCEEDED, "该 API Key 额度已用尽");
-  }
-
-  const ip = clientIp({
-    url: c.req.url,
-    method: c.req.method,
-    header: (n: string) => c.req.header(n),
-    text: () => c.req.text(),
-    json: <T = unknown>() => c.req.json<T>(),
-  });
-  if (row.ipWhitelist) {
-    try {
-      const list = JSON.parse(row.ipWhitelist) as string[];
-      if (list.length && !list.includes(ip)) {
-        throw new ApiError(403, ErrorCode.FORBIDDEN, `来源 IP ${ip} 不在白名单内`);
-      }
-    } catch (err) {
-      if (err instanceof ApiError) throw err;
-    }
-  }
-  touchApiKeyUsage(env, row.id, { lastUsedAt: nowSec });
-
-  return {
-    keyId: row.id,
-    userId: row.userId,
-    row,
-    limits: { rpm: settings.defaultRpm, tpm: settings.defaultTpm, concurrency: 10 },
-    ip,
-  };
-}
-
-/** 模型白名单校验（与对话链路一致，支持 slug/model 形式） */
-function assertModelAllowed(row: AuthCtx["row"], publicModel: string): void {
-  if (!row.modelWhitelist) return;
-  try {
-    const whitelist = JSON.parse(row.modelWhitelist) as string[];
-    const sub = publicModel.includes("/") ? publicModel.slice(publicModel.indexOf("/") + 1) : publicModel;
-    if (Array.isArray(whitelist) && whitelist.length && !whitelist.includes(publicModel) && !whitelist.includes(sub)) {
-      throw new ApiError(403, ErrorCode.MODEL_NOT_ALLOWED, `该 Key 无权调用模型 ${publicModel}`);
-    }
-  } catch (err) {
-    if (err instanceof ApiError) throw err;
-  }
-}
 
 /** 按优先级/成本展开候选路由，并带上 Key 池与健康度 */
 async function resolveRoutes(env: Env, publicModel: string): Promise<UpstreamRoute[]> {
@@ -218,7 +144,7 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
   let concKeyId: string | null = null;
 
   try {
-    const auth = await authenticate(c);
+    const auth = await authenticateSkGwKey(c);
     const body = (await c.req.json<VideoBody>().catch(() => ({}))) as VideoBody;
     if (!body.model) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 model");
     const prompt = typeof body.prompt === "string" ? body.prompt : typeof body.input === "string" ? body.input : "";
@@ -413,7 +339,7 @@ videoRouter.post("/generations", async (c) => {
 videoRouter.get("/:id", async (c) => {
   const env = c.env;
   try {
-    const auth = await authenticate(c);
+    const auth = await authenticateSkGwKey(c);
     const rec = await loadVideoTask(env, c.req.param("id"));
     if (!rec || rec.userId !== auth.userId) throw new ApiError(404, ErrorCode.NOT_FOUND, "视频任务不存在或已过期");
 
@@ -444,7 +370,7 @@ videoRouter.get("/:id", async (c) => {
 videoRouter.get("/:id/content", async (c) => {
   const env = c.env;
   try {
-    const auth = await authenticate(c);
+    const auth = await authenticateSkGwKey(c);
     const rec = await loadVideoTask(env, c.req.param("id"));
     if (!rec || rec.userId !== auth.userId) throw new ApiError(404, ErrorCode.NOT_FOUND, "视频任务不存在或已过期");
     if (!rec.url) throw new ApiError(409, ErrorCode.BAD_REQUEST, "视频尚未生成完成");

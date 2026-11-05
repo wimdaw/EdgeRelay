@@ -666,6 +666,30 @@ let apiKeyId = "";
   assert(getUnknown.status === 404, "不存在的视频任务返回 404");
 }
 
+// 14. 图片接口 /v1/images/generations
+{
+  const unauth = await request("/v1/images/generations", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: { model: "agnes-image-2.1-flash", prompt: "a cat" },
+  });
+  assert(unauth.status === 401, "图片接口未带 Key 返回 401");
+
+  const chatModel = await request("/v1/images/generations", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "agnes-2.5-flash", prompt: "a cat" },
+  });
+  assert([400, 404].includes(chatModel.status), "对话模型不能走图片接口");
+
+  const missingPrompt = await request("/v1/images/generations", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "agnes-image-2.1-flash" },
+  });
+  assert(missingPrompt.status === 400, "图片接口缺少 prompt 返回 400");
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

@@ -101,6 +101,7 @@ npm run deploy
 | `/v1/videos/{id}` | GET | 查询视频任务进度，完成后返回 `url` |
 | `/v1/videos/{id}/content` | GET | 302 跳转到视频文件 |
 | `/v1/videos/generations` | POST | 旧版 one-api 同步视频端点（最多等待 100s） |
+| `/v1/images/generations` | POST | OpenAI 兼容图片生成（agnes 同步透传，支持 url / b64_json） |
 | `/v1/models` | GET | 对外模型列表（OpenAI 格式） |
 | `/api/auth/register` | POST | 用户注册（首位注册者自动成为 admin） |
 | `/api/auth/login` | POST | 用户登录（颁发 Session Cookie） |
