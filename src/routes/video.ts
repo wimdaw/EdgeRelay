@@ -22,7 +22,7 @@ import { getPricing } from "../billing";
 import { checkRateLimit, releaseConcurrency, commitRateLimits } from "../ratelimit";
 import { readKeyHealth, recordKeySuccess, recordKeyFailure } from "../key-health";
 import { uuid, decryptSecret } from "../crypto";
-import { getProviderKeys, getProviderKeysAll, addUsageRecord, commitApiKeyUsage } from "../storage/db";
+import { getProviderKeys, getProviderKeysAll, addUsageRecord, commitApiKeyUsage, getUserById } from "../storage/db";
 import {
   isAgnesVideoRoute,
   refreshVideoTask,
@@ -246,6 +246,7 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
         size: body.size,
         userId: auth.userId,
         apiKeyId: auth.keyId,
+        userEmail: (await getUserById(env, auth.userId).catch(() => null))?.email,
         createdAt: Math.floor(Date.now() / 1000),
         updatedAt: Math.floor(Date.now() / 1000),
       };
@@ -258,6 +259,7 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
         requestId,
         userId: auth.userId,
         apiKeyId: auth.keyId,
+        userEmail: (await getUserById(env, auth.userId).catch(() => null))?.email,
         publicModel,
         status: "upstream_error",
         httpStatus: lastStatus || 502,

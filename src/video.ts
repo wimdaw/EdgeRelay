@@ -42,6 +42,8 @@ export type VideoTaskRecord = {
   size?: string;
   userId: string;
   apiKeyId: string;
+  /** 发起人邮箱（创建时冗余一份，便于管理员列表直接展示，避免逐条查库） */
+  userEmail?: string;
   createdAt: number;
   updatedAt: number;
 };
@@ -582,4 +584,9 @@ export async function refreshVideoTask(env: Env, rec: VideoTaskRecord): Promise<
   rec.updatedAt = Math.floor(Date.now() / 1000);
   await saveVideoTask(env, rec);
   return rec;
+}
+
+/** 删除任务记录（仅影响本地 KV，不会取消上游任务） */
+export async function deleteVideoTask(env: Env, id: string): Promise<void> {
+  await getKV(env).delete(taskKey(id)).catch(() => {});
 }

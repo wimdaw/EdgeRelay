@@ -11,6 +11,7 @@ import { Dialog, Button } from "./components/ui";
 // 控制台页面按需加载：首屏官网/登录不再被迫下载 recharts 等 375KB 大包
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Keys = lazy(() => import("./pages/Keys"));
+const VideoTasks = lazy(() => import("./pages/VideoTasks"));
 const Providers = lazy(() => import("./pages/Providers"));
 const AccountPool = lazy(() => import("./pages/AccountPool"));
 const ModelsPricing = lazy(() => import("./pages/ModelsPricing"));
@@ -118,6 +119,7 @@ function Shell() {
       <Route element={me ? <Layout me={me} site={site} onLogout={logout} /> : <Navigate to="/login" replace />}>
         <Route path="/dashboard" element={me ? <Dashboard /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/keys" element={me ? <Keys /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/videos" element={me ? <VideoTasks me={me} /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/models" element={me ? <ModelsPricing /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/pricing" element={<Navigate to="/dashboard/models" replace />} />
         <Route path="/dashboard/logs" element={me && canViewLogs ? <Logs me={me} /> : <Navigate to="/dashboard" replace />} />
