@@ -24,6 +24,8 @@ import { uuid, decryptSecret } from "../crypto";
 import { getProviderKeys, getProviderKeysAll, addUsageRecord, commitApiKeyUsage } from "../storage/db";
 import {
   isAgnesVideoRoute,
+  refreshVideoTask,
+  listVideoTasks,
   isTerminalVideoStatus,
   isQueueFullError,
   submitAgnesVideo,
@@ -346,29 +348,35 @@ videoRouter.post("/generations", async (c) => {
   return createVideo(c, waitMsFromBody(body));
 });
 
-/** 刷新任务状态：未完成时实时回查上游并落库（终态不再打上游） */
-async function refreshVideoTask(env: Env, rec: VideoTaskRecord): Promise<VideoTaskRecord> {
-  if (isTerminalVideoStatus(rec.status)) return rec;
-  const upstreamKey = await keyOf(env, rec);
-  if (!upstreamKey) return rec;
-  const poll = await pollAgnesVideo(rec.baseUrl, upstreamKey, rec.upstreamTaskId, rec.upstreamModel);
-  if (poll.ok) {
-    rec.status = poll.status;
-    rec.progress = poll.progress;
-    if (poll.url) rec.url = poll.url;
-    if (poll.error) rec.error = poll.error;
-  }
-  rec.updatedAt = Math.floor(Date.now() / 1000);
-  await saveVideoTask(env, rec);
-  return rec;
-}
-
 function taskUrls(c: any, id: string, watchToken?: string): { poll_url: string; watch_url?: string } {
   const origin = new URL(c.req.url).origin;
   const out: { poll_url: string; watch_url?: string } = { poll_url: `${origin}/v1/videos/${id}` };
   if (watchToken) out.watch_url = `${origin}/v1/videos/${id}/watch?token=${encodeURIComponent(watchToken)}`;
   return out;
 }
+
+/** 任务列表（需 API Key）：当前账号最近的视频任务 */
+videoRouter.get("/", async (c) => {
+  const env = c.env;
+  try {
+    const auth = await authenticateSkGwKey(c);
+    const limit = Number(c.req.query("limit") ?? 20);
+    const tasks = await listVideoTasks(env, { userId: auth.userId, limit });
+    const origin = new URL(c.req.url).origin;
+    return new Response(
+      JSON.stringify({
+        object: "list",
+        data: tasks.map((t) => ({
+          ...toOpenAiVideoObject(t),
+          poll_url: `${origin}/v1/videos/${t.id}`,
+        })),
+      }),
+      { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } }
+    );
+  } catch (err) {
+    return errorResponse(c, err);
+  }
+});
 
 /** 查询任务（需 API Key）：终态直接返回缓存，未完成则实时回查上游 */
 videoRouter.get("/:id", async (c) => {

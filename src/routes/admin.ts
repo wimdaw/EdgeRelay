@@ -419,6 +419,52 @@ adminRouter.post("/actions", async (c) => {
         return done({ added, count: added.length, fingerprint: added[0]?.fingerprint }, "provider_key", String(p.providerId));
       }
 
+      /* ---- 生成外部监控链接（免凭据，可贴到 cron-job.org / UptimeRobot） ---- */
+      case "video_monitor_link": {
+        const { signVideoToken } = await import("../video");
+        const { VIDEO_MONITOR_SUBJECT } = await import("./monitor");
+        const days = Math.min(365, Math.max(1, Number(p.days ?? 30) || 30));
+        const ttl = days * 86_400;
+        const token = await signVideoToken(env, VIDEO_MONITOR_SUBJECT, ttl);
+        const origin = new URL(hCtx.req.url).origin;
+        return json({
+          ok: true,
+          result: {
+            url: `${origin}/api/monitor/video?token=${encodeURIComponent(token)}`,
+            expires_at: Math.floor(Date.now() / 1000) + ttl,
+            interval_hint: "建议每 60 秒调用一次",
+          },
+        });
+      }
+
+      /* ---- 视频任务巡检（外部监控用）：刷新未完成任务并返回本轮新完成的 ---- */
+      case "video_tasks": {
+        const { listVideoTasks, refreshVideoTask, isTerminalVideoStatus } = await import("../video");
+        const limit = Math.min(100, Math.max(1, Number(p.limit ?? 30) || 30));
+        const all = await listVideoTasks(env, { limit });
+        const pending = all.filter((t) => !isTerminalVideoStatus(t.status)).slice(0, 15);
+        const newlyCompleted: any[] = [];
+        const progress: any[] = [];
+        for (const t of pending) {
+          const r = await refreshVideoTask(env, t);
+          progress.push({ id: r.id, status: r.status, progress: r.progress, model: r.model });
+          if (r.status === "completed") {
+            newlyCompleted.push({ id: r.id, url: r.url, model: r.model, created_at: r.createdAt, user_id: r.userId });
+          } else if (r.status === "failed" || r.status === "cancelled") {
+            newlyCompleted.push({ id: r.id, status: r.status, error: r.error, model: r.model, created_at: r.createdAt });
+          }
+        }
+        return json({
+          ok: true,
+          result: {
+            scanned: all.length,
+            pending: pending.length,
+            newly_completed: newlyCompleted,
+            progress,
+          },
+        });
+      }
+
       /* ---- Key 池分片迁移（万级 Key 渠道一次性迁移，幂等） ---- */
       case "migrate_provider_keys": {
         const providerId = String(p.providerId || "");

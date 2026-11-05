@@ -12,6 +12,8 @@
  */
 import type { Env, UpstreamRoute } from "./types";
 import { getKV } from "./storage/blob-store";
+import { decryptSecret } from "./crypto";
+import { getProviderKeysAll } from "./storage/db";
 
 /** 提交与轮询的超时（毫秒）；单次请求不能超过云函数 120s 上限 */
 const SUBMIT_TIMEOUT_MS = 30_000;
@@ -521,4 +523,63 @@ async function tick(){
 }
 if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelled'){setTimeout(tick,3000)}
 </script></body></html>`;
+}
+
+/* ==================================================================== */
+/* 任务列表（管理端巡检 / 客户端查询）                                      */
+/* ==================================================================== */
+
+/** 列出视频任务：可按用户过滤，按创建时间倒序 */
+export async function listVideoTasks(
+  env: Env,
+  opts: { userId?: string; limit?: number } = {}
+): Promise<VideoTaskRecord[]> {
+  const limit = Math.min(200, Math.max(1, opts.limit ?? 20));
+  let names: string[] = [];
+  try {
+    const res = await getKV(env).list({ prefix: "video:task:" });
+    names = res.keys.map((k) => k.name);
+  } catch {
+    return [];
+  }
+
+  const ids = names.map((n) => n.slice("video:task:".length)).slice(0, 300);
+  const records: VideoTaskRecord[] = [];
+  for (const id of ids) {
+    const rec = await loadVideoTask(env, id);
+    if (!rec) continue;
+    if (opts.userId && rec.userId !== opts.userId) continue;
+    records.push(rec);
+  }
+  records.sort((a, b) => b.createdAt - a.createdAt);
+  return records.slice(0, limit);
+}
+
+/** 取任务对应上游明文 Key */
+export async function videoTaskKey(env: Env, rec: VideoTaskRecord): Promise<string> {
+  try {
+    const keys = await getProviderKeysAll(env, rec.providerId);
+    const k = keys.find((x) => x.id === rec.providerKeyId);
+    if (!k) return "";
+    return await decryptSecret(env, k.encryptedKey);
+  } catch {
+    return "";
+  }
+}
+
+/** 刷新单个任务：未完成时回查上游并落库（终态直接返回） */
+export async function refreshVideoTask(env: Env, rec: VideoTaskRecord): Promise<VideoTaskRecord> {
+  if (isTerminalVideoStatus(rec.status)) return rec;
+  const upstreamKey = await videoTaskKey(env, rec);
+  if (!upstreamKey) return rec;
+  const poll = await pollAgnesVideo(rec.baseUrl, upstreamKey, rec.upstreamTaskId, rec.upstreamModel);
+  if (poll.ok) {
+    rec.status = poll.status;
+    rec.progress = poll.progress;
+    if (poll.url) rec.url = poll.url;
+    if (poll.error) rec.error = poll.error;
+  }
+  rec.updatedAt = Math.floor(Date.now() / 1000);
+  await saveVideoTask(env, rec);
+  return rec;
 }
