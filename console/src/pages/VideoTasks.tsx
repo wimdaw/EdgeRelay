@@ -171,7 +171,7 @@ export default function VideoTasks({ me }: { me: Me }) {
                   type="button"
                   onClick={() => setScope("own")}
                   className={cn(
-                    "px-2.5 py-1 text-[11px] font-medium transition-colors",
+                    "inline-flex h-9 items-center justify-center px-3.5 text-[13px] font-medium transition-colors",
                     scope === "own" ? "bg-brand/15 text-brand" : "text-muted hover:bg-surface2"
                   )}
                 >
@@ -181,7 +181,7 @@ export default function VideoTasks({ me }: { me: Me }) {
                   type="button"
                   onClick={() => setScope("all")}
                   className={cn(
-                    "px-2.5 py-1 text-[11px] font-medium transition-colors",
+                    "inline-flex h-9 items-center justify-center px-3.5 text-[13px] font-medium transition-colors",
                     scope === "all" ? "bg-brand/15 text-brand" : "text-muted hover:bg-surface2"
                   )}
                 >
@@ -189,19 +189,19 @@ export default function VideoTasks({ me }: { me: Me }) {
                 </button>
               </div>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded bg-surface2 px-2 py-1 text-[11px] font-medium text-muted">
-                <Film size={11} /> 我的任务
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-surface2 px-3.5 py-2 text-[13px] font-medium text-muted">
+                <Film size={12} /> 我的任务
               </span>
             )}
-            <Button variant="soft" onClick={() => load(false, scope)} disabled={loading}>
+            <Button variant="soft" className="h-9" onClick={() => load(false, scope)} disabled={loading}>
               <RefreshCw size={14} className={cn(loading && "animate-spin")} />
               {loading ? "刷新中…" : "刷新"}
             </Button>
             <Button
               variant={auto ? "soft" : "ghost"}
+              className="h-9"
               onClick={() => setAuto((v) => !v)}
               title="每 60 秒自动刷新未完成任务（与状态站监控同频）"
-              className="!px-2.5"
             >
               {auto ? `自动 ${countdown}s` : "已暂停"}
             </Button>
