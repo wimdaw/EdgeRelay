@@ -717,6 +717,8 @@ export async function handleGeminiWebRequest(p: OAuthCallParams): Promise<Respon
 
     // 非流式：读完整响应再聚合
     const raw = await new Response(upstream.body).text()
+    // TEMP-DEBUG: 把原始响应截断放进头，生产观察成功/失败协议结构差异
+    const debugRaw = raw.length > 1800 ? raw.slice(0, 900) + '...[SNIP]...' + raw.slice(-900) : raw
     const explicit = checkUpstreamError(raw)
     if (explicit) {
       lastError = explicit
@@ -748,6 +750,7 @@ export async function handleGeminiWebRequest(p: OAuthCallParams): Promise<Respon
       usage: { prompt_tokens: 0, completion_tokens: completionTokens, total_tokens: completionTokens },
     }
     defer(p, recordOAuthUsage(p, { promptTokens: 0, completionTokens }, true, 200))
+    ;(json as Record<string, any>).debug_raw = debugRaw
     return new Response(JSON.stringify(json), {
       status: 200,
       headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
