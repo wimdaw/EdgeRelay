@@ -22,7 +22,7 @@ type VideoTaskRow = {
 
 type TasksResp = { ok: boolean; scope: "all" | "own"; role: string; refreshed_at: number; tasks: VideoTaskRow[] };
 
-const POLL_MS = 10_000;
+const POLL_MS = 60_000;
 
 const STATUS_TEXT: Record<string, string> = {
   queued: "队列中",
@@ -172,7 +172,7 @@ export default function VideoTasks({ me }: { me: Me }) {
             <Button
               variant={auto ? "soft" : "ghost"}
               onClick={() => setAuto((v) => !v)}
-              title="每 10 秒自动刷新未完成任务"
+              title="每 60 秒自动刷新未完成任务（与状态站监控同频）"
               className="!px-2.5"
             >
               {auto ? `自动 ${countdown}s` : "已暂停"}
@@ -198,7 +198,7 @@ export default function VideoTasks({ me }: { me: Me }) {
           <EmptyState
             icon={<Film size={32} />}
             title="暂无视频任务"
-            hint="调用 POST /v1/videos 创建任务后，这里会自动出现，并按 10 秒间隔轮询进度。"
+            hint="调用 POST /v1/videos 创建任务后，这里会自动出现，并按 60 秒间隔轮询进度。"
           />
         </Card>
       ) : (
