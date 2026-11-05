@@ -60,7 +60,7 @@ const OAUTH_CATALOG: OAuthMeta[] = [
   },
   {
     type: "codex",
-    name: "ChatGPT (Codex)",
+    name: "Codex",
     slug: "codex-oauth",
     baseUrl: "https://chatgpt.com/backend-api/codex",
     mode: "redirect" as const,

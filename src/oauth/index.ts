@@ -70,7 +70,7 @@ export const OAUTH_PROVIDERS: Record<OAuthProviderType, OAuthProviderMeta> = {
   },
   codex: {
     type: "codex",
-    name: "ChatGPT (Codex)",
+    name: "Codex",
     slug: "codex-oauth",
     baseUrl: "https://chatgpt.com/backend-api/codex",
     mode: "redirect",
