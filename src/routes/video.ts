@@ -93,6 +93,7 @@ async function logUsage(
   args: {
     requestId: string;
     userId: string;
+    userEmail?: string | null;
     apiKeyId: string;
     publicModel: string;
     providerId?: string | null;
@@ -110,6 +111,7 @@ async function logUsage(
       id: uuid(),
       requestId: args.requestId,
       userId: args.userId,
+      userEmail: args.userEmail ?? null,
       apiKeyId: args.apiKeyId,
       publicModel: args.publicModel,
       providerId: args.providerId ?? null,
@@ -152,7 +154,7 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
 
   try {
     const auth = await authenticateSkGwKey(c);
-    const body = (await c.req.json<VideoBody>().catch(() => ({}))) as VideoBody;
+    const body = (await c.req.json().catch(() => ({}))) as VideoBody;
     if (!body.model) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 model");
     const prompt = typeof body.prompt === "string" ? body.prompt : typeof body.input === "string" ? body.input : "";
     if (!prompt.trim()) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 prompt");

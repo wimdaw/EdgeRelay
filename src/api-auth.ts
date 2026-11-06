@@ -41,7 +41,7 @@ export async function authenticateSkGwKey(c: any): Promise<ApiKeyAuth> {
     method: c.req.method,
     header: (n: string) => c.req.header(n),
     text: () => c.req.text(),
-    json: <T = unknown>() => c.req.json<T>(),
+    json: () => c.req.json(),
   });
 
   if (row.ipWhitelist) {

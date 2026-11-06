@@ -309,6 +309,7 @@ export interface UsageRecord {
   id: string;
   requestId: string;
   userId: string;
+  userEmail?: string | null;
   apiKeyId?: string | null;
   orgId?: string | null;
   publicModel: string;

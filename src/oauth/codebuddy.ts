@@ -1484,7 +1484,7 @@ export async function checkinCodebuddy(
  * 未配置 `ADMIN_PASSWORD` 时返回空串，调用方必须**失败关闭**。
  */
 export async function codebuddyCronToken(env: Env): Promise<string> {
-  const secret = env.ADMIN_PASSWORD || ''
+  const secret = String(env.ADMIN_PASSWORD || '')
   if (!secret) return ''
   const enc = new TextEncoder()
   const key = await crypto.subtle.importKey(

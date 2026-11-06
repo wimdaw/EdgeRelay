@@ -642,7 +642,7 @@ export async function handleKimiWebRequest(p: OAuthCallParams, baseUrl?: string)
         headers: webHeaders(fp, accessToken, {
           'Content-Type': 'application/connect+json',
         }),
-        body,
+        body: body as unknown as BodyInit,
         signal: AbortSignal.timeout(KIMI_WEB_TIMEOUT_MS),
       })
 
@@ -730,7 +730,7 @@ export async function testKimiWeb(
       headers: webHeaders(fp, accessToken, {
         'Content-Type': 'application/connect+json',
       }),
-      body: encodeFrame(buildChatPayload(modelId, 'hi', false)),
+      body: encodeFrame(buildChatPayload(modelId, 'hi', false)) as unknown as BodyInit,
       signal: AbortSignal.timeout(120000),
     })
     if (res.ok) {
