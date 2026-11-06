@@ -1,23 +1,25 @@
 /**
  * 操练场（Playground）/api/playground/*
  *
- * 面向控制台登录用户（Cookie 会话），无需 API Key：
+ * 面向控制台登录用户（Cookie 会话），对话必须绑定当前账户自己的 API Key：
  *  - GET  /api/playground/models  可用模型列表（普通用户隐藏付费模型）
- *  - POST /api/playground/chat    对话转发，支持 SSE 流式
+ *  - POST /api/playground/chat    对话转发，支持 SSE 流式（body.key_id 指定，缺省取当前账户最新可用 Key）
  *
  * 说明：
+ *  - 只允许使用当前登录用户名下的 Key，绝不跨账户取用
  *  - 复用网关的路由规划与 Key 池（含健康排序），与 /v1/chat/completions 同一套上游
- *  - 按会话用户做每分钟次数限制（KV 计数），避免被当成免费额度刷
+ *  - 按 API Key 做每分钟次数限制（KV 计数），并更新 Key 的 last_used_at
  *  - 操练场调用不计费、不写 usage_logs（仅用于调试预览）
  */
 import { Hono } from "hono";
-import type { Env, HandlerCtx } from "../types";
+import type { ApiKeyRecord, Env, HandlerCtx } from "../types";
 import { requireUser } from "../auth";
+import { assertModelAllowed } from "../api-auth";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
 import { json } from "../settings";
 import { getPricing } from "../billing";
 import { planModelRoutes, buildRoutesFromPlan } from "../router";
-import { getModels, getProviders, getProviderKeys } from "../storage/db";
+import { getApiKeyById, getModels, getProviders, getProviderKeys, listUserApiKeys, updateApiKey } from "../storage/db";
 import { readKeyHealth } from "../key-health";
 import { buildHeaders, resolveTarget, sanitizeUpstreamBody } from "../providers";
 import { getBlobStore } from "../storage/blob-store";
@@ -33,10 +35,10 @@ function isAdminRole(role: string): boolean {
   return role === "superadmin" || role === "admin";
 }
 
-/** 简单的分钟级限流（KV 计数） */
-async function checkUserRpm(env: Env, userId: string): Promise<{ ok: boolean; used: number }> {
+/** 简单的分钟级限流（KV 计数，按 Key 维度） */
+async function checkKeyRpm(env: Env, keyId: string): Promise<{ ok: boolean; used: number }> {
   const minute = Math.floor(Date.now() / 60_000);
-  const key = `pg:rl:${userId}:${minute}`;
+  const key = `pg:rl:key:${keyId}:${minute}`;
   try {
     const store = getBlobStore(env);
     const raw = (await store.get(key, { type: "json", consistency: "strong" })) as { n?: number } | null;
@@ -46,6 +48,45 @@ async function checkUserRpm(env: Env, userId: string): Promise<{ ok: boolean; us
   } catch {
     return { ok: true, used: 0 };
   }
+}
+
+/** 校验 Key 可用性（过期 / 撤销 / 额度） */
+function assertKeyUsable(key: ApiKeyRecord, nowSec: number): void {
+  if (key.status === "revoked") throw new ApiError(400, ErrorCode.KEY_REVOKED, "该 API Key 已撤销，请更换或重新创建");
+  if (key.expiresAt && key.expiresAt < nowSec) throw new ApiError(400, ErrorCode.KEY_EXPIRED, "该 API Key 已过期，请更换或重新创建");
+  if (key.quotaUsd !== null && key.quotaUsd !== undefined && key.spentUsd >= key.quotaUsd) {
+    throw new ApiError(429, ErrorCode.KEY_QUOTA_EXCEEDED, "该 API Key 额度已用尽，请更换或重新创建");
+  }
+}
+
+/**
+ * 解析当前账户的 Key：指定 key_id 时必须属于当前登录用户；
+ * 未指定时取当前用户名下最新创建且可用的 Key（绝不跨账户）。
+ */
+async function resolveAccountKey(env: Env, userId: string, keyId?: string): Promise<ApiKeyRecord> {
+  const nowSec = Math.floor(Date.now() / 1000);
+
+  if (keyId) {
+    const key = await getApiKeyById(env, keyId);
+    if (!key || key.userId !== userId) {
+      throw new ApiError(403, ErrorCode.FORBIDDEN, "该 API Key 不属于当前账户，不能使用他人的 Key");
+    }
+    assertKeyUsable(key, nowSec);
+    return key;
+  }
+
+  const active = (await listUserApiKeys(env, userId))
+    .filter((k) => k.status === "active")
+    .sort((a, b) => b.createdAt - a.createdAt);
+  if (!active.length) {
+    throw new ApiError(400, ErrorCode.BAD_REQUEST, "当前账户还没有可用的 API Key，请先在「API 密钥」页创建");
+  }
+  const usable = active.find(
+    (k) => (!k.expiresAt || k.expiresAt >= nowSec) && (k.quotaUsd === null || k.quotaUsd === undefined || k.spentUsd < k.quotaUsd)
+  );
+  if (usable) return usable;
+  assertKeyUsable(active[0], nowSec);
+  return active[0];
 }
 
 /** 模型列表：普通用户看不到付费模型 */
@@ -92,6 +133,7 @@ playgroundRouter.post("/chat", async (c) => {
       max_tokens?: number;
       system?: string;
       stream?: boolean;
+      key_id?: string;
     };
 
     const model = String(body.model || "");
@@ -99,16 +141,21 @@ playgroundRouter.post("/chat", async (c) => {
     if (!model) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 model");
     if (!messages.length) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 messages");
 
+    // 只认当前账户自己的 Key：指定则校验归属，未指定则取最新可用一条
+    const accountKey = await resolveAccountKey(c.env, user.id, String(body.key_id || "") || undefined);
+    assertModelAllowed(accountKey, model);
+
     const pricing = await getPricing(c.env, model);
     const paid = !!pricing && (pricing.inputPerMillion > 0 || pricing.outputPerMillion > 0);
     if (paid && !isAdminRole(user.role)) {
       throw new ApiError(403, ErrorCode.MODEL_NOT_ALLOWED, `模型 ${model} 为付费模型，普通用户不可在操练场使用`);
     }
 
-    const rpm = await checkUserRpm(c.env, user.id);
+    const rpm = await checkKeyRpm(c.env, accountKey.id);
     if (!rpm.ok) {
       throw new ApiError(429, ErrorCode.RATE_LIMITED, `操练场每分钟最多 ${RPM_LIMIT} 次，请稍后再试`);
     }
+    await updateApiKey(c.env, accountKey.keyHash, { lastUsedAt: Math.floor(Date.now() / 1000) });
 
     const plans = await planModelRoutes(c.env, model);
     if (!plans.length) throw new ApiError(404, ErrorCode.MODEL_NOT_FOUND, `模型 ${model} 不存在或暂无可用上游`);

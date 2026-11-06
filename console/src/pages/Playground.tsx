@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Bot, Copy, Eraser, Play, Send, Square, User } from "lucide-react";
-import { api, type Me } from "../lib/api";
+import { Link } from "react-router-dom";
+import { Bot, Copy, Eraser, FlaskConical, Send, Square, User } from "lucide-react";
+import { api, type KeyRow, type Me } from "../lib/api";
 import { Button, Card, Select, useToast } from "../components/ui";
 import { cn } from "../lib/utils";
 
@@ -18,6 +19,9 @@ export default function Playground({ me }: { me: Me }) {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [keys, setKeys] = useState<KeyRow[]>([]);
+  const [keyId, setKeyId] = useState("");
+  const [keysLoaded, setKeysLoaded] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const toast = useToast();
@@ -29,6 +33,22 @@ export default function Playground({ me }: { me: Me }) {
         if (d.models.length) setModel((m) => m || d.models[0].id);
       })
       .catch((e) => toast((e as Error).message, "err"));
+  }, []);
+
+  // 默认使用当前账户自己名下的 Key（最新的可用一条），可在下拉中切换
+  useEffect(() => {
+    api<{ keys: KeyRow[] }>("/api/keys")
+      .then((d) => {
+        const active = d.keys.filter((k) => k.status === "active").sort((a, b) => b.created_at - a.created_at);
+        setKeys(active);
+        const now = Date.now() / 1000;
+        const usable = active.find(
+          (k) => (!k.expires_at || k.expires_at > now) && (k.quota_usd === null || k.spent_usd < k.quota_usd)
+        );
+        setKeyId((cur) => cur || usable?.id || active[0]?.id || "");
+      })
+      .catch((e) => toast((e as Error).message, "err"))
+      .finally(() => setKeysLoaded(true));
   }, []);
 
   useEffect(() => {
@@ -46,6 +66,10 @@ export default function Playground({ me }: { me: Me }) {
     if (!text || busy) return;
     if (!model) {
       toast("请先选择模型", "err");
+      return;
+    }
+    if (!keyId) {
+      toast("当前账户没有可用的 API Key，请先到「API 密钥」页创建", "err");
       return;
     }
 
@@ -75,6 +99,7 @@ export default function Playground({ me }: { me: Me }) {
           temperature,
           max_tokens: maxTokens,
           stream: true,
+          key_id: keyId,
         }),
         signal: ctrl.signal,
       });
@@ -145,12 +170,12 @@ export default function Playground({ me }: { me: Me }) {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand">
-              <Play size={18} />
+              <FlaskConical size={18} />
             </div>
             <div>
               <h1 className="text-base font-bold text-ink">操练场</h1>
               <p className="mt-0.5 text-xs text-muted">
-                直接在控制台里试模型，走网关同一套路由与 Key 池，不需要 API Key；每分钟最多 20 次，不计量。
+                使用你账户自己的 API Key 调用，走网关同一套路由；每分钟最多 20 次，不计量。
               </p>
             </div>
           </div>
@@ -166,6 +191,36 @@ export default function Playground({ me }: { me: Me }) {
         {/* 参数面板 */}
         <Card className="h-fit p-4">
           <div className="space-y-3">
+            <div>
+              <label className="mb-1 block text-[11px] font-medium text-muted">API Key</label>
+              {keys.length > 0 ? (
+                <>
+                  <Select value={keyId} onChange={(e) => setKeyId(e.target.value)} className="w-full">
+                    {keys.map((k) => (
+                      <option key={k.id} value={k.id}>
+                        {k.name} · {k.prefix}
+                      </option>
+                    ))}
+                  </Select>
+                  <p className="mt-1 text-[10px] text-muted">只使用当前账户自己名下的 Key</p>
+                </>
+              ) : (
+                <div className="rounded-lg border border-line bg-surface2 px-2.5 py-2 text-[11px] leading-relaxed text-muted">
+                  {keysLoaded ? (
+                    <>
+                      当前账户还没有可用的 API Key，请先到{" "}
+                      <Link to="/dashboard/keys" className="font-medium text-brand hover:underline">
+                        API 密钥
+                      </Link>{" "}
+                      页创建。
+                    </>
+                  ) : (
+                    "正在读取你的 API Key…"
+                  )}
+                </div>
+              )}
+            </div>
+
             <div>
               <label className="mb-1 block text-[11px] font-medium text-muted">模型</label>
               <Select value={model} onChange={(e) => setModel(e.target.value)} className="w-full">
@@ -287,7 +342,7 @@ export default function Playground({ me }: { me: Me }) {
                   <Square size={14} /> 停止
                 </Button>
               ) : (
-                <Button className="h-11" onClick={send} disabled={!input.trim() || !model}>
+                <Button className="h-11" onClick={send} disabled={!input.trim() || !model || !keyId}>
                   <Send size={14} /> 发送
                 </Button>
               )}
