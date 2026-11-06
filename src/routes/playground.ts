@@ -8,28 +8,25 @@
  * 说明：
  *  - 只允许使用当前登录用户名下的 Key，绝不跨账户取用
  *  - 复用网关的路由规划与 Key 池（含健康排序），与 /v1/chat/completions 同一套上游
+ *  - 与 /v1 共用同一套计费/用量记录：写入 usage_logs、扣减 Key 用量（免费模型零费用）
  *  - 按 API Key 做每分钟次数限制（KV 计数），并更新 Key 的 last_used_at
- *  - 操练场调用不计费、不写 usage_logs（仅用于调试预览）
  */
 import { Hono } from "hono";
 import type { ApiKeyRecord, Env, HandlerCtx } from "../types";
-import { requireUser } from "../auth";
+import { clientIp, requireUser } from "../auth";
 import { assertModelAllowed } from "../api-auth";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
-import { json } from "../settings";
+import { getSettings, json } from "../settings";
 import { getPricing } from "../billing";
-import { planModelRoutes, buildRoutesFromPlan } from "../router";
-import { getApiKeyById, getModels, getProviders, getProviderKeys, listUserApiKeys, updateApiKey } from "../storage/db";
-import { readKeyHealth } from "../key-health";
-import { buildHeaders, resolveTarget, sanitizeUpstreamBody } from "../providers";
+import { getApiKeyById, getModels, getProviders, listUserApiKeys, touchApiKeyUsage } from "../storage/db";
 import { getBlobStore } from "../storage/blob-store";
+import { uuid } from "../crypto";
+import { runChatPipeline, type ChatBody, type ChatRequestAuth } from "./chat";
 
 export const playgroundRouter = new Hono<{ Bindings: Env }>();
 
-/** 每分钟每用户最多对话次数 */
+/** 每分钟每 Key 最多对话次数 */
 const RPM_LIMIT = 20;
-/** 单次请求最多尝试的上游路由数 */
-const MAX_ROUTES = 3;
 
 function isAdminRole(role: string): boolean {
   return role === "superadmin" || role === "admin";
@@ -155,83 +152,29 @@ playgroundRouter.post("/chat", async (c) => {
     if (!rpm.ok) {
       throw new ApiError(429, ErrorCode.RATE_LIMITED, `操练场每分钟最多 ${RPM_LIMIT} 次，请稍后再试`);
     }
-    await updateApiKey(c.env, accountKey.keyHash, { lastUsedAt: Math.floor(Date.now() / 1000) });
-
-    const plans = await planModelRoutes(c.env, model);
-    if (!plans.length) throw new ApiError(404, ErrorCode.MODEL_NOT_FOUND, `模型 ${model} 不存在或暂无可用上游`);
-
-    const routes = [];
-    for (const plan of plans) {
-      const [keys, health] = await Promise.all([getProviderKeys(c.env, plan.provider.id), readKeyHealth(c.env, plan.provider.id)]);
-      routes.push(...buildRoutesFromPlan(c.env, plan, keys, health));
-    }
-    if (!routes.length) throw new ApiError(404, ErrorCode.MODEL_NOT_FOUND, "暂无可用上游 Key");
+    touchApiKeyUsage(c.env, accountKey.id, { lastUsedAt: Math.floor(Date.now() / 1000) });
 
     const stream = body.stream !== false;
     const systemText = typeof body.system === "string" ? body.system.trim() : "";
     const outboundMessages = systemText ? [{ role: "system", content: systemText }, ...messages] : messages;
 
-    const upstreamBody = {
-      model: "",
-      messages: outboundMessages,
-      stream,
-      ...(typeof body.temperature === "number" ? { temperature: body.temperature } : {}),
-      ...(typeof body.top_p === "number" ? { top_p: body.top_p } : {}),
-      ...(typeof body.max_tokens === "number" ? { max_tokens: body.max_tokens } : {}),
+    // 复用 /v1 同一套流水线：路由规划、限流、计费冻结/结算、usage_logs、断开兜底
+    const outboundBody: Record<string, unknown> = { ...body, messages: outboundMessages, model, stream };
+    delete outboundBody.key_id;
+    delete outboundBody.system;
+
+    const settings = await getSettings(c.env);
+    const auth: ChatRequestAuth = {
+      requestId: c.req.header("x-request-id") || uuid(),
+      started: Date.now(),
+      keyId: accountKey.id,
+      userId: user.id,
+      orgId: accountKey.orgId || null,
+      limits: { rpm: settings.defaultRpm, tpm: settings.defaultTpm, concurrency: 10 },
+      ip: clientIp(hCtx.req),
+      keyRow: accountKey,
     };
-
-    let lastError = "上游请求失败";
-    let lastStatus = 502;
-
-    for (const route of routes.slice(0, MAX_ROUTES)) {
-      try {
-        const { url } = resolveTarget(c.env, route);
-        const headers = await buildHeaders(c.env, route);
-        const payload = sanitizeUpstreamBody(
-          { ...upstreamBody, model: route.upstreamModel } as Record<string, unknown>,
-          route,
-          stream
-        );
-        const resp = await fetch(url, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(payload),
-          signal: AbortSignal.timeout(120_000),
-        });
-
-        if (!resp.ok) {
-          lastStatus = resp.status;
-          lastError = (await resp.text().catch(() => "")).slice(0, 300) || `上游返回 ${resp.status}`;
-          continue;
-        }
-
-        if (!stream || !resp.body) {
-          const text = await resp.text();
-          return new Response(text, {
-            status: 200,
-            headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
-          });
-        }
-
-        return new Response(resp.body, {
-          status: 200,
-          headers: {
-            "content-type": "text/event-stream; charset=utf-8",
-            "cache-control": "no-cache, no-transform",
-            connection: "keep-alive",
-            "x-accel-buffering": "no",
-          },
-        });
-      } catch (err) {
-        lastStatus = 504;
-        lastError = (err as Error)?.message || "上游请求超时";
-      }
-    }
-
-    return json(
-      { error: { message: lastError, type: "upstream_error", code: "upstream_error" } },
-      lastStatus >= 400 && lastStatus < 600 ? lastStatus : 502
-    );
+    return await runChatPipeline(c, auth, outboundBody as ChatBody);
   } catch (err) {
     return errorResponse(hCtx, err);
   }

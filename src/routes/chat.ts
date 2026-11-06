@@ -33,12 +33,25 @@ import {
 
 export const chatRouter = new Hono<{ Bindings: Env }>();
 
-type ChatBody = {
+export type ChatBody = {
   model?: string;
   stream?: boolean;
   messages?: { role: string; content: unknown }[];
   max_tokens?: number;
   stream_options?: { include_usage?: boolean };
+  [key: string]: unknown;
+};
+
+/** 鉴权后的对话请求上下文（/v1 与操练场共用） */
+export type ChatRequestAuth = {
+  requestId: string;
+  started: number;
+  keyId: string;
+  userId: string;
+  orgId: string | null;
+  limits: { rpm: number; tpm: number; concurrency: number };
+  ip: string;
+  keyRow: { modelWhitelist?: string | null };
 };
 
 /**
@@ -139,8 +152,6 @@ chatRouter.post("/", async (c) => {
   const env = c.env;
   const requestId = c.req.header("x-request-id") || uuid();
   const started = Date.now();
-  let released = false;
-  let activeKeyId: string | null = null;
 
   const hCtx: HandlerCtx = {
     env,
@@ -149,7 +160,7 @@ chatRouter.post("/", async (c) => {
       method: c.req.method,
       header: (n) => c.req.header(n),
       text: () => c.req.text(),
-      json: <T = unknown>() => c.req.json<T>(),
+      json: () => c.req.json(),
     },
   };
 
@@ -163,7 +174,6 @@ chatRouter.post("/", async (c) => {
 
     const [row, settings] = await Promise.all([getApiKeyByHash(env, keyHash), getSettings(env)]);
     if (!row) throw new ApiError(401, ErrorCode.AUTH_INVALID, "API Key 无效");
-    activeKeyId = row.id;
     if (row.status === "revoked") throw new ApiError(401, ErrorCode.KEY_REVOKED, "API Key 已撤销");
     if (row.expiresAt && row.expiresAt < nowSec) throw new ApiError(401, ErrorCode.KEY_EXPIRED, "API Key 已过期");
     if (row.quotaUsd !== null && row.quotaUsd !== undefined && row.spentUsd >= row.quotaUsd) {
@@ -181,12 +191,43 @@ chatRouter.post("/", async (c) => {
     // lastUsedAt 先进请求内内存，收尾与用量一起落库
     touchApiKeyUsage(env, row.id, { lastUsedAt: nowSec });
 
-    const keyId = row.id;
-    const userId = row.userId;
-    const orgId = row.orgId || null;
     const limits = { rpm: settings.defaultRpm, tpm: settings.defaultTpm, concurrency: 10 };
-
     const body = await c.req.json<ChatBody>();
+    return await runChatPipeline(
+      c,
+      { requestId, started, keyId: row.id, userId: row.userId, orgId: row.orgId || null, limits, ip, keyRow: row },
+      body
+    );
+  } catch (err) {
+    return errorResponse(hCtx, err);
+  }
+});
+
+/**
+ * 鉴权后的共享对话流水线：/v1/chat/completions 与操练场共用同一套
+ * 路由规划、限流、计费冻结/结算、用量落库与断开兜底。
+ */
+export async function runChatPipeline(
+  c: any,
+  auth: ChatRequestAuth,
+  body: ChatBody
+): Promise<Response> {
+  const env = c.env as Env;
+  const { requestId, started, keyId, userId, orgId, limits, ip, keyRow } = auth;
+  let released = false;
+
+  const hCtx: HandlerCtx = {
+    env,
+    req: {
+      url: c.req.url,
+      method: c.req.method,
+      header: (n: string) => c.req.header(n),
+      text: () => c.req.text(),
+      json: () => c.req.json(),
+    },
+  };
+
+  try {
     if (!body.model || !Array.isArray(body.messages)) {
       throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 model 或 messages");
     }
@@ -194,9 +235,9 @@ chatRouter.post("/", async (c) => {
     const stream = !!body.stream;
     const subModelName = publicModel.includes("/") ? publicModel.slice(publicModel.indexOf("/") + 1) : publicModel;
 
-    if (row.modelWhitelist) {
+    if (keyRow.modelWhitelist) {
       try {
-        const whitelist = JSON.parse(row.modelWhitelist) as string[];
+        const whitelist = JSON.parse(keyRow.modelWhitelist) as string[];
         if (Array.isArray(whitelist) && whitelist.length && !whitelist.includes(publicModel) && !whitelist.includes(subModelName)) {
           throw new ApiError(403, ErrorCode.MODEL_NOT_ALLOWED, `该 Key 无权调用模型 ${publicModel}`);
         }
@@ -219,6 +260,7 @@ chatRouter.post("/", async (c) => {
     const scope = billingScope(userId, orgId);
 
     /* ---- RTT2：渠道 Key 池 + 健康度 + 限流 + 内容安全 一轮并行（付费模型并入用户/余额读取） ---- */
+    const settings = await getSettings(env);
     const uniqPlans = plans.filter((p, idx) => plans.findIndex((x) => x.provider.id === p.provider.id) === idx);
     const providerLoads = uniqPlans.map(async (plan) => {
       const [keys, health] = await Promise.all([getProviderKeys(env, plan.provider.id), readKeyHealth(env, plan.provider.id)]);
@@ -664,8 +706,8 @@ chatRouter.post("/", async (c) => {
     if (!released) {
       // 保证限流计数与并发释放不残留（尽力而为）
       void commitRateLimits(env);
-      if (activeKeyId) void releaseConcurrency(env, activeKeyId);
+      void releaseConcurrency(env, keyId);
     }
     return errorResponse(hCtx, err);
   }
-});
+}

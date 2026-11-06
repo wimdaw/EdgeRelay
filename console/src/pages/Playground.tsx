@@ -6,7 +6,7 @@ import { Button, Card, Select, useToast } from "../components/ui";
 import { cn } from "../lib/utils";
 
 type ModelItem = { id: string; provider: string; paid: boolean };
-type Msg = { id: string; role: "user" | "assistant"; content: string; error?: string; model?: string };
+type Msg = { id: string; role: "user" | "assistant"; content: string; error?: string; model?: string; tokens?: number };
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
@@ -114,6 +114,7 @@ export default function Playground({ me }: { me: Me }) {
       if (!reader) throw new Error("浏览器不支持流式读取");
       const decoder = new TextDecoder();
       let buffer = "";
+      let usageTokens = 0;
 
       for (;;) {
         const { done, value } = await reader.read();
@@ -132,6 +133,12 @@ export default function Playground({ me }: { me: Me }) {
                 if (typeof delta === "string" && delta) {
                   patch((m) => ({ ...m, content: m.content + delta }));
                 }
+                if (j?.usage) {
+                  usageTokens =
+                    typeof j.usage.total_tokens === "number"
+                      ? j.usage.total_tokens
+                      : (j.usage.prompt_tokens || 0) + (j.usage.completion_tokens || 0);
+                }
               } catch {
                 // 忽略无法解析的心跳帧
               }
@@ -140,6 +147,7 @@ export default function Playground({ me }: { me: Me }) {
           nl = buffer.indexOf("\n");
         }
       }
+      if (usageTokens) patch((m) => ({ ...m, tokens: usageTokens }));
     } catch (e) {
       if ((e as Error).name !== "AbortError") {
         patch((m) => ({ ...m, error: (e as Error).message || "请求失败" }));
@@ -310,6 +318,7 @@ export default function Playground({ me }: { me: Me }) {
                     </div>
                     <div className={cn("flex items-center gap-2 text-[10px] text-muted", m.role === "user" && "justify-end")}>
                       {m.role === "assistant" && m.model && <span>{m.model}</span>}
+                      {m.role === "assistant" && m.tokens ? <span>{m.tokens} tokens</span> : null}
                       {m.content && (
                         <button type="button" className="hover:text-ink" onClick={() => copy(m.content)}>
                           <Copy size={10} className="mr-0.5 inline" />复制

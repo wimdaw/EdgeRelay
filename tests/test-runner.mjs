@@ -327,6 +327,33 @@ let apiKeyId = "";
     const mockLogs = (logsData.logs || []).filter((l) => l.public_model === "mock-model");
     assert(mockLogs.length >= 10, `用量日志已记录模拟模型调用（${mockLogs.length} 条）`);
     assert(mockLogs.some((l) => l.status === "success" && l.prompt_tokens === 7 && l.completion_tokens === 5), "流式 usage 统计正确计入（7/5 tokens）");
+
+    // 操练场：使用账户自有 Key，并与 /v1 共用同一套 usage_logs
+    const pgRes = await request("/api/playground/chat", {
+      method: "POST",
+      headers: { cookie: adminCookie, "content-type": "application/json", "x-request-id": "pg-test-req-1" },
+      body: { model: "mock-model", messages: [{ role: "user", content: "ping" }], stream: false, key_id: apiKeyId },
+    });
+    assert(pgRes.status === 200, "操练场对话 HTTP 200（使用账户自有 Key）");
+    const pgData = await pgRes.json();
+    assert(pgData.choices?.[0]?.message?.content === "pong", "操练场对话内容与上游一致");
+
+    const foreign = await request("/api/playground/chat", {
+      method: "POST",
+      headers: { cookie: adminCookie, "content-type": "application/json" },
+      body: { model: "mock-model", messages: [{ role: "user", content: "ping" }], stream: false, key_id: "not-a-real-key" },
+    });
+    assert(foreign.status === 403, `操练场拒绝非当前账户的 Key（实际 ${foreign.status}）`);
+
+    let pgLog = null;
+    for (let i = 0; i < 10 && !pgLog; i++) {
+      const after = await (await request("/api/admin/usage/logs?limit=50", { headers: { cookie: adminCookie } })).json();
+      pgLog = (after.logs || []).find((l) => l.request_id === "pg-test-req-1");
+      if (!pgLog) await new Promise((r) => setTimeout(r, 200));
+    }
+    assert(!!pgLog, "操练场调用产生 usage_logs 记录");
+    assert(pgLog.status === "success" && pgLog.api_key_id === apiKeyId, "操练场 usage_logs 归属当前账户的 Key 且状态 success");
+    assert(pgLog.prompt_tokens === 3 && pgLog.completion_tokens === 1, "操练场 usage_logs 记录上游 token 用量");
   } finally {
     await new Promise((resolve) => upstream.close(resolve));
   }
