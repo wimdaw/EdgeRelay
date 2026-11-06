@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AlertTriangle, CheckCircle2, Clock, Gauge, Mail, RefreshCw, ShieldAlert, Users, Wallet } from "lucide-react";
 import { adminAction } from "../lib/api";
 import { Button, Card, EmptyState, useToast } from "../components/ui";
@@ -202,6 +202,7 @@ function QuotaView({ q }: { q: AccountQuota | null }) {
 export default function AccountPool() {
   const [rows, setRows] = useState<PoolProvider[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
   const toast = useToast();
 
   const load = async () => {
@@ -209,15 +210,15 @@ export default function AccountPool() {
     try {
       const r = await adminAction<{ providers: PoolProvider[] }>("account_pool");
       setRows(r.providers);
+      setLastUpdated(Date.now());
     } catch (e) {
       toast((e as Error).message, "err");
       setRows([]);
+      setLastUpdated(Date.now());
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => { load(); }, []);
 
   const totalAccounts = (rows || []).reduce((n, p) => n + p.accounts.length, 0);
 
@@ -230,26 +231,25 @@ export default function AccountPool() {
             <div>
               <h1 className="text-base font-bold text-ink">账号池</h1>
               <p className="mt-0.5 text-xs text-muted">
-                OAuth / Web 反代渠道的账号与额度总览。Antigravity、Cline、CodeBuddy、ChatGPT 网页版会实时查询上游额度，其余渠道展示账号健康状态。
+                OAuth / Web 反代渠道的账号与额度总览。进入页面不会自动查询，点击「刷新额度」后实时查询上游额度（Antigravity、Cline、CodeBuddy、ChatGPT 网页版），其余渠道展示账号健康状态。
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted"><Users size={12} className="mr-1 inline" />{rows ? `${rows.length} 个渠道 / ${totalAccounts} 个账号` : "加载中…"}</span>
+            {lastUpdated && <span className="text-xs text-muted">上次更新 {new Date(lastUpdated).toLocaleTimeString("zh-CN", { hour12: false })}</span>}
+            <span className="text-xs text-muted"><Users size={12} className="mr-1 inline" />{rows ? `${rows.length} 个渠道 / ${totalAccounts} 个账号` : "未查询"}</span>
             <Button variant="soft" onClick={load} disabled={loading}>
               <RefreshCw size={14} className={cn(loading && "animate-spin")} />{loading ? "查询中…" : "刷新额度"}
             </Button>
           </div>
         </div>
         <p className="mt-3 rounded-lg border border-line bg-surface2/40 px-3 py-2 text-[11px] text-muted">
-          额度查询为实时请求，账号较多时可能需要几秒；查询失败不会影响账号正常调用，只影响本页展示。
+          进入页面不会自动查询；点击「刷新额度」后才会实时请求，账号较多时可能需要几秒。查询失败不会影响账号正常调用，只影响本页展示。
         </p>
       </Card>
 
       {rows === null ? (
-        <div className="grid gap-3.5 grid-cols-1 lg:grid-cols-2">
-          {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-48 rounded-xl2" />)}
-        </div>
+        <Card><EmptyState icon={<Gauge size={32} />} title="点击刷新额度开始查询" hint="进入页面不会自动请求上游额度；点击右上角「刷新额度」获取实时额度与账号状态。" /></Card>
       ) : rows.length === 0 ? (
         <Card><EmptyState icon={<Wallet size={32} />} title="暂无 OAuth / Web 账号" hint="先在「供应商」页的 OAuth 授权或 Web 反代选项卡接入渠道账号。" /></Card>
       ) : (

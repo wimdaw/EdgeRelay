@@ -64,7 +64,7 @@ const OAUTH_CATALOG: OAuthMeta[] = [
     slug: "codex-oauth",
     baseUrl: "https://chatgpt.com/backend-api/codex",
     mode: "redirect" as const,
-    desc: "ChatGPT 账号授权（Codex CLI），自动翻译为 Responses 协议。",
+    desc: "Codex 账号授权（Codex CLI），自动翻译为 Responses 协议。",
     models: ["gpt-5.5", "gpt-5.4", "gpt-5.3-codex"],
   },
   {

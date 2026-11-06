@@ -200,7 +200,7 @@ function extractCode(input: string): string {
 
 export async function exchangeCodexCode(env: Env, codeOrUrl: string, state: string): Promise<{ refreshToken: string; accessToken: string; expiresIn: number; accountId: string; email?: string }> {
   const raw = await getKV(env).get(STATE_PREFIX + state)
-  if (!raw) throw new Error('授权会话不存在或已过期（10 分钟），请重新点击「用 ChatGPT 账号授权」')
+  if (!raw) throw new Error('授权会话不存在或已过期（10 分钟），请重新点击「授权新账号」')
   await getKV(env).delete(STATE_PREFIX + state).catch(() => {})
   const { verifier } = JSON.parse(raw) as { verifier: string }
   const code = extractCode(codeOrUrl)
@@ -533,7 +533,7 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
   const tokens = [...new Set((p.refreshTokens || []).map(extractCodexRefreshToken).filter(Boolean))]
   // 走中继时凭据由对端网关持有，本渠道无需配置 refresh_token
   if (tokens.length === 0 && !relay) {
-    return oauthErrorResponse('该 codex 渠道未配置凭据：请在「API Key」里每行填入一个 OpenAI OAuth refresh_token、四段发货行或 CPA JSON（可点「用 ChatGPT 账号授权」获取）', 400, 'configuration_error')
+    return oauthErrorResponse('该 codex 渠道未配置凭据：请在「API Key」里每行填入一个 OpenAI OAuth refresh_token、四段发货行或 CPA JSON（可点「授权新账号」获取）', 400, 'configuration_error')
   }
   const wantStream = p.body?.stream === true
 

@@ -74,7 +74,7 @@ export const OAUTH_PROVIDERS: Record<OAuthProviderType, OAuthProviderMeta> = {
     slug: "codex-oauth",
     baseUrl: "https://chatgpt.com/backend-api/codex",
     mode: "redirect",
-    desc: "使用 ChatGPT 账号授权（Codex CLI OAuth），请求翻译为 Responses 协议。",
+    desc: "使用 Codex 账号授权（Codex CLI OAuth），请求翻译为 Responses 协议。",
     // 仅作动态目录拉取失败时的兜底；gpt-5.4 / gpt-5.3-codex / codex-mini-latest 已不在上游目录，移除。
     // gpt-5.5 仍保留：上游 catalog 里它作为 GPT-6.1-Sol 的兼容 slug 存在。
     defaultModels: ["gpt-6.1-sol", "gpt-6-astra", "gpt-6.1-terra", "gpt-6-sol", "gpt-6-luna", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-5.5"],
