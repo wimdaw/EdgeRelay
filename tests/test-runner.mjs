@@ -232,12 +232,20 @@ let apiKeyId = "";
 // 8.2 对话转发链路（模拟上游，覆盖流式 tee 透传 / 旁路记账 / 用量潮写）
 {
   const http = await import("node:http");
+  let lastUpstreamBody = {};
   const upstream = http.createServer((req, res) => {
     let raw = "";
     req.on("data", (c) => (raw += c));
     req.on("end", () => {
       let body = {};
       try { body = JSON.parse(raw); } catch {}
+      lastUpstreamBody = body;
+      // 模拟 AMD：显式拒绝 thinking 参数，复现线上 400
+      if (body.model === "amd-upstream-model" && body.thinking !== undefined) {
+        res.writeHead(400, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: { message: '"thinking" is not supported on /v1/chat/completions', type: "invalid_request", code: "unsupported_parameter" } }));
+        return;
+      }
       if (body.stream) {
         res.writeHead(200, { "content-type": "text/event-stream; charset=utf-8" });
         res.write(`data: ${JSON.stringify({ id: "chatcmpl-mock", choices: [{ index: 0, delta: { role: "assistant" } }] })}\n\n`);
@@ -354,6 +362,57 @@ let apiKeyId = "";
     assert(!!pgLog, "操练场调用产生 usage_logs 记录");
     assert(pgLog.status === "success" && pgLog.api_key_id === apiKeyId, "操练场 usage_logs 归属当前账户的 Key 且状态 success");
     assert(pgLog.prompt_tokens === 3 && pgLog.completion_tokens === 1, "操练场 usage_logs 记录上游 token 用量");
+
+    // AMD 渠道参数适配：thinking 不能透传，需映射为 reasoning_effort
+    const amdProv = await action("upsert_provider", {
+      name: "AMD-Test",
+      slug: "amd",
+      kind: "openai_compat",
+      baseUrl: `http://127.0.0.1:${port}`,
+      authScheme: "bearer",
+      key: "mock-amd-key",
+    });
+    assert(amdProv.status === 200, "创建 AMD 测试渠道 HTTP 200");
+    const amdProvData = await amdProv.json();
+    const amdModel = await action("upsert_model", {
+      publicName: "amd-model",
+      providerId: amdProvData.result.id,
+      upstreamModel: "amd-upstream-model",
+      inputPerMillion: 0,
+      outputPerMillion: 0,
+    });
+    assert(amdModel.status === 200, "创建 AMD 测试模型映射 HTTP 200");
+
+    const amdTrue = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: { model: "amd-model", messages: [{ role: "user", content: "ping" }], stream: false, thinking: true },
+    });
+    assert(amdTrue.status === 200, `AMD 渠道带 thinking=true 不再 400（实际 ${amdTrue.status}）`);
+    assert(!("thinking" in lastUpstreamBody), "AMD 上游请求体已剔除 thinking");
+    assert(lastUpstreamBody.reasoning_effort === "medium", "thinking=true 映射为 reasoning_effort=medium");
+
+    const amdHigh = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: { model: "amd-model", messages: [{ role: "user", content: "ping" }], stream: false, thinking: "high" },
+    });
+    assert(amdHigh.status === 200 && lastUpstreamBody.reasoning_effort === "high", "thinking=high 映射为 reasoning_effort=high");
+
+    const amdOff = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: { model: "amd-model", messages: [{ role: "user", content: "ping" }], stream: false, thinking: { type: "disabled" } },
+    });
+    assert(amdOff.status === 200 && !("thinking" in lastUpstreamBody) && !("reasoning_effort" in lastUpstreamBody), "thinking 关闭态丢弃且不注入 reasoning_effort");
+
+    // 非 AMD 渠道行为未变：thinking 原样透传
+    const other = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: { model: "mock-model", messages: [{ role: "user", content: "ping" }], stream: false, thinking: true },
+    });
+    assert(other.status === 200 && lastUpstreamBody.thinking === true, "非 AMD 渠道 thinking 参数行为未变");
   } finally {
     await new Promise((resolve) => upstream.close(resolve));
   }

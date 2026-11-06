@@ -66,10 +66,34 @@ export function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
 
+/** 把客户端常见的 thinking 开关/档位映射为 OpenAI 的 reasoning_effort（low/medium/high） */
+export function mapThinkingToEffort(thinking: unknown): "low" | "medium" | "high" | undefined {
+  if (thinking === true) return "medium";
+  if (thinking === false || thinking === null || thinking === undefined) return undefined;
+  if (typeof thinking === "number") return thinking >= 3 ? "high" : thinking >= 2 ? "medium" : "low";
+  if (typeof thinking === "string") {
+    const v = thinking.trim().toLowerCase();
+    if (["high", "max", "xhigh", "extended", "deep"].includes(v)) return "high";
+    if (["medium", "auto", "default", "standard"].includes(v)) return "medium";
+    if (["low", "minimal", "fast", "light", "lite"].includes(v)) return "low";
+    return undefined;
+  }
+  if (typeof thinking === "object") {
+    const obj = thinking as Record<string, unknown>;
+    const type = String(obj.type ?? "").toLowerCase();
+    if (obj.enabled === false || type === "disabled" || type === "off" || type === "none") return undefined;
+    const budget = obj.budget_tokens ?? obj.thinking_budget ?? obj.max_thinking_tokens;
+    if (typeof budget === "number") return budget >= 4096 ? "high" : budget >= 1024 ? "medium" : "low";
+    if (obj.effort !== undefined) return mapThinkingToEffort(obj.effort);
+    if (obj.enabled === true || type === "enabled") return "medium";
+  }
+  return undefined;
+}
+
 /**
  * 清理发往 OpenAI 兼容上游的请求体：
- * 针对严格校验参数白名单的上游（如 NVIDIA NIM 等），剥离客户端（如 ZCode）注入的非标参数，
- * 避免因 enable_thinking / reasoning 等字段触发上游 400 Validation 错误。
+ * 针对严格校验参数白名单的上游（如 NVIDIA NIM、AMD Radeon 等），剥离客户端（如 ZCode）注入的非标参数，
+ * 避免因 enable_thinking / reasoning / thinking 等字段触发上游 400 Validation 错误。
  */
 export function sanitizeUpstreamBody(
   body: Record<string, unknown>,
@@ -98,6 +122,48 @@ export function sanitizeUpstreamBody(
     // reasoning_effort 必须为 string（"low" | "medium" | "high"），若为数字或布尔则移除，防止反序列化 400
     if (typeof upstreamBody.reasoning_effort === "number" || typeof upstreamBody.reasoning_effort === "boolean") {
       delete upstreamBody.reasoning_effort;
+    }
+  }
+
+  const isAmd =
+    route.providerSlug === "amd" ||
+    route.providerId === "amd" ||
+    (typeof route.baseUrl === "string" && route.baseUrl.includes("developer.amd.com.cn"));
+
+  if (isAmd) {
+    // AMD Radeon（OpenAI 兼容）不接受 thinking：
+    // '"thinking" is not supported on /v1/chat/completions ... Use "reasoning_effort" (or "reasoning.effort")'
+    // 只做一次映射，无法映射时丢弃并记非敏感日志，绝不让请求因参数适配失败。
+    const thinking = upstreamBody.thinking;
+    const rawEffort = upstreamBody.reasoning_effort;
+    // 先把已有 reasoning_effort 归一到 low/medium/high（数字/布尔/未知字符串一律丢弃或映射）
+    let effort: "low" | "medium" | "high" | undefined;
+    if (rawEffort !== undefined) {
+      effort = mapThinkingToEffort(rawEffort);
+      if (effort) upstreamBody.reasoning_effort = effort;
+      else {
+        delete upstreamBody.reasoning_effort;
+        console.warn(`[sanitize] amd: reasoning_effort 无法识别，已丢弃 (model=${route.upstreamModel})`);
+      }
+    }
+    const mapped = thinking !== undefined ? mapThinkingToEffort(thinking) : undefined;
+    if (!effort && mapped) upstreamBody.reasoning_effort = mapped;
+    if (thinking !== undefined && !mapped) {
+      console.warn(`[sanitize] amd: thinking 无法映射为 reasoning_effort，已丢弃 (model=${route.upstreamModel})`);
+    }
+    delete upstreamBody.thinking;
+    delete upstreamBody.thinking_budget;
+    delete upstreamBody.max_thinking_tokens;
+    delete upstreamBody.enable_thinking;
+    // reasoning 对象：若顶层已有合法 reasoning_effort 则移除，避免与上游要求冲突
+    const reasoning = upstreamBody.reasoning;
+    if (reasoning !== undefined) {
+      if (!upstreamBody.reasoning_effort && reasoning && typeof reasoning === "object") {
+        const m = mapThinkingToEffort((reasoning as Record<string, unknown>).effort);
+        if (m) upstreamBody.reasoning_effort = m;
+        else console.warn(`[sanitize] amd: reasoning.effort 无法映射，已丢弃 (model=${route.upstreamModel})`);
+      }
+      delete upstreamBody.reasoning;
     }
   }
 
