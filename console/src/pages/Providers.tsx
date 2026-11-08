@@ -242,6 +242,12 @@ export default function Providers() {
   const [keyDlg, setKeyDlg] = useState<Provider | null>(null);
   const [keyVal, setKeyVal] = useState("");
   const [newKeyLabel, setNewKeyLabel] = useState("prod");
+  // 保存凭据进行中：state 用于渲染，ref 用于拦截同一事件循环内的连点
+  const [savingKey, setSavingKey] = useState(false);
+  const savingKeyRef = useRef(false);
+  const savingRef = useRef(false);
+  const webSavingRef = useRef(false);
+  const oauthBusyRef = useRef(false);
   // 模型导入流程
   const [importStep, setImportStep] = useState<{ providerId: string; providerName: string; models: string[]; picked: Set<string>; loading: boolean; error?: string; note?: string } | null>(null);
   const [customModelInput, setCustomModelInput] = useState("");
@@ -282,10 +288,12 @@ export default function Providers() {
 
   /** 保存供应商；成功后自动拉取上游模型列表进入导入步骤 */
   const save = async () => {
+    if (savingRef.current) return;
     if (!form.name.trim()) return toast("请填写供应商名称", "err");
     if (!form.slug.trim()) return toast("请填写渠道标识符 (Slug)", "err");
     const isKeyless = isKeylessSlug(form.slug);
     if (!form.id && !form.key.trim() && !isKeyless) return toast("添加供应商必须录入上游密钥", "err");
+    savingRef.current = true;
     setSaving(true);
     try {
       const payload: Record<string, unknown> = {
@@ -304,7 +312,7 @@ export default function Providers() {
         setImportStep({ providerId, providerName: form.name, models: [], picked: new Set(), loading: true });
         await pullModels(providerId, form.name, form.url, form.key.trim());
       }
-    } catch (e) { toast((e as Error).message, "err"); } finally { setSaving(false); }
+    } catch (e) { toast((e as Error).message, "err"); } finally { savingRef.current = false; setSaving(false); }
   };
 
   /** 各供应商最近一次录入的明文密钥（仅存内存，用于重试时浏览器直拉；不落 localStorage） */
@@ -380,13 +388,22 @@ export default function Providers() {
 
   const saveKey = async () => {
     if (!keyVal.trim() || !keyDlg) return;
+    // 连点保护：ref 同步置位，避免两次点击在同一渲染周期内都通过校验
+    if (savingKeyRef.current) return;
+    savingKeyRef.current = true;
+    setSavingKey(true);
     try {
-      const r = await adminAction<{ result?: { fingerprint?: string } }>("upsert_provider_key", {
+      const r = await adminAction<{ result?: { fingerprint?: string; count?: number; skipped?: number; duplicate?: boolean } }>("upsert_provider_key", {
         providerId: keyDlg.id,
         key: keyVal.trim(),
         label: newKeyLabel.trim() || (isOAuthProvider(keyDlg) || isWebProvider(keyDlg) ? `account-${(keyDlg.key_count ?? 0) + 1}` : "prod"),
       });
-      toast(isOAuthProvider(keyDlg) || isWebProvider(keyDlg) ? `账号凭据已加密入库（指纹 ${r.result?.fingerprint ?? ""}）` : `密钥已加密入库（指纹 ${r.result?.fingerprint ?? ""}）`);
+      const fp = r.result?.fingerprint ? `（指纹 ${r.result.fingerprint}）` : "";
+      if (r.result?.duplicate && !r.result?.count) {
+        toast(`该凭据已在池中，未重复添加${fp}`);
+      } else {
+        toast(isOAuthProvider(keyDlg) || isWebProvider(keyDlg) ? `账号凭据已加密入库${fp}` : `密钥已加密入库${fp}`);
+      }
       const keyInput = keyVal.trim();
       setKeyVal("");
       const updated = await adminAction<{ providers: Provider[] }>("list_providers");
@@ -399,6 +416,10 @@ export default function Providers() {
         await pullModels(keyDlg.id, keyDlg.name, keyDlg.base_url, isWebProvider(keyDlg) ? "" : keyInput);
       }
     } catch (e) { toast((e as Error).message, "err"); }
+    finally {
+      savingKeyRef.current = false;
+      setSavingKey(false);
+    }
   };
 
   const delKey = async (providerId: string, keyId: string) => {
@@ -563,7 +584,9 @@ export default function Providers() {
 
   const completeOAuthNow = async () => {
     if (!oauthDlg) return;
+    if (oauthBusyRef.current) return;
     if (!oauthDlg.codeInput.trim()) return toast("请粘贴授权返回的 code 或整段回调地址", "err");
+    oauthBusyRef.current = true;
     setOauthDlg({ ...oauthDlg, busy: true, message: "正在换取 access_token…" });
     try {
       const r = await adminActionStepUp<any>("oauth_complete", {
@@ -577,6 +600,8 @@ export default function Providers() {
     } catch (e) {
       toast((e as Error).message, "err");
       setOauthDlg((d) => (d ? { ...d, step: "error", message: (e as Error).message, busy: false } : d));
+    } finally {
+      oauthBusyRef.current = false;
     }
   };
 
@@ -600,6 +625,7 @@ export default function Providers() {
 
   const saveWeb = async () => {
     if (!webDlg) return;
+    if (webSavingRef.current) return;
     const d = webDlg;
     if (!d.provider && !d.credential.trim() && !d.meta.anonymous) return toast("请粘贴账号凭据", "err");
     if (!d.provider) {
@@ -607,6 +633,7 @@ export default function Providers() {
       if (!d.slug.trim()) return toast("请填写渠道 Slug", "err");
       if (!d.baseUrl.trim()) return toast("请填写 Base URL", "err");
     }
+    webSavingRef.current = true;
     setWebDlg({ ...d, saving: true });
     try {
       let providerId = d.provider?.id || "";
@@ -637,6 +664,8 @@ export default function Providers() {
     } catch (e) {
       toast((e as Error).message, "err");
       setWebDlg((s) => (s ? { ...s, saving: false } : s));
+    } finally {
+      webSavingRef.current = false;
     }
   };
 
@@ -1233,7 +1262,7 @@ export default function Providers() {
               </div>
               <div className="flex items-center justify-end gap-2">
                 <Button variant="ghost" className="flex-1 sm:flex-initial" onClick={() => setKeyDlg(null)}>关闭</Button>
-                <Button className="flex-1 sm:flex-initial" onClick={saveKey} disabled={!keyVal.trim()}>{isOAuthProvider(keyDlg) ? "保存账号凭据" : isWebProvider(keyDlg) ? "保存账号凭据" : "保存并追加至池"}</Button>
+                <Button className="flex-1 sm:flex-initial" onClick={saveKey} disabled={!keyVal.trim() || savingKey}>{savingKey ? "保存中…" : isOAuthProvider(keyDlg) ? "保存账号凭据" : isWebProvider(keyDlg) ? "保存账号凭据" : "保存并追加至池"}</Button>
               </div>
             </div>
           </div>

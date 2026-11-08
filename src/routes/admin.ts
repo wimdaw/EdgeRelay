@@ -47,6 +47,37 @@ import { mapLimit } from "../storage/cache";
 
 export const adminRouter = new Hono<{ Bindings: Env }>();
 
+/**
+ * 渠道 Key 写入串行化队列（按 providerId 分桶）
+ *
+ * 双击「保存凭据」会在极短时间内打两个 upsert_provider_key；前端禁用按钮存在
+ * 同一事件循环内的空窗，必须由服务端兜底。串行化后，后一个请求一定能读到前一个
+ * 刚写入的 Key，再配合指纹去重即可避免重复入库。
+ */
+const providerKeyWriteTails = new Map<string, Promise<void>>();
+
+async function withProviderKeyWriteLock<T>(providerId: string, fn: () => Promise<T>): Promise<T> {
+  const prev = providerKeyWriteTails.get(providerId) ?? Promise.resolve();
+  let release: () => void = () => {};
+  const current = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const tail = prev.catch(() => {}).then(() => current);
+  providerKeyWriteTails.set(providerId, tail);
+  await prev.catch(() => {});
+  try {
+    return await fn();
+  } finally {
+    release();
+    if (providerKeyWriteTails.get(providerId) === tail) providerKeyWriteTails.delete(providerId);
+  }
+}
+
+/** 与落库字段一致的 Key 指纹（sha256 前 16 位十六进制） */
+async function fingerprintProviderKeys(rawKeys: string[]): Promise<string[]> {
+  return mapLimit(rawKeys, 8, async (plaintext) => (await sha256Hex(plaintext)).slice(0, 16));
+}
+
 /** 管理操作统一入口 */
 adminRouter.post("/actions", async (c) => {
   const env = c.env;
@@ -347,21 +378,33 @@ adminRouter.post("/actions", async (c) => {
 
         if (p.key) {
           const rawKeys = String(p.key).split(/[\r\n,]+/).map((s) => s.trim()).filter(Boolean);
-          // 批量加密 + 一次读写落库（万级 Key 导入从 N 轮往返降为 1 轮）
-          const records = await mapLimit(rawKeys, 8, async (plaintext, i) => {
-            const encryptedKey = await encryptSecret(env, plaintext);
-            const keyFingerprint = (await sha256Hex(plaintext)).slice(0, 16);
-            return {
-              id: uuid(),
-              providerId: id,
-              label: rawKeys.length > 1 ? `key-${i + 1}` : "default",
-              encryptedKey,
-              keyFingerprint,
-              status: "active" as const,
-              createdAt: now,
-            };
+          await withProviderKeyWriteLock(id, async () => {
+            // 新建渠道时同样按指纹去重：防止「添加渠道」按钮连点或同批粘贴重复
+            const existing = await getProviderKeysAll(env, id);
+            const known = new Set(existing.map((k) => k.keyFingerprint).filter(Boolean));
+            const fingerprints = await fingerprintProviderKeys(rawKeys);
+            const picked: { plaintext: string; index: number; fingerprint: string }[] = [];
+            rawKeys.forEach((plaintext, i) => {
+              const fp = fingerprints[i]!;
+              if (known.has(fp)) return;
+              known.add(fp);
+              picked.push({ plaintext, index: i, fingerprint: fp });
+            });
+            // 批量加密 + 一次读写落库（万级 Key 导入从 N 轮往返降为 1 轮）
+            const records = await mapLimit(picked, 8, async ({ plaintext, index, fingerprint }) => {
+              const encryptedKey = await encryptSecret(env, plaintext);
+              return {
+                id: uuid(),
+                providerId: id,
+                label: rawKeys.length > 1 ? `key-${index + 1}` : "default",
+                encryptedKey,
+                keyFingerprint: fingerprint,
+                status: "active" as const,
+                createdAt: now,
+              };
+            });
+            if (records.length) await bulkUpsertProviderKeys(env, id, records);
           });
-          await bulkUpsertProviderKeys(env, id, records);
         }
         return done({ id }, "provider", id);
       }
@@ -391,32 +434,63 @@ adminRouter.post("/actions", async (c) => {
       }
       case "upsert_provider_key": {
         if (!p.providerId || (!p.key && !p.keys)) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 providerId 或 key");
-        const rawKeys = Array.isArray(p.keys)
-          ? p.keys.map(String)
-          : String(p.key).split(/[\r\n,]+/).map((s) => s.trim()).filter(Boolean);
+        const providerId = String(p.providerId);
+        const rawKeys = (Array.isArray(p.keys) ? p.keys.map(String) : String(p.key).split(/[\r\n,]+/))
+          .map((s) => s.trim())
+          .filter(Boolean);
         if (!rawKeys.length) throw new ApiError(400, ErrorCode.BAD_REQUEST, "请提供有效的 API Key");
 
         const email = typeof p.email === "string" && p.email.trim() ? p.email.trim() : undefined;
-        const added: { id: string; fingerprint: string }[] = [];
-        const records = await mapLimit(rawKeys, 8, async (plaintext, i) => {
-          const encryptedKey = await encryptSecret(env, plaintext);
-          const keyFingerprint = (await sha256Hex(plaintext)).slice(0, 16);
-          const id = rawKeys.length === 1 && p.id ? String(p.id) : uuid();
-          const label = rawKeys.length > 1 && !p.label ? `key-${i + 1}` : String(p.label ?? "prod");
-          added.push({ id, fingerprint: keyFingerprint });
-          return {
-            id,
-            providerId: String(p.providerId),
-            label,
-            encryptedKey,
-            keyFingerprint,
-            ...(email ? { email } : {}),
-            status: ((p.status as "active" | "disabled") ?? "active") as "active" | "disabled",
-            createdAt: now,
-          };
+
+        const outcome = await withProviderKeyWriteLock(providerId, async () => {
+          // 以库内既有指纹为准做幂等：重复点击、刷新重提、同批粘贴重复都不会新增记录
+          const existing = await getProviderKeysAll(env, providerId);
+          const known = new Set(existing.map((k) => k.keyFingerprint).filter(Boolean));
+          const fingerprints = await fingerprintProviderKeys(rawKeys);
+          const picked: { plaintext: string; index: number; fingerprint: string }[] = [];
+          const skipped: string[] = [];
+          rawKeys.forEach((plaintext, i) => {
+            const fp = fingerprints[i]!;
+            if (known.has(fp)) {
+              skipped.push(fp);
+              return;
+            }
+            known.add(fp); // 同一次 payload 内的重复也只保留一条
+            picked.push({ plaintext, index: i, fingerprint: fp });
+          });
+
+          const added: { id: string; fingerprint: string }[] = [];
+          const records = await mapLimit(picked, 8, async ({ plaintext, index, fingerprint }) => {
+            const encryptedKey = await encryptSecret(env, plaintext);
+            const id = rawKeys.length === 1 && p.id ? String(p.id) : uuid();
+            const label = rawKeys.length > 1 && !p.label ? `key-${index + 1}` : String(p.label ?? "prod");
+            added.push({ id, fingerprint });
+            return {
+              id,
+              providerId,
+              label,
+              encryptedKey,
+              keyFingerprint: fingerprint,
+              ...(email ? { email } : {}),
+              status: ((p.status as "active" | "disabled") ?? "active") as "active" | "disabled",
+              createdAt: now,
+            };
+          });
+          if (records.length) await bulkUpsertProviderKeys(env, providerId, records);
+          return { added, skipped };
         });
-        await bulkUpsertProviderKeys(env, String(p.providerId), records);
-        return done({ added, count: added.length, fingerprint: added[0]?.fingerprint }, "provider_key", String(p.providerId));
+
+        return done(
+          {
+            added: outcome.added,
+            count: outcome.added.length,
+            skipped: outcome.skipped.length,
+            duplicate: outcome.skipped.length > 0,
+            fingerprint: outcome.added[0]?.fingerprint ?? outcome.skipped[0],
+          },
+          "provider_key",
+          providerId
+        );
       }
 
       /* ---- 生成外部监控链接（免凭据，可贴到 cron-job.org / UptimeRobot） ---- */

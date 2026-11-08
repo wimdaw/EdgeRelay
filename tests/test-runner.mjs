@@ -286,6 +286,37 @@ let apiKeyId = "";
     assert(provRes.status === 200, "创建模拟上游渠道 HTTP 200");
     const provData = await provRes.json();
 
+    // 凭据重复提交防护：连点「保存凭据」、并发双击、同批重复粘贴都不应产生重复记录
+    const reSubmit = await action("upsert_provider_key", {
+      providerId: provData.result.id,
+      key: "mock-upstream-key",
+      label: "prod",
+    });
+    const reSubmitData = await reSubmit.json();
+    assert(reSubmitData.result?.count === 0 && reSubmitData.result?.skipped === 1, "重复提交同一 Key 被幂等拦截（0 新增 / 1 跳过）");
+
+    const dupKey = "mock-upstream-key-2";
+    const [concurrentA, concurrentB] = await Promise.all([
+      action("upsert_provider_key", { providerId: provData.result.id, key: dupKey, label: "prod" }),
+      action("upsert_provider_key", { providerId: provData.result.id, key: dupKey, label: "prod" }),
+    ]);
+    const concurrentAData = await concurrentA.json();
+    const concurrentBData = await concurrentB.json();
+    const insertedByDoubleClick = (concurrentAData.result?.count || 0) + (concurrentBData.result?.count || 0);
+    assert(insertedByDoubleClick === 1, `并发双击同一 Key 只落一条（实际 ${insertedByDoubleClick} 条）`);
+
+    const batchRes = await action("upsert_provider_key", {
+      providerId: provData.result.id,
+      keys: ["mock-key-batch", "mock-key-batch", "mock-key-batch-2"],
+      label: "batch",
+    });
+    const batchData = await batchRes.json();
+    assert(batchData.result?.count === 2 && batchData.result?.skipped === 1, "同批粘贴重复 Key 自动去重（2 新增 / 1 跳过）");
+
+    const listAfterKeys = await (await action("list_providers")).json();
+    const provAfterKeys = listAfterKeys.providers.find((x) => x.id === provData.result.id);
+    assert(provAfterKeys?.key_count === 4, `渠道 Key 总数正确（期望 4，实际 ${provAfterKeys?.key_count}）`);
+
     const modelRes = await action("upsert_model", {
       publicName: "mock-model",
       providerId: provData.result.id,
