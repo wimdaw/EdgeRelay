@@ -6,6 +6,14 @@ import { createContext, runInContext } from "node:vm";
 import { parseFragment, serialize } from "parse5";
 import crypto from "node:crypto";
 import { extractImageParts, type DuckAiImagePart } from "./duckai-image";
+import {
+  buildAnnotations,
+  createCitationFilter,
+  cleanCitationText,
+  extractCitations,
+  mergeSources,
+  type DuckAiSource,
+} from "./duckai-sources";
 
 const BASE_URL = "https://duck.ai";
 const STATUS_URL = `${BASE_URL}/duckchat/v1/status`;
@@ -423,6 +431,67 @@ function toUpstreamMessages(messages: DuckMessage[]) {
   });
 }
 
+/** 是否显式请求联网搜索：兼容 duckai-cpa 的 tools[type=web_search] 与 web_search 快捷字段。 */
+function isWebSearchEnabled(tools: unknown, webSearch: unknown): boolean {
+  if (webSearch === true) return true;
+  if (!Array.isArray(tools)) return false;
+  return tools.some((tool) => {
+    if (!tool || typeof tool !== "object") return false;
+    const type = typeof (tool as Record<string, unknown>).type === "string"
+      ? ((tool as Record<string, unknown>).type as string).trim().toLowerCase()
+      : "";
+    return type === "web_search" || type === "web_search_preview" || type === "websearch";
+  });
+}
+
+const NON_TEXT_ROLES = new Set([
+  "reasoning",
+  "tool-invocation",
+  "source",
+  "ui-component",
+  "generated-image",
+  "partial-image",
+  "refusal",
+  "image-validated",
+  "continuation",
+  "skill-references",
+]);
+
+/** 从上游事件里取正文增量（与 duckai-cpa 的 assistant 事件判定一致） */
+function extractTextDelta(ev: Record<string, unknown>): string | undefined {
+  const role = typeof ev.role === "string" ? ev.role : undefined;
+  if (role && NON_TEXT_ROLES.has(role)) return undefined;
+  if (typeof ev.message === "string" && ev.message) return ev.message;
+  if (Array.isArray(ev.parts)) {
+    const text = ev.parts
+      .map((part) => {
+        const record = part && typeof part === "object" ? (part as Record<string, unknown>) : null;
+        return record && record.type === "text" && typeof record.text === "string" ? record.text : "";
+      })
+      .join("");
+    if (text) return text;
+  }
+  if (typeof ev.text === "string" && ev.text) return ev.text;
+  return undefined;
+}
+
+/** 从上游事件里收集搜索来源：tool-invocation(result) 与 source 事件。 */
+function collectSourcesFromEvent(ev: Record<string, unknown>, current: DuckAiSource[]): DuckAiSource[] {
+  if (ev.role === "tool-invocation" && ev.state === "result") {
+    const name = typeof ev.toolName === "string" ? ev.toolName : typeof ev.name === "string" ? ev.name : "";
+    if (!name || name === "WebSearch") {
+      const citations = extractCitations(ev.data);
+      if (citations.length) return mergeSources(current, citations);
+    }
+    return current;
+  }
+  if (ev.role === "source" && ev.source) {
+    const merged = mergeSources(current, [ev.source]);
+    return merged.length === current.length ? current : merged;
+  }
+  return current;
+}
+
 function openAiChunk(id: string, model: string, delta: Record<string, unknown>, finishReason: string | null = null): string {
   return `data: ${JSON.stringify({
     id,
@@ -433,7 +502,7 @@ function openAiChunk(id: string, model: string, delta: Record<string, unknown>, 
   })}\n\n`;
 }
 
-function streamResponse(upstream: Response, model: string): Response {
+function streamResponse(upstream: Response, model: string, searchEnabled: boolean): Response {
   if (!upstream.body) throw new Error("Duck.ai 没有返回响应流");
   const id = `chatcmpl-duckai-${crypto.randomUUID()}`;
   const encoder = new TextEncoder();
@@ -441,6 +510,25 @@ function streamResponse(upstream: Response, model: string): Response {
   let buffer = "";
   let sentRole = false;
   let sentDone = false;
+  let sources: DuckAiSource[] = [];
+  let sentAnnotations = 0;
+  const citationFilter = searchEnabled ? createCitationFilter() : null;
+
+  const emit = (controller: TransformStreamDefaultController<Uint8Array>, delta: Record<string, unknown>, finishReason: string | null = null) => {
+    if (Object.keys(delta).length === 0 && finishReason === null) return;
+    if (!sentRole) {
+      controller.enqueue(encoder.encode(openAiChunk(id, model, { role: "assistant" })));
+      sentRole = true;
+    }
+    controller.enqueue(encoder.encode(openAiChunk(id, model, delta, finishReason)));
+  };
+
+  const emitNewAnnotations = (controller: TransformStreamDefaultController<Uint8Array>) => {
+    if (!searchEnabled || sources.length <= sentAnnotations) return;
+    const fresh = sources.slice(sentAnnotations);
+    sentAnnotations = sources.length;
+    emit(controller, { annotations: buildAnnotations(fresh), sources: fresh });
+  };
 
   const transform = new TransformStream<Uint8Array, Uint8Array>({
     transform(chunk, controller) {
@@ -454,6 +542,11 @@ function streamResponse(upstream: Response, model: string): Response {
         const payloadStr = trimmed.slice(5).trim();
         if (!payloadStr || payloadStr.startsWith("[CHAT_TITLE") || payloadStr === "[PING]") continue;
         if (payloadStr === "[DONE]") {
+          if (citationFilter) {
+            const tail = citationFilter.process("", { flush: true });
+            if (tail) emit(controller, { content: tail });
+          }
+          emitNewAnnotations(controller);
           if (!sentRole) {
             controller.enqueue(encoder.encode(openAiChunk(id, model, { role: "assistant" })));
             sentRole = true;
@@ -465,13 +558,17 @@ function streamResponse(upstream: Response, model: string): Response {
         }
         try {
           const ev = JSON.parse(payloadStr);
-          const textDelta = ev.message || (ev.role !== "reasoning" ? ev.text : undefined);
-          if (textDelta) {
-            if (!sentRole) {
-              controller.enqueue(encoder.encode(openAiChunk(id, model, { role: "assistant" })));
-              sentRole = true;
+          if (searchEnabled) {
+            const nextSources = collectSourcesFromEvent(ev, sources);
+            if (nextSources !== sources) {
+              sources = nextSources;
+              emitNewAnnotations(controller);
             }
-            controller.enqueue(encoder.encode(openAiChunk(id, model, { content: textDelta })));
+          }
+          const rawDelta = extractTextDelta(ev);
+          if (rawDelta) {
+            const textDelta = citationFilter ? citationFilter.process(rawDelta) : rawDelta;
+            if (textDelta) emit(controller, { content: textDelta });
           }
         } catch {}
       }
@@ -479,6 +576,11 @@ function streamResponse(upstream: Response, model: string): Response {
     flush(controller) {
       buffer += decoder.decode();
       if (!sentDone) {
+        if (citationFilter) {
+          const tail = citationFilter.process("", { flush: true });
+          if (tail) emit(controller, { content: tail });
+        }
+        emitNewAnnotations(controller);
         if (!sentRole) {
           controller.enqueue(encoder.encode(openAiChunk(id, model, { role: "assistant" })));
         }
@@ -498,9 +600,10 @@ function streamResponse(upstream: Response, model: string): Response {
   });
 }
 
-async function parseNonStreamingResponse(upstream: Response, model: string): Promise<Response> {
+async function parseNonStreamingResponse(upstream: Response, model: string, searchEnabled: boolean): Promise<Response> {
   const text = await upstream.text();
   let content = "";
+  let sources: DuckAiSource[] = [];
   for (const line of text.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed.startsWith("data:")) continue;
@@ -509,9 +612,21 @@ async function parseNonStreamingResponse(upstream: Response, model: string): Pro
     if (payloadStr === "[DONE]") break;
     try {
       const ev = JSON.parse(payloadStr);
-      const textDelta = ev.message || (ev.role !== "reasoning" ? ev.text : undefined);
+      if (searchEnabled) {
+        const nextSources = collectSourcesFromEvent(ev, sources);
+        if (nextSources !== sources) sources = nextSources;
+      }
+      const textDelta = extractTextDelta(ev);
       if (textDelta) content += textDelta;
     } catch {}
+  }
+
+  if (searchEnabled) content = cleanCitationText(content);
+
+  const message: Record<string, unknown> = { role: "assistant", content };
+  if (searchEnabled && sources.length > 0) {
+    message.annotations = buildAnnotations(sources);
+    message.sources = sources;
   }
 
   const result = {
@@ -519,7 +634,7 @@ async function parseNonStreamingResponse(upstream: Response, model: string): Pro
     object: "chat.completion",
     created: Math.floor(Date.now() / 1000),
     model,
-    choices: [{ index: 0, message: { role: "assistant", content }, finish_reason: "stop" }],
+    choices: [{ index: 0, message, finish_reason: "stop" }],
     usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
   };
 
@@ -533,11 +648,14 @@ export async function handleDuckAiRequest(input: {
   model: string;
   messages: unknown;
   stream?: boolean;
+  tools?: unknown;
+  webSearch?: unknown;
 }): Promise<Response> {
   const messages = normalizeMessages(input.messages);
   if (messages.length === 0) {
     return new Response(JSON.stringify({ error: { message: "messages 不能为空", type: "invalid_request_error" } }), { status: 400 });
   }
+  const searchEnabled = isWebSearchEnabled(input.tools, input.webSearch);
 
   await acquireDuckSlot();
   try {
@@ -565,7 +683,7 @@ export async function handleDuckAiRequest(input: {
 
   const payload = {
     model: requestedModel,
-    metadata: { toolChoice: { NewsSearch: false, VideosSearch: false, LocalSearch: false, WeatherForecast: false } },
+    // 与 duckai-cpa 一致：不再下发 metadata.toolChoice，联网由模型自决（显式 WebSearch 会破坏 continuation）
     messages: toUpstreamMessages(messages),
     canUseTools: true,
     reasoningEffort: reasoningEffort(requestedModel),
@@ -601,7 +719,7 @@ export async function handleDuckAiRequest(input: {
     });
   }
 
-  return input.stream ? streamResponse(upstream, input.model) : await parseNonStreamingResponse(upstream, input.model);
+  return input.stream ? streamResponse(upstream, input.model, searchEnabled) : await parseNonStreamingResponse(upstream, input.model, searchEnabled);
   } finally {
     releaseDuckSlot();
   }

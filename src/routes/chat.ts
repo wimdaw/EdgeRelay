@@ -473,7 +473,13 @@ export async function runChatPipeline(
           });
         } else if (isDuckai) {
           const { handleDuckAiRequest } = await import("../duckai");
-          resp = await handleDuckAiRequest({ model: route.upstreamModel, messages: body.messages, stream });
+          resp = await handleDuckAiRequest({
+            model: route.upstreamModel,
+            messages: body.messages,
+            stream,
+            tools: body.tools,
+            webSearch: body.web_search ?? body.enable_web_search,
+          });
         } else if (isAnthropic) {
           const { openAIToAnthropicRequest } = await import("../anthropic-translate");
           const { request: antRequest } = openAIToAnthropicRequest({ ...body, model: route.upstreamModel, stream });

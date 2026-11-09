@@ -904,6 +904,91 @@ let apiKeyId = "";
   }
 }
 
+// 16. Duck.ai 联网搜索（来源 / 注解 / 引用标记清理）
+{
+  const sse = [
+    'data: {"type":"message","role":"tool-invocation","toolName":"WebSearch","state":"call","data":{}}',
+    'data: {"type":"message","role":"tool-invocation","toolName":"WebSearch","state":"result","data":{"citations":[{"url":"https://a.example/1","title":"A1"},{"url":"https://b.example/2","title":"B2"},{"url":"https://a.example/1","title":"A1 dup"}]}}',
+    'data: {"type":"message","role":"assistant","message":"答案是 42"}',
+    'data: {"type":"message","role":"assistant","message":"<citation src=\\"1\\">"}',
+    'data: {"type":"message","role":"assistant","message":"</citation>，见上。"}',
+    'data: [DONE]',
+    '',
+  ].join('\n\n');
+  const realFetch = globalThis.fetch;
+  const chatCalls = [];
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("/duckchat/v1/status")) {
+      return new Response("{}", {
+        status: 200,
+        headers: { "x-vqd-hash-1": Buffer.from('(function(){return {client_hashes:["x"]}})()').toString("base64") },
+      });
+    }
+    if (target.includes("/duckchat/v1/chat")) {
+      chatCalls.push({ init });
+      return new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+  };
+  const collect = (body) => {
+    const chunks = String(body)
+      .split('\n\n')
+      .map((block) => block.trim())
+      .filter((block) => block.startsWith('data:'))
+      .map((block) => block.slice(5).trim())
+      .filter((payload) => payload && payload !== '[DONE]')
+      .map((payload) => JSON.parse(payload));
+    return chunks;
+  };
+  try {
+    const res = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: {
+        model: "mock-duck-image",
+        stream: false,
+        messages: [{ role: "user", content: "现在几点" }],
+        tools: [{ type: "web_search" }],
+      },
+    });
+    assert(res.status === 200, "联网搜索请求 HTTP 200");
+    const sent = JSON.parse(chatCalls[0].init.body);
+    assert(!("metadata" in sent), "不再下发 metadata.toolChoice");
+    assert(sent.canUseTools === true, "canUseTools 仍为 true");
+    const resJson = await res.json();
+    const msg = resJson?.choices?.[0]?.message;
+    assert(msg?.content === "答案是 42[1]，见上。", "引用标记被清理为 [1]");
+    assert(Array.isArray(msg?.annotations) && msg.annotations.length === 2, "annotations 按 url 去重后为 2 条");
+    assert(msg?.annotations?.[0]?.type === "url_citation", "注解类型为 url_citation");
+    assert(msg?.sources?.length === 2, "sources 输出 2 条");
+
+    const streamRes = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: { model: "mock-duck-image", stream: true, messages: [{ role: "user", content: "现在几点" }], web_search: true },
+    });
+    assert(streamRes.status === 200, "联网搜索流式请求 HTTP 200");
+    const chunks = collect(await streamRes.text());
+    const streamed = chunks.map((chunk) => chunk.choices?.[0]?.delta?.content || "").join("");
+    assert(streamed === "答案是 42[1]，见上。", "流式响应跨 delta 清理引用标记");
+    assert(chunks.some((chunk) => Array.isArray(chunk.choices?.[0]?.delta?.annotations)), "流式响应携带 annotations");
+
+    const plainCallsBefore = chatCalls.length;
+    const plain = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: { model: "mock-duck-image", stream: false, messages: [{ role: "user", content: "普通请求" }] },
+    });
+    assert(chatCalls.length === plainCallsBefore + 1, "普通请求仍转发上游");
+    const plainMsg = (await plain.json())?.choices?.[0]?.message;
+    assert(!("annotations" in (plainMsg || {})), "未启用搜索时不输出 annotations");
+    assert(plainMsg?.content === '答案是 42<citation src="1"></citation>，见上。', "未启用搜索时保持原有透传行为");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);
