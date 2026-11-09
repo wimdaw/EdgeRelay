@@ -204,3 +204,103 @@ git checkout edgeone
   - 持续维护 `main` 分支与 `edgeone` 分支的架构对齐，确保平台可以在 EdgeOne (Node.js 20 + Blob) 与 Cloudflare (V8 + D1) 之间无缝切换。
 - [ ] **边缘多区域延迟感知调度**：
   - 结合客户端请求地理位置（GeoIP）自适应选择东京、首尔或香港节点上游，保障最低访问延迟。
+
+---
+
+## 八、 2026-11 渠道能力对齐与发布链路进展
+
+> 本节记录 2026-11 这一轮「Duck.ai 渠道对齐 `duckai-cpa`、Codex 渠道补全、发布链路加固、操练场」的已完成项与已知边界，供后续接手。相关源码位于 `src/duckai*.ts`、`src/opencode*.ts`、`src/video.ts` 及构建脚本。
+
+### 1. 已完成（记进度）
+
+#### 1.1 Duck.ai 渠道：对齐 `duckai-cpa`
+- [x] **图片输入**：
+  - 客户端传入的 `image_url` 图片统一转为 PNG，最长边限制 ≤ 512px。
+  - 内置 `jpeg-js` 解码 JPEG，零额外运行时依赖，以 duck.ai 原生 file / image part 上传。
+- [x] **联网搜索与来源注解**：
+  - 三路来源（SSE `citations`、`urls`、`source` 事件）合并，按 URL 去重，上限 50 条。
+  - 输出为 OpenAI 兼容 `annotations`；对跨 delta 被拆断的引用标记做清理，避免正文出现半截标记。
+- [x] **`reasoning_content` 透传**：上游推理片段映射到 `delta.reasoning_content`。
+- [x] **refusal / limit / stop_reason 映射**：
+  - `refusal` 映射为 403 错误响应。
+  - `[LIMIT_*]` 帧转为对应 HTTP 错误。
+  - `[STOP_REASON:max_tokens]` 等转为标准 `finish_reason`（如 `length`）。
+- [x] **客户端 function calling 桥**（`src/duckai-tools.ts`）：
+  - 工具定义协议注入首条 user 消息，兼容 `tool_call` / `tool_calls` 两种上游形态，含跨 delta 拼接与去重。
+  - 输出标准 `tool_calls` 与 `finish_reason:"tool_calls"`；`role:"tool"` / `role:"function"` 回放为 `[tool_result]` 文本，assistant 历史中的调用回放为 `[tool_call]`。
+- [x] **PDF 上下文溢出**（`src/duckai-pdf.ts`）：
+  - 历史消息超过字符上限时，渲染为 PDF 文件 part 随请求上传，保留最后一条 user 消息为原文。
+  - 零依赖最小 PDF 生成器，不依赖文件系统与外部字体。
+- [x] **低价值元数据透传**（`src/duckai-meta.ts`）：
+  - 解析 `[CHAT_TITLE]`、`[FIXED_COST_WINDOW_USAGE]`、`[ADS]`、`[WARN_CONVERSATION_LIMIT]`、`role:"skill-references"` 及 `type:"quota"` / `type:"ad-window"` 事件。
+  - 统一挂在非流式 `message.duckai` 与流式 `delta.duckai`，不影响正文。
+
+#### 1.2 Codex 渠道
+- [x] **账号池额度查询**：接入 `wham/usage` 拉取账号额度。
+- [x] **动态模型清单**：读取 `codex/models`；请求失败时回退到内置静态清单。
+- [x] **窗口标签**：按 `window_minutes` 生成额度窗口标签，不再写死。
+- [x] **邮箱回填**：从 `id_token` / profile claim 解析并回填账号邮箱。
+- [x] **渠道显示名统一**：对外统一显示为 `Codex`。
+- [x] **账号池改为手动查询**：额度查询改为手动触发，避免自动轮询。
+
+#### 1.3 发布链路
+- [x] **类型检查前置阻断**：服务端 `tsc` 类型检查（`build:typecheck`）纳入 build 流程，类型错误直接阻断构建。
+- [x] **修复 7 个既有类型错误**：其中包含 video 用量日志的 `userEmail` 此前未真正落库，现已写入。
+
+#### 1.4 操练场（Playground）
+- [x] **绑定当前账户 API Key**：操练场使用当前登录账户自己的 Key，不再借用公共/默认 Key。
+- [x] **计入用量与计费**：操练场调用写入 `usage_logs` 并参与计费。
+- [x] **菜单调整**：更新图标与菜单位置。
+
+### 2. 明确没做 / 已知边界（待办）
+
+- [ ] **PDF 上下文溢出仅支持 ASCII 历史**：
+  - 现状：`src/duckai-pdf.ts` 使用内置 Helvetica / WinAnsi，仅能渲染 ASCII；检测到非 ASCII 时抛 `font_missing`，调用方捕获后回退为纯文本历史，不生成 file part。
+  - 原因：EdgeOne 边缘运行时无文件系统，无法读取或内联系统字体；实测尝试 Type0 + STSong-Light + ToUnicode 后，pdf.js 提取仍为乱码，duck.ai 侧模型也无法正确读取。
+  - 前置条件：需要一套可在边缘运行时内联、体积可接受的 CJK 子集字体方案（字体烘焙进 bundle 或远端按需加载），并验证 pdf.js 与 duck.ai 均可正确提取中文。
+
+- [ ] **联网搜索为模型自决，无法强制每次必搜**：
+  - 现状：搜索开关只是把工具与提示暴露给上游，是否实际发起搜索由模型决定。
+  - 原因：参考项目已验证强制模式（`toolChoice.WebSearch`）会与 continuation 流冲突，上游返回 409。
+  - 前置条件：需要上游提供可强制、且与 continuation 流兼容的搜索参数；在此之前不建议实现。
+
+- [ ] **function calling 桥的流式为「整条缓冲后回放」**：
+  - 现状：`streamResponseWithTools` 先收完整条上游响应再回放，首字延迟等于整条响应耗时。
+  - 原因：工具 JSON 参数可能跨多个 delta 拆断，必须完整拼接后才能得到合法参数，属于用首字延迟换正确性。
+  - 前置条件：需要另一套增量 JSON 解析（流式状态机），在参数完整前先输出已确定的片段；属独立改造。
+
+- [ ] **`[LIMIT_CONVERSATION]` 使用 400 而非 409**：
+  - 现状：会话长度类限制返回 400。
+  - 原因：网关会把 409 改写成 502，吞掉原始错误信息；400 可稳定透出。属有意偏差。
+  - 前置条件：先修改网关错误分类/透传规则，再考虑改为 409。
+
+- [ ] **Codex 额度未解析 `additional_rate_limits`，且 `client_version` 写死**：
+  - 现状：仅解析主额度窗口，模型级限流（`additional_rate_limits`）未展示；`client_version` 固定为 `0.156.1`。
+  - 原因：当前未覆盖模型级限流结构；版本号用于客户端伪装，固定值可满足现状。
+  - 前置条件：需要真实账号返回含 `additional_rate_limits` 的样本，以及上游要求的最新 `client_version`。若上游收紧版本校验，当前实现会降级（推测：表现为额度查询失败或返回空）。
+
+- [ ] **Codex 渠道不支持「账号—密码—2FA」格式导入**：
+  - 现状：仅支持 token / JSON 类凭据导入，账号密码 + 2FA 的导入校验与报错文案尚未收紧。
+  - 原因：该登录链路涉及交互式 2FA，尚未实现。
+  - 前置条件：需确认是否需要该导入形态；若需要，需提供可测试账号并明确 2FA 密钥（TOTP）的提供方式。
+
+- [ ] **OpenCode 渠道：机房 IP 与 TLS JA4 双门禁**：
+  - 现状：实测 Koyeb / EdgeOne / Cloudflare Pages / 普通 VPS 全部返回 429；唯一返回 200 的路径是本机住宅 IP 上的 Bun 中继。
+  - 原因：上游同时校验来源 IP 属性（机房 vs 住宅）与 TLS 指纹（JA4），边缘平台出口无法满足。
+  - 已证伪方向：IPv6 —— 三家平台均不具备可用独立 IPv6，Cloudflare Workers 为单一共享出口地址，且无法修改 TLS 指纹。
+  - 前置条件：可选方向仅剩 (a) 付费 Key 实测；(b) 把中继迁移到家庭低功耗设备（住宅 IP）。需要用户选定方向并提供对应资源。
+
+- [ ] **ai-gateway（Cloudflare Pages）对齐未完成**：
+  - 现状：预览环境验证通过，但生产环境 OpenCode 请求返回 530，已回滚到 `1b7f8b33`。
+  - 原因：根因尚未确证；`wrangler tail` 对 `_worker.js` 不可用，本机无 Node 环境无法本地复现。
+  - 前置条件：下一步增加临时诊断端点采集生产错误。（推测：问题可能出在 Pages 生产环境的 worker 加载或绑定差异，尚待验证。）
+
+- [ ] **ai-gateway-koyeb 已上线，但运维能力存在缺口**：
+  - 现状：服务已对齐并上线；Postgres 未备份；deployment id 无法读取。
+  - 原因：本机无 Koyeb token。
+  - 前置条件：需要用户提供 Koyeb API token；备份需确认数据库连接方式与备份目标。
+
+- [ ] **仓库凭据卫生**：
+  - 现状：`pull-ai-gateway.ps1` 含明文 GitHub token；`ai-gateway-koyeb` 源码含硬编码数据库凭据与默认管理员密码。
+  - 原因：历史脚本与示例配置直接写死。
+  - 前置条件：建议轮换相关 token / 密码并改为环境变量注入；需要用户确认轮换窗口与新的环境变量配置位置。
