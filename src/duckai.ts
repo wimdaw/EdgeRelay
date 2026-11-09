@@ -19,6 +19,7 @@ import {
   extractGeneratedImage,
   toChatImage,
   type DuckAiChatImage,
+  type DuckAiGeneratedImage,
 } from "./duckai-generated";
 import {
   extractReasoningDelta,
@@ -531,6 +532,8 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
   let reasoningSeen = false;
   let finishReason: "stop" | "length" | "content_filter" = "stop";
   let limit: DuckAiLimit | null = null;
+  let partialImage: DuckAiGeneratedImage | null = null;
+  let sentImage = false;
   const citationFilter = searchEnabled ? createCitationFilter() : null;
 
   const emit = (controller: TransformStreamDefaultController<Uint8Array>, delta: Record<string, unknown>, finishReason: string | null = null) => {
@@ -557,6 +560,10 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
       if (tail) emit(controller, { content: tail });
     }
     emitNewAnnotations(controller);
+    if (!sentImage && partialImage) {
+      emit(controller, { images: [toChatImage(partialImage)] });
+      sentImage = true;
+    }
     const fatal = limit ?? (refusal ? REFUSAL_ERROR : null);
     if (fatal) {
       controller.enqueue(encoder.encode(streamErrorEvent(fatal)));
@@ -593,7 +600,13 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
           if (imageGenEnabled) {
             const image = extractGeneratedImage(ev);
             if (image) {
-              emit(controller, { images: [toChatImage(image)] });
+              if (image.partial) {
+                partialImage = image;
+              } else {
+                partialImage = null;
+                sentImage = true;
+                emit(controller, { images: [toChatImage(image)] });
+              }
               continue;
             }
           }
@@ -645,6 +658,7 @@ async function parseNonStreamingResponse(upstream: Response, model: string, sear
   let content = "";
   let sources: DuckAiSource[] = [];
   const images: DuckAiChatImage[] = [];
+  let partialImage: DuckAiGeneratedImage | null = null;
   let reasoning = "";
   let reasoningSeen = false;
   let refusal = false;
@@ -666,7 +680,12 @@ async function parseNonStreamingResponse(upstream: Response, model: string, sear
       if (imageGenEnabled) {
         const image = extractGeneratedImage(ev);
         if (image) {
-          images.push(toChatImage(image));
+          if (image.partial) {
+            partialImage = image;
+          } else {
+            partialImage = null;
+            images.push(toChatImage(image));
+          }
           continue;
         }
       }
@@ -703,6 +722,7 @@ async function parseNonStreamingResponse(upstream: Response, model: string, sear
 
   const message: Record<string, unknown> = { role: "assistant", content };
   if (reasoning) message.reasoning_content = reasoning;
+  if (images.length === 0 && partialImage) images.push(toChatImage(partialImage));
   if (images.length > 0) message.images = images;
   if (searchEnabled && sources.length > 0) {
     message.annotations = buildAnnotations(sources);

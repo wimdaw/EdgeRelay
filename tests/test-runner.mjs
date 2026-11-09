@@ -1135,6 +1135,55 @@ let apiKeyId = "";
   }
 }
 
+// 19. Duck.ai 图片生成（ui-component 形态，partial → success）
+{
+  const realFetch = globalThis.fetch;
+  const sse = [
+    'data: [CHAT_TITLE:cat]',
+    'data: {"role":"ui-component","state":"placement","name":"generate-image","toolCallId":"call_1","toolName":"GenerateImage"}',
+    'data: {"role":"ui-component","state":"data","name":"generate-image","toolCallId":"call_1","data":{"type":"image-title","title":"drawing"}}',
+    'data: {"role":"ui-component","state":"data","name":"generate-image","toolCallId":"call_1","data":{"type":"image-partial","status":"partial","b64Image":"cGFydGlhbA==","format":"jpeg","width":512,"height":512}}',
+    'data: {"role":"tool-invocation","state":"result","toolCallId":"call_1","result":"Image generated successfully."}',
+    'data: {"role":"ui-component","state":"data","name":"generate-image","toolCallId":"call_1","data":{"status":"success","b64Image":"ZmluYWw=","format":"jpeg","width":1024,"height":1024}}',
+    'data: [DONE]',
+    '',
+  ].join('\n\n');
+  globalThis.fetch = async (url) => {
+    const target = String(url);
+    if (target.includes("/duckchat/v1/status")) {
+      return new Response("{}", {
+        status: 200,
+        headers: { "x-vqd-hash-1": Buffer.from('(function(){return {client_hashes:["x"]}})()').toString("base64") },
+      });
+    }
+    if (target.includes("/duckchat/v1/chat")) {
+      return new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+  };
+  const post = (body) => request("/v1/chat/completions", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "mock-duck-image", messages: [{ role: "user", content: "画猫" }], tools: [{ type: "image_generation" }], ...body },
+  });
+  try {
+    const res = await post({ stream: false });
+    const msg = (await res.json())?.choices?.[0]?.message;
+    assert(msg?.images?.length === 1, "ui-component 形态只输出一张图");
+    assert(msg?.images?.[0]?.image_url?.url === "data:image/jpeg;base64,ZmluYWw=", "最终图替换分片图");
+
+    const streamRes = await post({ stream: true });
+    const chunks = String(await streamRes.text())
+      .split("\n\n").map((b) => b.trim()).filter((b) => b.startsWith("data:")).map((b) => b.slice(5).trim())
+      .filter((p) => p && p !== "[DONE]").map((p) => JSON.parse(p));
+    const imageDeltas = chunks.filter((c) => Array.isArray(c.choices?.[0]?.delta?.images));
+    assert(imageDeltas.length === 1, "流式只下发最终图");
+    assert(String(imageDeltas[0]?.choices?.[0]?.delta?.images?.[0]?.image_url?.url).endsWith("ZmluYWw="), "流式最终图正确");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);
