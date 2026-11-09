@@ -821,6 +821,89 @@ let apiKeyId = "";
   assert(missingPrompt.status === 400, "图片接口缺少 prompt 返回 400");
 }
 
+// 15. Duck.ai 图片输入（多模态）
+{
+  const modelRes = await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_model",
+      payload: {
+        publicName: "mock-duck-image",
+        providerId: "duckai",
+        upstreamModel: "gpt-5.4-mini",
+        inputPerMillion: 0,
+        outputPerMillion: 0,
+      },
+    },
+  });
+  assert(modelRes.status === 200, "创建 Duck.ai 测试模型映射 HTTP 200");
+
+  const jpegModule = await import("jpeg-js");
+  const jpegLib = jpegModule.default || jpegModule;
+  const raw = Buffer.alloc(2 * 2 * 4);
+  for (let i = 0; i < raw.length; i += 4) {
+    raw[i] = 255;
+    raw[i + 1] = 0;
+    raw[i + 2] = 0;
+    raw[i + 3] = 255;
+  }
+  const jpegBytes = jpegLib.encode({ width: 2, height: 2, data: raw }, 80).data;
+  const jpegUrl = `data:image/jpeg;base64,${Buffer.from(jpegBytes).toString("base64")}`;
+  const pngBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
+
+  const realFetch = globalThis.fetch;
+  const chatCalls = [];
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("/duckchat/v1/status")) {
+      return new Response("{}", {
+        status: 200,
+        headers: { "x-vqd-hash-1": Buffer.from('(function(){return {client_hashes:["x"]}})()').toString("base64") },
+      });
+    }
+    if (target.includes("/duckchat/v1/chat")) {
+      chatCalls.push({ url: target, init });
+      return new Response('data: {"type":"message","message":"ok"}\n\ndata: {"type":"done"}\n\n', {
+        status: 200,
+        headers: { "content-type": "text/event-stream" },
+      });
+    }
+    return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+  };
+  try {
+    const res = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: {
+        model: "mock-duck-image",
+        stream: false,
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: "what is this" },
+              { type: "image_url", image_url: { url: jpegUrl } },
+              { type: "image_url", image_url: { url: `data:image/png;base64,${pngBase64}` } },
+            ],
+          },
+        ],
+      },
+    });
+    assert(res.status === 200, "带图片的 Duck.ai 请求 HTTP 200");
+    assert(chatCalls.length > 0, "已向上游发出 chat 请求");
+    const sent = JSON.parse(chatCalls[0].init.body);
+    const parts = sent.messages?.[0]?.content;
+    assert(Array.isArray(parts), "上游 messages content 为 parts 数组");
+    assert(parts[0]?.type === "text" && parts[0]?.text === "what is this", "文本 part 保留");
+    assert(parts[1]?.type === "image" && parts[1]?.mimeType === "image/png", "JPEG 图片自动转成 PNG");
+    assert(String(parts[1]?.image).startsWith("data:image/png;base64,"), "JPEG 转换结果为 PNG data URL");
+    assert(parts[2]?.type === "image" && String(parts[2]?.image).includes(pngBase64), "PNG 图片直通不改写");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

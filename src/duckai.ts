@@ -5,6 +5,7 @@
 import { createContext, runInContext } from "node:vm";
 import { parseFragment, serialize } from "parse5";
 import crypto from "node:crypto";
+import { extractImageParts, type DuckAiImagePart } from "./duckai-image";
 
 const BASE_URL = "https://duck.ai";
 const STATUS_URL = `${BASE_URL}/duckchat/v1/status`;
@@ -383,14 +384,42 @@ function contentToText(content: unknown): string {
   return content == null ? "" : JSON.stringify(content);
 }
 
-function normalizeMessages(value: unknown): Array<{ role: "user" | "assistant"; content: string }> {
+type DuckMessage = { role: "user" | "assistant"; content: string; images: DuckAiImagePart[] };
+
+function normalizeMessages(value: unknown): DuckMessage[] {
   if (!Array.isArray(value)) return [];
-  return value.flatMap((entry) => {
-    if (!entry || typeof entry !== "object") return [];
+  const messages: DuckMessage[] = [];
+  let pendingImages: DuckAiImagePart[] = [];
+  for (const entry of value) {
+    if (!entry || typeof entry !== "object") continue;
     const message = entry as Record<string, unknown>;
     const role = message.role === "assistant" ? "assistant" : "user";
     const content = contentToText(message.content);
-    return content ? [{ role, content }] : [];
+    const images = extractImageParts(message.content);
+    if (role === "assistant") {
+      // assistant 轮产生的图片没有文本也会被丢弃，这里保留图片并挂到下一轮 user
+      if (content || images.length) messages.push({ role, content, images: [] });
+      if (images.length) pendingImages = images;
+      continue;
+    }
+    const allImages = pendingImages.concat(images);
+    pendingImages = [];
+    if (!content && allImages.length === 0) continue;
+    messages.push({ role, content, images: allImages });
+  }
+  return messages;
+}
+
+/** 上游要求 user 消息的 content 为 parts 数组；纯文本消息保持字符串以兼容旧行为 */
+function toUpstreamMessages(messages: DuckMessage[]) {
+  return messages.map((message) => {
+    if (message.role !== "user" || message.images.length === 0) {
+      return { role: message.role, content: message.content };
+    }
+    return {
+      role: message.role,
+      content: [{ type: "text", text: message.content }, ...message.images],
+    };
   });
 }
 
@@ -537,7 +566,7 @@ export async function handleDuckAiRequest(input: {
   const payload = {
     model: requestedModel,
     metadata: { toolChoice: { NewsSearch: false, VideosSearch: false, LocalSearch: false, WeatherForecast: false } },
-    messages,
+    messages: toUpstreamMessages(messages),
     canUseTools: true,
     reasoningEffort: reasoningEffort(requestedModel),
     canUseApproxLocation: null,
