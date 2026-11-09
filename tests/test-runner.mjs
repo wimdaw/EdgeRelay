@@ -1184,6 +1184,98 @@ let apiKeyId = "";
   }
 }
 
+// 20. Duck.ai 客户端 function calling 桥
+{
+  const realFetch = globalThis.fetch;
+  let mode = "tool";
+  let lastBody = null;
+  const toolSse = [
+    { type: "message", role: "assistant", message: '```json\n{"tool_call":{"name":"get_weather","argu' },
+    { type: "message", role: "assistant", message: 'ments":{"city":"Paris"}}}\n```' },
+  ].map((ev) => `data: ${JSON.stringify(ev)}`).join('\n\n') + '\n\ndata: [DONE]\n\n';
+  const textSse = 'data: {"type":"message","role":"assistant","message":"今天风和日丽"}\n\ndata: [DONE]\n\n';
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("/duckchat/v1/status")) {
+      return new Response("{}", {
+        status: 200,
+        headers: { "x-vqd-hash-1": Buffer.from('(function(){return {client_hashes:["x"]}})()').toString("base64") },
+      });
+    }
+    if (target.includes("/duckchat/v1/chat")) {
+      lastBody = JSON.parse(init.body);
+      return new Response(mode === "tool" ? toolSse : textSse, { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+  };
+  const tools = [{
+    type: "function",
+    function: {
+      name: "get_weather",
+      description: "查询城市天气",
+      parameters: { type: "object", properties: { city: { type: "string" } }, required: ["city"] },
+    },
+  }];
+  const post = (body) => request("/v1/chat/completions", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "mock-duck-image", messages: [{ role: "user", content: "巴黎天气" }], ...body },
+  });
+  const chunksOf = (text) => String(text)
+    .split("\n\n").map((b) => b.trim()).filter((b) => b.startsWith("data:")).map((b) => b.slice(5).trim())
+    .filter((p) => p && p !== "[DONE]").map((p) => JSON.parse(p));
+  try {
+    mode = "tool";
+    const res = await post({ stream: false, tools });
+    assert(res.status === 200, "工具桥非流式请求 HTTP 200");
+    const sent = lastBody?.messages?.[0]?.content;
+    assert(typeof sent === "string" && sent.includes("[工具调用协议]"), "协议注入首条 user 消息");
+    assert(sent.includes("- get_weather: 查询城市天气"), "协议列出工具名与描述");
+    const choice = (await res.json())?.choices?.[0];
+    assert(choice?.finish_reason === "tool_calls", "非流式 finish_reason=tool_calls");
+    const call = choice?.message?.tool_calls?.[0];
+    assert(call?.type === "function" && call?.function?.name === "get_weather", "非流式返回标准 tool_calls");
+    assert(call?.function?.arguments === '{"city":"Paris"}', "工具参数被解析为 JSON 字符串");
+    assert(choice?.message?.content === null, "纯工具调用时 content 为 null");
+
+    const streamRes = await post({ stream: true, tools });
+    const chunks = chunksOf(await streamRes.text());
+    const deltas = chunks.flatMap((c) => c.choices?.[0]?.delta?.tool_calls || []);
+    assert(deltas.length === 1, "流式下发 tool_calls delta");
+    assert(deltas[0]?.function?.name === "get_weather", "流式 tool_calls 名称正确");
+    assert(deltas[0]?.function?.arguments === '{"city":"Paris"}', "流式 tool_calls 参数完整");
+    assert(chunks.some((c) => c.choices?.[0]?.finish_reason === "tool_calls"), "流式 finish_reason=tool_calls");
+
+    const historyRes = await post({
+      stream: false,
+      tools,
+      messages: [
+        { role: "user", content: "巴黎天气" },
+        {
+          role: "assistant",
+          content: null,
+          tool_calls: [{ id: "call_1", type: "function", function: { name: "get_weather", arguments: '{"city":"Paris"}' } }],
+        },
+        { role: "tool", tool_call_id: "call_1", name: "get_weather", content: '{"temp":20}' },
+      ],
+    });
+    assert(historyRes.status === 200, "工具历史回放请求 HTTP 200");
+    const historyMessages = lastBody?.messages || [];
+    assert(historyMessages.some((m) => String(m.content).includes('[tool_call] get_weather({"city":"Paris"})')), "assistant.tool_calls 回放为文本");
+    assert(historyMessages.some((m) => String(m.content).includes('[tool_result] get_weather: {"temp":20}')), "role=tool 回放为工具结果文本");
+    assert(historyMessages.every((m) => m.role !== "tool"), "上游不出现 tool role");
+
+    mode = "text";
+    const plainRes = await post({ stream: false, tools });
+    const plainChoice = (await plainRes.json())?.choices?.[0];
+    assert(plainChoice?.message?.content === "今天风和日丽", "无工具调用时正文正常");
+    assert(!("tool_calls" in (plainChoice?.message || {})), "无工具调用时不输出 tool_calls");
+    assert(plainChoice?.finish_reason === "stop", "无工具调用时 finish_reason=stop");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

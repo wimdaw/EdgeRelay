@@ -30,6 +30,17 @@ import {
   streamErrorEvent,
   type DuckAiLimit,
 } from "./duckai-signals";
+import {
+  buildToolProtocol,
+  formatToolCallsForHistory,
+  formatToolResult,
+  injectToolProtocol,
+  normalizeToolDefinitions,
+  parseToolCalls,
+  stripToolCallText,
+  toChatToolCalls,
+  type DuckAiTool,
+} from "./duckai-tools";
 
 const BASE_URL = "https://duck.ai";
 const STATUS_URL = `${BASE_URL}/duckchat/v1/status`;
@@ -417,12 +428,20 @@ function normalizeMessages(value: unknown): DuckMessage[] {
   for (const entry of value) {
     if (!entry || typeof entry !== "object") continue;
     const message = entry as Record<string, unknown>;
-    const role = message.role === "assistant" ? "assistant" : "user";
     const content = contentToText(message.content);
     const images = extractImageParts(message.content);
+    if (message.role === "tool" || message.role === "function") {
+      // duck.ai 没有 tool role：客户端回传的工具结果编码为上游可读 user 文本
+      const name = typeof message.name === "string" ? message.name : "";
+      messages.push({ role: "user", content: formatToolResult({ name, result: content }), images: [] });
+      continue;
+    }
+    const role = message.role === "assistant" ? "assistant" : "user";
     if (role === "assistant") {
+      // 回放 assistant.tool_calls 时同样编码成文本（对齐 duckai-cpa）
+      const merged = [content, formatToolCallsForHistory(message.tool_calls)].filter(Boolean).join("\n");
       // assistant 轮产生的图片没有文本也会被丢弃，这里保留图片并挂到下一轮 user
-      if (content || images.length) messages.push({ role, content, images: [] });
+      if (merged || images.length) messages.push({ role, content: merged, images: [] });
       if (images.length) pendingImages = images;
       continue;
     }
@@ -653,8 +672,7 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
   });
 }
 
-async function parseNonStreamingResponse(upstream: Response, model: string, searchEnabled: boolean, imageGenEnabled: boolean): Promise<Response> {
-  const text = await upstream.text();
+function collectUpstream(text: string, searchEnabled: boolean, imageGenEnabled: boolean): CollectedUpstream {
   let content = "";
   let sources: DuckAiSource[] = [];
   const images: DuckAiChatImage[] = [];
@@ -710,7 +728,36 @@ async function parseNonStreamingResponse(upstream: Response, model: string, sear
     } catch {}
   }
 
-  const fatal = limit ?? (refusal ? REFUSAL_ERROR : null);
+  return { content, sources, images, partialImage, reasoning, refusal, limit, finishReason };
+}
+
+type CollectedUpstream = {
+  content: string;
+  sources: DuckAiSource[];
+  images: DuckAiChatImage[];
+  partialImage: DuckAiGeneratedImage | null;
+  reasoning: string;
+  refusal: boolean;
+  limit: DuckAiLimit | null;
+  finishReason: "stop" | "length" | "content_filter";
+};
+
+function finalizeImages(collected: CollectedUpstream): DuckAiChatImage[] {
+  const images = collected.images.slice();
+  if (images.length === 0 && collected.partialImage) images.push(toChatImage(collected.partialImage));
+  return images;
+}
+
+async function parseNonStreamingResponse(
+  upstream: Response,
+  model: string,
+  searchEnabled: boolean,
+  imageGenEnabled: boolean,
+  clientTools: DuckAiTool[],
+): Promise<Response> {
+  const collected = collectUpstream(await upstream.text(), searchEnabled, imageGenEnabled);
+
+  const fatal = collected.limit ?? (collected.refusal ? REFUSAL_ERROR : null);
   if (fatal) {
     return new Response(
       JSON.stringify({ error: { message: fatal.message, type: fatal.type, code: fatal.code } }),
@@ -718,15 +765,25 @@ async function parseNonStreamingResponse(upstream: Response, model: string, sear
     );
   }
 
-  if (searchEnabled) content = cleanCitationText(content);
+  const toolCalls = clientTools.length ? parseToolCalls(collected.content, clientTools) : [];
+  const hasToolCalls = toolCalls.length > 0;
+  let messageContent = searchEnabled ? cleanCitationText(collected.content) : collected.content;
+  if (hasToolCalls) {
+    messageContent = stripToolCallText(messageContent, true);
+    if (/^```|^\{|^<tool_call>/i.test(collected.content.trim())) messageContent = "";
+  }
 
-  const message: Record<string, unknown> = { role: "assistant", content };
-  if (reasoning) message.reasoning_content = reasoning;
-  if (images.length === 0 && partialImage) images.push(toChatImage(partialImage));
+  const message: Record<string, unknown> = {
+    role: "assistant",
+    content: hasToolCalls && !messageContent ? null : messageContent,
+  };
+  if (hasToolCalls) message.tool_calls = toChatToolCalls(toolCalls);
+  if (collected.reasoning) message.reasoning_content = collected.reasoning;
+  const images = finalizeImages(collected);
   if (images.length > 0) message.images = images;
-  if (searchEnabled && sources.length > 0) {
-    message.annotations = buildAnnotations(sources);
-    message.sources = sources;
+  if (searchEnabled && collected.sources.length > 0) {
+    message.annotations = buildAnnotations(collected.sources);
+    message.sources = collected.sources;
   }
 
   const result = {
@@ -734,13 +791,85 @@ async function parseNonStreamingResponse(upstream: Response, model: string, sear
     object: "chat.completion",
     created: Math.floor(Date.now() / 1000),
     model,
-    choices: [{ index: 0, message, finish_reason: finishReason }],
+    choices: [{ index: 0, message, finish_reason: hasToolCalls ? "tool_calls" : collected.finishReason }],
     usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
   };
 
   return new Response(JSON.stringify(result), {
     status: 200,
     headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" },
+  });
+}
+
+/**
+ * 带客户端工具的流式响应：先完整解析（工具 JSON 可能跨 delta），再按 OpenAI chunk 回放。
+ * 与 duckai-cpa 的 streamChatCompletionWithTools 一致。
+ */
+async function streamResponseWithTools(
+  upstream: Response,
+  model: string,
+  searchEnabled: boolean,
+  imageGenEnabled: boolean,
+  clientTools: DuckAiTool[],
+): Promise<Response> {
+  const collected = collectUpstream(await upstream.text(), searchEnabled, imageGenEnabled);
+  const id = `chatcmpl-duckai-${crypto.randomUUID()}`;
+  const encoder = new TextEncoder();
+  const fatal = collected.limit ?? (collected.refusal ? REFUSAL_ERROR : null);
+  const toolCalls = clientTools.length ? parseToolCalls(collected.content, clientTools) : [];
+  const hasToolCalls = toolCalls.length > 0;
+  let content = searchEnabled ? cleanCitationText(collected.content) : collected.content;
+  if (hasToolCalls) {
+    content = stripToolCallText(content, true);
+    if (/^```|^\{|^<tool_call>/i.test(collected.content.trim())) content = "";
+  }
+  const images = finalizeImages(collected);
+
+  const body = new ReadableStream<Uint8Array>({
+    start(controller) {
+      const emit = (delta: Record<string, unknown>, finishReason: string | null = null) => {
+        if (Object.keys(delta).length === 0 && finishReason === null) return;
+        controller.enqueue(encoder.encode(openAiChunk(id, model, delta, finishReason)));
+      };
+      if (fatal) {
+        controller.enqueue(encoder.encode(streamErrorEvent(fatal)));
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+        return;
+      }
+      emit({ role: "assistant", content: "" });
+      if (collected.reasoning) {
+        for (let i = 0; i < collected.reasoning.length; i += 200) {
+          emit({ reasoning_content: collected.reasoning.slice(i, i + 200) });
+        }
+      }
+      if (hasToolCalls) {
+        toolCalls.forEach((call, index) => {
+          emit({
+            tool_calls: [{ index, id: call.id, type: "function", function: { name: call.name, arguments: call.arguments } }],
+          });
+        });
+        emit({}, "tool_calls");
+      } else {
+        for (let i = 0; i < content.length; i += 120) emit({ content: content.slice(i, i + 120) });
+        if (searchEnabled && collected.sources.length) {
+          emit({ annotations: buildAnnotations(collected.sources), sources: collected.sources });
+        }
+        if (images.length) emit({ images });
+        emit({}, collected.finishReason);
+      }
+      controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+      controller.close();
+    },
+  });
+
+  return new Response(body, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      "X-Accel-Buffering": "no",
+    },
   });
 }
 
@@ -752,10 +881,12 @@ export async function handleDuckAiRequest(input: {
   webSearch?: unknown;
   imageGeneration?: unknown;
 }): Promise<Response> {
-  const messages = normalizeMessages(input.messages);
+  const clientTools = normalizeToolDefinitions(input.tools);
+  let messages = normalizeMessages(input.messages);
   if (messages.length === 0) {
     return new Response(JSON.stringify({ error: { message: "messages 不能为空", type: "invalid_request_error" } }), { status: 400 });
   }
+  if (clientTools.length > 0) messages = injectToolProtocol(messages, buildToolProtocol(clientTools));
   const searchEnabled = isWebSearchEnabled(input.tools, input.webSearch);
   const imageGenEnabled = isImageGenerationEnabled(input.tools, input.imageGeneration);
 
@@ -822,9 +953,9 @@ export async function handleDuckAiRequest(input: {
     });
   }
 
-  return input.stream
-    ? streamResponse(upstream, input.model, searchEnabled, imageGenEnabled)
-    : await parseNonStreamingResponse(upstream, input.model, searchEnabled, imageGenEnabled);
+  if (!input.stream) return await parseNonStreamingResponse(upstream, input.model, searchEnabled, imageGenEnabled, clientTools);
+  if (clientTools.length > 0) return await streamResponseWithTools(upstream, input.model, searchEnabled, imageGenEnabled, clientTools);
+  return streamResponse(upstream, input.model, searchEnabled, imageGenEnabled);
   } finally {
     releaseDuckSlot();
   }
