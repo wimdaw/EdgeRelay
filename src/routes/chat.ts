@@ -479,6 +479,7 @@ export async function runChatPipeline(
             stream,
             tools: body.tools,
             webSearch: body.web_search ?? body.enable_web_search,
+            imageGeneration: body.image_generation ?? body.enable_image_generation,
           });
         } else if (isAnthropic) {
           const { openAIToAnthropicRequest } = await import("../anthropic-translate");

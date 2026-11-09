@@ -1081,6 +1081,60 @@ let apiKeyId = "";
   }
 }
 
+// 18. Duck.ai 图片生成输出
+{
+  const realFetch = globalThis.fetch;
+  const sse = [
+    'data: {"type":"message","role":"generated-image","result":"aGVsbG8taW1n","format":"png","width":64,"height":64}',
+    'data: {"type":"message","role":"assistant","message":"这是你要的图。"}',
+    'data: [DONE]',
+    '',
+  ].join('\n\n');
+  let lastBody = null;
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("/duckchat/v1/status")) {
+      return new Response("{}", {
+        status: 200,
+        headers: { "x-vqd-hash-1": Buffer.from('(function(){return {client_hashes:["x"]}})()').toString("base64") },
+      });
+    }
+    if (target.includes("/duckchat/v1/chat")) {
+      lastBody = JSON.parse(init.body);
+      return new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+  };
+  const post = (body) => request("/v1/chat/completions", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "mock-duck-image", messages: [{ role: "user", content: "画一只猫" }], ...body },
+  });
+  try {
+    const res = await post({ stream: false, tools: [{ type: "image_generation" }] });
+    assert(res.status === 200, "图片生成请求 HTTP 200");
+    assert(lastBody?.metadata?.toolChoice?.GenerateImage === true, "图片生成下发 toolChoice.GenerateImage");
+    const msg = (await res.json())?.choices?.[0]?.message;
+    assert(msg?.images?.length === 1, "非流式返回 message.images");
+    assert(msg?.images?.[0]?.type === "image_url", "images 类型为 image_url");
+    assert(String(msg?.images?.[0]?.image_url?.url).startsWith("data:image/png;base64,"), "图片为 PNG data URL");
+    assert(msg?.content === "这是你要的图。", "图片场景正文正常");
+
+    const streamRes = await post({ stream: true, image_generation: true });
+    const chunks = String(await streamRes.text())
+      .split("\n\n").map((b) => b.trim()).filter((b) => b.startsWith("data:")).map((b) => b.slice(5).trim())
+      .filter((p) => p && p !== "[DONE]").map((p) => JSON.parse(p));
+    const imageDelta = chunks.find((c) => Array.isArray(c.choices?.[0]?.delta?.images));
+    assert(Boolean(imageDelta), "流式返回 delta.images");
+    assert(String(imageDelta?.choices?.[0]?.delta?.images?.[0]?.image_url?.url).startsWith("data:image/png;base64,"), "流式图片为 PNG data URL");
+
+    await post({ stream: false, image_generation: false });
+    assert(!("metadata" in (lastBody || {})), "未启用图片生成时不下发 metadata");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

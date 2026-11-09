@@ -15,6 +15,12 @@ import {
   type DuckAiSource,
 } from "./duckai-sources";
 import {
+  isImageGenerationEnabled,
+  extractGeneratedImage,
+  toChatImage,
+  type DuckAiChatImage,
+} from "./duckai-generated";
+import {
   extractReasoningDelta,
   isRefusalEvent,
   normalizeDuckFinishReason,
@@ -511,7 +517,7 @@ function openAiChunk(id: string, model: string, delta: Record<string, unknown>, 
   })}\n\n`;
 }
 
-function streamResponse(upstream: Response, model: string, searchEnabled: boolean): Response {
+function streamResponse(upstream: Response, model: string, searchEnabled: boolean, imageGenEnabled: boolean): Response {
   if (!upstream.body) throw new Error("Duck.ai 没有返回响应流");
   const id = `chatcmpl-duckai-${crypto.randomUUID()}`;
   const encoder = new TextEncoder();
@@ -584,6 +590,13 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
         }
         try {
           const ev = JSON.parse(payloadStr);
+          if (imageGenEnabled) {
+            const image = extractGeneratedImage(ev);
+            if (image) {
+              emit(controller, { images: [toChatImage(image)] });
+              continue;
+            }
+          }
           if (isRefusalEvent(ev)) {
             refusal = true;
             continue;
@@ -627,10 +640,11 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
   });
 }
 
-async function parseNonStreamingResponse(upstream: Response, model: string, searchEnabled: boolean): Promise<Response> {
+async function parseNonStreamingResponse(upstream: Response, model: string, searchEnabled: boolean, imageGenEnabled: boolean): Promise<Response> {
   const text = await upstream.text();
   let content = "";
   let sources: DuckAiSource[] = [];
+  const images: DuckAiChatImage[] = [];
   let reasoning = "";
   let reasoningSeen = false;
   let refusal = false;
@@ -649,6 +663,13 @@ async function parseNonStreamingResponse(upstream: Response, model: string, sear
     }
     try {
       const ev = JSON.parse(payloadStr);
+      if (imageGenEnabled) {
+        const image = extractGeneratedImage(ev);
+        if (image) {
+          images.push(toChatImage(image));
+          continue;
+        }
+      }
       if (isRefusalEvent(ev)) {
         refusal = true;
         continue;
@@ -682,6 +703,7 @@ async function parseNonStreamingResponse(upstream: Response, model: string, sear
 
   const message: Record<string, unknown> = { role: "assistant", content };
   if (reasoning) message.reasoning_content = reasoning;
+  if (images.length > 0) message.images = images;
   if (searchEnabled && sources.length > 0) {
     message.annotations = buildAnnotations(sources);
     message.sources = sources;
@@ -708,12 +730,14 @@ export async function handleDuckAiRequest(input: {
   stream?: boolean;
   tools?: unknown;
   webSearch?: unknown;
+  imageGeneration?: unknown;
 }): Promise<Response> {
   const messages = normalizeMessages(input.messages);
   if (messages.length === 0) {
     return new Response(JSON.stringify({ error: { message: "messages 不能为空", type: "invalid_request_error" } }), { status: 400 });
   }
   const searchEnabled = isWebSearchEnabled(input.tools, input.webSearch);
+  const imageGenEnabled = isImageGenerationEnabled(input.tools, input.imageGeneration);
 
   await acquireDuckSlot();
   try {
@@ -741,7 +765,8 @@ export async function handleDuckAiRequest(input: {
 
   const payload = {
     model: requestedModel,
-    // 与 duckai-cpa 一致：不再下发 metadata.toolChoice，联网由模型自决（显式 WebSearch 会破坏 continuation）
+    // 联网与 duckai-cpa 一致交由模型自决；仅图片生成下发 GenerateImage（参考实现同样只在生图时设置 toolChoice）
+    ...(imageGenEnabled ? { metadata: { toolChoice: { GenerateImage: true } } } : {}),
     messages: toUpstreamMessages(messages),
     canUseTools: true,
     reasoningEffort: reasoningEffort(requestedModel),
@@ -777,7 +802,9 @@ export async function handleDuckAiRequest(input: {
     });
   }
 
-  return input.stream ? streamResponse(upstream, input.model, searchEnabled) : await parseNonStreamingResponse(upstream, input.model, searchEnabled);
+  return input.stream
+    ? streamResponse(upstream, input.model, searchEnabled, imageGenEnabled)
+    : await parseNonStreamingResponse(upstream, input.model, searchEnabled, imageGenEnabled);
   } finally {
     releaseDuckSlot();
   }
