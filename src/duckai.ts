@@ -771,7 +771,7 @@ export async function handleDuckAiRequest(input: {
     canUseTools: true,
     reasoningEffort: reasoningEffort(requestedModel),
     canUseApproxLocation: null,
-    canDelegateImageGeneration: null,
+    canDelegateImageGeneration: imageGenEnabled ? true : null,
     durableStream: {
       messageId: crypto.randomUUID(),
       conversationId: crypto.randomUUID(),
