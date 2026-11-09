@@ -1276,6 +1276,67 @@ let apiKeyId = "";
   }
 }
 
+// 21. Duck.ai 上下文 PDF 溢出
+{
+  const realFetch = globalThis.fetch;
+  let lastBody = null;
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("/duckchat/v1/status")) {
+      return new Response("{}", {
+        status: 200,
+        headers: { "x-vqd-hash-1": Buffer.from('(function(){return {client_hashes:["x"]}})()').toString("base64") },
+      });
+    }
+    if (target.includes("/duckchat/v1/chat")) {
+      lastBody = JSON.parse(init.body);
+      return new Response('data: {"type":"message","role":"assistant","message":"已读取上下文"}\n\ndata: [DONE]\n\n', {
+        status: 200,
+        headers: { "content-type": "text/event-stream" },
+      });
+    }
+    return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+  };
+  const post = (body) => request("/v1/chat/completions", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "mock-duck-image", stream: false, ...body },
+  });
+  const fileOf = (message) => (Array.isArray(message?.content) ? message.content.find((part) => part.type === "file") : null);
+  try {
+    const longHistory = "The quick brown fox jumps over the lazy dog. ".repeat(480);
+    const res = await post({
+      messages: [
+        { role: "user", content: longHistory.slice(0, 21000) },
+        { role: "assistant", content: "Noted." },
+        { role: "user", content: "请总结之前的要点" },
+      ],
+    });
+    assert(res.status === 200, "PDF 溢出请求 HTTP 200");
+    const sent = lastBody?.messages || [];
+    assert(sent.length === 1, "历史被移出文本消息，只保留当前 user");
+    const file = fileOf(sent[0]);
+    assert(Boolean(file), "当前 user 消息携带 type=file part");
+    assert(file?.mimeType === "application/pdf" && file?.filename === "conversation-context.pdf", "PDF part 元数据正确");
+    assert(typeof file?.content === "string" && file.content.startsWith("JVBERi0"), "PDF 内容为 base64 且以 %PDF 开头");
+    const textPart = Array.isArray(sent[0]?.content) ? sent[0].content.find((p) => p.type === "text") : null;
+    assert(String(textPart?.text || "").includes("请总结之前的要点"), "当前问题保留为文本");
+    assert(String(textPart?.text || "").includes("conversation-context.pdf"), "附带 PDF 阅读提示");
+
+    const small = await post({ messages: [{ role: "user", content: "短问题" }] });
+    assert(small.status === 200, "未超阈值请求 HTTP 200");
+    assert(typeof lastBody?.messages?.[0]?.content === "string", "未超阈值时保持纯文本 content");
+
+    const cjkHistory = "中文上下文内容。".repeat(3000);
+    await post({ messages: [{ role: "user", content: cjkHistory }, { role: "user", content: "继续" }] });
+    const cjkMessages = lastBody?.messages || [];
+    assert(cjkMessages.length === 2, "中文历史无法生成 PDF 时回退为文本");
+    assert(!fileOf(cjkMessages[0]), "回退时不附带 file part");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

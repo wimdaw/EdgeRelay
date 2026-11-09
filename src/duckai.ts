@@ -41,6 +41,7 @@ import {
   toChatToolCalls,
   type DuckAiTool,
 } from "./duckai-tools";
+import { spillMessagesToPdf, type DuckAiFilePart } from "./duckai-pdf";
 
 const BASE_URL = "https://duck.ai";
 const STATUS_URL = `${BASE_URL}/duckchat/v1/status`;
@@ -419,7 +420,12 @@ function contentToText(content: unknown): string {
   return content == null ? "" : JSON.stringify(content);
 }
 
-type DuckMessage = { role: "user" | "assistant"; content: string; images: DuckAiImagePart[] };
+type DuckMessage = {
+  role: "user" | "assistant";
+  content: string;
+  images: DuckAiImagePart[];
+  files: DuckAiFilePart[];
+};
 
 function normalizeMessages(value: unknown): DuckMessage[] {
   if (!Array.isArray(value)) return [];
@@ -433,7 +439,7 @@ function normalizeMessages(value: unknown): DuckMessage[] {
     if (message.role === "tool" || message.role === "function") {
       // duck.ai 没有 tool role：客户端回传的工具结果编码为上游可读 user 文本
       const name = typeof message.name === "string" ? message.name : "";
-      messages.push({ role: "user", content: formatToolResult({ name, result: content }), images: [] });
+      messages.push({ role: "user", content: formatToolResult({ name, result: content }), images: [], files: [] });
       continue;
     }
     const role = message.role === "assistant" ? "assistant" : "user";
@@ -441,14 +447,14 @@ function normalizeMessages(value: unknown): DuckMessage[] {
       // 回放 assistant.tool_calls 时同样编码成文本（对齐 duckai-cpa）
       const merged = [content, formatToolCallsForHistory(message.tool_calls)].filter(Boolean).join("\n");
       // assistant 轮产生的图片没有文本也会被丢弃，这里保留图片并挂到下一轮 user
-      if (merged || images.length) messages.push({ role, content: merged, images: [] });
+      if (merged || images.length) messages.push({ role, content: merged, images: [], files: [] });
       if (images.length) pendingImages = images;
       continue;
     }
     const allImages = pendingImages.concat(images);
     pendingImages = [];
     if (!content && allImages.length === 0) continue;
-    messages.push({ role, content, images: allImages });
+    messages.push({ role, content, images: allImages, files: [] });
   }
   return messages;
 }
@@ -456,12 +462,12 @@ function normalizeMessages(value: unknown): DuckMessage[] {
 /** 上游要求 user 消息的 content 为 parts 数组；纯文本消息保持字符串以兼容旧行为 */
 function toUpstreamMessages(messages: DuckMessage[]) {
   return messages.map((message) => {
-    if (message.role !== "user" || message.images.length === 0) {
+    if (message.role !== "user" || (message.images.length === 0 && message.files.length === 0)) {
       return { role: message.role, content: message.content };
     }
     return {
       role: message.role,
-      content: [{ type: "text", text: message.content }, ...message.images],
+      content: [{ type: "text", text: message.content }, ...message.files, ...message.images],
     };
   });
 }
@@ -886,6 +892,11 @@ export async function handleDuckAiRequest(input: {
   if (messages.length === 0) {
     return new Response(JSON.stringify({ error: { message: "messages 不能为空", type: "invalid_request_error" } }), { status: 400 });
   }
+  // 历史文本超过 duck.ai 输入阈值时，旧历史改渲染为 PDF 附件（失败则保持原文本行为）
+  try {
+    const spilled = spillMessagesToPdf(messages);
+    if (spilled) messages = spilled.messages;
+  } catch {}
   if (clientTools.length > 0) messages = injectToolProtocol(messages, buildToolProtocol(clientTools));
   const searchEnabled = isWebSearchEnabled(input.tools, input.webSearch);
   const imageGenEnabled = isImageGenerationEnabled(input.tools, input.imageGeneration);
