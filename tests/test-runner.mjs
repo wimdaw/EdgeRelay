@@ -839,7 +839,7 @@ let apiKeyId = "";
   });
   assert(modelRes.status === 200, "创建 Duck.ai 测试模型映射 HTTP 200");
 
-  const jpegModule = await import("jpeg-js");
+  const jpegModule = await import("../src/vendor/jpeg-js/index.cjs");
   const jpegLib = jpegModule.default || jpegModule;
   const raw = Buffer.alloc(2 * 2 * 4);
   for (let i = 0; i < raw.length; i += 4) {

@@ -1,5 +1,5 @@
 import { deflateSync } from "node:zlib";
-import * as jpeg from "jpeg-js";
+import * as jpeg from "./vendor/jpeg-js/index.cjs";
 
 /** Duck.ai 上游只接受的图片类型（实测 JPEG data URL 会被 400 拒绝） */
 export type DuckAiImagePart = { type: "image"; mimeType: string; image: string };
