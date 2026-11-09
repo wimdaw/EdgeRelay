@@ -42,6 +42,7 @@ import {
   type DuckAiTool,
 } from "./duckai-tools";
 import { spillMessagesToPdf, type DuckAiFilePart } from "./duckai-pdf";
+import { mergeDuckMetadata, parseDuckMetadataFrame, readDuckEventMetadata, type DuckAiMetadata } from "./duckai-meta";
 
 const BASE_URL = "https://duck.ai";
 const STATUS_URL = `${BASE_URL}/duckchat/v1/status`;
@@ -559,6 +560,7 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
   let limit: DuckAiLimit | null = null;
   let partialImage: DuckAiGeneratedImage | null = null;
   let sentImage = false;
+  const meta: DuckAiMetadata = {};
   const citationFilter = searchEnabled ? createCitationFilter() : null;
 
   const emit = (controller: TransformStreamDefaultController<Uint8Array>, delta: Record<string, unknown>, finishReason: string | null = null) => {
@@ -589,6 +591,7 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
       emit(controller, { images: [toChatImage(partialImage)] });
       sentImage = true;
     }
+    if (Object.keys(meta).length) emit(controller, { duckai: meta });
     const fatal = limit ?? (refusal ? REFUSAL_ERROR : null);
     if (fatal) {
       controller.enqueue(encoder.encode(streamErrorEvent(fatal)));
@@ -612,8 +615,13 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
         const trimmed = line.trim();
         if (!trimmed.startsWith("data:")) continue;
         const payloadStr = trimmed.slice(5).trim();
-        if (!payloadStr || payloadStr.startsWith("[CHAT_TITLE") || payloadStr === "[PING]") continue;
+        if (!payloadStr || payloadStr === "[PING]") continue;
+        if (payloadStr.includes("[CHAT_TITLE")) {
+          mergeDuckMetadata(meta, parseDuckMetadataFrame(payloadStr));
+          continue;
+        }
         if (payloadStr.includes("[DONE]")) {
+          mergeDuckMetadata(meta, parseDuckMetadataFrame(payloadStr));
           const markers = parseDuckMarkers(payloadStr);
           if (markers.limit) limit = markers.limit;
           else finishReason = normalizeDuckFinishReason(markers.stopReason);
@@ -622,6 +630,7 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
         }
         try {
           const ev = JSON.parse(payloadStr);
+          mergeDuckMetadata(meta, readDuckEventMetadata(ev));
           if (imageGenEnabled) {
             const image = extractGeneratedImage(ev);
             if (image) {
@@ -688,12 +697,18 @@ function collectUpstream(text: string, searchEnabled: boolean, imageGenEnabled: 
   let refusal = false;
   let limit: DuckAiLimit | null = null;
   let finishReason: "stop" | "length" | "content_filter" = "stop";
+  const meta: DuckAiMetadata = {};
   for (const line of text.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed.startsWith("data:")) continue;
     const payloadStr = trimmed.slice(5).trim();
-    if (!payloadStr || payloadStr.startsWith("[CHAT_TITLE")) continue;
+    if (!payloadStr) continue;
+    if (payloadStr.includes("[CHAT_TITLE")) {
+      mergeDuckMetadata(meta, parseDuckMetadataFrame(payloadStr));
+      continue;
+    }
     if (payloadStr.includes("[DONE]")) {
+      mergeDuckMetadata(meta, parseDuckMetadataFrame(payloadStr));
       const markers = parseDuckMarkers(payloadStr);
       if (markers.limit) limit = markers.limit;
       else finishReason = normalizeDuckFinishReason(markers.stopReason);
@@ -701,6 +716,7 @@ function collectUpstream(text: string, searchEnabled: boolean, imageGenEnabled: 
     }
     try {
       const ev = JSON.parse(payloadStr);
+      mergeDuckMetadata(meta, readDuckEventMetadata(ev));
       if (imageGenEnabled) {
         const image = extractGeneratedImage(ev);
         if (image) {
@@ -734,7 +750,7 @@ function collectUpstream(text: string, searchEnabled: boolean, imageGenEnabled: 
     } catch {}
   }
 
-  return { content, sources, images, partialImage, reasoning, refusal, limit, finishReason };
+  return { content, sources, images, partialImage, reasoning, refusal, limit, finishReason, meta };
 }
 
 type CollectedUpstream = {
@@ -746,6 +762,7 @@ type CollectedUpstream = {
   refusal: boolean;
   limit: DuckAiLimit | null;
   finishReason: "stop" | "length" | "content_filter";
+  meta: DuckAiMetadata;
 };
 
 function finalizeImages(collected: CollectedUpstream): DuckAiChatImage[] {
@@ -791,6 +808,7 @@ async function parseNonStreamingResponse(
     message.annotations = buildAnnotations(collected.sources);
     message.sources = collected.sources;
   }
+  if (Object.keys(collected.meta).length > 0) message.duckai = collected.meta;
 
   const result = {
     id: `chatcmpl-duckai-${crypto.randomUUID()}`,
@@ -844,6 +862,7 @@ async function streamResponseWithTools(
         return;
       }
       emit({ role: "assistant", content: "" });
+      if (Object.keys(collected.meta).length) emit({ duckai: collected.meta });
       if (collected.reasoning) {
         for (let i = 0; i < collected.reasoning.length; i += 200) {
           emit({ reasoning_content: collected.reasoning.slice(i, i + 200) });

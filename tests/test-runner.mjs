@@ -1337,6 +1337,60 @@ let apiKeyId = "";
   }
 }
 
+// 22. Duck.ai 低价值元数据（标题 / 配额窗口 / 广告 / skill-references）
+{
+  const realFetch = globalThis.fetch;
+  const quota = [{ kind: "chat", remaining: 12, total: 100 }];
+  const ads = [{ id: "ad-1", title: "Sponsored" }];
+  const doneLine = `data: [DONE][FIXED_COST_WINDOW_USAGE:${encodeURIComponent(JSON.stringify({ windows: quota }))}][ADS:${encodeURIComponent(JSON.stringify(ads))}][WARN_CONVERSATION_LIMIT:80]\n\n`;
+  const sse = [
+    "data: [CHAT_TITLE:天气讨论]",
+    `data: ${JSON.stringify({ type: "quota", windows: quota })}`,
+    `data: ${JSON.stringify({ role: "skill-references", skills: [{ name: "summarize" }] })}`,
+    `data: ${JSON.stringify({ type: "message", role: "assistant", message: "今天晴。" })}`,
+  ].join("\n\n") + "\n\n" + doneLine;
+  globalThis.fetch = async (url) => {
+    const target = String(url);
+    if (target.includes("/duckchat/v1/status")) {
+      return new Response("{}", {
+        status: 200,
+        headers: { "x-vqd-hash-1": Buffer.from('(function(){return {client_hashes:["x"]}})()').toString("base64") },
+      });
+    }
+    if (target.includes("/duckchat/v1/chat")) {
+      return new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+  };
+  const post = (stream) => request("/v1/chat/completions", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "mock-duck-image", stream, messages: [{ role: "user", content: "天气" }] },
+  });
+  const chunksOf = (text) => String(text)
+    .split("\n\n").map((b) => b.trim()).filter((b) => b.startsWith("data:")).map((b) => b.slice(5).trim())
+    .filter((p) => p && p !== "[DONE]").map((p) => JSON.parse(p));
+  try {
+    const res = await post(false);
+    const message = (await res.json())?.choices?.[0]?.message;
+    assert(message?.content === "今天晴。", "低价值元数据不影响正文");
+    assert(message?.duckai?.title === "天气讨论", "非流式透传会话标题");
+    assert(JSON.stringify(message?.duckai?.quota_windows) === JSON.stringify(quota), "非流式透传配额窗口");
+    assert(JSON.stringify(message?.duckai?.ads) === JSON.stringify(ads), "非流式透传广告");
+    assert(message?.duckai?.conversation_limit_percent === 80, "非流式透传会话额度警告");
+    assert(message?.duckai?.skill_references?.[0]?.name === "summarize", "非流式透传 skill-references");
+
+    const streamRes = await post(true);
+    const chunks = chunksOf(await streamRes.text());
+    const meta = chunks.map((c) => c.choices?.[0]?.delta?.duckai).filter(Boolean).pop();
+    assert(meta?.title === "天气讨论", "流式透传会话标题");
+    assert(Array.isArray(meta?.quota_windows) && meta.quota_windows.length === 1, "流式透传配额窗口");
+    assert(meta?.skill_references?.[0]?.name === "summarize", "流式透传 skill-references");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);
