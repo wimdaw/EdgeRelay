@@ -8,7 +8,8 @@ export default defineConfig({
   build: {
     outDir: "../public",
     emptyOutDir: true,
-    rollupOptions: { output: { manualChunks: { vendor: ["react", "react-dom", "react-router-dom"], charts: ["recharts"] } } },
+    // EdgeOne 构建容器 fd 上限较低，降低 Rollup 并发读文件数，避免 EMFILE: too many open files
+    rollupOptions: { maxParallelFileOps: 4, output: { manualChunks: { vendor: ["react", "react-dom", "react-router-dom"], charts: ["recharts"] } } },
   },
   server: { proxy: { "/api": "http://localhost:8787", "/v1": "http://localhost:8787" } },
 });
