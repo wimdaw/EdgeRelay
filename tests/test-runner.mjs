@@ -989,6 +989,98 @@ let apiKeyId = "";
   }
 }
 
+// 17. Duck.ai reasoning / 拒答 / 额度 / 结束原因
+{
+  const realFetch = globalThis.fetch;
+  let scenario = "";
+  const scenarios = {
+    reasoning: [
+      'data: {"type":"message","role":"reasoning","state":"text-delta","text":"先想一下。"}',
+      'data: {"type":"message","role":"reasoning","state":"done","summaryText":["先想一下。"]}',
+      'data: {"type":"message","role":"assistant","message":"答案在这里"}',
+      'data: [DONE] [STOP_REASON:max_tokens]',
+      '',
+    ].join('\n\n'),
+    refusal: [
+      'data: {"type":"message","role":"refusal","message":"blocked","detectedBy":"model"}',
+      'data: [DONE]',
+      '',
+    ].join('\n\n'),
+    limit: ['data: [DONE] [LIMIT_ENTITY]', ''].join('\n\n'),
+    limitAccount: ['data: [DONE] [LIMIT_ACCOUNT]', ''].join('\n\n'),
+    limitConversation: ['data: [DONE] [LIMIT_CONVERSATION]', ''].join('\n\n'),
+  };
+  globalThis.fetch = async (url) => {
+    const target = String(url);
+    if (target.includes("/duckchat/v1/status")) {
+      return new Response("{}", {
+        status: 200,
+        headers: { "x-vqd-hash-1": Buffer.from('(function(){return {client_hashes:["x"]}})()').toString("base64") },
+      });
+    }
+    if (target.includes("/duckchat/v1/chat")) {
+      return new Response(scenarios[scenario], { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+  };
+  const post = (body) => request("/v1/chat/completions", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "mock-duck-image", messages: [{ role: "user", content: "hi" }], ...body },
+  });
+  try {
+    scenario = "reasoning";
+    const res = await post({ stream: false });
+    const msg = (await res.json())?.choices?.[0]?.message;
+    assert(res.status === 200, "reasoning 场景 HTTP 200");
+    assert(msg?.reasoning_content === "先想一下。", "非流式透传 reasoning_content");
+    assert(msg?.content === "答案在这里", "reasoning 不进入正文");
+    const fin = (await post({ stream: false }))?.status;
+    assert(fin === 200, "reasoning 场景可重复请求");
+
+    scenario = "reasoning";
+    const streamRes = await post({ stream: true });
+    const chunks = String(await streamRes.text())
+      .split("\n\n").map((b) => b.trim()).filter((b) => b.startsWith("data:")).map((b) => b.slice(5).trim())
+      .filter((p) => p && p !== "[DONE]").map((p) => JSON.parse(p));
+    const reasoningStreamed = chunks.map((c) => c.choices?.[0]?.delta?.reasoning_content || "").join("");
+    assert(reasoningStreamed === "先想一下。", "流式透传 reasoning_content");
+    assert(chunks.some((c) => c.choices?.[0]?.finish_reason === "length"), "[STOP_REASON:max_tokens] → finish_reason=length");
+
+    scenario = "refusal";
+    const refusalRes = await post({ stream: false });
+    assert(refusalRes.status === 403, "拒答 → HTTP 403");
+    assert((await refusalRes.json())?.error?.code === "content_filter", "拒答 → code=content_filter");
+
+    scenario = "limit";
+    const limitRes = await post({ stream: false });
+    const limitBody = await limitRes.json();
+    assert(limitRes.status === 429, "[LIMIT_ENTITY] → HTTP 429");
+    assert(limitBody?.error?.type === "rate_limited", "[LIMIT_ENTITY] → 网关统一限流错误体");
+
+    scenario = "limitAccount";
+    const accountRes = await post({ stream: false });
+    assert(accountRes.status === 403, "[LIMIT_ACCOUNT] → HTTP 403");
+    assert((await accountRes.json())?.error?.code === "upstream_subscription_required", "[LIMIT_ACCOUNT] → code=upstream_subscription_required");
+
+    scenario = "limitConversation";
+    const convRes = await post({ stream: false });
+    assert(convRes.status === 400, `[LIMIT_CONVERSATION] → HTTP 400（实际 ${convRes.status}）`);
+    assert((await convRes.json())?.error?.code === "conversation_limit_reached", "[LIMIT_CONVERSATION] → code=conversation_limit_reached");
+
+    scenario = "refusal";
+    const refusalStream = await post({ stream: true });
+    const refusalText = await refusalStream.text();
+    assert(refusalText.includes('"code":"content_filter"'), "流式拒答以 error 事件收尾");
+
+    scenario = "limit";
+    const limitStream = await post({ stream: true });
+    assert((await limitStream.text()).includes("user_limit_exceeded"), "流式额度错误以 error 事件收尾");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

@@ -14,6 +14,15 @@ import {
   mergeSources,
   type DuckAiSource,
 } from "./duckai-sources";
+import {
+  extractReasoningDelta,
+  isRefusalEvent,
+  normalizeDuckFinishReason,
+  parseDuckMarkers,
+  REFUSAL_ERROR,
+  streamErrorEvent,
+  type DuckAiLimit,
+} from "./duckai-signals";
 
 const BASE_URL = "https://duck.ai";
 const STATUS_URL = `${BASE_URL}/duckchat/v1/status`;
@@ -512,6 +521,10 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
   let sentDone = false;
   let sources: DuckAiSource[] = [];
   let sentAnnotations = 0;
+  let refusal = false;
+  let reasoningSeen = false;
+  let finishReason: "stop" | "length" | "content_filter" = "stop";
+  let limit: DuckAiLimit | null = null;
   const citationFilter = searchEnabled ? createCitationFilter() : null;
 
   const emit = (controller: TransformStreamDefaultController<Uint8Array>, delta: Record<string, unknown>, finishReason: string | null = null) => {
@@ -530,6 +543,27 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
     emit(controller, { annotations: buildAnnotations(fresh), sources: fresh });
   };
 
+  const finishStream = (controller: TransformStreamDefaultController<Uint8Array>) => {
+    if (sentDone) return;
+    sentDone = true;
+    if (citationFilter) {
+      const tail = citationFilter.process("", { flush: true });
+      if (tail) emit(controller, { content: tail });
+    }
+    emitNewAnnotations(controller);
+    const fatal = limit ?? (refusal ? REFUSAL_ERROR : null);
+    if (fatal) {
+      controller.enqueue(encoder.encode(streamErrorEvent(fatal)));
+    } else {
+      if (!sentRole) {
+        controller.enqueue(encoder.encode(openAiChunk(id, model, { role: "assistant" })));
+        sentRole = true;
+      }
+      controller.enqueue(encoder.encode(openAiChunk(id, model, {}, finishReason)));
+    }
+    controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+  };
+
   const transform = new TransformStream<Uint8Array, Uint8Array>({
     transform(chunk, controller) {
       buffer += decoder.decode(chunk, { stream: true });
@@ -541,23 +575,27 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
         if (!trimmed.startsWith("data:")) continue;
         const payloadStr = trimmed.slice(5).trim();
         if (!payloadStr || payloadStr.startsWith("[CHAT_TITLE") || payloadStr === "[PING]") continue;
-        if (payloadStr === "[DONE]") {
-          if (citationFilter) {
-            const tail = citationFilter.process("", { flush: true });
-            if (tail) emit(controller, { content: tail });
-          }
-          emitNewAnnotations(controller);
-          if (!sentRole) {
-            controller.enqueue(encoder.encode(openAiChunk(id, model, { role: "assistant" })));
-            sentRole = true;
-          }
-          controller.enqueue(encoder.encode(openAiChunk(id, model, {}, "stop")));
-          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-          sentDone = true;
+        if (payloadStr.includes("[DONE]")) {
+          const markers = parseDuckMarkers(payloadStr);
+          if (markers.limit) limit = markers.limit;
+          else finishReason = normalizeDuckFinishReason(markers.stopReason);
+          finishStream(controller);
           continue;
         }
         try {
           const ev = JSON.parse(payloadStr);
+          if (isRefusalEvent(ev)) {
+            refusal = true;
+            continue;
+          }
+          const reasoning = extractReasoningDelta(ev);
+          if (reasoning.text) {
+            reasoningSeen = true;
+            emit(controller, { reasoning_content: reasoning.text });
+          } else if (reasoning.fallback && !reasoningSeen) {
+            reasoningSeen = true;
+            emit(controller, { reasoning_content: reasoning.fallback });
+          }
           if (searchEnabled) {
             const nextSources = collectSourcesFromEvent(ev, sources);
             if (nextSources !== sources) {
@@ -575,18 +613,7 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
     },
     flush(controller) {
       buffer += decoder.decode();
-      if (!sentDone) {
-        if (citationFilter) {
-          const tail = citationFilter.process("", { flush: true });
-          if (tail) emit(controller, { content: tail });
-        }
-        emitNewAnnotations(controller);
-        if (!sentRole) {
-          controller.enqueue(encoder.encode(openAiChunk(id, model, { role: "assistant" })));
-        }
-        controller.enqueue(encoder.encode(openAiChunk(id, model, {}, "stop")));
-        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-      }
+      finishStream(controller);
     },
   });
 
@@ -604,14 +631,36 @@ async function parseNonStreamingResponse(upstream: Response, model: string, sear
   const text = await upstream.text();
   let content = "";
   let sources: DuckAiSource[] = [];
+  let reasoning = "";
+  let reasoningSeen = false;
+  let refusal = false;
+  let limit: DuckAiLimit | null = null;
+  let finishReason: "stop" | "length" | "content_filter" = "stop";
   for (const line of text.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed.startsWith("data:")) continue;
     const payloadStr = trimmed.slice(5).trim();
     if (!payloadStr || payloadStr.startsWith("[CHAT_TITLE")) continue;
-    if (payloadStr === "[DONE]") break;
+    if (payloadStr.includes("[DONE]")) {
+      const markers = parseDuckMarkers(payloadStr);
+      if (markers.limit) limit = markers.limit;
+      else finishReason = normalizeDuckFinishReason(markers.stopReason);
+      break;
+    }
     try {
       const ev = JSON.parse(payloadStr);
+      if (isRefusalEvent(ev)) {
+        refusal = true;
+        continue;
+      }
+      const reasoningDelta = extractReasoningDelta(ev);
+      if (reasoningDelta.text) {
+        reasoningSeen = true;
+        reasoning += reasoningDelta.text;
+      } else if (reasoningDelta.fallback && !reasoningSeen) {
+        reasoningSeen = true;
+        reasoning += reasoningDelta.fallback;
+      }
       if (searchEnabled) {
         const nextSources = collectSourcesFromEvent(ev, sources);
         if (nextSources !== sources) sources = nextSources;
@@ -621,9 +670,18 @@ async function parseNonStreamingResponse(upstream: Response, model: string, sear
     } catch {}
   }
 
+  const fatal = limit ?? (refusal ? REFUSAL_ERROR : null);
+  if (fatal) {
+    return new Response(
+      JSON.stringify({ error: { message: fatal.message, type: fatal.type, code: fatal.code } }),
+      { status: fatal.status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } },
+    );
+  }
+
   if (searchEnabled) content = cleanCitationText(content);
 
   const message: Record<string, unknown> = { role: "assistant", content };
+  if (reasoning) message.reasoning_content = reasoning;
   if (searchEnabled && sources.length > 0) {
     message.annotations = buildAnnotations(sources);
     message.sources = sources;
@@ -634,7 +692,7 @@ async function parseNonStreamingResponse(upstream: Response, model: string, sear
     object: "chat.completion",
     created: Math.floor(Date.now() / 1000),
     model,
-    choices: [{ index: 0, message, finish_reason: "stop" }],
+    choices: [{ index: 0, message, finish_reason: finishReason }],
     usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
   };
 
