@@ -131,3 +131,5 @@ npm run deploy
 | `/api/admin/usage/trend`| GET | 用量图表数据走势 |
 | `/api/site` | GET | 动态站点信息与 SEO 配置 |
 | `/*` | GET | SPA 页面与静态资源分发 |
+
+<!-- ci-probe -->
