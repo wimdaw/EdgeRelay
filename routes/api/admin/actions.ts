@@ -142,8 +142,11 @@ export const POST = defineHandler(async (c) => {
         const keyRow = await db.prepare("SELECT encrypted_key FROM provider_keys WHERE provider_id=?1 AND status='active' ORDER BY created_at DESC LIMIT 1").bind(providerId).first<{ encrypted_key: string }>();
         if (!prov || !keyRow) throw new ApiError(400, ErrorCode.BAD_REQUEST, "供应商不存在或未录入密钥");
         const upstreamKey = await decryptSecret(env, keyRow.encrypted_key);
-        const { aiGatewayUrl } = await import("../../../src/providers");
-        const base = aiGatewayUrl(env, prov.slug, prov.base_url.replace(/\/+$/, ""));
+        const { aiGatewayUrl, normalizeBaseUrl, upstreamUrl } = await import("../../../src/providers");
+        const providerBase = normalizeBaseUrl(prov.base_url);
+        // Base URL 已带版本路径（…/v1、…/v1beta/openai）时不再补一层 /v1，否则 …/v1/v1/models 会 404
+        const gateway = env.CF_ACCOUNT_ID && env.AI_GATEWAY_ID ? aiGatewayUrl(env, prov.slug, providerBase) : "";
+        const modelsUrl = gateway ? `${gateway}/v1/models` : upstreamUrl(providerBase, "/models");
         const headers: Record<string, string> = {
           "user-agent": "EdgeRelay/1.0 (+https://api.obitw.cn)",
           ...(prov.extra_headers ? JSON.parse(prov.extra_headers) : {}),
@@ -160,7 +163,7 @@ export const POST = defineHandler(async (c) => {
         let resp: Response | null = null;
         let lastStatus = 0;
         for (let attempt = 0; attempt < 2; attempt++) {
-          resp = await fetch(`${base}/v1/models`, { headers, signal: AbortSignal.timeout(20000) });
+          resp = await fetch(modelsUrl, { headers, signal: AbortSignal.timeout(20000) });
           if (resp.ok) break;
           lastStatus = resp.status;
           if (resp.status === 429 || resp.status >= 500) {

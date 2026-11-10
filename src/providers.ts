@@ -6,9 +6,12 @@
  */
 import type { Env, UpstreamRoute } from "./types";
 import { decryptSecret } from "./crypto";
+import { normalizeBaseUrl, upstreamUrl } from "./upstream-url";
 
-export function aiGatewayUrl(env: Env, providerSlug: string, upstreamUrl: string): string {
-  if (!env.CF_ACCOUNT_ID || !env.AI_GATEWAY_ID) return upstreamUrl;
+export { upstreamUrl, normalizeBaseUrl, hasVersionPath } from "./upstream-url";
+
+export function aiGatewayUrl(env: Env, providerSlug: string, baseUrl: string): string {
+  if (!env.CF_ACCOUNT_ID || !env.AI_GATEWAY_ID) return baseUrl;
   const slugMap: Record<string, string> = {
     openai: "openai",
     anthropic: "anthropic",
@@ -19,9 +22,12 @@ export function aiGatewayUrl(env: Env, providerSlug: string, upstreamUrl: string
   return `https://gateway.ai.cloudflare.com/v1/${env.CF_ACCOUNT_ID}/${env.AI_GATEWAY_ID}/${gwSlug}`;
 }
 
-export function resolveTarget(env: Env, route: UpstreamRoute, chatPath = "/v1/chat/completions"): { url: string; headers: Record<string, string> } {
-  const base = route.baseUrl.replace(/\/+$/, "");
-  const url = aiGatewayUrl(env, route.providerSlug, base) + chatPath;
+export function resolveTarget(env: Env, route: UpstreamRoute, apiPath = "/chat/completions"): { url: string; headers: Record<string, string> } {
+  const base = normalizeBaseUrl(route.baseUrl);
+  // 走 CF AI Gateway 时由网关按 slug 分发，统一用 /v1 前缀（网关的通用端点约定）
+  const gateway = env.CF_ACCOUNT_ID && env.AI_GATEWAY_ID ? aiGatewayUrl(env, route.providerSlug, base) : "";
+  // 直连上游：Base URL 已带版本路径（…/v1、…/v1beta/openai）时不再补一层 /v1
+  const url = gateway ? `${gateway}/v1${apiPath}` : upstreamUrl(base, apiPath);
   return { url, headers: {} };
 }
 

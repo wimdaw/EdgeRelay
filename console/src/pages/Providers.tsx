@@ -12,6 +12,16 @@ const SLUG_URL: Record<string, string> = {
   deepseek: "https://api.deepseek.com",
 };
 
+/**
+ * 上游模型列表地址，规则与后端 src/upstream-url.ts 一致：
+ * Base URL 已带版本路径（…/v1、…/v1beta/openai）时不再补一层 /v1，
+ * 否则会拼成 …/v1/v1/models 被上游 404。
+ */
+const upstreamModelsUrl = (baseUrl: string) => {
+  const base = baseUrl.trim().replace(/\/+$/, "").replace(/\/(?:chat\/completions|completions|models)$/i, "");
+  return /(?:^|\/)v\d+(?:[a-z]+\d*)?(?:\/|$)/i.test(base) ? `${base}/models` : `${base}/v1/models`;
+};
+
 export default function Providers() {
   const [rows, setRows] = useState<Provider[] | null>(null);
   const [dlg, setDlg] = useState(false);
@@ -60,7 +70,7 @@ export default function Providers() {
     let models: string[] | null = null;
     if (effectiveKey && baseUrl) {
       try {
-        const resp = await fetch(`${baseUrl.replace(/\/+$/, "")}/v1/models`, {
+        const resp = await fetch(upstreamModelsUrl(baseUrl), {
           headers: { authorization: `Bearer ${effectiveKey}` },
           signal: AbortSignal.timeout(20000),
         });
@@ -85,12 +95,8 @@ export default function Providers() {
 
   const fetchModels = async (providerId: string, providerName: string) => {
     const p = (rows ?? []).find((x) => x.id === providerId);
-    // 重试：优先用记住的密钥浏览器直拉；没有密钥则提示先录入
-    if (!keyMemo.current[providerId]) {
-      setImportStep({ providerId, providerName, models: [], picked: new Set(), loading: false,
-        error: "浏览器直拉需要密钥（服务端不保存明文）。请点供应商卡片的「录入密钥」重新输入一次，即可直连上游获取模型列表。" });
-      return;
-    }
+    // 有内存密钥时浏览器直拉（上游对数据中心 IP 限流，浏览器请求最可靠）；
+    // 没有则回退后端兜底，由服务端用库里加密的密钥去拉，无需用户重新输入
     await pullModels(providerId, providerName, p?.base_url ?? "", "");
   };
 
