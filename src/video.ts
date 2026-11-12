@@ -46,6 +46,16 @@ export type VideoTaskRecord = {
   userEmail?: string;
   createdAt: number;
   updatedAt: number;
+  /**
+   * 排队等待重投：上游队列满（503 video_queue_full）时先把任务挂在这里，
+   * 之后每分钟重新提交一次，挤到空位就转正常轮询。
+   * 有 requestBody + upstreamTaskId 为空 + status=queued 三个特征。
+   */
+  requestBody?: Record<string, any>;
+  /** 下次允许重投的时间（秒） */
+  nextRetryAt?: number;
+  /** 已重投次数（不含首次提交） */
+  retryCount?: number;
 };
 
 /** 该路由是否走 agnes 异步视频协议：渠道显式声明 agnes_video，或上游模型名以 agnes-video 开头
@@ -371,6 +381,21 @@ export function isTerminalVideoStatus(status: VideoTaskStatus): boolean {
 }
 
 /* ==================================================================== */
+/* 排队等空位：上游队列满时挂着，每分钟重投一次                              */
+/* ==================================================================== */
+
+/** 队列满后的重投间隔（秒），与 agnes 免费层的 1 次/分钟节奏对齐 */
+export const QUEUE_RETRY_INTERVAL_SECONDS = 60;
+
+/** 单个任务最多重投多少次（默认约 3 小时） */
+export const MAX_QUEUE_RETRIES = 180;
+
+/** 是否在「排队等空位」：有原始请求体、还没拿到上游任务号、状态仍是 queued */
+export function isWaitingSlot(rec: VideoTaskRecord): boolean {
+  return !!rec.requestBody && !rec.upstreamTaskId && rec.status === "queued";
+}
+
+/* ==================================================================== */
 /* 免费账号额度节流：1 次/分钟/账号                                           */
 /* ==================================================================== */
 
@@ -580,6 +605,8 @@ export async function videoTaskKey(env: Env, rec: VideoTaskRecord): Promise<stri
 /** 刷新单个任务：未完成时回查上游并落库（终态直接返回） */
 export async function refreshVideoTask(env: Env, rec: VideoTaskRecord): Promise<VideoTaskRecord> {
   if (isTerminalVideoStatus(rec.status)) return rec;
+  // 排队等空位的任务没有上游任务号，回查没有意义：交给 route 层的重投逻辑
+  if (isWaitingSlot(rec)) return rec;
   const upstreamKey = await videoTaskKey(env, rec);
   if (!upstreamKey) return rec;
   const poll = await pollAgnesVideo(rec.baseUrl, upstreamKey, rec.upstreamTaskId, rec.upstreamModel);

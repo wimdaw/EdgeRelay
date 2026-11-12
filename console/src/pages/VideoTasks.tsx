@@ -18,6 +18,10 @@ type VideoTaskRow = {
   user_email: string | null;
   created_at: number;
   updated_at: number;
+  /** 排队等空位：上游队列满，后台每分钟自动重投 */
+  waiting_slot?: boolean;
+  retry_count?: number;
+  next_retry_at?: number | null;
 };
 
 type TasksResp = {
@@ -30,6 +34,23 @@ type TasksResp = {
 };
 
 const POLL_MS = 60_000;
+
+/** 选项卡：全部 / 排队中 / 生成中 / 已完成 / 失败 */
+type TabKey = "all" | "queued" | "in_progress" | "completed" | "failed";
+
+const TABS: { key: TabKey; label: string }[] = [
+  { key: "all", label: "全部" },
+  { key: "queued", label: "排队中" },
+  { key: "in_progress", label: "生成中" },
+  { key: "completed", label: "已完成" },
+  { key: "failed", label: "失败" },
+];
+
+function inTab(t: VideoTaskRow, tab: TabKey): boolean {
+  if (tab === "all") return true;
+  if (tab === "failed") return t.status === "failed" || t.status === "cancelled";
+  return t.status === tab;
+}
 
 const STATUS_TEXT: Record<string, string> = {
   queued: "队列中",
@@ -75,6 +96,7 @@ function Progress({ value }: { value: number }) {
 export default function VideoTasks({ me }: { me: Me }) {
   const [data, setData] = useState<TasksResp | null>(null);
   const [scope, setScope] = useState<"own" | "all">("own");
+  const [tab, setTab] = useState<TabKey>("all");
   const [loading, setLoading] = useState(false);
   const [auto, setAuto] = useState(true);
   const [countdown, setCountdown] = useState(POLL_MS / 1000);
@@ -145,6 +167,8 @@ export default function VideoTasks({ me }: { me: Me }) {
   const running = tasks.filter((t) => t.status === "in_progress" || t.status === "queued").length;
   const done = tasks.filter((t) => t.status === "completed").length;
   const failed = tasks.filter((t) => t.status === "failed" || t.status === "cancelled").length;
+  const waiting = tasks.filter((t) => t.waiting_slot).length;
+  const shown = tasks.filter((t) => inTab(t, tab));
 
   return (
     <div className="flex flex-col gap-4">
@@ -211,9 +235,35 @@ export default function VideoTasks({ me }: { me: Me }) {
         <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-muted">
           <span>共 <b className="font-mono text-ink">{tasks.length}</b> 个</span>
           <span>进行中 <b className="font-mono text-ink">{running}</b></span>
+          {waiting > 0 && (
+            <span>
+              排队等空位 <b className="font-mono text-amber-500">{waiting}</b>
+            </span>
+          )}
           <span>已完成 <b className="font-mono text-emerald-500">{done}</b></span>
           <span>失败 <b className="font-mono text-red-500">{failed}</b></span>
           {data && <span className="ml-auto">上次刷新 {fmtTime(data.refreshed_at)}</span>}
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-1.5 border-t border-line/70 pt-3">
+          {TABS.map((t) => {
+            const n = tasks.filter((x) => inTab(x, t.key)).length;
+            const active = tab === t.key;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setTab(t.key)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors",
+                  active ? "bg-brand/15 text-brand" : "text-muted hover:bg-surface2"
+                )}
+              >
+                {t.label}
+                <span className={cn("rounded px-1 text-[10px] font-mono", active ? "bg-brand/15" : "bg-surface2")}>{n}</span>
+              </button>
+            );
+          })}
         </div>
       </Card>
 
@@ -221,17 +271,21 @@ export default function VideoTasks({ me }: { me: Me }) {
         <Card className="p-6">
           <div className="skeleton h-24 rounded-xl2" />
         </Card>
-      ) : tasks.length === 0 ? (
+      ) : shown.length === 0 ? (
         <Card>
           <EmptyState
             icon={<Film size={32} />}
-            title="暂无视频任务"
-            hint="调用 POST /v1/videos 创建任务后，这里会自动出现，并按 60 秒间隔轮询进度。"
+            title={tab === "queued" ? "没有排队中的任务" : "暂无视频任务"}
+            hint={
+              tab === "queued"
+                ? "上游队列满（503 video_queue_full）时，提交的请求会挂在这里，每分钟自动重投一次，挤到空位就开始生成。"
+                : "调用 POST /v1/videos 创建任务后，这里会自动出现，并按 60 秒间隔轮询进度。"
+            }
           />
         </Card>
       ) : (
         <div className="flex flex-col gap-3">
-          {tasks.map((t) => (
+          {shown.map((t) => (
             <Card key={t.id} className="p-3.5">
               <div className="flex flex-wrap items-center gap-2">
                 <StatusPill status={t.status} />
@@ -273,6 +327,17 @@ export default function VideoTasks({ me }: { me: Me }) {
                 <span className="text-[10px] text-muted">创建 {fmtTime(t.created_at)}</span>
                 {t.updated_at > t.created_at && <span className="text-[10px] text-muted">更新 {fmtTime(t.updated_at)}</span>}
               </div>
+
+              {t.waiting_slot && (
+                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-500">
+                  <span className="inline-flex items-center gap-1">
+                    <Clock size={11} /> 排队等空位
+                  </span>
+                  <span>已重试 <b className="font-mono">{t.retry_count ?? 0}</b> 次</span>
+                  {t.next_retry_at ? <span>下次重投 {fmtTime(t.next_retry_at)}</span> : null}
+                  <span className="text-amber-500/70">上游队列满，后台每分钟自动重投，无需重新提交</span>
+                </div>
+              )}
 
               {t.error && (
                 <p className="mt-2 break-all text-[11px] text-err">{t.error}</p>

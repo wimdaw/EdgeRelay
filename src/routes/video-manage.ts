@@ -18,13 +18,18 @@ import {
   deleteVideoTask,
   loadVideoTask,
   isTerminalVideoStatus,
+  isWaitingSlot,
   type VideoTaskRecord,
 } from "../video";
+import { retryQueuedVideoTasks } from "./video";
 
 export const videoManageRouter = new Hono<{ Bindings: Env }>();
 
 /** 每轮刷新上限：避免管理员页面在任务多时把请求拖到超时 */
 const MAX_REFRESH_PER_POLL = 6;
+
+/** 每轮重投上限：排队中的任务每次列表刷新最多重投这么多个（间隔 60s） */
+const MAX_RETRY_PER_POLL = 3;
 
 function canManageAll(role: string): boolean {
   return role === "superadmin" || role === "admin";
@@ -45,6 +50,10 @@ function toRow(t: VideoTaskRecord) {
     user_email: t.userEmail ?? null,
     created_at: t.createdAt,
     updated_at: t.updatedAt,
+    /** 排队等空位：有原始请求体、还没拿到上游任务号 */
+    waiting_slot: isWaitingSlot(t),
+    retry_count: t.retryCount ?? 0,
+    next_retry_at: t.nextRetryAt ?? null,
   };
 }
 
@@ -64,6 +73,10 @@ videoManageRouter.get("/tasks", async (c) => {
       throw new ApiError(403, ErrorCode.FORBIDDEN, "仅管理员可查看全部任务");
     }
     const tasks = await listVideoTasks(c.env, { userId: wantAll ? undefined : user.id, limit });
+
+    // 排队等空位的任务：到期就重投一次。控制台每 60 秒轮询一次，正好当节拍用。
+    // 重投成功会就地改写记录（换成 in_progress 并带上上游任务号），下面的刷新逻辑接着跑。
+    await retryQueuedVideoTasks(c.env, tasks, MAX_RETRY_PER_POLL);
 
     // 刷新未完成任务（并发上限 3，总量上限 6）
     const pending = tasks.filter((t) => !isTerminalVideoStatus(t.status)).slice(0, MAX_REFRESH_PER_POLL);

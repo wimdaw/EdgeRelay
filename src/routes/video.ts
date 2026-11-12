@@ -30,6 +30,9 @@ import {
   isTerminalVideoStatus,
   isQueueFullError,
   isQuotaError,
+  isWaitingSlot,
+  QUEUE_RETRY_INTERVAL_SECONDS,
+  MAX_QUEUE_RETRIES,
   submitAgnesVideo,
   pollAgnesVideo,
   saveVideoTask,
@@ -279,8 +282,44 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
         ip: auth.ip,
       });
       if (queueFull) {
-        // 上游是"容量不足"而不是"你请求太快"：503 更准确，仍带 retry_after 方便客户端退避
-        return openAiError(503, ErrorCode.UPSTREAM_ERROR, lastError, { retry_after: 60, code: "video_queue_full" });
+        // 上游是"容量不足"而不是"你请求太快"：503 更准确，仍带 retry_after 方便客户端退避。
+        // 同时把这次请求挂进排队表：之后每分钟自动重投一次，挤到空位就转正常轮询，
+        // 客户端即使放弃轮询，后台也能把这个视频跑出来。
+        const first = candidates[0];
+        const nowSec = Math.floor(Date.now() / 1000);
+        const secRaw = body.seconds ?? body.duration;
+        const secNum = secRaw === undefined ? NaN : Number(secRaw);
+        const waiting: VideoTaskRecord = {
+          id: `video_${uuid().replace(/-/g, "").slice(0, 20)}`,
+          providerId: first?.providerId ?? "",
+          providerKeyId: first?.providerKeyId ?? "",
+          providerSlug: first?.providerSlug ?? "",
+          baseUrl: first?.baseUrl ?? "",
+          model: publicModel,
+          upstreamModel: first?.upstreamModel ?? publicModel,
+          upstreamTaskId: "",
+          status: "queued",
+          progress: 0,
+          error: "等待上游队列空位（每分钟自动重试一次）",
+          seconds: Number.isFinite(secNum) ? secNum : undefined,
+          size: typeof body.size === "string" ? body.size : undefined,
+          userId: auth.userId,
+          apiKeyId: auth.keyId,
+          userEmail: (await getUserById(env, auth.userId).catch(() => null))?.email,
+          createdAt: nowSec,
+          updatedAt: nowSec,
+          requestBody: queueRequestBody(body as Record<string, any>),
+          nextRetryAt: nowSec + QUEUE_RETRY_INTERVAL_SECONDS,
+          retryCount: 0,
+        };
+        await saveVideoTask(env, waiting);
+        return openAiError(503, ErrorCode.UPSTREAM_ERROR, lastError, {
+          retry_after: QUEUE_RETRY_INTERVAL_SECONDS,
+          code: "video_queue_full",
+          task_id: waiting.id,
+          poll_url: `/v1/videos/${waiting.id}`,
+          queue_waiting: true,
+        });
       }
       if (quotaError) {
         return openAiError(402, ErrorCode.INSUFFICIENT_BALANCE, `上游账户余额不足，无法创建视频任务：${quotaError}`, {
@@ -406,7 +445,7 @@ videoRouter.get("/:id", async (c) => {
     const rec = await loadVideoTask(env, id);
     if (!rec || rec.userId !== auth.userId) throw new ApiError(404, ErrorCode.NOT_FOUND, "视频任务不存在或已过期");
 
-    const updated = await refreshVideoTask(env, rec);
+    const updated = await refreshVideoTask(env, await advanceIfWaiting(env, rec));
     const token = await signVideoToken(env, id);
     return new Response(JSON.stringify({ ...toOpenAiVideoObject(updated), ...taskUrls(c, id, token) }), {
       headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
@@ -489,7 +528,7 @@ videoRouter.get("/:id/status", async (c) => {
     }
     const rec = await loadVideoTask(env, id);
     if (!rec) throw new ApiError(404, ErrorCode.NOT_FOUND, "视频任务不存在或已过期");
-    const updated = await refreshVideoTask(env, rec);
+    const updated = await refreshVideoTask(env, await advanceIfWaiting(env, rec));
     return new Response(JSON.stringify(toOpenAiVideoObject(updated)), {
       headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
     });
@@ -534,3 +573,118 @@ videoRouter.get("/:id/content", async (c) => {
     return errorResponse(c, err);
   }
 });
+
+/* ==================================================================== */
+/* 排队等空位：上游队列满时挂着，每分钟自动重投一次                          */
+/* ==================================================================== */
+
+/** 存进排队表的请求体：去掉 wait（那是本次请求的语义），超长字符串截断，控制 KV 体积 */
+function queueRequestBody(body: Record<string, any>): Record<string, any> {
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(body || {})) {
+    if (k === "wait" || v === undefined || v === null) continue;
+    if (typeof v === "string") {
+      out[k] = v.length > 4000 ? v.slice(0, 4000) : v;
+      continue;
+    }
+    out[k] = v;
+  }
+  return out;
+}
+
+/**
+ * 重投一条排队中的任务：重新解析路由（可能换到别的 Key/渠道），
+ * 成功则转成正常任务，仍是队列满就顺延一分钟，余额不足直接判失败。
+ */
+export async function retryQueuedVideoTask(env: Env, rec: VideoTaskRecord): Promise<VideoTaskRecord> {
+  if (!isWaitingSlot(rec)) return rec;
+  const nowSec = Math.floor(Date.now() / 1000);
+  if ((rec.nextRetryAt ?? 0) > nowSec) return rec;
+
+  if ((rec.retryCount ?? 0) >= MAX_QUEUE_RETRIES) {
+    rec.status = "failed";
+    rec.error = `排队超时：重试 ${rec.retryCount} 次仍未等到上游空位，请稍后重新提交`;
+    rec.nextRetryAt = undefined;
+    rec.updatedAt = nowSec;
+    await saveVideoTask(env, rec);
+    return rec;
+  }
+
+  const body = rec.requestBody || {};
+  const candidates = (await resolveRoutes(env, rec.model)).filter(isAgnesVideoRoute);
+  let queueFull = false;
+  let quotaError = "";
+  let lastError = "";
+
+  for (const route of candidates.slice(0, MAX_VIDEO_ROUTES)) {
+    const upstreamKey = route.encryptedKey ? await decryptSecret(env, route.encryptedKey) : "";
+    const submit = await submitAgnesVideo(route.baseUrl, upstreamKey, { ...body, model: route.upstreamModel });
+
+    if (!submit.ok) {
+      if (isQueueFullError(submit.code, submit.error)) {
+        queueFull = true;
+        break;
+      }
+      if (isQuotaError(submit.code, submit.error)) {
+        quotaError = submit.error || "上游账户余额不足";
+        continue;
+      }
+      lastError = submit.error || "上游提交失败";
+      continue;
+    }
+
+    rec.providerId = route.providerId;
+    rec.providerKeyId = route.providerKeyId;
+    rec.providerSlug = route.providerSlug;
+    rec.baseUrl = route.baseUrl;
+    rec.upstreamModel = route.upstreamModel;
+    rec.upstreamTaskId = submit.taskId || "";
+    rec.status = submit.status || "queued";
+    rec.progress = submit.status === "completed" ? 100 : 0;
+    if (submit.url) rec.url = submit.url;
+    rec.error = undefined;
+    rec.retryCount = (rec.retryCount ?? 0) + 1;
+    rec.nextRetryAt = undefined;
+    rec.updatedAt = Math.floor(Date.now() / 1000);
+    if (route.providerKeyId !== "keyless") {
+      await recordKeySuccess(env, route.providerId, route.providerKeyId).catch(() => {});
+      await setKeyCooldown(env, route.providerId, route.providerKeyId);
+    }
+    await saveVideoTask(env, rec);
+    return rec;
+  }
+
+  rec.retryCount = (rec.retryCount ?? 0) + 1;
+  rec.updatedAt = Math.floor(Date.now() / 1000);
+  if (queueFull) {
+    rec.status = "queued";
+    rec.nextRetryAt = Math.floor(Date.now() / 1000) + QUEUE_RETRY_INTERVAL_SECONDS;
+    rec.error = `等待上游队列空位（已重试 ${rec.retryCount} 次，每分钟自动再试）`;
+  } else if (quotaError) {
+    rec.status = "failed";
+    rec.error = `上游账户余额不足：${quotaError}`;
+    rec.nextRetryAt = undefined;
+  } else {
+    rec.status = "failed";
+    rec.error = lastError || "重投失败";
+    rec.nextRetryAt = undefined;
+  }
+  await saveVideoTask(env, rec);
+  return rec;
+}
+
+/** 批量重投到期的排队任务（调用方负责控制频率：控制台轮询/状态查询时顺带触发） */
+export async function retryQueuedVideoTasks(env: Env, tasks: VideoTaskRecord[], limit = 3): Promise<number> {
+  const nowSec = Math.floor(Date.now() / 1000);
+  const due = tasks.filter((t) => isWaitingSlot(t) && (t.nextRetryAt ?? 0) <= nowSec).slice(0, limit);
+  for (const t of due) {
+    await retryQueuedVideoTask(env, t).catch(() => {});
+  }
+  return due.length;
+}
+
+/** 状态查询时顺带推进排队任务：到期就重投一次，客户端轮询即可驱动，不依赖控制台 */
+async function advanceIfWaiting(env: Env, rec: VideoTaskRecord): Promise<VideoTaskRecord> {
+  if (!isWaitingSlot(rec)) return rec;
+  return await retryQueuedVideoTask(env, rec);
+}
