@@ -676,7 +676,11 @@ export async function retryQueuedVideoTask(env: Env, rec: VideoTaskRecord): Prom
 /** 批量重投到期的排队任务（调用方负责控制频率：控制台轮询/状态查询时顺带触发） */
 export async function retryQueuedVideoTasks(env: Env, tasks: VideoTaskRecord[], limit = 3): Promise<number> {
   const nowSec = Math.floor(Date.now() / 1000);
-  const due = tasks.filter((t) => isWaitingSlot(t) && (t.nextRetryAt ?? 0) <= nowSec).slice(0, limit);
+  const due = tasks
+    .filter((t) => isWaitingSlot(t) && (t.nextRetryAt ?? 0) <= nowSec)
+    // 先来先投：列表是按创建时间倒序给的，这里反过来，避免老任务被新任务一直挤在后面饿死
+    .sort((a, b) => a.createdAt - b.createdAt)
+    .slice(0, limit);
   for (const t of due) {
     await retryQueuedVideoTask(env, t).catch(() => {});
   }
