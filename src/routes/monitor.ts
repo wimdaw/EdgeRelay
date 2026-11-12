@@ -10,7 +10,8 @@ import { Hono } from "hono";
 import type { Env } from "../types";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
 import { verifyVideoToken } from "../video";
-import { listVideoTasks, refreshVideoTask, isTerminalVideoStatus } from "../video";
+import { listVideoTasks, refreshVideoTask, isTerminalVideoStatus, isWaitingSlot } from "../video";
+import { retryQueuedVideoTask } from "./video";
 
 export const monitorRouter = new Hono<{ Bindings: Env }>();
 
@@ -28,9 +29,14 @@ monitorRouter.get("/video", async (c) => {
     const pending = all.filter((t) => !isTerminalVideoStatus(t.status)).slice(0, 15);
     const completed: any[] = [];
     const refreshed: any[] = [];
+    let retried = 0;
 
     for (const t of pending) {
-      const r = await refreshVideoTask(env, t);
+      // 排队等空位的任务没有上游任务号，回查没意义：由这里负责按 60s 节奏重投，
+      // 外部定时器（cron-job / UptimeRobot 打这个地址）就是整站的心跳。
+      const beforeRetry = t.retryCount ?? 0;
+      const r = isWaitingSlot(t) ? await retryQueuedVideoTask(env, t) : await refreshVideoTask(env, t);
+      if ((r.retryCount ?? 0) > beforeRetry) retried++;
       refreshed.push({
         id: r.id,
         model: r.model,
@@ -38,6 +44,9 @@ monitorRouter.get("/video", async (c) => {
         progress: r.progress,
         url: r.url ?? null,
         error: r.error ?? null,
+        waiting_slot: isWaitingSlot(r),
+        retry_count: r.retryCount ?? 0,
+        next_retry_at: r.nextRetryAt ?? null,
         created_at: r.createdAt,
       });
       if (isTerminalVideoStatus(r.status)) {
@@ -57,6 +66,8 @@ monitorRouter.get("/video", async (c) => {
         ok: true,
         scanned: all.length,
         pending: pending.length - completed.length,
+        queue_waiting: refreshed.filter((x) => x.waiting_slot).length,
+        retried,
         newly_completed: completed,
         tasks: all.slice(0, 20).map((t) => {
           const fresh = refreshed.find((x) => x.id === t.id);
