@@ -29,6 +29,7 @@ import {
   listVideoTasks,
   isTerminalVideoStatus,
   isQueueFullError,
+  isQuotaError,
   submitAgnesVideo,
   pollAgnesVideo,
   saveVideoTask,
@@ -202,6 +203,7 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
     let lastStatus = 0;
     let lastError = "";
     let queueFull = false;
+    let quotaError = "";
     let record: VideoTaskRecord | null = null;
 
     for (const route of routes) {
@@ -213,9 +215,15 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
         // 排队已满属于平台侧的全局限制，换账号也没用，且不能计入 Key 健康度
         if (isQueueFullError(submit.code, submit.error)) {
           queueFull = true;
-          lastStatus = 429;
+          lastStatus = 503;
           lastError = "上游视频队列已满，请稍后重试";
           break;
+        }
+        // 上游账户余额不足：余额属于账号而非 Key，不记 Key 健康度；换下一个 Key 可能换到有余额的账号
+        if (isQuotaError(submit.code, submit.error)) {
+          quotaError = submit.error || "上游账户余额不足";
+          lastStatus = 402;
+          continue;
         }
         lastStatus = submit.httpStatus;
         lastError = submit.error || "上游提交失败";
@@ -266,12 +274,18 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
         status: "upstream_error",
         httpStatus: lastStatus || 502,
         latencyMs: Date.now() - started,
-        errorCode: queueFull ? "video_queue_full" : lastStatus ? `http_${lastStatus}` : "upstream_error",
+        errorCode: queueFull ? "video_queue_full" : quotaError ? "upstream_quota_exhausted" : lastStatus ? `http_${lastStatus}` : "upstream_error",
         attempts,
         ip: auth.ip,
       });
       if (queueFull) {
-        return openAiError(429, ErrorCode.RATE_LIMITED, lastError, { retry_after: 60, code: "video_queue_full" });
+        // 上游是"容量不足"而不是"你请求太快"：503 更准确，仍带 retry_after 方便客户端退避
+        return openAiError(503, ErrorCode.UPSTREAM_ERROR, lastError, { retry_after: 60, code: "video_queue_full" });
+      }
+      if (quotaError) {
+        return openAiError(402, ErrorCode.INSUFFICIENT_BALANCE, `上游账户余额不足，无法创建视频任务：${quotaError}`, {
+          code: "upstream_quota_exhausted",
+        });
       }
       return openAiError(lastStatus === 401 ? 401 : 502, ErrorCode.UPSTREAM_ERROR, lastError || "视频任务提交失败", {
         attempts,

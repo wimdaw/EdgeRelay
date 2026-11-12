@@ -417,6 +417,14 @@ export function isQueueFullError(code?: string, message?: string): boolean {
   return c.includes("queue_full") || m.includes("queue is full") || m.includes("queue_full");
 }
 
+/** 上游账户额度不足（如 Agnes 的 insufficient_user_quota / pre-consume quota 失败） */
+export function isQuotaError(code?: string, message?: string): boolean {
+  const c = (code || "").toLowerCase();
+  const m = (message || "").toLowerCase();
+  if (c.includes("insufficient") && (c.includes("quota") || c.includes("balance"))) return true;
+  return m.includes("insufficient_user_quota") || m.includes("pre-consume quota") || m.includes("insufficient quota");
+}
+
 /* ==================================================================== */
 /* 免 Key 分享链接：签名 token（浏览器可直接打开，24h 有效）                 */
 /* ==================================================================== */
