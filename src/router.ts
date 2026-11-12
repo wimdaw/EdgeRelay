@@ -206,12 +206,17 @@ export async function listPublicModels(env: any): Promise<{ id: string; created:
   const activeModels = models.filter((m) => m.enabled === 1 && activeProviders.has(m.providerId));
   const names = new Set<string>();
 
+  // 只输出可调用的 id：{渠道slug}/{模型名}
+  // 以前这里同时塞了裸名和带前缀两种写法，导致每个模型在列表里出现两次
+  // （94 个模型 → 186 条），而对话接口只认带前缀的那种，
+  // 裸名那一半点进去必然报错。保留裸名只在渠道没有 slug 时兜底。
   for (const m of activeModels) {
-    names.add(m.publicName);
     const p = providerMap.get(m.providerId);
-    if (p?.slug && !m.publicName.startsWith(`${p.slug}/`)) {
-      names.add(`${p.slug}/${m.publicName}`);
+    if (!p?.slug) {
+      names.add(m.publicName);
+      continue;
     }
+    names.add(m.publicName.startsWith(`${p.slug}/`) ? m.publicName : `${p.slug}/${m.publicName}`);
   }
 
   const created = Math.floor(Date.parse("2026-01-01") / 1000);
