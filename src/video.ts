@@ -475,19 +475,21 @@ async function hmacHex(env: Env, payload: string): Promise<string> {
 
 /** 生成视频查询 token：{exp}.{hmac} */
 export async function signVideoToken(env: Env, videoId: string, ttlSeconds = TASK_TTL_SECONDS): Promise<string> {
-  const exp = Math.floor(Date.now() / 1000) + ttlSeconds;
+  // ttl<=0 表示永不过期：签发 exp=0，校验侧跳过时间判断（监控链接用的就是这种）
+  const exp = ttlSeconds > 0 ? Math.floor(Date.now() / 1000) + ttlSeconds : 0;
   const sig = await hmacHex(env, `${videoId}|${exp}`);
   return `${exp}.${sig}`;
 }
 
-/** 校验 token（过期或签名不符一律 false） */
+/** 校验 token（过期或签名不符一律 false）；exp=0 的长期 token 只校验签名 */
 export async function verifyVideoToken(env: Env, videoId: string, token?: string | null): Promise<boolean> {
   if (!token) return false;
   const dot = token.indexOf(".");
   if (dot <= 0) return false;
   const exp = Number(token.slice(0, dot));
   const sig = token.slice(dot + 1);
-  if (!Number.isFinite(exp) || exp < Math.floor(Date.now() / 1000)) return false;
+  if (!Number.isFinite(exp) || exp < 0) return false;
+  if (exp !== 0 && exp < Math.floor(Date.now() / 1000)) return false;
   const expect = await hmacHex(env, `${videoId}|${exp}`);
   if (expect.length !== sig.length) return false;
   let diff = 0;

@@ -497,8 +497,11 @@ adminRouter.post("/actions", async (c) => {
       case "video_monitor_link": {
         const { signVideoToken } = await import("../video");
         const { VIDEO_MONITOR_SUBJECT } = await import("./monitor");
-        const days = Math.min(365, Math.max(1, Number(p.days ?? 30) || 30));
-        const ttl = days * 86_400;
+        // days=0（或不传 never=1）→ 签发永不过期的链接：exp=0，只校验签名
+        const rawDays = p.days === undefined || p.days === null || p.days === "" ? 30 : Number(p.days);
+        const days = Number.isFinite(rawDays) ? Math.max(0, Math.min(3650, rawDays)) : 30;
+        const forever = days === 0;
+        const ttl = forever ? 0 : days * 86_400;
         const token = await signVideoToken(env, VIDEO_MONITOR_SUBJECT, ttl);
         const { publicOrigin } = await import("../public-url");
         const origin = publicOrigin({ req: { header: (n: string) => hCtx.req.header(n) } }, env);
@@ -506,7 +509,8 @@ adminRouter.post("/actions", async (c) => {
           ok: true,
           result: {
             url: `${origin}/api/monitor/video?token=${encodeURIComponent(token)}`,
-            expires_at: Math.floor(Date.now() / 1000) + ttl,
+            never_expires: forever,
+            expires_at: forever ? null : Math.floor(Date.now() / 1000) + ttl,
             interval_hint: "建议每 60 秒调用一次",
           },
         });
