@@ -35,12 +35,16 @@ type TasksResp = {
 
 const POLL_MS = 60_000;
 
-/** 选项卡：全部 / 排队中 / 生成中 / 已完成 / 失败 */
-type TabKey = "all" | "queued" | "in_progress" | "completed" | "failed";
+/** 选项卡：全部 / 待提交 / 排队中 / 生成中 / 已完成 / 失败
+ *  - 待提交：还没交到上游（队列满时挂在本地，每分钟自动重投）
+ *  - 排队中：已交到上游、排在它的队列里等生成
+ */
+type TabKey = "all" | "pending" | "queued" | "in_progress" | "completed" | "failed";
 
-const TABS: { key: TabKey; label: string }[] = [
+const TABS: { key: TabKey; label: string; hint?: string }[] = [
   { key: "all", label: "全部" },
-  { key: "queued", label: "排队中" },
+  { key: "pending", label: "待提交", hint: "上游队列满，本地挂着每分钟自动重投" },
+  { key: "queued", label: "排队中", hint: "已提交上游，在上游队列里等生成" },
   { key: "in_progress", label: "生成中" },
   { key: "completed", label: "已完成" },
   { key: "failed", label: "失败" },
@@ -48,6 +52,8 @@ const TABS: { key: TabKey; label: string }[] = [
 
 function inTab(t: VideoTaskRow, tab: TabKey): boolean {
   if (tab === "all") return true;
+  if (tab === "pending") return t.waiting_slot === true;
+  if (tab === "queued") return t.status === "queued" && !t.waiting_slot;
   if (tab === "failed") return t.status === "failed" || t.status === "cancelled";
   return t.status === tab;
 }
@@ -237,7 +243,7 @@ export default function VideoTasks({ me }: { me: Me }) {
           <span>进行中 <b className="font-mono text-ink">{running}</b></span>
           {waiting > 0 && (
             <span>
-              排队等空位 <b className="font-mono text-amber-500">{waiting}</b>
+              待提交 <b className="font-mono text-amber-500">{waiting}</b>
             </span>
           )}
           <span>已完成 <b className="font-mono text-emerald-500">{done}</b></span>
@@ -254,6 +260,7 @@ export default function VideoTasks({ me }: { me: Me }) {
                 key={t.key}
                 type="button"
                 onClick={() => setTab(t.key)}
+                title={t.hint}
                 className={cn(
                   "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors",
                   active ? "bg-brand/15 text-brand" : "text-muted hover:bg-surface2"
@@ -275,10 +282,14 @@ export default function VideoTasks({ me }: { me: Me }) {
         <Card>
           <EmptyState
             icon={<Film size={32} />}
-            title={tab === "queued" ? "没有排队中的任务" : "暂无视频任务"}
+            title={
+              tab === "pending" ? "没有待提交的任务" : tab === "queued" ? "没有排队中的任务" : "暂无视频任务"
+            }
             hint={
-              tab === "queued"
-                ? "上游队列满（503 video_queue_full）时，提交的请求会挂在这里，每分钟自动重投一次，挤到空位就开始生成。"
+              tab === "pending"
+                ? "上游队列满（503 video_queue_full）时，提交的请求会挂在这里，每分钟自动重投一次，挤到空位就自动提交。"
+                : tab === "queued"
+                ? "已经提交到上游、正在上游队列里排队的任务会显示在这里。"
                 : "调用 POST /v1/videos 创建任务后，这里会自动出现，并按 60 秒间隔轮询进度。"
             }
           />
