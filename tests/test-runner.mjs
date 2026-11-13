@@ -1922,6 +1922,7 @@ let apiKeyId = "";
     assert(Boolean(conversationBody), "已向 ChatGPT 网页版 conversation 发出请求");
     assert(conversationBody.model === "auto", "生图模式自动使用 auto 模型");
     assert(Array.isArray(conversationBody.system_hints) && conversationBody.system_hints.includes("picture_v2"), "生图模式自动携带 picture_v2");
+    assert(conversationBody.history_and_training_disabled === false, "生图模式关闭临时对话（临时对话不支持生图）");
   } finally {
     globalThis.fetch = realFetch;
   }

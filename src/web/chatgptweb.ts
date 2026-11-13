@@ -957,7 +957,9 @@ function buildConversationPayload(
     force_paragen_model_slug: '',
     force_rate_limit: false,
     force_use_sse: true,
-    history_and_training_disabled: true,
+    // 临时对话（history_and_training_disabled=true）不支持生图，上游会直接回
+    // “image generation isn’t available in this temporary chat”；生图模式必须走常规会话。
+    history_and_training_disabled: !isImageMode,
     reset_rate_limits: false,
     suggestions: [],
     supported_encodings: [],

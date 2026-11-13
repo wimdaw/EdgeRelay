@@ -25,7 +25,7 @@ import {
   defer,
   resolveAccessToken,
 } from './common'
-import { openAIToResponsesRequest, createOpenAIStreamFromResponses, collectResponsesStreamToOpenAI } from '../responses-translate'
+import { openAIToResponsesRequest, createOpenAIStreamFromResponses, collectResponsesStreamToOpenAI, isImageGenerationRequest } from '../responses-translate'
 
 // ===== OAuth 客户端（来自 CLIProxyAPI internal/auth/codex） =====
 const CODEX_CLIENT_ID = 'app_EMoamEEZ73f0CkXaXp7hrann'
@@ -536,6 +536,11 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
     return oauthErrorResponse('该 codex 渠道未配置凭据：请在「API Key」里每行填入一个 OpenAI OAuth refresh_token、四段发货行或 CPA JSON（可点「授权新账号」获取）', 400, 'configuration_error')
   }
   const wantStream = p.body?.stream === true
+  // 中继网关可能丢弃 image_generation 工具（Responses 翻译层不支持），导致
+  // “Tool choice 'image_generation' not found in 'tools'”。生图请求在本机有凭据时优先直连
+  // chatgpt.com；EdgeOne 出口可直连（chatgptweb 渠道已验证），无需依赖中继。
+  const isImageMode = isImageGenerationRequest(p.body || {})
+  const activeRelay = isImageMode && tokens.length > 0 ? null : relay
 
   // 原生 Responses 协议透传（/v1/responses）
   if (subPath === 'responses-passthrough') {
@@ -543,7 +548,7 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
   }
 
   // 直连时上游只认裸模型 ID(带 providerId/ 前缀会被 Codex 后端拒绝)；走中继则靠前缀路由
-  const { request } = openAIToResponsesRequest({ ...p.body, model: relay ? relayModelId(p) : p.modelId })
+  const { request } = openAIToResponsesRequest({ ...p.body, model: activeRelay ? relayModelId(p) : p.modelId })
   // Codex 后端不接受 max_output_tokens(传了直接 400: Unsupported parameter)
   delete request.max_output_tokens
   // Codex 后端强制 stream=true：客户端要非流式时先取 SSE，再本地聚合
@@ -552,11 +557,11 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
   let lastStatus = 502
 
   // 走中继时凭据轮换由对端负责，本机只发一次；直连时多账号随机打散 + 冷却排序
-  const attempts: Array<{ token: string; index: number; hash: string }> = relay
+  const attempts: Array<{ token: string; index: number; hash: string }> = activeRelay
     ? [{ token: '', index: 0, hash: '' }]
     : await Promise.all(tokens.map(async (raw, i) => ({ token: raw, index: i + 1, hash: await sha256Hex(raw) })))
-  const health: CodexHealthMap = relay ? {} : await readCodexHealth(p.env, p.providerId)
-  const ordered = relay ? attempts : orderByCooldown(attempts, health)
+  const health: CodexHealthMap = activeRelay ? {} : await readCodexHealth(p.env, p.providerId)
+  const ordered = activeRelay ? attempts : orderByCooldown(attempts, health)
   let healthChanged = false
   const markFailed = (hash: string, reason: string, cooldownMs: number): void => {
     if (!hash) return
@@ -586,9 +591,9 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
     try {
       let endpoint = `${CODEX_API_BASE}/responses`
       let headers: Record<string, string>
-      if (relay) {
-        endpoint = `${relay.url}/v1/responses`
-        headers = relayHeaders(relay, true)
+      if (activeRelay) {
+        endpoint = `${activeRelay.url}/v1/responses`
+        headers = relayHeaders(activeRelay, true)
       } else {
         const { token, accountId } = await getAccessToken(p.env, refreshToken)
         headers = apiHeaders(token, accountId, true)
@@ -623,7 +628,7 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
 
       markOk(hash)
       defer(p, persistHealth())
-      const extraHeaders: Record<string, string> = relay ? {} : { 'x-codex-account': String(accountIndex), 'x-codex-cooldown': String(coolingCount) }
+      const extraHeaders: Record<string, string> = activeRelay ? {} : { 'x-codex-account': String(accountIndex), 'x-codex-cooldown': String(coolingCount) }
 
       if (wantStream && upstream.body) {
         const stream = createOpenAIStreamFromResponses(upstream.body, p.requestedModel, (usage) => {
