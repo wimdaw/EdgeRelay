@@ -10,6 +10,7 @@ import { ApiError, ErrorCode, errorResponse } from "../errors";
 import { uuid } from "../crypto";
 import { appendAppeal, getAppeals, getAnnouncements } from "../storage/db";
 import { epayReady } from "./pay";
+import { isEmailVerificationRequired } from "../auth-policy";
 
 export const siteRouter = new Hono<{ Bindings: Env }>();
 
@@ -41,7 +42,7 @@ siteRouter.get("/site", async (c) => {
     },
     smtpEnabled: !!s.smtpEnabled,
     // 注册是否强制邮箱验证码：历史配置缺字段时按开启处理，与后端判定保持一致
-    emailVerificationRequired: s.requireEmailVerification !== false,
+    emailVerificationRequired: isEmailVerificationRequired(s),
     // 在线支付可用性：前端据此决定是否显示「在线充值」入口
     payment: {
       epayEnabled: epayReady(s),

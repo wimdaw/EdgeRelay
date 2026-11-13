@@ -24,6 +24,7 @@ import { sendMail } from "../smtp";
 import { verifyCodeEmailHtml } from "../email-templates";
 import { getKV } from "../storage/blob-store";
 import { checkCode, putCode, CODE_ERROR_MESSAGE } from "../email-code";
+import { isEmailVerificationRequired } from "../auth-policy";
 
 export const authRouter = new Hono<{ Bindings: Env }>();
 
@@ -113,7 +114,7 @@ authRouter.post("/register", async (c) => {
 
     // 注册邮箱验证：由后台开关显式控制，**不再根据 smtpReady 隐式决定**。
     // 历史配置里没有该字段时按「开启」处理（undefined → 强制验证），避免升级后静默失效。
-    if (settings.requireEmailVerification !== false) {
+    if (isEmailVerificationRequired(settings)) {
       // 首位管理员自举：此时系统内还没有任何用户，也就没人能配置 SMTP，必须放行一次
       const bootstrapping = !(await hasAnyUser(env));
       if (!bootstrapping) {
