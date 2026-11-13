@@ -26,6 +26,7 @@ import {
   resolveAccessToken,
 } from './common'
 import { openAIToResponsesRequest, createOpenAIStreamFromResponses, collectResponsesStreamToOpenAI, isImageGenerationRequest } from '../responses-translate'
+import { lastUserText } from '../image-intent'
 
 // ===== OAuth 客户端（来自 CLIProxyAPI internal/auth/codex） =====
 const CODEX_CLIENT_ID = 'app_EMoamEEZ73f0CkXaXp7hrann'
@@ -525,6 +526,138 @@ export function orderByCooldown<T extends { hash: string }>(accounts: T[], healt
 }
 
 // =====================================================================
+// 中继生图：走对端网关的标准 /v1/images/generations，绕开其 Responses
+// 翻译层可能丢弃 image_generation 工具的问题
+// =====================================================================
+
+export type RelayImageResult = {
+  ok: boolean
+  status: number
+  images?: Array<{ b64?: string; url?: string; revised_prompt?: string }>
+  error?: string
+}
+
+function imageMimeFromBase64(b64: string): string {
+  if (/^iVBORw0KGgo/.test(b64)) return 'image/png'
+  if (/^\/9j\//.test(b64)) return 'image/jpeg'
+  if (/^UklGR/.test(b64)) return 'image/webp'
+  return 'image/png'
+}
+
+function relayImageToDataUrl(image: { b64?: string; url?: string }): string {
+  if (image.url) return image.url
+  const b64 = String(image.b64 || '').replace(/^data:image\/[a-z0-9.+-]+;base64,/i, '')
+  return `data:${imageMimeFromBase64(b64)};base64,${b64}`
+}
+
+function imagesToChatMessages(images: Array<{ b64?: string; url?: string; revised_prompt?: string }>): Array<Record<string, any>> {
+  return images.map((image) => ({
+    type: 'image_url',
+    image_url: { url: relayImageToDataUrl(image) },
+  }))
+}
+
+/** 调对端网关的 /v1/images/generations（OpenAI 标准图片协议） */
+export async function callRelayImageGeneration(
+  relay: CodexUpstreamRelay,
+  model: string,
+  prompt: string,
+  body: Record<string, any>,
+  timeoutMs = 120_000,
+): Promise<RelayImageResult> {
+  const payload: Record<string, any> = {
+    model,
+    prompt,
+    n: Math.max(1, Math.min(4, Number(body.n) || 1)),
+    response_format: 'b64_json',
+  }
+  if (body.size) payload.size = body.size
+  if (body.quality) payload.quality = body.quality
+  try {
+    const res = await fetch(`${relay.url}/v1/images/generations`, {
+      method: 'POST',
+      headers: relayHeaders(relay, false),
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(timeoutMs),
+    })
+    const text = await res.text()
+    if (!res.ok) {
+      return { ok: false, status: res.status, error: `中继生图 HTTP ${res.status}: ${text.slice(0, 300)}` }
+    }
+    let json: any = null
+    try { json = JSON.parse(text) } catch { /* ignore */ }
+    const rows = Array.isArray(json?.data) ? json.data : []
+    const images = rows.map((row: any) => ({
+      b64: typeof row?.b64_json === 'string' ? row.b64_json : typeof row?.b64 === 'string' ? row.b64 : undefined,
+      url: typeof row?.url === 'string' ? row.url : undefined,
+      revised_prompt: typeof row?.revised_prompt === 'string' ? row.revised_prompt : undefined,
+    })).filter((img: any) => img.b64 || img.url)
+    if (!images.length) {
+      return { ok: false, status: 502, error: '中继生图未返回图片数据' }
+    }
+    return { ok: true, status: res.status, images }
+  } catch (err) {
+    return { ok: false, status: 504, error: `中继生图失败: ${(err as Error).message}` }
+  }
+}
+
+/** 把中继图片结果包装成 OpenAI chat.completion（非流式 / 流式） */
+function relayImagesToChatResponse(
+  images: Array<{ b64?: string; url?: string; revised_prompt?: string }>,
+  requestedModel: string,
+  promptTokens: number,
+  stream: boolean,
+): Response {
+  const id = `chatcmpl-codex-img-${randomId()}`
+  const created = Math.floor(Date.now() / 1000)
+  const chatImages = imagesToChatMessages(images)
+  if (!stream) {
+    const json = {
+      id,
+      object: 'chat.completion',
+      created,
+      model: requestedModel,
+      choices: [{
+        index: 0,
+        message: { role: 'assistant', content: '', images: chatImages },
+        finish_reason: 'stop',
+        logprobs: null,
+      }],
+      usage: { prompt_tokens: promptTokens, completion_tokens: 0, total_tokens: promptTokens },
+    }
+    return new Response(JSON.stringify(json), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
+    })
+  }
+  const encoder = new TextEncoder()
+  const sse = new ReadableStream<Uint8Array>({
+    start(controller) {
+      const send = (delta: Record<string, any>, finish: string | null = null, usage?: { prompt: number; completion: number }) => {
+        const chunk: Record<string, any> = {
+          id,
+          object: 'chat.completion.chunk',
+          created,
+          model: requestedModel,
+          choices: [{ index: 0, delta, finish_reason: finish, logprobs: null }],
+        }
+        if (usage) chunk.usage = { prompt_tokens: usage.prompt, completion_tokens: usage.completion, total_tokens: usage.prompt + usage.completion }
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`))
+      }
+      send({ role: 'assistant', content: '' })
+      send({ images: chatImages })
+      send({}, 'stop', { prompt: promptTokens, completion: 0 })
+      controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+      controller.close()
+    },
+  })
+  return new Response(sse, {
+    status: 200,
+    headers: { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-store', Connection: 'keep-alive' },
+  })
+}
+
+// =====================================================================
 // 对外入口
 // =====================================================================
 
@@ -541,6 +674,28 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
   // chatgpt.com；EdgeOne 出口可直连（chatgptweb 渠道已验证），无需依赖中继。
   const isImageMode = isImageGenerationRequest(p.body || {})
   const activeRelay = isImageMode && tokens.length > 0 ? null : relay
+
+  // 中继模式下的生图：优先走对端标准 /v1/images/generations。
+  // 对端 Responses 翻译层可能不认识 image_generation 工具，直接走 /v1/responses 会
+  // 报 “Tool choice 'image_generation' not found in 'tools' parameter”。
+  if (isImageMode && activeRelay) {
+    const prompt = lastUserText(p.body?.messages)
+    if (prompt) {
+      const relayImages = await callRelayImageGeneration(activeRelay, relayModelId(p), prompt, p.body || {})
+      if (relayImages.ok && relayImages.images?.length) {
+        return relayImagesToChatResponse(
+          relayImages.images,
+          p.requestedModel,
+          Math.max(1, Math.ceil(prompt.length / 4)),
+          wantStream,
+        )
+      }
+      // 400/404/405 说明对端没有图片接口或该模型不支持，回退到原 Responses 路径
+      if (relayImages.status !== 400 && relayImages.status !== 404 && relayImages.status !== 405) {
+        return oauthErrorResponse(relayImages.error || '中继生图失败', relayImages.status || 502, 'upstream_error')
+      }
+    }
+  }
 
   // 原生 Responses 协议透传（/v1/responses）
   if (subPath === 'responses-passthrough') {
@@ -817,6 +972,27 @@ export async function generateCodexImage(
   let endpoint = `${CODEX_API_BASE}/responses`
   let headers: Record<string, string>
   if (relay) {
+    // 中继生图优先走标准图片接口；对端 Responses 翻译层可能丢弃 image_generation 工具
+    const relayModel = body.providerId
+      ? `${body.providerId}/${requestedModel || mainModel}`
+      : (requestedModel || mainModel)
+    const relayImages = await callRelayImageGeneration(relay, relayModel, prompt, body, timeoutMs)
+    if (relayImages.ok && relayImages.images?.length) {
+      const data = relayImages.images.map((image) => ({
+        ...(image.b64 ? { b64_json: image.b64 } : {}),
+        ...(image.url ? { url: image.url } : {}),
+        ...(image.revised_prompt ? { revised_prompt: image.revised_prompt } : {}),
+      }))
+      return {
+        ok: true,
+        httpStatus: 200,
+        contentType: 'application/json; charset=utf-8',
+        body: JSON.stringify({ created: Math.floor(Date.now() / 1000), data }),
+      }
+    }
+    if (relayImages.status !== 400 && relayImages.status !== 404 && relayImages.status !== 405) {
+      return { ok: false, httpStatus: relayImages.status || 502, error: relayImages.error || '中继生图失败' }
+    }
     endpoint = `${relay.url}/v1/responses`
     headers = relayHeaders(relay, true)
     request.model = body.providerId ? `${body.providerId}/${request.model}` : request.model
