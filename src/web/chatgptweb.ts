@@ -1864,9 +1864,11 @@ export async function testChatgptWeb(
 // /v1/images/generations 生图接口支持
 // =====================================================================
 
-export async function generateChatgptWebImage(
+async function generateChatgptWebImageWithToken(
   env: Env,
-  rawToken: string,
+  accessToken: string,
+  accountId: string,
+  fingerprintSeed: string,
   body: Record<string, any>,
   timeoutMs = 110_000,
 ): Promise<{ ok: boolean; httpStatus: number; body?: string; contentType?: string; error?: string; code?: string }> {
@@ -1874,25 +1876,23 @@ export async function generateChatgptWebImage(
   if (!prompt) {
     return { ok: false, httpStatus: 400, error: '缺少 prompt 参数' }
   }
-
-  const tokenInfo = await resolveAccountToken(env, rawToken)
-  if (!tokenInfo.token) {
+  if (!accessToken) {
     return { ok: false, httpStatus: 401, error: '未配置可用的 ChatGPT 网页版凭据' }
   }
 
-  const fp = await buildFingerprint(rawToken)
+  const fp = await buildFingerprint(fingerprintSeed)
   try {
     const resources = await getPowResources(env, fp)
-    const requirements = await getChatRequirements(fp, tokenInfo.token, tokenInfo.accountId, resources)
-    const path = tokenInfo.token ? '/backend-api/conversation' : '/backend-anon/conversation'
+    const requirements = await getChatRequirements(fp, accessToken, accountId, resources)
+    const path = accessToken ? '/backend-api/conversation' : '/backend-anon/conversation'
     const headers = browserHeaders(fp, path, {
       Accept: 'text/event-stream',
       'OpenAI-Sentinel-Chat-Requirements-Token': requirements.token,
       ...(requirements.proofToken ? { 'OpenAI-Sentinel-Proof-Token': requirements.proofToken } : {}),
       ...(requirements.turnstileToken ? { 'OpenAI-Sentinel-Turnstile-Token': requirements.turnstileToken } : {}),
       ...(requirements.soToken ? { 'OpenAI-Sentinel-SO-Token': requirements.soToken } : {}),
-      Authorization: `Bearer ${tokenInfo.token}`,
-      ...(tokenInfo.accountId ? { 'Chatgpt-Account-Id': tokenInfo.accountId } : {}),
+      Authorization: `Bearer ${accessToken}`,
+      ...(accountId ? { 'Chatgpt-Account-Id': accountId } : {}),
     })
 
     const payload = buildConversationPayload('auto', [{ role: 'user', content: prompt }], {
@@ -1924,7 +1924,7 @@ export async function generateChatgptWebImage(
 
     let pointers = extractImagePointers(text)
     if (!pointers.length && conversationId) {
-      pointers = await pollConversationForPointers(fp, tokenInfo.token, tokenInfo.accountId, conversationId)
+      pointers = await pollConversationForPointers(fp, accessToken, accountId, conversationId)
     }
 
     if (!pointers.length) {
@@ -1940,9 +1940,9 @@ export async function generateChatgptWebImage(
     const data: Array<{ b64_json?: string; url?: string; revised_prompt?: string }> = []
 
     for (const ptr of selected) {
-      const dlUrl = await fetchWebImageDownloadUrl(fp, tokenInfo.token, tokenInfo.accountId, ptr.pointer, conversationId)
+      const dlUrl = await fetchWebImageDownloadUrl(fp, accessToken, accountId, ptr.pointer, conversationId)
       if (dlUrl) {
-        const downloaded = await downloadImageAsBase64(dlUrl, fp, tokenInfo.token, tokenInfo.accountId)
+        const downloaded = await downloadImageAsBase64(dlUrl, fp, accessToken, accountId)
         if (downloaded) {
           const row: Record<string, any> = { b64_json: downloaded.b64 }
           if (body.response_format === 'url') {
@@ -1977,4 +1977,29 @@ export async function generateChatgptWebImage(
       error: `ChatGPT 网页版生图超时或异常: ${(err as Error).message}`,
     }
   }
+}
+
+/** 用已解析的 ChatGPT access_token 直接生图（Codex 账号也可复用网页协议） */
+export async function generateChatgptWebImageWithAccessToken(
+  env: Env,
+  accessToken: string,
+  accountId: string,
+  body: Record<string, any>,
+  timeoutMs = 110_000,
+): Promise<{ ok: boolean; httpStatus: number; body?: string; contentType?: string; error?: string; code?: string }> {
+  return generateChatgptWebImageWithToken(env, accessToken, accountId, accessToken, body, timeoutMs)
+}
+
+/** 用 refresh_token / 凭据行生图（先刷新成 access_token） */
+export async function generateChatgptWebImage(
+  env: Env,
+  rawToken: string,
+  body: Record<string, any>,
+  timeoutMs = 110_000,
+): Promise<{ ok: boolean; httpStatus: number; body?: string; contentType?: string; error?: string; code?: string }> {
+  const tokenInfo = await resolveAccountToken(env, rawToken)
+  if (!tokenInfo.token) {
+    return { ok: false, httpStatus: 401, error: '未配置可用的 ChatGPT 网页版凭据' }
+  }
+  return generateChatgptWebImageWithToken(env, tokenInfo.token, tokenInfo.accountId, rawToken, body, timeoutMs)
 }

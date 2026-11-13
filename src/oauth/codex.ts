@@ -752,6 +752,33 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
         headers = relayHeaders(activeRelay, true)
       } else {
         const { token, accountId } = await getAccessToken(p.env, refreshToken)
+        // Codex 的 backend-api/codex/responses 不执行 image_generation（会返回“无法生图”/纯文本）。
+        // Codex access_token 与网页版同源，优先用网页 picture_v2 协议真实生图；失败再回退 Responses。
+        if (isImageMode) {
+          try {
+            const { generateChatgptWebImageWithAccessToken } = await import('../web/chatgptweb')
+            const webImage = await generateChatgptWebImageWithAccessToken(
+              p.env,
+              token,
+              accountId,
+              p.body || {},
+              100_000,
+            )
+            if (webImage.ok && webImage.body) {
+              const parsed = JSON.parse(webImage.body)
+              const imgs = (Array.isArray(parsed?.data) ? parsed.data : [])
+                .map((row: any) => ({
+                  b64: typeof row?.b64_json === 'string' ? row.b64_json : undefined,
+                  url: typeof row?.url === 'string' ? row.url : undefined,
+                  revised_prompt: typeof row?.revised_prompt === 'string' ? row.revised_prompt : undefined,
+                }))
+                .filter((img: any) => img.b64 || img.url)
+              if (imgs.length) {
+                return relayImagesToChatResponse(imgs, p.requestedModel, Math.max(1, Math.ceil(lastUserText(p.body?.messages).length / 4)), wantStream)
+              }
+            }
+          } catch { /* 网页协议失败则继续走 Codex Responses */ }
+        }
         headers = {
           ...apiHeaders(token, accountId, true),
           ...(isImageMode ? { 'OpenAI-Beta': 'responses=experimental' } : {}),

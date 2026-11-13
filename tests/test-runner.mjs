@@ -1822,6 +1822,10 @@ let apiKeyId = "";
       const sse = `data: {"type":"response.output_item.done","item":{"type":"image_generation_call","id":"img_nl","status":"completed","result":"${mockB64}"}}\n\ndata: {"type":"response.completed","response":{"usage":{"input_tokens":5,"output_tokens":5}}}\n\ndata: [DONE]\n\n`;
       return new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } });
     }
+    // Codex 会先尝试网页 picture_v2 生图；测试里直接拒绝，走 Responses mock
+    if (target.includes("chatgpt.com")) {
+      return new Response("blocked", { status: 403 });
+    }
     return realFetch(url, init);
   };
 
