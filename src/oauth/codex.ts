@@ -706,6 +706,9 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
   delete request.max_output_tokens
   // Codex 后端强制 stream=true：客户端要非流式时先取 SSE，再本地聚合
   request.stream = true
+  // 生图工具在当前 Codex 后端只对部分文本模型开放；与 CLIProxyAPI/duckai-cpa 保持一致，
+  // 直连生图固定用 gpt-5.4-mini 作为主模型（工具内部再指定 gpt-image-2）。
+  if (isImageMode && !activeRelay) request.model = 'gpt-5.4-mini'
   let lastError = ''
   let lastStatus = 502
 
@@ -749,7 +752,10 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
         headers = relayHeaders(activeRelay, true)
       } else {
         const { token, accountId } = await getAccessToken(p.env, refreshToken)
-        headers = apiHeaders(token, accountId, true)
+        headers = {
+          ...apiHeaders(token, accountId, true),
+          ...(isImageMode ? { 'OpenAI-Beta': 'responses=experimental' } : {}),
+        }
       }
       const upstream = await fetch(endpoint, {
         method: 'POST',
@@ -759,7 +765,8 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
       })
       if (!upstream.ok) {
         lastStatus = upstream.status
-        lastError = `[codex ${activeRelay ? 'relay' : 'direct'} tokens=${tokens.length} img=${isImageMode ? 1 : 0}] HTTP ${upstream.status}: ${(await readErrorBody(upstream)).slice(0, 300)}`
+        const toolTypes = Array.isArray(request.tools) ? request.tools.map((t: any) => t?.type).join(',') : 'none'
+        lastError = `[codex ${activeRelay ? 'relay' : 'direct'} tokens=${tokens.length} img=${isImageMode ? 1 : 0} model=${request.model} tools=${toolTypes} tc=${typeof request.tool_choice === 'object' ? request.tool_choice?.type : request.tool_choice}] HTTP ${upstream.status}: ${(await readErrorBody(upstream)).slice(0, 300)}`
         if (upstream.status === 429) {
           // 配额耗尽按账号冷却：优先取上游重置时间（Retry-After 头或文本里的 Resets in），别让后续请求白撞
           const retryAfter = Number(upstream.headers.get('retry-after'))

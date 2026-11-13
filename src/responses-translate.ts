@@ -165,9 +165,10 @@ export function openAIToResponsesRequest(body: Record<string, any>, opts?: { def
   // 显式生图模式 或 模型名带生图特征时，自动注入 image_generation 工具
   const isImageMode = isImageGenerationRequest(body)
   if (!hasImageTool && isImageMode) {
-    const toolDef: Record<string, any> = { type: 'image_generation' }
-    if (toolImageModel) {
-      toolDef.model = toolImageModel
+    const toolDef: Record<string, any> = {
+      type: 'image_generation',
+      action: 'generate',
+      model: toolImageModel || 'gpt-image-2',
     }
     tools.push(toolDef)
     hasImageTool = true
