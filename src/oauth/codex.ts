@@ -706,8 +706,9 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
   delete request.max_output_tokens
   // Codex 后端强制 stream=true：客户端要非流式时先取 SSE，再本地聚合
   request.stream = true
-  // 注意：Codex 后端不接受 gpt-5.4-mini（ChatGPT 账号会报 model not supported），
-  // 生图主模型必须沿用路由配置的 Codex 模型（如 gpt-6-luna）。
+  // Codex 后端不接受 gpt-5.4-mini（ChatGPT 账号会报 model not supported），
+  // 生图主模型沿用路由模型。部分账号对显式 tool_choice 校验严格，改为 auto 让模型自行调用。
+  if (isImageMode && !activeRelay) request.tool_choice = 'auto'
   let lastError = ''
   let lastStatus = 502
 

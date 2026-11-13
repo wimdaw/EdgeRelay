@@ -1842,7 +1842,7 @@ let apiKeyId = "";
     assert(Boolean(codexRequest), "已向 Codex Responses 发出请求");
     assert(codexRequest.model === "gpt-6-luna", "Codex 生图主模型沿用路由配置的 gpt-6-luna");
     assert(codexRequest.tools?.some((t) => t.type === "image_generation" && t.model === "gpt-image-2"), "Codex 请求自动注入 image_generation 工具（gpt-image-2）");
-    assert(codexRequest.tool_choice?.type === "image_generation", "Codex 请求自动强制 tool_choice=image_generation");
+    assert(codexRequest.tool_choice === "auto", "Codex 直连生图使用 tool_choice=auto 规避严格校验");
   } finally {
     globalThis.fetch = realFetch;
   }
