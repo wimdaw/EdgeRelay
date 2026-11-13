@@ -690,10 +690,8 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
           wantStream,
         )
       }
-      // 400/404/405 说明对端没有图片接口或该模型不支持，回退到原 Responses 路径
-      if (relayImages.status !== 400 && relayImages.status !== 404 && relayImages.status !== 405) {
-        return oauthErrorResponse(relayImages.error || '中继生图失败', relayImages.status || 502, 'upstream_error')
-      }
+      // 对端图片接口不可用时直接返回其错误，便于定位（Responses 路径已知会丢生图工具）
+      return oauthErrorResponse(relayImages.error || '中继生图失败', relayImages.status || 502, 'upstream_error')
     }
   }
 
