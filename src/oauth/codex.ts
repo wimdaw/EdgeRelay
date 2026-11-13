@@ -762,7 +762,7 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
               token,
               accountId,
               p.body || {},
-              100_000,
+              30_000,
             )
             if (webImage.ok && webImage.body) {
               const parsed = JSON.parse(webImage.body)
@@ -792,8 +792,7 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
       })
       if (!upstream.ok) {
         lastStatus = upstream.status
-        const toolTypes = Array.isArray(request.tools) ? request.tools.map((t: any) => t?.type).join(',') : 'none'
-        lastError = `[codex ${activeRelay ? 'relay' : 'direct'} tokens=${tokens.length} img=${isImageMode ? 1 : 0} model=${request.model} tools=${toolTypes} tc=${typeof request.tool_choice === 'object' ? request.tool_choice?.type : request.tool_choice}] HTTP ${upstream.status}: ${(await readErrorBody(upstream)).slice(0, 300)}`
+        lastError = `HTTP ${upstream.status}: ${(await readErrorBody(upstream)).slice(0, 300)}`
         if (upstream.status === 429) {
           // 配额耗尽按账号冷却：优先取上游重置时间（Retry-After 头或文本里的 Resets in），别让后续请求白撞
           const retryAfter = Number(upstream.headers.get('retry-after'))

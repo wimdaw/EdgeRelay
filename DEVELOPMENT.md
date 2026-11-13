@@ -246,8 +246,9 @@ git checkout edgeone
 - [x] **渠道显示名统一**：对外统一显示为 `Codex`。
 - [x] **账号池改为手动查询**：额度查询改为手动触发，避免自动轮询。
 - [x] **生图模式支持**：
-  - 对话接口：自动识别 `image_generation: true` / 工具调用 / `gpt-image-*` 生图模型，向 Responses API 注入 `image_generation` 工具并强制 tool_choice，上游返回 `image_generation_call` 统一映射为 `message.images`（流式 `delta.images`）。
-  - 图片接口：`/v1/images/generations` 路由支持派发至 Codex 渠道，调用 Responses API 生图并返回标准 OpenAI 格式。
+  - 对话接口：自动识别 `image_generation: true` / 工具调用 / `gpt-image-*` 生图模型 / 自然语言生图意图，向 Responses API 注入 `image_generation` 工具；上游返回 `image_generation_call` 统一映射为 `message.images`（流式 `delta.images`）。
+  - 图片接口：`/v1/images/generations` 路由支持派发至 Codex 渠道。
+  - **已知边界**：实测 `chatgpt.com/backend-api/codex/responses` 对当前 Codex 账号不执行 `image_generation`（gpt-6-luna / gpt-5.6-luna / gpt-5.6-terra 均返回纯文本或 ASCII，强制 tool_choice 会报 “Tool choice 'image_generation' not found in 'tools'”）；Codex access_token 也无法直接复用网页 picture_v2 会话。实际生图请使用 `chatgpt-web/*` 渠道（已验证可出图）。
 
 #### 1.3 ChatGPT 网页版渠道
 - [x] **生图模式支持**：
