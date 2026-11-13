@@ -1840,7 +1840,7 @@ let apiKeyId = "";
     const msg = data.choices?.[0]?.message;
     assert(Array.isArray(msg?.images) && msg.images.length === 1, "Codex 自然语言生图返回 message.images");
     assert(Boolean(codexRequest), "已向 Codex Responses 发出请求");
-    assert(codexRequest.model === "gpt-5.4-mini", "Codex 生图主模型固定为支持 image_generation 的 gpt-5.4-mini");
+    assert(codexRequest.model === "gpt-6-luna", "Codex 生图主模型沿用路由配置的 gpt-6-luna");
     assert(codexRequest.tools?.some((t) => t.type === "image_generation" && t.model === "gpt-image-2"), "Codex 请求自动注入 image_generation 工具（gpt-image-2）");
     assert(codexRequest.tool_choice?.type === "image_generation", "Codex 请求自动强制 tool_choice=image_generation");
   } finally {

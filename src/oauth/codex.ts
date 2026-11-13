@@ -706,9 +706,8 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
   delete request.max_output_tokens
   // Codex 后端强制 stream=true：客户端要非流式时先取 SSE，再本地聚合
   request.stream = true
-  // 生图工具在当前 Codex 后端只对部分文本模型开放；与 CLIProxyAPI/duckai-cpa 保持一致，
-  // 直连生图固定用 gpt-5.4-mini 作为主模型（工具内部再指定 gpt-image-2）。
-  if (isImageMode && !activeRelay) request.model = 'gpt-5.4-mini'
+  // 注意：Codex 后端不接受 gpt-5.4-mini（ChatGPT 账号会报 model not supported），
+  // 生图主模型必须沿用路由配置的 Codex 模型（如 gpt-6-luna）。
   let lastError = ''
   let lastStatus = 502
 
