@@ -103,6 +103,9 @@ export default function Settings() {
           <label className="flex items-center justify-between text-[13px]">开放注册
             <input type="checkbox" className="h-4 w-4 accent-[#F38020]" checked={!!s.signupsEnabled} onChange={(e) => set("signupsEnabled", e.target.checked)} />
           </label>
+          <label className="flex items-center justify-between text-[13px]">注册强制邮箱验证码
+            <input type="checkbox" className="h-4 w-4 accent-[#F38020]" checked={s.requireEmailVerification !== false} onChange={(e) => set("requireEmailVerification", e.target.checked)} />
+          </label>
           <label className="flex items-center justify-between text-[13px]">注册强制确认条款/隐私
             <input type="checkbox" className="h-4 w-4 accent-[#F38020]" checked={!!s.requireTosAcceptance} onChange={(e) => set("requireTosAcceptance", e.target.checked)} />
           </label>

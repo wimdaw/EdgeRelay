@@ -86,6 +86,35 @@ let adminUserId = "";
   assert(bootstrapData.user.role === "superadmin", "首位注册用户自动提权为 superadmin 角色");
 }
 
+// 3.1 注册邮箱验证开关：开启时无码注册一律拒绝，关闭后才放行
+{
+  const noCodeRes = await request("/api/auth/register", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: { email: "no-code@edgerelay.test", password: "StrongPassword123!", tosAccepted: true, privacyAccepted: true },
+  });
+  assert(noCodeRes.status === 503, "开关开启且邮件不可用时无码注册被拒（503）");
+  const noCodeData = await noCodeRes.json();
+  assert(
+    String(noCodeData?.error?.message ?? "").includes("邮件服务当前不可用"),
+    "无码注册返回可读的失败原因"
+  );
+
+  const offRes = await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: { action: "set_settings", payload: { requireEmailVerification: false, password: "StrongPassword123!" } },
+  });
+  assert(offRes.status === 200, "超级管理员可关闭「注册强制邮箱验证」");
+
+  const allowedRes = await request("/api/auth/register", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: { email: "no-code@edgerelay.test", password: "StrongPassword123!", tosAccepted: true, privacyAccepted: true },
+  });
+  assert(allowedRes.status === 200 || allowedRes.status === 201, "关闭开关后允许无码注册");
+}
+
 // 4. 用户登录
 {
   const loginRes = await request("/api/auth/login", {

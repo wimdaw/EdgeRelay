@@ -39,6 +39,8 @@ export type HandlerCtx = {
 export type PlatformSettings = {
   signupsEnabled: boolean;
   requireTosAcceptance: boolean;
+  /** 注册是否强制邮箱验证码。默认 true；仅当后台显式关闭时才允许无码注册 */
+  requireEmailVerification?: boolean;
   privacyPolicyUrl: string;
   termsOfServiceUrl: string;
   contentModerationEnabled: boolean;
@@ -106,6 +108,7 @@ export function clampAuditRetentionDays(value: unknown): number {
 export const DEFAULT_SETTINGS: PlatformSettings = {
   signupsEnabled: true,
   requireTosAcceptance: true,
+  requireEmailVerification: true,
   privacyPolicyUrl: "/privacy.html",
   termsOfServiceUrl: "/terms.html",
   contentModerationEnabled: false,

@@ -17,6 +17,7 @@ import {
   createSession,
   deleteSession,
   getOrCreateBalance,
+  hasAnyUser,
 } from "../storage/db";
 import { topup } from "../billing";
 import { sendMail } from "../smtp";
@@ -110,11 +111,23 @@ authRouter.post("/register", async (c) => {
       throw new ApiError(409, ErrorCode.BAD_REQUEST, "邮箱已注册");
     }
 
-    // 若 SMTP 启用，强制校验验证码
-    if (smtpReady) {
-      const checked = await checkCode(kv, "register", emailNorm, body.code);
-      if (!checked.ok) {
-        throw new ApiError(400, ErrorCode.BAD_REQUEST, CODE_ERROR_MESSAGE[checked.reason ?? "absent"]);
+    // 注册邮箱验证：由后台开关显式控制，**不再根据 smtpReady 隐式决定**。
+    // 历史配置里没有该字段时按「开启」处理（undefined → 强制验证），避免升级后静默失效。
+    if (settings.requireEmailVerification !== false) {
+      // 首位管理员自举：此时系统内还没有任何用户，也就没人能配置 SMTP，必须放行一次
+      const bootstrapping = !(await hasAnyUser(env));
+      if (!bootstrapping) {
+        if (!smtpReady) {
+          throw new ApiError(
+            503,
+            ErrorCode.INTERNAL,
+            "已开启注册邮箱验证，但邮件服务当前不可用，请联系管理员"
+          );
+        }
+        const checked = await checkCode(kv, "register", emailNorm, body.code);
+        if (!checked.ok) {
+          throw new ApiError(400, ErrorCode.BAD_REQUEST, CODE_ERROR_MESSAGE[checked.reason ?? "absent"]);
+        }
       }
     }
 

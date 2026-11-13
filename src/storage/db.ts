@@ -242,6 +242,13 @@ export async function getUserById(env: any, id: string): Promise<UserRecord | nu
   });
 }
 
+/** 系统内是否已有用户。用于「首位管理员自举」判定，与 createUser 提权条件保持一致 */
+export async function hasAnyUser(env: any): Promise<boolean> {
+  const store = getBlobStore(env);
+  const idx = (await store.get("idx:users:all", { type: "json", consistency: "strong" })) || [];
+  return Array.isArray(idx) && idx.length > 0;
+}
+
 export async function createUser(env: any, user: UserRecord): Promise<UserRecord> {
   const store = getBlobStore(env);
   const norm = user.email.trim().toLowerCase();

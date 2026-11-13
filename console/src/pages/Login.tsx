@@ -22,6 +22,8 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
   const [inviteCode, setInviteCode] = useState(() => new URLSearchParams(window.location.search).get("invite") || new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("invite") || "");
   const nav = useNavigate();
   const toast = useToast();
+  // 注册是否需要邮箱验证码：以后台开关为准，未下发该字段时按开启处理
+  const regNeedsCode = site?.emailVerificationRequired ?? !!site?.smtpEnabled;
 
   const submit = async () => {
     setBusy(true);
@@ -41,7 +43,7 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
         }
       } else {
         const cleanCode = regCode.trim();
-        if (site?.smtpEnabled) {
+        if (regNeedsCode) {
           if (!cleanCode) return toast("请输入邮箱验证码", "err");
           if (cleanCode.length !== 6) return toast("请输入完整的 6 位数字验证码", "err");
         }
@@ -115,7 +117,7 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
             {mode === "register" && (
               <Field label="密码"><Input type="password" required minLength={10} value={pass} onChange={(e) => setPass(e.target.value)} autoComplete="new-password" /></Field>
             )}
-            {mode === "register" && site?.smtpEnabled && (
+            {mode === "register" && regNeedsCode && (
               <Field label="邮箱验证码">
                 <div className="flex gap-2">
                   <Input required value={regCode} onChange={(e) => setRegCode(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="6 位数字验证码" inputMode="numeric" autoComplete="one-time-code" maxLength={6} />
