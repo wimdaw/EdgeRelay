@@ -22,6 +22,7 @@ import { topup } from "../billing";
 import { sendMail } from "../smtp";
 import { verifyCodeEmailHtml } from "../email-templates";
 import { getKV } from "../storage/blob-store";
+import { checkCode, putCode, CODE_ERROR_MESSAGE } from "../email-code";
 
 export const authRouter = new Hono<{ Bindings: Env }>();
 
@@ -81,8 +82,7 @@ authRouter.post("/register", async (c) => {
           }
         );
 
-        await kv.put(`emailcode:reg:${emailNorm}`, code, { expirationTtl: 600 });
-        await kv.put(`emailcode:common:${emailNorm}`, code, { expirationTtl: 600 });
+        await putCode(kv, "register", emailNorm, code);
         await kv.put(`emailcode:sent:${emailNorm}`, "1", { expirationTtl: 60 });
       } catch (e: any) {
         throw new ApiError(502, ErrorCode.UPSTREAM_ERROR, `邮件发送失败：${e?.message}（请检查 SMTP 配置）`);
@@ -112,18 +112,10 @@ authRouter.post("/register", async (c) => {
 
     // 若 SMTP 启用，强制校验验证码
     if (smtpReady) {
-      const stored =
-        (await kv.get(`emailcode:reg:${emailNorm}`)) ||
-        (await kv.get(`emailcode:common:${emailNorm}`));
-      const inputCode = (body.code ?? "").toString().trim();
-      if (!stored) {
-        throw new ApiError(400, ErrorCode.BAD_REQUEST, "验证码已过期或未获取，请点击重新获取");
+      const checked = await checkCode(kv, "register", emailNorm, body.code);
+      if (!checked.ok) {
+        throw new ApiError(400, ErrorCode.BAD_REQUEST, CODE_ERROR_MESSAGE[checked.reason ?? "absent"]);
       }
-      if (stored !== inputCode) {
-        throw new ApiError(400, ErrorCode.BAD_REQUEST, "验证码输入错误，请仔细核对邮件中的 6 位数字");
-      }
-      await kv.delete(`emailcode:reg:${emailNorm}`).catch(() => {});
-      await kv.delete(`emailcode:common:${emailNorm}`).catch(() => {});
     }
 
     const now = Math.floor(Date.now() / 1000);
@@ -229,8 +221,7 @@ authRouter.post("/login", async (c) => {
           }
         );
 
-        await kv.put(`emailcode:login:${emailNorm}`, code, { expirationTtl: 600 });
-        await kv.put(`emailcode:common:${emailNorm}`, code, { expirationTtl: 600 });
+        await putCode(kv, "login", emailNorm, code);
         await kv.put(`emailcode:sent:${emailNorm}`, "1", { expirationTtl: 60 });
       } catch (e: any) {
         throw new ApiError(502, ErrorCode.UPSTREAM_ERROR, `邮件发送失败：${e?.message}`);
@@ -250,18 +241,12 @@ authRouter.post("/login", async (c) => {
 
     // 模式 A: 验证码登录
     if (body.code) {
-      const stored =
-        (await kv.get(`emailcode:login:${emailNorm}`)) ||
-        (await kv.get(`emailcode:common:${emailNorm}`));
-      const inputCode = body.code.toString().trim();
-      if (!stored) {
-        throw new ApiError(401, ErrorCode.AUTH_INVALID, "验证码已过期或未获取，请点击重新获取");
+      const checked = await checkCode(kv, "login", emailNorm, body.code);
+      if (!checked.ok) {
+        const status = checked.reason === "locked" ? 429 : 401;
+        const code = checked.reason === "locked" ? ErrorCode.RATE_LIMITED : ErrorCode.AUTH_INVALID;
+        throw new ApiError(status, code, CODE_ERROR_MESSAGE[checked.reason ?? "absent"]);
       }
-      if (stored !== inputCode) {
-        throw new ApiError(401, ErrorCode.AUTH_INVALID, "验证码输入错误，请仔细核对邮件中的 6 位数字");
-      }
-      await kv.delete(`emailcode:login:${emailNorm}`).catch(() => {});
-      await kv.delete(`emailcode:common:${emailNorm}`).catch(() => {});
     }
     // 模式 B: 密码登录
     else if (body.password) {
@@ -387,6 +372,7 @@ authRouter.post("/reset", async (c) => {
     const settings = await getSettings(env);
     const body = await c.req.json<{
       stage?: number;
+      action?: "request" | "confirm";
       email?: string;
       code?: string;
       password?: string;
@@ -399,8 +385,8 @@ authRouter.post("/reset", async (c) => {
 
     if (!smtpReady) throw new ApiError(503, ErrorCode.INTERNAL, "邮件服务未启用，无法重置密码");
 
-    // 阶段 1: 发送重置验证码
-    if (body.stage === 1 || !body.code) {
+    // 阶段 1: 发送重置验证码（兼容 stage / action 两套入参）
+    if (body.stage === 1 || body.action === "request" || !body.code) {
       const user = await getUserByEmail(env, emailNorm);
       if (!user) throw new ApiError(404, ErrorCode.NOT_FOUND, "该邮箱尚未注册");
 
@@ -411,51 +397,51 @@ authRouter.post("/reset", async (c) => {
       const code = String(Math.floor(100000 + Math.random() * 900000));
       const password = await decryptSecret(env, settings.smtpPassEnc!);
 
-      await sendMail(
-        {
-          host: settings.smtpHost!,
-          port: settings.smtpPort || 465,
-          username: settings.smtpUsername || settings.smtpFrom || "wimdaw@163.com",
-          password,
-          from: settings.smtpFrom || settings.smtpUsername || "wimdaw@163.com",
-        },
-        {
-          to: emailNorm,
-          fromName: "Relay AI",
-          subject: `${settings.siteName ?? "Relay"} 密码重置验证码`,
-          text: `你的密码重置验证码为：${code}，10 分钟内有效。`,
-          html: verifyCodeEmailHtml(settings.siteName ?? "Relay", code),
-        }
-      );
+      try {
+        await sendMail(
+          {
+            host: settings.smtpHost!,
+            port: settings.smtpPort || 465,
+            username: settings.smtpUsername || settings.smtpFrom || "wimdaw@163.com",
+            password,
+            from: settings.smtpFrom || settings.smtpUsername || "wimdaw@163.com",
+          },
+          {
+            to: emailNorm,
+            fromName: "Relay AI",
+            subject: `${settings.siteName ?? "Relay"} 密码重置验证码`,
+            text: `你的密码重置验证码为：${code}，10 分钟内有效。`,
+            html: verifyCodeEmailHtml(settings.siteName ?? "Relay", code),
+          }
+        );
+      } catch (e: any) {
+        throw new ApiError(502, ErrorCode.UPSTREAM_ERROR, `邮件发送失败：${e?.message}（请检查 SMTP 配置）`);
+      }
 
-      await kv.put(`emailcode:reset:${emailNorm}`, code, { expirationTtl: 600 });
-      await kv.put(`emailcode:common:${emailNorm}`, code, { expirationTtl: 600 });
+      await putCode(kv, "reset", emailNorm, code);
       await kv.put(`emailcode:sent:${emailNorm}`, "1", { expirationTtl: 60 });
 
       return json({ ok: true, message: "重置验证码已发送" });
     }
 
-    // 阶段 2: 校验验证码并更新密码
-    const stored =
-      (await kv.get(`emailcode:reset:${emailNorm}`)) ||
-      (await kv.get(`emailcode:common:${emailNorm}`));
-    const inputCode = body.code.toString().trim();
-    if (!stored) {
-      throw new ApiError(400, ErrorCode.BAD_REQUEST, "验证码已过期或未获取，请重新获取");
-    }
-    if (stored !== inputCode) {
-      throw new ApiError(400, ErrorCode.BAD_REQUEST, "验证码输入错误，请仔细核对邮件中的 6 位数字");
-    }
+    // 阶段 2: 校验验证码并更新密码。先校验密码强度，避免一次手误白白烧掉验证码
     if (!body.password || body.password.length < 10) {
       throw new ApiError(400, ErrorCode.BAD_REQUEST, "新密码至少 10 位");
+    }
+
+    const checked = await checkCode(kv, "reset", emailNorm, body.code);
+    if (!checked.ok) {
+      throw new ApiError(400, ErrorCode.BAD_REQUEST, CODE_ERROR_MESSAGE[checked.reason ?? "absent"]);
     }
 
     const user = await getUserByEmail(env, emailNorm);
     if (!user) throw new ApiError(404, ErrorCode.NOT_FOUND, "用户不存在");
 
     const newHash = await hashPassword(body.password);
-    await updateUser(env, user.id, { passwordHash: newHash });
-    await kv.delete(`emailcode:reset:${emailNorm}`);
+    await updateUser(env, user.id, {
+      passwordHash: newHash,
+      passwordChangedAt: Math.floor(Date.now() / 1000),
+    });
 
     await audit(hCtx, {
       actorUserId: user.id,

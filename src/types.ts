@@ -189,6 +189,8 @@ export interface UserRecord {
   tosAcceptedAt?: number;
   privacyAcceptedAt?: number;
   stepUpUntil?: number;
+  /** 密码最近一次变更时间（秒）。早于该时间创建的会话一律失效，用于改密/重置后踢掉其它设备 */
+  passwordChangedAt?: number;
   createdAt: number;
   updatedAt: number;
 }

@@ -8,7 +8,7 @@ import type { HandlerCtx, AuthedKey, RateLimits } from "./types";
 import { ApiError, ErrorCode } from "./errors";
 import { hmacHex, sha256Hex, timingSafeEqualHex } from "./crypto";
 import { getSettings } from "./settings";
-import { getSession, getUserById, getApiKeyByHash, touchApiKeyUsage, updateUser, syncUserVipStatus } from "./storage/db";
+import { getSession, getUserById, getApiKeyByHash, touchApiKeyUsage, updateUser, syncUserVipStatus, deleteSession } from "./storage/db";
 
 export type SessionUser = {
   id: string;
@@ -54,6 +54,12 @@ export async function getSessionUser(c: HandlerCtx): Promise<SessionUser | null>
 
   const user = await getUserById(c.env, session.userId);
   if (!user || user.status !== "active") return null;
+
+  // 改密 / 找回密码后，变更时间之前的会话全部作废（含其它设备），避免旧 Cookie 继续可用
+  if (user.passwordChangedAt && session.createdAt < user.passwordChangedAt) {
+    deleteSession(c.env, session.id).catch(() => {});
+    return null;
+  }
 
   // 创始人账号无条件锁定为 superadmin；普通用户与 VIP 依据余额是否大于 0 自动升降级
   let currentRole = user.role;

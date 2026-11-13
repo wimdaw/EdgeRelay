@@ -3,12 +3,12 @@
  */
 import { Hono } from "hono";
 import type { Env, HandlerCtx } from "../types";
-import { requireUser, clientIp } from "../auth";
+import { requireUser, clientIp, sessionCookie } from "../auth";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
-import { hashPassword, verifyPassword } from "../crypto";
-import { json } from "../settings";
+import { hashPassword, verifyPassword, uuid } from "../crypto";
+import { json, getSettings } from "../settings";
 import { audit } from "../audit";
-import { getUserById, updateUser, getBlobStore } from "../storage/db";
+import { getUserById, updateUser, getBlobStore, createSession } from "../storage/db";
 
 export const profileRouter = new Hono<{ Bindings: Env }>();
 
@@ -89,7 +89,9 @@ profileRouter.put("/", async (c) => {
     }
 
     const newHash = await hashPassword(body.newPassword);
-    await updateUser(c.env, u.id, { passwordHash: newHash });
+    const now = Math.floor(Date.now() / 1000);
+    // 记录变更时间：早于此刻的会话（含其它设备）全部失效
+    await updateUser(c.env, u.id, { passwordHash: newHash, passwordChangedAt: now });
 
     await audit(hCtx, {
       actorUserId: u.id,
@@ -99,7 +101,21 @@ profileRouter.put("/", async (c) => {
       targetId: u.id,
     });
 
-    return json({ ok: true, message: "密码已更新" });
+    // 当前设备重新签发会话，避免用户改完密码就把自己登出
+    const settings = await getSettings(c.env);
+    const maxAge = settings.persistentSession ? 315360000 : 604800;
+    const sid = uuid();
+    await createSession(c.env, {
+      id: sid,
+      userId: u.id,
+      createdAt: now,
+      expiresAt: now + maxAge,
+      ip: clientIp(hCtx.req),
+      userAgent: c.req.header("user-agent"),
+    });
+
+    const secret = String(c.env.SESSION_SECRET || "edgerelay-default-session-secret-32b");
+    return await sessionCookie(json({ ok: true, message: "密码已更新" }), secret, sid, maxAge);
   } catch (err) {
     return errorResponse(hCtx, err);
   }

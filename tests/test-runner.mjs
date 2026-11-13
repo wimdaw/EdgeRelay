@@ -1932,6 +1932,70 @@ let apiKeyId = "";
   }
 }
 
+// 26. 改密后其它设备会话失效，当前设备自动续签
+{
+  const email = "session-check@edgerelay.test";
+  const oldPwd = "OriginPassword123!";
+  const newPwd = "ChangedPassword456!";
+
+  const reg = await request("/api/auth/register", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: { email, password: oldPwd, tosAccepted: true, privacyAccepted: true },
+  });
+  assert(reg.status === 200 || reg.status === 201, "改密用例：新用户注册成功");
+
+  const loginOnce = async () => {
+    const r = await request("/api/auth/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: { email, password: oldPwd },
+    });
+    return r.headers.get("set-cookie").split(";")[0];
+  };
+  const deviceA = await loginOnce();
+  const deviceB = await loginOnce();
+
+  const meA = await request("/api/auth/me", { headers: { cookie: deviceA } });
+  assert(meA.status === 200, "改密用例：设备 A 登录态有效");
+  const meB = await request("/api/auth/me", { headers: { cookie: deviceB } });
+  assert(meB.status === 200, "改密用例：设备 B 登录态有效");
+
+  // 会话创建时间精确到秒，先跨过秒边界再改密，避免同秒会话被判定为「未过期」
+  await new Promise((r) => setTimeout(r, 1100));
+
+  const changed = await request("/api/user/profile", {
+    method: "PUT",
+    headers: { cookie: deviceA, "content-type": "application/json" },
+    body: { oldPassword: oldPwd, newPassword: newPwd },
+  });
+  assert(changed.status === 200, "改密用例：修改密码成功");
+  const reissued = changed.headers.get("set-cookie");
+  assert(!!reissued && reissued.includes("gw_session="), "改密用例：当前设备获得新会话 Cookie");
+
+  const staleA = await request("/api/auth/me", { headers: { cookie: deviceA } });
+  assert(staleA.status === 401, "改密用例：旧会话 Cookie 已失效");
+  const kickedB = await request("/api/auth/me", { headers: { cookie: deviceB } });
+  assert(kickedB.status === 401, "改密用例：其它设备会话被踢下线");
+
+  const freshCookie = reissued.split(";")[0];
+  const stillIn = await request("/api/auth/me", { headers: { cookie: freshCookie } });
+  assert(stillIn.status === 200, "改密用例：当前设备凭新 Cookie 保持登录");
+
+  const oldLogin = await request("/api/auth/login", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: { email, password: oldPwd },
+  });
+  assert(oldLogin.status === 401, "改密用例：旧密码无法登录");
+  const newLogin = await request("/api/auth/login", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: { email, password: newPwd },
+  });
+  assert(newLogin.status === 200, "改密用例：新密码可登录");
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);
