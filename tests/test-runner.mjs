@@ -1729,6 +1729,55 @@ let apiKeyId = "";
   assert(badFormat.status === 400, "Duck.ai 生图 response_format=html 返回 400");
 }
 
+// 26. Duck.ai 自然语言生图意图（ZCode 客户端不传 image_generation 字段）
+{
+  const realFetch = globalThis.fetch;
+  const mockB64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+  const chatCalls = [];
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("/duckchat/v1/status")) {
+      return new Response("{}", {
+        status: 200,
+        headers: { "x-vqd-hash-1": Buffer.from('(function(){return {client_hashes:["x"]}})()').toString("base64") },
+      });
+    }
+    if (target.includes("/duckchat/v1/chat")) {
+      chatCalls.push({ target, init });
+      const sse = [
+        `data: {"role":"ui-component","name":"generate-image","state":"data","data":{"b64Image":"${mockB64}","format":"jpeg","status":"success"}}`,
+        "data: [DONE]",
+        "",
+      ].join("\n\n");
+      return new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+  };
+
+  try {
+    const res = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: {
+        model: "mock-duck-image",
+        stream: false,
+        messages: [{ role: "user", content: "请生成一张小猫图片" }],
+      },
+    });
+    assert(res.status === 200, "自然语言生图请求 HTTP 200（未传 image_generation）");
+    const data = await res.json();
+    const msg = data.choices?.[0]?.message;
+    assert(Array.isArray(msg?.images) && msg.images.length === 1, "自然语言生图仍返回 message.images");
+    assert(String(msg.images[0]?.image_url?.url).startsWith("data:image/png;base64,"), "图片按魔数修正为 PNG data URL");
+    assert(chatCalls.length > 0, "已向上游发出生图对话请求");
+    const sent = JSON.parse(chatCalls[0].init.body);
+    assert(sent.metadata?.toolChoice?.GenerateImage === true, "自然语言生图意图自动预授权 GenerateImage");
+    assert(sent.canDelegateImageGeneration === true, "自然语言生图意图自动设置 canDelegateImageGeneration=true");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

@@ -488,6 +488,28 @@ function isWebSearchEnabled(tools: unknown, webSearch: unknown): boolean {
   });
 }
 
+/**
+ * 从最后一条 user 消息里识别「生图」意图。
+ * 客户端（如 ZCode）通常不会发送 image_generation 字段，只会把「生成一张小猫图片」当普通文本；
+ * 这里做一次保守的意图识别，用于给上游预授权 GenerateImage，避免模型反问/拒答。
+ */
+function looksLikeImageGenerationPrompt(messages: unknown): boolean {
+  if (!Array.isArray(messages)) return false;
+  let text = "";
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const msg = messages[i] as Record<string, unknown> | null;
+    if (!msg || String(msg.role || "").toLowerCase() !== "user") continue;
+    text = contentToText(msg.content).trim();
+    if (text) break;
+  }
+  if (!text) return false;
+  // 命中「画/生成/绘制 + 图片类名词」；限制跨度，避免把讨论代码的句子误判为生图
+  if (/(?:画|绘制|生成|做|来|给我|帮我)[\s\S]{0,12}(?:一张|一幅|一个|张|幅|个)?[\s\S]{0,8}(?:图片|图像|照片|插画|海报|头像|壁纸|表情包|动图|图)/.test(text)) {
+    return true;
+  }
+  return /\b(?:draw|paint|generate|create|make)\b[\s\S]{0,30}\b(?:image|picture|photo|illustration|artwork|wallpaper|avatar|poster)\b/i.test(text);
+}
+
 const NON_TEXT_ROLES = new Set([
   "reasoning",
   "tool-invocation",
@@ -633,18 +655,18 @@ function streamResponse(upstream: Response, model: string, searchEnabled: boolea
         try {
           const ev = JSON.parse(payloadStr);
           mergeDuckMetadata(meta, readDuckEventMetadata(ev));
-          if (imageGenEnabled) {
-            const image = extractGeneratedImage(ev);
-            if (image) {
-              if (image.partial) {
-                partialImage = image;
-              } else {
-                partialImage = null;
-                sentImage = true;
-                emit(controller, { images: [toChatImage(image)] });
-              }
-              continue;
+          // 图片按事件形态无条件解析：即使客户端没显式开生图，上游也可能自发返回 generate-image，
+          // 不能因为开关为 false 就把图片丢掉（否则正文为空，客户端看起来像“用不了”）。
+          const image = extractGeneratedImage(ev);
+          if (image) {
+            if (image.partial) {
+              partialImage = image;
+            } else {
+              partialImage = null;
+              sentImage = true;
+              emit(controller, { images: [toChatImage(image)] });
             }
+            continue;
           }
           if (isRefusalEvent(ev)) {
             refusal = true;
@@ -719,17 +741,16 @@ function collectUpstream(text: string, searchEnabled: boolean, imageGenEnabled: 
     try {
       const ev = JSON.parse(payloadStr);
       mergeDuckMetadata(meta, readDuckEventMetadata(ev));
-      if (imageGenEnabled) {
-        const image = extractGeneratedImage(ev);
-        if (image) {
-          if (image.partial) {
-            partialImage = image;
-          } else {
-            partialImage = null;
-            images.push(toChatImage(image));
-          }
-          continue;
+      // 与流式一致：图片事件无条件解析，避免上游自发生图时被静默丢弃
+      const image = extractGeneratedImage(ev);
+      if (image) {
+        if (image.partial) {
+          partialImage = image;
+        } else {
+          partialImage = null;
+          images.push(toChatImage(image));
         }
+        continue;
       }
       if (isRefusalEvent(ev)) {
         refusal = true;
@@ -920,7 +941,8 @@ export async function handleDuckAiRequest(input: {
   } catch {}
   if (clientTools.length > 0) messages = injectToolProtocol(messages, buildToolProtocol(clientTools));
   const searchEnabled = isWebSearchEnabled(input.tools, input.webSearch);
-  const imageGenEnabled = isImageGenerationEnabled(input.tools, input.imageGeneration, input.model);
+  const imageGenEnabled = isImageGenerationEnabled(input.tools, input.imageGeneration, input.model)
+    || looksLikeImageGenerationPrompt(input.messages);
 
   await acquireDuckSlot();
   try {
