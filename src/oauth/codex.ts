@@ -759,7 +759,7 @@ export async function handleCodexRequest(p: OAuthCallParams, subPath: string): P
       })
       if (!upstream.ok) {
         lastStatus = upstream.status
-        lastError = `HTTP ${upstream.status}: ${(await readErrorBody(upstream)).slice(0, 300)}`
+        lastError = `[codex ${activeRelay ? 'relay' : 'direct'} tokens=${tokens.length} img=${isImageMode ? 1 : 0}] HTTP ${upstream.status}: ${(await readErrorBody(upstream)).slice(0, 300)}`
         if (upstream.status === 429) {
           // 配额耗尽按账号冷却：优先取上游重置时间（Retry-After 头或文本里的 Resets in），别让后续请求白撞
           const retryAfter = Number(upstream.headers.get('retry-after'))
