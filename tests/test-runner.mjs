@@ -1778,6 +1778,155 @@ let apiKeyId = "";
   }
 }
 
+// 27. 共享生图意图识别
+{
+  const { looksLikeImageGenerationPrompt, isImageIntentRequest } = await import("../src/image-intent.ts");
+  assert(looksLikeImageGenerationPrompt([{ role: "user", content: "请生成一张小猫图片" }]), "中文自然语言识别为生图意图");
+  assert(looksLikeImageGenerationPrompt([{ role: "user", content: "Please draw a picture of a cat" }]), "英文自然语言识别为生图意图");
+  assert(!looksLikeImageGenerationPrompt([{ role: "user", content: "用 Python 生成图片的代码怎么写" }]), "技术讨论不误判为生图意图");
+  assert(isImageIntentRequest({ model: "gpt-6-luna", messages: [{ role: "user", content: "帮我画一幅插画" }] }, "gpt-6-luna"), "共享判断函数支持自然语言");
+  assert(!isImageIntentRequest({ model: "gpt-6-luna", messages: [{ role: "user", content: "你好" }] }, "gpt-6-luna"), "普通问候不触发共享生图判断");
+}
+
+// 28. Codex 渠道自然语言生图（ZCode 等客户端）
+{
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_model",
+      payload: {
+        publicName: "mock-codex-luna",
+        providerId: "p_mock_codex",
+        upstreamModel: "gpt-6-luna",
+        inputPerMillion: 0,
+        outputPerMillion: 0,
+      },
+    },
+  });
+
+  const realFetch = globalThis.fetch;
+  const mockB64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+  let codexRequest = null;
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("auth.openai.com/oauth/token")) {
+      return new Response(JSON.stringify({
+        access_token: "mock-access-token",
+        refresh_token: "mock-refresh-token",
+        expires_in: 3600,
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (target.includes("/backend-api/codex/responses")) {
+      codexRequest = JSON.parse(init.body);
+      const sse = `data: {"type":"response.output_item.done","item":{"type":"image_generation_call","id":"img_nl","status":"completed","result":"${mockB64}"}}\n\ndata: {"type":"response.completed","response":{"usage":{"input_tokens":5,"output_tokens":5}}}\n\ndata: [DONE]\n\n`;
+      return new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    return realFetch(url, init);
+  };
+
+  try {
+    const res = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: {
+        model: "mock-codex-luna",
+        stream: false,
+        messages: [{ role: "user", content: "请生成一张小猫图片" }],
+      },
+    });
+    assert(res.status === 200, "Codex 自然语言生图 HTTP 200");
+    const data = await res.json();
+    const msg = data.choices?.[0]?.message;
+    assert(Array.isArray(msg?.images) && msg.images.length === 1, "Codex 自然语言生图返回 message.images");
+    assert(Boolean(codexRequest), "已向 Codex Responses 发出请求");
+    assert(codexRequest.model === "gpt-6-luna", "Codex 主模型沿用路由配置的 gpt-6-luna");
+    assert(codexRequest.tools?.some((t) => t.type === "image_generation"), "Codex 请求自动注入 image_generation 工具");
+    assert(codexRequest.tool_choice?.type === "image_generation", "Codex 请求自动强制 tool_choice=image_generation");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
+// 29. ChatGPT 网页版自然语言生图（ZCode 等客户端）
+{
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_model",
+      payload: {
+        publicName: "mock-chatgpt-luna",
+        providerId: "p_mock_chatgptweb",
+        upstreamModel: "gpt-6-luna",
+        inputPerMillion: 0,
+        outputPerMillion: 0,
+      },
+    },
+  });
+
+  const realFetch = globalThis.fetch;
+  const mockB64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+  let conversationBody = null;
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("auth.openai.com/oauth/token") || target.includes("auth0.openai.com/oauth/token")) {
+      return new Response(JSON.stringify({
+        access_token: "mock-web-access-token",
+        expires_in: 3600,
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (target.endsWith("chatgpt.com/")) {
+      return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+    }
+    if (target.includes("/sentinel/chat-requirements/prepare")) {
+      return new Response(JSON.stringify({ prepare_token: "mock-prepare" }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (target.includes("/sentinel/chat-requirements/finalize")) {
+      return new Response(JSON.stringify({ token: "mock-sentinel" }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (target.includes("/sentinel/chat-requirements")) {
+      return new Response(JSON.stringify({ token: "mock-sentinel" }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (target.includes("/backend-api/conversation")) {
+      conversationBody = JSON.parse(init.body);
+      const sse = `data: {"conversation_id":"conv_nl","message":{"content":{"parts":["file-service://file-nl"]}}}\n\ndata: [DONE]\n\n`;
+      return new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    if (target.includes("/backend-api/files/file-nl/download")) {
+      return new Response(JSON.stringify({ status: "success", download_url: "https://files.example.com/nl.png" }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }
+    if (target === "https://files.example.com/nl.png") {
+      return new Response(Buffer.from(mockB64, "base64"), { status: 200, headers: { "content-type": "image/png" } });
+    }
+    return realFetch(url, init);
+  };
+
+  try {
+    const res = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: {
+        model: "mock-chatgpt-luna",
+        stream: false,
+        messages: [{ role: "user", content: "请生成一张小猫图片" }],
+      },
+    });
+    assert(res.status === 200, "ChatGPT 网页版自然语言生图 HTTP 200");
+    const data = await res.json();
+    const msg = data.choices?.[0]?.message;
+    assert(Array.isArray(msg?.images) && msg.images.length === 1, "ChatGPT 网页版自然语言生图返回 message.images");
+    assert(Boolean(conversationBody), "已向 ChatGPT 网页版 conversation 发出请求");
+    assert(conversationBody.model === "auto", "生图模式自动使用 auto 模型");
+    assert(Array.isArray(conversationBody.system_hints) && conversationBody.system_hints.includes("picture_v2"), "生图模式自动携带 picture_v2");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

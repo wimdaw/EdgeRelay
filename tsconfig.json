@@ -6,6 +6,7 @@
     "strict": true,
     "noUncheckedIndexedAccess": false,
     "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "noEmit": true,
     "lib": ["ES2022"],

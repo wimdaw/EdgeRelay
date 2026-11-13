@@ -5,6 +5,7 @@
  * 请求翻译成 Responses 格式，响应（含 SSE 流式）翻译回 OpenAI chat/completions。
  * 纯函数，不依赖存储或运行时环境。参照 CLIProxyAPI 的 translator/codex 实现。
  */
+import { isImageIntentRequest, isImageModelName } from './image-intent.ts'
 
 function randomId(): string {
   try { return crypto.randomUUID() } catch { return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}` }
@@ -45,16 +46,7 @@ export function extractImagesFromOutputItem(item: any): GeneratedImageItem[] {
 }
 
 export function isImageGenerationRequest(body: Record<string, any>): boolean {
-  if (body?.image_generation === true || body?.enable_image_generation === true) return true
-  const model = String(body?.model || '').toLowerCase()
-  if (/gpt-image|dall-e|^image-/i.test(model)) return true
-  if (Array.isArray(body?.tools)) {
-    return body.tools.some((t: any) => {
-      const type = String(t?.type || '').toLowerCase()
-      return type === 'image_generation' || type === 'image_generation_preview' || type === 'generate_image'
-    })
-  }
-  return false
+  return isImageIntentRequest(body, body?.model)
 }
 
 // =====================================================================
@@ -129,7 +121,7 @@ export function openAIToResponsesRequest(body: Record<string, any>, opts?: { def
 
   let model = String(body.model || '')
   let toolImageModel: string | undefined
-  if (/gpt-image|dall-e|^image-/i.test(model)) {
+  if (isImageModelName(model)) {
     toolImageModel = model
     model = 'gpt-5.4-mini'
   }
@@ -187,7 +179,7 @@ export function openAIToResponsesRequest(body: Record<string, any>, opts?: { def
   else if (tc && typeof tc === 'object') {
     if (tc.type === 'image_generation') request.tool_choice = { type: 'image_generation' }
     else if (tc.function?.name || tc.name) request.tool_choice = { type: 'function', name: tc.function?.name || tc.name }
-  } else if (hasImageTool && (body.image_generation === true || body.enable_image_generation === true || toolImageModel)) {
+  } else if (hasImageTool && isImageMode) {
     request.tool_choice = { type: 'image_generation' }
   }
   if (body.parallel_tool_calls !== undefined && tools.length > 0) request.parallel_tool_calls = !!body.parallel_tool_calls

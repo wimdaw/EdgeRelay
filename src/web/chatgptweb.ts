@@ -32,6 +32,7 @@ import {
   randomId,
 } from '../oauth/common'
 import { getKV } from '../storage/blob-store'
+import { isImageIntentRequest } from '../image-intent'
 
 // =====================================================================
 // 常量
@@ -933,15 +934,7 @@ function buildFlatConversationPayload(
 }
 
 export function isWebImageGenerationRequest(body: Record<string, any>, model: string): boolean {
-  if (body?.image_generation === true || body?.enable_image_generation === true) return true
-  if (/gpt-image|dall-e|^image-/i.test(model)) return true
-  if (Array.isArray(body?.tools)) {
-    return body.tools.some((t: any) => {
-      const type = String(t?.type || '').toLowerCase()
-      return type === 'image_generation' || type === 'image_generation_preview' || type === 'generate_image'
-    })
-  }
-  return false
+  return isImageIntentRequest(body, model)
 }
 
 function buildConversationPayload(
@@ -950,7 +943,9 @@ function buildConversationPayload(
   body: Record<string, any>,
 ): Record<string, any> {
   const isImageMode = isWebImageGenerationRequest(body, model)
-  const actualModel = isImageMode && /gpt-image|dall-e|^image-/i.test(model) ? 'auto' : model
+  // picture_v2 生图走 auto 模型，与 chatgpt 网页端行为一致；
+  // 否则上游可能把 gpt-6-luna 之类的展示名当模型 slug 拒掉。
+  const actualModel = isImageMode ? 'auto' : model
   const payload: Record<string, any> = {
     action: 'next',
     messages: toWebMessages(messages),
@@ -1591,7 +1586,8 @@ function createOpenAIStream(
           if (done) {
             if (buffer.trim()) handle(buffer.trim())
             const wrapFinish = async () => {
-              if (options?.isImageMode && options?.token && options?.fp && imagePointers.length > 0) {
+              // 不依赖 isImageMode：上游自发返回图片指针时也要下载，否则客户端只看到空消息
+              if (options?.token && options?.fp && imagePointers.length > 0) {
                 const images: Array<{ type: 'image_url'; image_url: { url: string } }> = []
                 for (const ptr of imagePointers.slice(0, 4)) {
                   const dlUrl = await fetchWebImageDownloadUrl(options.fp, options.token, options.accountId || '', ptr, conversationId)
@@ -1699,7 +1695,8 @@ async function collectSseToJson(
   try { await reader.cancel() } catch { /* ignore */ }
 
   const images: Array<{ type: 'image_url'; image_url: { url: string } }> = []
-  if (options?.isImageMode && options?.token && options?.fp) {
+  // 不依赖 isImageMode：只要上游返回图片指针就解析下载
+  if (options?.token && options?.fp) {
     if (imagePointers.length === 0 && conversationId) {
       const polled = await pollConversationForPointers(options.fp, options.token, options.accountId || '', conversationId)
       for (const p of polled) {

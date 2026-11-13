@@ -780,7 +780,12 @@ export async function generateCodexImage(
     return { ok: false, httpStatus: 401, error: '未配置可用的 Codex refresh_token' }
   }
 
-  const imageModel = body.model && /gpt-image|dall-e/i.test(String(body.model)) ? String(body.model) : 'gpt-image-2'
+  const requestedModel = String(body.model || '')
+  const isImageModel = /gpt-image|dall-e|^image-/i.test(requestedModel)
+  const imageModel = isImageModel ? requestedModel : 'gpt-image-2'
+  // 主模型必须是能调用 image_generation 工具的文本模型：
+  // 路由配置的是 gpt-6-luna / gpt-5.5 等文本模型时直接复用，生图模型名则回退默认文本模型。
+  const mainModel = requestedModel && !isImageModel ? requestedModel : 'gpt-5.4-mini'
   const tool: Record<string, any> = {
     type: 'image_generation',
     action: 'generate',
@@ -790,7 +795,7 @@ export async function generateCodexImage(
   if (body.quality) tool.quality = String(body.quality)
 
   const request = {
-    model: 'gpt-5.4-mini',
+    model: mainModel,
     input: [{
       type: 'message',
       role: 'user',

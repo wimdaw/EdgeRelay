@@ -15,7 +15,6 @@ import {
   type DuckAiSource,
 } from "./duckai-sources";
 import {
-  isImageGenerationEnabled,
   extractGeneratedImage,
   detectImageFormat,
   mimeFor,
@@ -45,6 +44,7 @@ import {
 } from "./duckai-tools";
 import { spillMessagesToPdf, type DuckAiFilePart } from "./duckai-pdf";
 import { mergeDuckMetadata, parseDuckMetadataFrame, readDuckEventMetadata, type DuckAiMetadata } from "./duckai-meta";
+import { isImageIntentRequest } from "./image-intent";
 
 const BASE_URL = "https://duck.ai";
 const STATUS_URL = `${BASE_URL}/duckchat/v1/status`;
@@ -489,25 +489,22 @@ function isWebSearchEnabled(tools: unknown, webSearch: unknown): boolean {
 }
 
 /**
- * 从最后一条 user 消息里识别「生图」意图。
- * 客户端（如 ZCode）通常不会发送 image_generation 字段，只会把「生成一张小猫图片」当普通文本；
- * 这里做一次保守的意图识别，用于给上游预授权 GenerateImage，避免模型反问/拒答。
+ * 生图意图判断统一走 shared image-intent：
+ * 兼容显式字段、生图工具、生图模型名，以及「生成一张小猫图片」这类自然语言。
  */
-function looksLikeImageGenerationPrompt(messages: unknown): boolean {
-  if (!Array.isArray(messages)) return false;
-  let text = "";
-  for (let i = messages.length - 1; i >= 0; i--) {
-    const msg = messages[i] as Record<string, unknown> | null;
-    if (!msg || String(msg.role || "").toLowerCase() !== "user") continue;
-    text = contentToText(msg.content).trim();
-    if (text) break;
-  }
-  if (!text) return false;
-  // 命中「画/生成/绘制 + 图片类名词」；限制跨度，避免把讨论代码的句子误判为生图
-  if (/(?:画|绘制|生成|做|来|给我|帮我)[\s\S]{0,12}(?:一张|一幅|一个|张|幅|个)?[\s\S]{0,8}(?:图片|图像|照片|插画|海报|头像|壁纸|表情包|动图|图)/.test(text)) {
-    return true;
-  }
-  return /\b(?:draw|paint|generate|create|make)\b[\s\S]{0,30}\b(?:image|picture|photo|illustration|artwork|wallpaper|avatar|poster)\b/i.test(text);
+function isDuckAiImageRequest(input: {
+  model: string;
+  messages: unknown;
+  tools?: unknown;
+  imageGeneration?: unknown;
+}): boolean {
+  return isImageIntentRequest({
+    model: input.model,
+    messages: input.messages,
+    tools: input.tools,
+    image_generation: input.imageGeneration,
+    enable_image_generation: input.imageGeneration,
+  }, input.model);
 }
 
 const NON_TEXT_ROLES = new Set([
@@ -941,8 +938,7 @@ export async function handleDuckAiRequest(input: {
   } catch {}
   if (clientTools.length > 0) messages = injectToolProtocol(messages, buildToolProtocol(clientTools));
   const searchEnabled = isWebSearchEnabled(input.tools, input.webSearch);
-  const imageGenEnabled = isImageGenerationEnabled(input.tools, input.imageGeneration, input.model)
-    || looksLikeImageGenerationPrompt(input.messages);
+  const imageGenEnabled = isDuckAiImageRequest(input);
 
   await acquireDuckSlot();
   try {
