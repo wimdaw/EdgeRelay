@@ -758,3 +758,167 @@ export async function testCodex(env: Env, refreshToken: string, modelId: string,
     return { success: false, message: (err as Error).message || '连接失败' }
   }
 }
+
+// =====================================================================
+// /v1/images/generations 生图接口支持
+// =====================================================================
+
+export async function generateCodexImage(
+  env: Env,
+  refreshToken: string,
+  body: Record<string, any>,
+  timeoutMs = 120_000
+): Promise<{ ok: boolean; httpStatus: number; body?: string; contentType?: string; error?: string; code?: string }> {
+  const prompt = String(body.prompt ?? body.input ?? '').trim()
+  if (!prompt) {
+    return { ok: false, httpStatus: 400, error: '缺少 prompt 参数' }
+  }
+
+  const relay = await getCodexUpstreamRelay(env)
+  const parsedRefreshToken = extractCodexRefreshToken(refreshToken)
+  if (!parsedRefreshToken && !relay) {
+    return { ok: false, httpStatus: 401, error: '未配置可用的 Codex refresh_token' }
+  }
+
+  const imageModel = body.model && /gpt-image|dall-e/i.test(String(body.model)) ? String(body.model) : 'gpt-image-2'
+  const tool: Record<string, any> = {
+    type: 'image_generation',
+    action: 'generate',
+    model: imageModel,
+  }
+  if (body.size) tool.size = String(body.size)
+  if (body.quality) tool.quality = String(body.quality)
+
+  const request = {
+    model: 'gpt-5.4-mini',
+    input: [{
+      type: 'message',
+      role: 'user',
+      content: [{ type: 'input_text', text: prompt }],
+    }],
+    stream: true,
+    store: false,
+    parallel_tool_calls: true,
+    tool_choice: { type: 'image_generation' },
+    tools: [tool],
+    instructions: '',
+  }
+
+  let endpoint = `${CODEX_API_BASE}/responses`
+  let headers: Record<string, string>
+  if (relay) {
+    endpoint = `${relay.url}/v1/responses`
+    headers = relayHeaders(relay, true)
+    request.model = body.providerId ? `${body.providerId}/${request.model}` : request.model
+  } else {
+    try {
+      const { token, accountId } = await getAccessToken(env, parsedRefreshToken)
+      headers = {
+        ...apiHeaders(token, accountId, true),
+        'OpenAI-Beta': 'responses=experimental',
+      }
+    } catch (err) {
+      return { ok: false, httpStatus: 401, error: `Codex Token 刷新失败: ${(err as Error).message}` }
+    }
+  }
+
+  try {
+    const upstream = await fetch(endpoint, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(request),
+      signal: AbortSignal.timeout(timeoutMs),
+    })
+
+    if (!upstream.ok) {
+      const errText = await readErrorBody(upstream)
+      return {
+        ok: false,
+        httpStatus: upstream.status,
+        error: `Codex 生图失败 HTTP ${upstream.status}: ${errText.slice(0, 300)}`,
+        code: upstream.status === 429 ? 'rate_limit_exceeded' : undefined,
+      }
+    }
+
+    const text = await upstream.text()
+    const images: Array<{ b64: string; revised_prompt?: string }> = []
+
+    const consumeItem = (item: any) => {
+      if (!item || typeof item !== 'object') return
+      if (item.type === 'image_generation_call') {
+        const b64 = String(item.result || item.b64_json || item.image_base64 || '').trim()
+        if (b64) {
+          images.push({
+            b64,
+            revised_prompt: typeof item.revised_prompt === 'string' ? item.revised_prompt : undefined,
+          })
+        }
+      }
+    }
+
+    for (const line of text.split('\n')) {
+      const trimmed = line.trim()
+      if (!trimmed.startsWith('data:')) continue
+      const dataStr = trimmed.slice(5).trim()
+      if (!dataStr || dataStr === '[DONE]') continue
+      try {
+        const payload = JSON.parse(dataStr)
+        if (payload?.item) consumeItem(payload.item)
+        if (Array.isArray(payload?.response?.output)) {
+          for (const it of payload.response.output) consumeItem(it)
+        }
+      } catch {}
+    }
+
+    // 兜底直接解析整个 JSON（若上游非流式返回）
+    if (!images.length) {
+      try {
+        const whole = JSON.parse(text)
+        if (Array.isArray(whole?.output)) {
+          for (const it of whole.output) consumeItem(it)
+        }
+      } catch {}
+    }
+
+    if (!images.length) {
+      return {
+        ok: false,
+        httpStatus: 502,
+        error: 'Codex 上游未返回图片数据（可能被审核拦截或模型拒答）',
+      }
+    }
+
+    const count = Math.max(1, Math.min(4, Number(body.n) || 1))
+    const selected = images.slice(0, count)
+    const formattedData = selected.map((item) => {
+      const cleanB64 = item.b64.replace(/^data:image\/[a-z0-9.+-]+;base64,/i, '').trim()
+      const mime = cleanB64.startsWith('iVBORw0KGgo') ? 'image/png' : (cleanB64.startsWith('/9j/') ? 'image/jpeg' : 'image/png')
+      const row: Record<string, any> = {
+        b64_json: cleanB64,
+      }
+      if (body.response_format === 'url') {
+        row.url = `data:${mime};base64,${cleanB64}`
+      }
+      if (item.revised_prompt) {
+        row.revised_prompt = item.revised_prompt
+      }
+      return row
+    })
+
+    return {
+      ok: true,
+      httpStatus: 200,
+      contentType: 'application/json; charset=utf-8',
+      body: JSON.stringify({
+        created: Math.floor(Date.now() / 1000),
+        data: formattedData,
+      }),
+    }
+  } catch (err) {
+    return {
+      ok: false,
+      httpStatus: 504,
+      error: `Codex 生图请求超时或网络异常: ${(err as Error).message}`,
+    }
+  }
+}

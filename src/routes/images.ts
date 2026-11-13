@@ -17,7 +17,7 @@ import { readKeyHealth, recordKeySuccess, recordKeyFailure } from "../key-health
 import { uuid, decryptSecret } from "../crypto";
 import { getProviderKeys, addUsageRecord, commitApiKeyUsage } from "../storage/db";
 import { isQueueFullError } from "../video";
-import { isAgnesImageRoute, generateAgnesImage, countGeneratedImages } from "../images";
+import { isSupportedImageRoute, generateImageByRoute, countGeneratedImages } from "../images";
 
 export const imagesRouter = new Hono<{ Bindings: Env }>();
 
@@ -113,9 +113,9 @@ imagesRouter.post("/generations", async (c) => {
     }
     if (auth.limits.concurrency > 0) concKeyId = auth.keyId;
 
-    const routes = (await resolveRoutes(env, publicModel)).filter(isAgnesImageRoute).slice(0, MAX_IMAGE_ROUTES);
+    const routes = (await resolveRoutes(env, publicModel)).filter(isSupportedImageRoute).slice(0, MAX_IMAGE_ROUTES);
     if (!routes.length) {
-      throw new ApiError(400, ErrorCode.BAD_REQUEST, `模型 ${publicModel} 不支持图片生成（当前仅支持 agnes-image 系列）`);
+      throw new ApiError(400, ErrorCode.BAD_REQUEST, `模型 ${publicModel} 不支持图片生成（当前支持 agnes-image / Codex / ChatGPT / Duck.ai 渠道）`);
     }
 
     let attempts = 0;
@@ -126,7 +126,7 @@ imagesRouter.post("/generations", async (c) => {
     for (const route of routes) {
       attempts++;
       const upstreamKey = route.encryptedKey ? await decryptSecret(env, route.encryptedKey) : "";
-      const result = await generateAgnesImage(route.baseUrl, upstreamKey, { ...body, model: route.upstreamModel });
+      const result = await generateImageByRoute(env, route, upstreamKey, body);
 
       if (result.ok) {
         if (route.providerKeyId !== "keyless") {

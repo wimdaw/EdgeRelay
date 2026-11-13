@@ -20,6 +20,43 @@ export function isReasoningModel(model: string): boolean {
   return /gpt-5|gpt-6|codex|^o[134]/i.test(model || '')
 }
 
+export type GeneratedImageItem = {
+  type: "image_url";
+  image_url: { url: string };
+  revised_prompt?: string;
+};
+
+export function extractImagesFromOutputItem(item: any): GeneratedImageItem[] {
+  if (!item || typeof item !== 'object') return []
+  if (item.type !== 'image_generation_call') return []
+  const b64 = String(item.result || item.b64_json || item.image_base64 || '').trim()
+  if (!b64) return []
+  const cleanB64 = b64.replace(/^data:image\/[a-z0-9.+-]+;base64,/i, '').trim()
+  const mime = cleanB64.startsWith('iVBORw0KGgo') ? 'image/png' : (cleanB64.startsWith('/9j/') ? 'image/jpeg' : 'image/png')
+  const url = b64.startsWith('data:') ? b64 : `data:${mime};base64,${cleanB64}`
+  const res: GeneratedImageItem = {
+    type: 'image_url',
+    image_url: { url },
+  }
+  if (typeof item.revised_prompt === 'string' && item.revised_prompt) {
+    res.revised_prompt = item.revised_prompt
+  }
+  return [res]
+}
+
+export function isImageGenerationRequest(body: Record<string, any>): boolean {
+  if (body?.image_generation === true || body?.enable_image_generation === true) return true
+  const model = String(body?.model || '').toLowerCase()
+  if (/gpt-image|dall-e|^image-/i.test(model)) return true
+  if (Array.isArray(body?.tools)) {
+    return body.tools.some((t: any) => {
+      const type = String(t?.type || '').toLowerCase()
+      return type === 'image_generation' || type === 'image_generation_preview' || type === 'generate_image'
+    })
+  }
+  return false
+}
+
 // =====================================================================
 // OpenAI -> Responses 请求翻译
 // =====================================================================
@@ -90,7 +127,13 @@ export function openAIToResponsesRequest(body: Record<string, any>, opts?: { def
     }
   }
 
-  const model = String(body.model || '')
+  let model = String(body.model || '')
+  let toolImageModel: string | undefined
+  if (/gpt-image|dall-e|^image-/i.test(model)) {
+    toolImageModel = model
+    model = 'gpt-5.4-mini'
+  }
+
   const request: Record<string, any> = {
     model,
     input,
@@ -101,7 +144,21 @@ export function openAIToResponsesRequest(body: Record<string, any>, opts?: { def
 
   // 工具
   const tools: Array<Record<string, any>> = []
+  let hasImageTool = false
   for (const t of Array.isArray(body.tools) ? body.tools : []) {
+    const rawType = String((t as Record<string, any>)?.type || '').toLowerCase()
+    if (rawType === 'image_generation' || rawType === 'image_generation_preview' || rawType === 'generate_image') {
+      const it = t as Record<string, any>
+      tools.push({
+        type: 'image_generation',
+        ...(it.action ? { action: it.action } : {}),
+        ...(it.model || toolImageModel ? { model: it.model || toolImageModel } : {}),
+        ...(it.size ? { size: it.size } : {}),
+        ...(it.quality ? { quality: it.quality } : {}),
+      })
+      hasImageTool = true
+      continue
+    }
     const fn = (t as Record<string, any>)?.function
     if (!fn?.name) continue
     tools.push({
@@ -112,10 +169,27 @@ export function openAIToResponsesRequest(body: Record<string, any>, opts?: { def
       strict: false,
     })
   }
+
+  // 显式生图模式 或 模型名带生图特征时，自动注入 image_generation 工具
+  const isImageMode = isImageGenerationRequest(body)
+  if (!hasImageTool && isImageMode) {
+    const toolDef: Record<string, any> = { type: 'image_generation' }
+    if (toolImageModel) {
+      toolDef.model = toolImageModel
+    }
+    tools.push(toolDef)
+    hasImageTool = true
+  }
+
   if (tools.length > 0) request.tools = tools
   const tc = body.tool_choice
   if (tc === 'auto' || tc === 'none' || tc === 'required') request.tool_choice = tc
-  else if (tc && typeof tc === 'object' && (tc.function?.name || tc.name)) request.tool_choice = { type: 'function', name: tc.function?.name || tc.name }
+  else if (tc && typeof tc === 'object') {
+    if (tc.type === 'image_generation') request.tool_choice = { type: 'image_generation' }
+    else if (tc.function?.name || tc.name) request.tool_choice = { type: 'function', name: tc.function?.name || tc.name }
+  } else if (hasImageTool && (body.image_generation === true || body.enable_image_generation === true || toolImageModel)) {
+    request.tool_choice = { type: 'image_generation' }
+  }
   if (body.parallel_tool_calls !== undefined && tools.length > 0) request.parallel_tool_calls = !!body.parallel_tool_calls
 
   // 采样参数：推理模型不接受
@@ -152,6 +226,7 @@ export function responsesResponseToOpenAI(json: any, requestedModel: string): Re
   const output: any[] = Array.isArray(json?.output) ? json.output : []
   let text = ''
   const toolCalls: Array<Record<string, any>> = []
+  const images: GeneratedImageItem[] = []
   for (const item of output) {
     if (item?.type === 'message' && Array.isArray(item.content)) {
       for (const part of item.content) {
@@ -163,10 +238,13 @@ export function responsesResponseToOpenAI(json: any, requestedModel: string): Re
         type: 'function',
         function: { name: item.name || '', arguments: typeof item.arguments === 'string' ? item.arguments : JSON.stringify(item.arguments ?? {}) },
       })
+    } else if (item?.type === 'image_generation_call') {
+      images.push(...extractImagesFromOutputItem(item))
     }
   }
   const message: Record<string, any> = { role: 'assistant', content: text || null, refusal: null }
   if (toolCalls.length > 0) message.tool_calls = toolCalls
+  if (images.length > 0) message.images = images
   const usage = json?.usage || {}
   const promptTokens = Number(usage.input_tokens) || 0
   const completionTokens = Number(usage.output_tokens) || 0
@@ -236,9 +314,16 @@ export function createOpenAIStreamFromResponses(
       case 'response.in_progress': {
         break
       }
+      case 'response.output_item.done':
       case 'response.output_item.added': {
         const item = payload?.item || {}
-        if (item.type === 'function_call') {
+        if (item.type === 'image_generation_call') {
+          const imgs = extractImagesFromOutputItem(item)
+          if (imgs.length > 0) {
+            sendChunk(controller, { images: imgs })
+          }
+        }
+        if (type === 'response.output_item.added' && item.type === 'function_call') {
           toolItems.add(Number(payload.output_index ?? -1))
           toolIndex += 1
           sendChunk(controller, {
@@ -340,6 +425,7 @@ export async function collectResponsesStreamToOpenAI(
   let reasoning = ''
   const toolCalls: Array<{ id: string; name: string; args: string }> = []
   const toolIndexByOutput = new Map<number, number>()
+  const images: GeneratedImageItem[] = []
   let promptTokens = 0
   let completionTokens = 0
   let finish = 'stop'
@@ -353,9 +439,18 @@ export async function collectResponsesStreamToOpenAI(
     if (!type || !type.startsWith('response.')) return
 
     switch (type) {
+      case 'response.output_item.done':
       case 'response.output_item.added': {
         const item = payload?.item || {}
-        if (item.type === 'function_call') {
+        if (item.type === 'image_generation_call') {
+          const imgs = extractImagesFromOutputItem(item)
+          for (const img of imgs) {
+            if (!images.some((x) => x.image_url.url === img.image_url.url)) {
+              images.push(img)
+            }
+          }
+        }
+        if (type === 'response.output_item.added' && item.type === 'function_call') {
           toolIndexByOutput.set(Number(payload.output_index ?? -1), toolCalls.length)
           toolCalls.push({
             id: item.call_id || item.id || `call_${randomId().replace(/-/g, '').slice(0, 24)}`,
@@ -416,6 +511,9 @@ export async function collectResponsesStreamToOpenAI(
       type: 'function',
       function: { name: t.name, arguments: t.args || '{}' },
     }))
+  }
+  if (images.length > 0) {
+    message.images = images
   }
   return {
     id: `chatcmpl-resp-${randomId()}`,

@@ -217,6 +217,9 @@ git checkout edgeone
 - [x] **图片输入**：
   - 客户端传入的 `image_url` 图片统一转为 PNG，最长边限制 ≤ 512px。
   - 内置 `jpeg-js` 解码 JPEG，零额外运行时依赖，以 duck.ai 原生 file / image part 上传。
+- [x] **生图模式支持（对齐 `src/openai/images.js`）**：
+  - 对话接口：`image_generation: true` / 生图工具 / 生图模型名均可触发，自动下发 `metadata.toolChoice.GenerateImage` 与 `canDelegateImageGeneration=true`，输出 `message.images` / `delta.images`。
+  - 图片接口：`/v1/images/generations` 路由支持派发至 Duck.ai 渠道，实现 `n`（1-4）、`response_format`（b64_json/url）、`size` 校验，并用魔数纠正上游返回的图片格式；`n>1` 时串行请求上游。
 - [x] **联网搜索与来源注解**：
   - 三路来源（SSE `citations`、`urls`、`source` 事件）合并，按 URL 去重，上限 50 条。
   - 输出为 OpenAI 兼容 `annotations`；对跨 delta 被拆断的引用标记做清理，避免正文出现半截标记。
@@ -242,8 +245,16 @@ git checkout edgeone
 - [x] **邮箱回填**：从 `id_token` / profile claim 解析并回填账号邮箱。
 - [x] **渠道显示名统一**：对外统一显示为 `Codex`。
 - [x] **账号池改为手动查询**：额度查询改为手动触发，避免自动轮询。
+- [x] **生图模式支持**：
+  - 对话接口：自动识别 `image_generation: true` / 工具调用 / `gpt-image-*` 生图模型，向 Responses API 注入 `image_generation` 工具并强制 tool_choice，上游返回 `image_generation_call` 统一映射为 `message.images`（流式 `delta.images`）。
+  - 图片接口：`/v1/images/generations` 路由支持派发至 Codex 渠道，调用 Responses API 生图并返回标准 OpenAI 格式。
 
-#### 1.3 发布链路
+#### 1.3 ChatGPT 网页版渠道
+- [x] **生图模式支持**：
+  - 对话接口：自动识别 `image_generation: true` / 工具调用 / 生图模型，自动注入 `system_hints: ['picture_v2']`，解析 SSE 中的 `file-service://...` / `sediment://...` 引用并下载直链图片转为 Base64，挂载 `message.images`（流式 `delta.images`）。
+  - 图片接口：`/v1/images/generations` 路由支持派发至 ChatGPT 网页版渠道，完成 PoW 校验与直链下载组装返回。
+
+#### 1.4 发布链路
 - [x] **类型检查前置阻断**：服务端 `tsc` 类型检查（`build:typecheck`）纳入 build 流程，类型错误直接阻断构建。
 - [x] **修复 7 个既有类型错误**：其中包含 video 用量日志的 `userEmail` 此前未真正落库，现已写入。
 

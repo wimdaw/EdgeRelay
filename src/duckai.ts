@@ -17,6 +17,8 @@ import {
 import {
   isImageGenerationEnabled,
   extractGeneratedImage,
+  detectImageFormat,
+  mimeFor,
   toChatImage,
   type DuckAiChatImage,
   type DuckAiGeneratedImage,
@@ -918,7 +920,7 @@ export async function handleDuckAiRequest(input: {
   } catch {}
   if (clientTools.length > 0) messages = injectToolProtocol(messages, buildToolProtocol(clientTools));
   const searchEnabled = isWebSearchEnabled(input.tools, input.webSearch);
-  const imageGenEnabled = isImageGenerationEnabled(input.tools, input.imageGeneration);
+  const imageGenEnabled = isImageGenerationEnabled(input.tools, input.imageGeneration, input.model);
 
   await acquireDuckSlot();
   try {
@@ -989,4 +991,194 @@ export async function handleDuckAiRequest(input: {
   } finally {
     releaseDuckSlot();
   }
+}
+
+// =====================================================================
+// /v1/images/generations 生图接口支持（对齐 duckai-cpa src/openai/images.js）
+// =====================================================================
+
+export type DuckAiImageResult = {
+  ok: boolean;
+  httpStatus: number;
+  body?: string;
+  contentType?: string;
+  error?: string;
+  code?: string;
+};
+
+function normalizeImageCount(value: unknown): number | null {
+  if (value === undefined || value === null || value === "") return 1;
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < 1 || n > 4) return null;
+  return n;
+}
+
+/** 调一次 upstream chat，收集最终生成图（原始 b64，不做 data URL 转换） */
+async function requestDuckAiImages(model: string, prompt: string): Promise<DuckAiGeneratedImage[]> {
+  const statusRes = await fetchDuckWithRetry(STATUS_URL, {
+    headers: { ...DEFAULT_HEADERS, "x-vqd-accept": "1", "User-Agent": USER_AGENT },
+  }, 15000);
+  if (!statusRes.ok) {
+    const status = statusRes.status;
+    if (status === 429) {
+      throw Object.assign(new Error("Duck.ai 上游按 IP 限流（HTTP 429），请稍后重试"), { status, code: "rate_limited" });
+    }
+    throw Object.assign(new Error(`Duck.ai status 返回 HTTP ${status}`), { status });
+  }
+  const challenge = statusRes.headers.get("x-vqd-hash-1");
+  if (!challenge) throw new Error("Duck.ai 没有返回挑战令牌");
+
+  const [solvedChallenge, feVersion, publicKey] = await Promise.all([
+    solveDuckDuckGoChallenge(challenge, USER_AGENT),
+    getFeVersion(),
+    getDurablePublicKey(),
+  ]);
+
+  const payload = {
+    model,
+    messages: [{ role: "user", content: prompt }],
+    metadata: { toolChoice: { GenerateImage: true } },
+    canUseTools: true,
+    reasoningEffort: "none" as const,
+    canUseApproxLocation: null,
+    canDelegateImageGeneration: true,
+    durableStream: {
+      messageId: crypto.randomUUID(),
+      conversationId: crypto.randomUUID(),
+      publicKey,
+    },
+  };
+
+  const upstream = await fetchDuckWithRetry(CHAT_URL, {
+    method: "POST",
+    headers: {
+      ...DEFAULT_HEADERS,
+      Accept: "text/event-stream",
+      "Content-Type": "application/json",
+      "User-Agent": USER_AGENT,
+      "x-ddg-journey-id": crypto.randomUUID().replaceAll("-", ""),
+      "x-fe-signals": makeDuckDuckGoFeSignals(),
+      "x-fe-version": feVersion,
+      "x-vqd-hash-1": solvedChallenge,
+    },
+    body: JSON.stringify(payload),
+  }, 120000);
+
+  if (!upstream.ok) {
+    const errText = await upstream.text().catch(() => "");
+    throw Object.assign(
+      new Error(`Duck.ai 上游返回 HTTP ${upstream.status}: ${errText.slice(0, 300)}`),
+      { status: upstream.status },
+    );
+  }
+
+  const text = await upstream.text();
+  const images: DuckAiGeneratedImage[] = [];
+  let partialImage: DuckAiGeneratedImage | null = null;
+  for (const line of text.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith("data:")) continue;
+    const payloadStr = trimmed.slice(5).trim();
+    if (!payloadStr || payloadStr === "[PING]" || payloadStr.includes("[DONE]")) continue;
+    try {
+      const ev = JSON.parse(payloadStr) as Record<string, unknown>;
+      const image = extractGeneratedImage(ev);
+      if (!image) continue;
+      if (image.partial) {
+        partialImage = image;
+      } else {
+        partialImage = null;
+        images.push(image);
+      }
+    } catch {}
+  }
+  if (images.length === 0 && partialImage) images.push(partialImage);
+  return images;
+}
+
+/**
+ * /v1/images/generations 的 Duck.ai 实现。
+ * 上游只有 chat 接口，生图通过 GenerateImage 工具触发；n>1 时按次数串行请求。
+ */
+export async function generateDuckAiImage(
+  env: unknown,
+  routeModel: string,
+  body: Record<string, any>,
+): Promise<DuckAiImageResult> {
+  const prompt = String(body.prompt ?? body.input ?? "").trim();
+  if (!prompt) {
+    return { ok: false, httpStatus: 400, error: '"prompt" is required and must be a non-empty string', code: "prompt_required" };
+  }
+  if (prompt.length > 32000) {
+    return { ok: false, httpStatus: 400, error: '"prompt" is too long (max 32000 characters)', code: "prompt_too_long" };
+  }
+
+  const n = normalizeImageCount(body.n);
+  if (n === null) {
+    return { ok: false, httpStatus: 400, error: '"n" must be an integer between 1 and 4', code: "invalid_n" };
+  }
+
+  const responseFormat = body.response_format == null ? "b64_json" : String(body.response_format);
+  if (responseFormat !== "b64_json" && responseFormat !== "url") {
+    return { ok: false, httpStatus: 400, error: '"response_format" must be "b64_json" or "url"', code: "invalid_response_format" };
+  }
+
+  if (body.size !== undefined && body.size !== null) {
+    const size = String(body.size);
+    if (size !== "auto" && !/^\d{2,5}x\d{2,5}$/.test(size)) {
+      return { ok: false, httpStatus: 400, error: '"size" must look like "1024x1024" or "auto"', code: "invalid_size" };
+    }
+  }
+
+  const model = resolveModel(routeModel || "gpt-5.4-mini");
+  const collected: DuckAiGeneratedImage[] = [];
+
+  await acquireDuckSlot();
+  try {
+    for (let i = 0; i < n; i++) {
+      const images = await requestDuckAiImages(model, prompt);
+      collected.push(...images);
+      if (collected.length >= n) break;
+    }
+  } catch (err) {
+    const e = err as Error & { status?: number; code?: string };
+    const httpStatus = typeof e.status === "number" && e.status >= 400 ? e.status : 502;
+    return { ok: false, httpStatus, error: e.message || "Duck.ai 生图失败", code: e.code };
+  } finally {
+    releaseDuckSlot();
+  }
+
+  if (collected.length === 0) {
+    return { ok: false, httpStatus: 502, error: "Duck.ai 上游未返回图片（可能被审核拦截或该模型不支持生图）", code: "upstream_no_image" };
+  }
+
+  const data = collected.slice(0, n).map((image) => {
+    const format = detectImageFormat(image.b64, image.format || "png");
+    if (responseFormat === "url") {
+      return {
+        url: `data:${mimeFor(format)};base64,${image.b64}`,
+        revised_prompt: prompt,
+        format,
+        mime_type: mimeFor(format),
+      };
+    }
+    return {
+      b64_json: image.b64,
+      revised_prompt: prompt,
+      format,
+      mime_type: mimeFor(format),
+    };
+  });
+
+  return {
+    ok: true,
+    httpStatus: 200,
+    contentType: "application/json; charset=utf-8",
+    body: JSON.stringify({
+      created: Math.floor(Date.now() / 1000),
+      data,
+      model,
+      response_id: `img_${crypto.randomUUID().replaceAll("-", "").slice(0, 24)}`,
+    }),
+  };
 }

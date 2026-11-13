@@ -1391,6 +1391,344 @@ let apiKeyId = "";
   }
 }
 
+// 22. Codex 渠道生图能力测试
+{
+  const { openAIToResponsesRequest, collectResponsesStreamToOpenAI, createOpenAIStreamFromResponses, responsesResponseToOpenAI } = await import("../src/responses-translate.ts");
+
+  // 22.1 请求体翻译
+  const req1 = openAIToResponsesRequest({
+    model: "gpt-image-2",
+    messages: [{ role: "user", content: "画一只可爱的猫" }],
+  });
+  assert(req1.request.tools?.some((t) => t.type === "image_generation"), "生图模型名自动注入 image_generation 工具");
+  assert(req1.request.tool_choice?.type === "image_generation", "生图模型名自动强制 tool_choice 为 image_generation");
+  assert(req1.request.model === "gpt-5.4-mini", "生图模型名安全回退主模型为 gpt-5.4-mini");
+
+  const req2 = openAIToResponsesRequest({
+    model: "gpt-5.5",
+    messages: [{ role: "user", content: "画一只小狗" }],
+    image_generation: true,
+  });
+  assert(req2.request.tools?.some((t) => t.type === "image_generation"), "image_generation: true 自动注入生图工具");
+  assert(req2.request.tool_choice?.type === "image_generation", "image_generation: true 自动强制生图 tool_choice");
+
+  // 22.2 非流式聚合与响应转换
+  const mockB64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+  const mockSse = [
+    `data: {"type":"response.output_item.added","item":{"type":"image_generation_call","id":"img_1","status":"in_progress"}}`,
+    `data: {"type":"response.output_item.done","item":{"type":"image_generation_call","id":"img_1","status":"completed","result":"${mockB64}","revised_prompt":"一只可爱的蓝猫"}}`,
+    `data: {"type":"response.completed","response":{"usage":{"input_tokens":10,"output_tokens":20}}}`,
+    `data: [DONE]`,
+  ].join("\n\n");
+
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode(mockSse));
+      controller.close();
+    },
+  });
+
+  const collected = await collectResponsesStreamToOpenAI(stream, "gpt-image-2");
+  assert(Array.isArray(collected.choices?.[0]?.message?.images), "Codex Responses 非流式输出 message.images");
+  assert(collected.choices[0].message.images[0]?.type === "image_url", "图片类型为 image_url");
+  assert(collected.choices[0].message.images[0]?.image_url?.url.includes(mockB64), "图片 URL 包含生成的 Base64");
+  assert(collected.choices[0].message.images[0]?.revised_prompt === "一只可爱的蓝猫", "保留改写后的 revised_prompt");
+
+  // 22.3 流式转换
+  const streamForSse = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode(mockSse));
+      controller.close();
+    },
+  });
+  const openAiSseStream = createOpenAIStreamFromResponses(streamForSse, "gpt-image-2");
+  const reader = openAiSseStream.getReader();
+  const chunks = [];
+  const dec = new TextDecoder();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const text = dec.decode(value);
+    for (const line of text.split("\n")) {
+      if (line.startsWith("data:") && !line.includes("[DONE]")) {
+        try { chunks.push(JSON.parse(line.slice(5).trim())); } catch {}
+      }
+    }
+  }
+  const imageChunk = chunks.find((c) => Array.isArray(c.choices?.[0]?.delta?.images));
+  assert(Boolean(imageChunk), "Codex Responses 流式输出 delta.images");
+  assert(imageChunk.choices[0].delta.images[0]?.image_url?.url.includes(mockB64), "流式图片 URL 包含 Base64 数据");
+}
+
+// 23. Codex 渠道在 /v1/images/generations 接口的端到端派发测试
+{
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_provider",
+      payload: {
+        id: "p_mock_codex",
+        name: "Mock Codex",
+        slug: "codex-test",
+        kind: "oauth:codex",
+        baseUrl: "https://chatgpt.com/backend-api/codex",
+        authScheme: "bearer",
+        status: "active",
+      },
+    },
+  });
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_provider_key",
+      payload: {
+        providerId: "p_mock_codex",
+        key: "rt_mock_token_123456789",
+        label: "prod",
+      },
+    },
+  });
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_model",
+      payload: {
+        publicName: "mock-codex-image",
+        providerId: "p_mock_codex",
+        upstreamModel: "gpt-image-2",
+        inputPerMillion: 0,
+        outputPerMillion: 0,
+      },
+    },
+  });
+
+  const realFetch = globalThis.fetch;
+  const mockB64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+  let codexCalled = false;
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("auth.openai.com/oauth/token")) {
+      return new Response(JSON.stringify({
+        access_token: "mock-access-token",
+        refresh_token: "mock-refresh-token",
+        expires_in: 3600,
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (target.includes("/backend-api/codex/responses")) {
+      codexCalled = true;
+      const sse = `data: {"type":"response.output_item.done","item":{"type":"image_generation_call","id":"img_1","status":"completed","result":"${mockB64}","revised_prompt":"一只可爱的蓝猫"}}\n\ndata: {"type":"response.completed","response":{"usage":{"input_tokens":10,"output_tokens":20}}}\n\ndata: [DONE]\n\n`;
+      return new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    return realFetch(url, init);
+  };
+
+  try {
+    const res = await request("/v1/images/generations", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: {
+        model: "mock-codex-image",
+        prompt: "画一只可爱的猫",
+        response_format: "b64_json",
+      },
+    });
+    assert(res.status === 200, "Codex 模型走 /v1/images/generations 接口 HTTP 200");
+    const data = await res.json();
+    assert(Array.isArray(data.data) && data.data.length > 0, "返回有效图片数组");
+    assert(data.data[0].b64_json === mockB64, "返回图片 Base64 与上游一致");
+    assert(data.data[0].revised_prompt === "一只可爱的蓝猫", "保留改写后的 revised_prompt");
+    assert(codexCalled, "成功触发向 Codex 上游的生图调用");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
+// 24. ChatGPT 网页版渠道在 /v1/images/generations 接口的端到端派发测试
+{
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_provider",
+      payload: {
+        id: "p_mock_chatgptweb",
+        name: "Mock ChatGPT Web",
+        slug: "chatgpt-test",
+        kind: "web:chatgptweb",
+        baseUrl: "https://chatgpt.com",
+        authScheme: "bearer",
+        status: "active",
+      },
+    },
+  });
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_provider_key",
+      payload: {
+        providerId: "p_mock_chatgptweb",
+        key: "rt_mock_token_chatgpt_web_123",
+        label: "prod",
+      },
+    },
+  });
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_model",
+      payload: {
+        publicName: "mock-chatgpt-image",
+        providerId: "p_mock_chatgptweb",
+        upstreamModel: "auto",
+        inputPerMillion: 0,
+        outputPerMillion: 0,
+      },
+    },
+  });
+
+  const realFetch = globalThis.fetch;
+  const mockB64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+  let chatgptCalled = false;
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("auth.openai.com/oauth/token") || target.includes("auth0.openai.com/oauth/token")) {
+      return new Response(JSON.stringify({
+        access_token: "mock-web-access-token",
+        expires_in: 3600,
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (target.endsWith("chatgpt.com/")) {
+      return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+    }
+    if (target.includes("/sentinel/chat-requirements/prepare")) {
+      return new Response(JSON.stringify({
+        prepare_token: "mock-prepare-token",
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (target.includes("/sentinel/chat-requirements/finalize")) {
+      return new Response(JSON.stringify({
+        token: "mock-sentinel-token",
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (target.includes("/sentinel/chat-requirements")) {
+      return new Response(JSON.stringify({
+        token: "mock-sentinel-token",
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (target.includes("/backend-api/conversation")) {
+      chatgptCalled = true;
+      const body = JSON.parse(init.body);
+      assert(Array.isArray(body.system_hints) && body.system_hints.includes("picture_v2"), "上游请求体包含 picture_v2 系统提示");
+      const sse = `data: {"conversation_id":"conv_123","message":{"content":{"parts":["file-service://file-mock-123"]}}}\n\ndata: [DONE]\n\n`;
+      return new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    if (target.includes("/backend-api/files/file-mock-123/download")) {
+      return new Response(JSON.stringify({
+        status: "success",
+        download_url: "https://files.example.com/mock.png",
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    if (target === "https://files.example.com/mock.png") {
+      return new Response(Buffer.from(mockB64, "base64"), {
+        status: 200,
+        headers: { "content-type": "image/png" },
+      });
+    }
+    return realFetch(url, init);
+  };
+
+  try {
+    const res = await request("/v1/images/generations", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: {
+        model: "mock-chatgpt-image",
+        prompt: "画一个日落海滩",
+        response_format: "b64_json",
+      },
+    });
+    assert(res.status === 200, "ChatGPT 网页版模型走 /v1/images/generations 接口 HTTP 200");
+    const data = await res.json();
+    assert(Array.isArray(data.data) && data.data.length > 0, "返回有效图片数组");
+    assert(data.data[0].b64_json === mockB64, "返回图片 Base64 与下载产物一致");
+    assert(chatgptCalled, "成功触发向 ChatGPT 网页版上游的 picture_v2 生图调用");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
+// 25. Duck.ai 渠道在 /v1/images/generations 接口的端到端派发测试
+{
+  const realFetch = globalThis.fetch;
+  // 1x1 透明 PNG，带真实魔数，用于校验 detectImageFormat
+  const mockB64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+  const chatCalls = [];
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("/duckchat/v1/status")) {
+      return new Response("{}", {
+        status: 200,
+        headers: { "x-vqd-hash-1": Buffer.from('(function(){return {client_hashes:["x"]}})()').toString("base64") },
+      });
+    }
+    if (target.includes("/duckchat/v1/chat")) {
+      chatCalls.push({ url: target, init });
+      const sse = [
+        `data: {"role":"ui-component","name":"generate-image","state":"data","data":{"b64Image":"${mockB64}","format":"jpeg","status":"success"}}`,
+        "data: [DONE]",
+        "",
+      ].join("\n\n");
+      return new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } });
+    }
+    return new Response("<html></html>", { status: 200, headers: { "content-type": "text/html" } });
+  };
+
+  try {
+    const res = await request("/v1/images/generations", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: {
+        model: "mock-duck-image",
+        prompt: "画一只可爱的猫",
+        response_format: "b64_json",
+      },
+    });
+    assert(res.status === 200, "Duck.ai 模型走 /v1/images/generations 接口 HTTP 200");
+    const data = await res.json();
+    assert(Array.isArray(data.data) && data.data.length === 1, "Duck.ai 返回 1 张图片");
+    assert(data.data[0].b64_json === mockB64, "Duck.ai 返回图片 Base64 与上游一致");
+    assert(data.data[0].format === "png", "按魔数纠正错误的 format（jpeg → png）");
+    assert(data.data[0].mime_type === "image/png", "mime_type 与真实格式一致");
+    assert(data.data[0].revised_prompt === "画一只可爱的猫", "回显原始 prompt 作为 revised_prompt");
+    assert(chatCalls.length > 0, "已向 Duck.ai 上游发出生图请求");
+    const sent = JSON.parse(chatCalls[0].init.body);
+    assert(sent.metadata?.toolChoice?.GenerateImage === true, "上游请求携带 toolChoice.GenerateImage");
+    assert(sent.canDelegateImageGeneration === true, "上游请求携带 canDelegateImageGeneration=true");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+
+  // 参数校验：n 非法 / response_format 非法
+  const badN = await request("/v1/images/generations", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "mock-duck-image", prompt: "cat", n: 9 },
+  });
+  assert(badN.status === 400, "Duck.ai 生图 n=9 返回 400");
+
+  const badFormat = await request("/v1/images/generations", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+    body: { model: "mock-duck-image", prompt: "cat", response_format: "html" },
+  });
+  assert(badFormat.status === 400, "Duck.ai 生图 response_format=html 返回 400");
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

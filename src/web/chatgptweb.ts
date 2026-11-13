@@ -932,15 +932,29 @@ function buildFlatConversationPayload(
   })
 }
 
+export function isWebImageGenerationRequest(body: Record<string, any>, model: string): boolean {
+  if (body?.image_generation === true || body?.enable_image_generation === true) return true
+  if (/gpt-image|dall-e|^image-/i.test(model)) return true
+  if (Array.isArray(body?.tools)) {
+    return body.tools.some((t: any) => {
+      const type = String(t?.type || '').toLowerCase()
+      return type === 'image_generation' || type === 'image_generation_preview' || type === 'generate_image'
+    })
+  }
+  return false
+}
+
 function buildConversationPayload(
   model: string,
   messages: OpenAIMessage[],
   body: Record<string, any>,
 ): Record<string, any> {
+  const isImageMode = isWebImageGenerationRequest(body, model)
+  const actualModel = isImageMode && /gpt-image|dall-e|^image-/i.test(model) ? 'auto' : model
   const payload: Record<string, any> = {
     action: 'next',
     messages: toWebMessages(messages),
-    model,
+    model: actualModel,
     parent_message_id: randomId(),
     conversation_mode: { kind: 'primary_assistant' },
     conversation_origin: null,
@@ -952,7 +966,7 @@ function buildConversationPayload(
     reset_rate_limits: false,
     suggestions: [],
     supported_encodings: [],
-    system_hints: [],
+    system_hints: isImageMode ? ['picture_v2'] : [],
     timezone: 'Asia/Shanghai',
     timezone_offset_min: -480,
     variant_purpose: 'comparison_implicit',
@@ -1155,6 +1169,134 @@ function orderByCooldown<T extends { hash: string }>(accounts: T[], health: WebH
 }
 
 // =====================================================================
+// 网页图片提取与下载工具
+// =====================================================================
+
+function extractImagePointers(rawText: string): Array<{ pointer: string }> {
+  const pointers: Array<{ pointer: string }> = []
+  const seen = new Set<string>()
+  const matches = rawText.matchAll(/(?:file-service:\/\/|sediment:\/\/)([A-Za-z0-9_-]+)/g)
+  for (const m of matches) {
+    const p = m[0]
+    if (!seen.has(p)) {
+      seen.add(p)
+      pointers.push({ pointer: p })
+    }
+  }
+  return pointers
+}
+
+async function fetchWebImageDownloadUrl(
+  fp: Fingerprint,
+  token: string,
+  accountId: string,
+  pointer: string,
+  conversationId?: string,
+): Promise<string> {
+  let url = ''
+  if (pointer.startsWith('file-service://')) {
+    const fid = pointer.slice('file-service://'.length)
+    url = `${BASE_URL}/backend-api/files/${encodeURIComponent(fid)}/download`
+  } else if (pointer.startsWith('sediment://')) {
+    const fid = pointer.slice('sediment://'.length)
+    if (conversationId) {
+      url = `${BASE_URL}/backend-api/conversation/${encodeURIComponent(conversationId)}/attachment/${encodeURIComponent(fid)}/download`
+    } else {
+      url = `${BASE_URL}/backend-api/files/download/${encodeURIComponent(fid)}`
+    }
+  } else {
+    url = `${BASE_URL}/backend-api/files/${encodeURIComponent(pointer)}/download`
+  }
+
+  const path = new URL(url).pathname
+  const headers = browserHeaders(fp, path, {
+    Accept: 'application/json, text/plain, */*',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(accountId ? { 'Chatgpt-Account-Id': accountId } : {}),
+  })
+
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      headers,
+      redirect: 'manual',
+      signal: AbortSignal.timeout(20000),
+    })
+
+    if (res.status >= 300 && res.status < 400) {
+      const loc = res.headers.get('location')
+      if (loc) return loc
+    }
+
+    if (res.ok) {
+      const data = await res.json() as any
+      return String(data?.download_url || data?.url || '')
+    }
+  } catch {}
+  return ''
+}
+
+async function downloadImageAsBase64(
+  url: string,
+  fp: Fingerprint,
+  token: string,
+  accountId: string,
+): Promise<{ b64: string; mime: string } | null> {
+  if (!url) return null
+  const needAuth = url.startsWith(BASE_URL)
+  const headers: Record<string, string> = {
+    'User-Agent': fp.ua,
+    Accept: 'image/*,*/*;q=0.8',
+    ...(needAuth ? {
+      Authorization: `Bearer ${token}`,
+      ...(accountId ? { 'Chatgpt-Account-Id': accountId } : {}),
+    } : {}),
+  }
+
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      headers,
+      signal: AbortSignal.timeout(30000),
+    })
+    if (!res.ok) return null
+    const mime = (res.headers.get('content-type') || 'image/png').split(';')[0].trim()
+    const buf = await res.arrayBuffer()
+    const bytes = new Uint8Array(buf)
+    const b64 = bytesToBase64(bytes)
+    return { b64, mime }
+  } catch {
+    return null
+  }
+}
+
+async function pollConversationForPointers(
+  fp: Fingerprint,
+  token: string,
+  accountId: string,
+  conversationId: string,
+): Promise<Array<{ pointer: string }>> {
+  const path = `/backend-api/conversation/${conversationId}`
+  const headers = browserHeaders(fp, path, {
+    Accept: 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(accountId ? { 'Chatgpt-Account-Id': accountId } : {}),
+  })
+  for (let i = 0; i < 3; i++) {
+    await new Promise((r) => setTimeout(r, 2000))
+    try {
+      const res = await fetch(BASE_URL + path, { headers, signal: AbortSignal.timeout(15000) })
+      if (res.ok) {
+        const text = await res.text()
+        const ptrs = extractImagePointers(text)
+        if (ptrs.length > 0) return ptrs
+      }
+    } catch {}
+  }
+  return []
+}
+
+// =====================================================================
 // 对外入口
 // =====================================================================
 
@@ -1292,8 +1434,11 @@ export async function handleChatgptWebRequest(p: OAuthCallParams): Promise<Respo
         return oauthErrorResponse('上游未返回响应体', 502, 'upstream_error')
       }
 
+      const isImageMode = isWebImageGenerationRequest(p.body || {}, p.modelId)
+      const streamOpts: WebStreamOptions = { fp, token, accountId, isImageMode }
+
       if (stream) {
-        const sse = createOpenAIStream(upstream.body, p.requestedModel, p, messages)
+        const sse = createOpenAIStream(upstream.body, p.requestedModel, p, messages, streamOpts)
         return new Response(sse, {
           status: 200,
           headers: {
@@ -1305,7 +1450,7 @@ export async function handleChatgptWebRequest(p: OAuthCallParams): Promise<Respo
         })
       }
 
-      const result = await collectSseToJson(upstream.body, p.requestedModel, messages)
+      const result = await collectSseToJson(upstream.body, p.requestedModel, messages, streamOpts)
       defer(p, recordOAuthUsage(p, {
         promptTokens: result.promptTokens,
         completionTokens: result.completionTokens,
@@ -1365,11 +1510,19 @@ function sseChunk(
   controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`))
 }
 
+export interface WebStreamOptions {
+  fp?: Fingerprint
+  token?: string
+  accountId?: string
+  isImageMode?: boolean
+}
+
 function createOpenAIStream(
   upstream: ReadableStream<Uint8Array>,
   requestedModel: string,
   p: OAuthCallParams,
   messages: OpenAIMessage[],
+  options?: WebStreamOptions,
 ): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder()
   const decoder = new TextDecoder()
@@ -1386,6 +1539,8 @@ function createOpenAIStream(
   let roleSent = false
   let finished = false
   let completionTokens = 0
+  const imagePointers: string[] = []
+  let conversationId = ''
 
   return new ReadableStream<Uint8Array>({
     start(controller) {
@@ -1406,6 +1561,12 @@ function createOpenAIStream(
         let event: Record<string, any>
         try { event = JSON.parse(payload) as Record<string, any> } catch { return }
         if (!event || typeof event !== 'object') return
+        if (!conversationId && event.conversation_id) conversationId = String(event.conversation_id)
+        if (!conversationId && event.v?.conversation_id) conversationId = String(event.v.conversation_id)
+        const matches = payload.matchAll(/(?:file-service:\/\/|sediment:\/\/)([A-Za-z0-9_-]+)/g)
+        for (const m of matches) {
+          if (!imagePointers.includes(m[0])) imagePointers.push(m[0])
+        }
         if (event.type === 'moderation' && event.moderation_response?.blocked === true) {
           if (!roleSent) { roleSent = true; sseChunk(controller, encoder, state, { role: 'assistant', content: '' }) }
           sseChunk(controller, encoder, state, { content: '\n[内容被上游审核拦截]' })
@@ -1429,7 +1590,28 @@ function createOpenAIStream(
         reader.read().then(({ done, value }) => {
           if (done) {
             if (buffer.trim()) handle(buffer.trim())
-            finish('stop')
+            const wrapFinish = async () => {
+              if (options?.isImageMode && options?.token && options?.fp && imagePointers.length > 0) {
+                const images: Array<{ type: 'image_url'; image_url: { url: string } }> = []
+                for (const ptr of imagePointers.slice(0, 4)) {
+                  const dlUrl = await fetchWebImageDownloadUrl(options.fp, options.token, options.accountId || '', ptr, conversationId)
+                  if (dlUrl) {
+                    const downloaded = await downloadImageAsBase64(dlUrl, options.fp, options.token, options.accountId || '')
+                    if (downloaded) {
+                      images.push({
+                        type: 'image_url',
+                        image_url: { url: `data:${downloaded.mime};base64,${downloaded.b64}` },
+                      })
+                    }
+                  }
+                }
+                if (images.length > 0) {
+                  sseChunk(controller, encoder, state, { images })
+                }
+              }
+              finish('stop')
+            }
+            void wrapFinish()
             return
           }
           buffer += decoder.decode(value, { stream: true }).replace(/\r/g, '')
@@ -1465,6 +1647,7 @@ async function collectSseToJson(
   upstream: ReadableStream<Uint8Array>,
   requestedModel: string,
   messages: OpenAIMessage[],
+  options?: WebStreamOptions,
 ): Promise<{ json: Record<string, any>; promptTokens: number; completionTokens: number }> {
   const reader = upstream.getReader()
   const decoder = new TextDecoder()
@@ -1477,12 +1660,20 @@ async function collectSseToJson(
   let text = ''
   let blocked = false
   let done = false
+  const imagePointers: string[] = []
+  let conversationId = ''
 
   const handle = (payload: string): void => {
     if (payload === '[DONE]') { done = true; return }
     let event: Record<string, any>
     try { event = JSON.parse(payload) as Record<string, any> } catch { return }
     if (!event || typeof event !== 'object') return
+    if (!conversationId && event.conversation_id) conversationId = String(event.conversation_id)
+    if (!conversationId && event.v?.conversation_id) conversationId = String(event.v.conversation_id)
+    const matches = payload.matchAll(/(?:file-service:\/\/|sediment:\/\/)([A-Za-z0-9_-]+)/g)
+    for (const m of matches) {
+      if (!imagePointers.includes(m[0])) imagePointers.push(m[0])
+    }
     if (event.type === 'moderation' && event.moderation_response?.blocked === true) blocked = true
     const next = sanitizeOutputText(stripHistory(nextAssistantText(event, text), historyText))
     if (next) text = next
@@ -1507,8 +1698,35 @@ async function collectSseToJson(
   if (!done && buffer.trim()) handle(buffer.trim())
   try { await reader.cancel() } catch { /* ignore */ }
 
+  const images: Array<{ type: 'image_url'; image_url: { url: string } }> = []
+  if (options?.isImageMode && options?.token && options?.fp) {
+    if (imagePointers.length === 0 && conversationId) {
+      const polled = await pollConversationForPointers(options.fp, options.token, options.accountId || '', conversationId)
+      for (const p of polled) {
+        if (!imagePointers.includes(p.pointer)) imagePointers.push(p.pointer)
+      }
+    }
+    for (const ptr of imagePointers.slice(0, 4)) {
+      const dlUrl = await fetchWebImageDownloadUrl(options.fp, options.token, options.accountId || '', ptr, conversationId)
+      if (dlUrl) {
+        const downloaded = await downloadImageAsBase64(dlUrl, options.fp, options.token, options.accountId || '')
+        if (downloaded) {
+          images.push({
+            type: 'image_url',
+            image_url: { url: `data:${downloaded.mime};base64,${downloaded.b64}` },
+          })
+        }
+      }
+    }
+  }
+
   const completionTokens = estimateTokens(text)
   const content = blocked && !text ? '[内容被上游审核拦截]' : text
+  const messageChoice: Record<string, any> = { role: 'assistant', content }
+  if (images.length > 0) {
+    messageChoice.images = images
+  }
+
   return {
     promptTokens,
     completionTokens,
@@ -1519,7 +1737,7 @@ async function collectSseToJson(
       model: requestedModel,
       choices: [{
         index: 0,
-        message: { role: 'assistant', content },
+        message: messageChoice,
         finish_reason: blocked ? 'content_filter' : 'stop',
         logprobs: null,
       }],
@@ -1639,6 +1857,125 @@ export async function testChatgptWeb(
       success: false,
       message: (err as Error).message || '连接失败',
       statusCode: err instanceof WebAuthError ? 401 : (err instanceof WebHttpError ? err.status : 0),
+    }
+  }
+}
+
+// =====================================================================
+// /v1/images/generations 生图接口支持
+// =====================================================================
+
+export async function generateChatgptWebImage(
+  env: Env,
+  rawToken: string,
+  body: Record<string, any>,
+  timeoutMs = 110_000,
+): Promise<{ ok: boolean; httpStatus: number; body?: string; contentType?: string; error?: string; code?: string }> {
+  const prompt = String(body.prompt ?? body.input ?? '').trim()
+  if (!prompt) {
+    return { ok: false, httpStatus: 400, error: '缺少 prompt 参数' }
+  }
+
+  const tokenInfo = await resolveAccountToken(env, rawToken)
+  if (!tokenInfo.token) {
+    return { ok: false, httpStatus: 401, error: '未配置可用的 ChatGPT 网页版凭据' }
+  }
+
+  const fp = await buildFingerprint(rawToken)
+  try {
+    const resources = await getPowResources(env, fp)
+    const requirements = await getChatRequirements(fp, tokenInfo.token, tokenInfo.accountId, resources)
+    const path = tokenInfo.token ? '/backend-api/conversation' : '/backend-anon/conversation'
+    const headers = browserHeaders(fp, path, {
+      Accept: 'text/event-stream',
+      'OpenAI-Sentinel-Chat-Requirements-Token': requirements.token,
+      ...(requirements.proofToken ? { 'OpenAI-Sentinel-Proof-Token': requirements.proofToken } : {}),
+      ...(requirements.turnstileToken ? { 'OpenAI-Sentinel-Turnstile-Token': requirements.turnstileToken } : {}),
+      ...(requirements.soToken ? { 'OpenAI-Sentinel-SO-Token': requirements.soToken } : {}),
+      Authorization: `Bearer ${tokenInfo.token}`,
+      ...(tokenInfo.accountId ? { 'Chatgpt-Account-Id': tokenInfo.accountId } : {}),
+    })
+
+    const payload = buildConversationPayload('auto', [{ role: 'user', content: prompt }], {
+      ...body,
+      image_generation: true,
+    })
+
+    const res = await fetch(BASE_URL + path, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(Math.min(timeoutMs, 90_000)),
+    })
+
+    if (!res.ok) {
+      const errText = await readErrorBody(res)
+      return {
+        ok: false,
+        httpStatus: res.status,
+        error: `ChatGPT 网页版生图失败 HTTP ${res.status}: ${errText.slice(0, 300)}`,
+        code: res.status === 429 ? 'rate_limit_exceeded' : undefined,
+      }
+    }
+
+    const text = await res.text()
+    let conversationId = ''
+    const matchConv = text.match(/"conversation_id"\s*:\s*"([^"]+)"/)
+    if (matchConv) conversationId = matchConv[1]
+
+    let pointers = extractImagePointers(text)
+    if (!pointers.length && conversationId) {
+      pointers = await pollConversationForPointers(fp, tokenInfo.token, tokenInfo.accountId, conversationId)
+    }
+
+    if (!pointers.length) {
+      return {
+        ok: false,
+        httpStatus: 502,
+        error: 'ChatGPT 网页版未返回图片数据（可能由于生图限额或内容审核拦截）',
+      }
+    }
+
+    const count = Math.max(1, Math.min(4, Number(body.n) || 1))
+    const selected = pointers.slice(0, count)
+    const data: Array<{ b64_json?: string; url?: string; revised_prompt?: string }> = []
+
+    for (const ptr of selected) {
+      const dlUrl = await fetchWebImageDownloadUrl(fp, tokenInfo.token, tokenInfo.accountId, ptr.pointer, conversationId)
+      if (dlUrl) {
+        const downloaded = await downloadImageAsBase64(dlUrl, fp, tokenInfo.token, tokenInfo.accountId)
+        if (downloaded) {
+          const row: Record<string, any> = { b64_json: downloaded.b64 }
+          if (body.response_format === 'url') {
+            row.url = `data:${downloaded.mime};base64,${downloaded.b64}`
+          }
+          data.push(row)
+        }
+      }
+    }
+
+    if (!data.length) {
+      return {
+        ok: false,
+        httpStatus: 502,
+        error: 'ChatGPT 网页版图片下载失败',
+      }
+    }
+
+    return {
+      ok: true,
+      httpStatus: 200,
+      contentType: 'application/json; charset=utf-8',
+      body: JSON.stringify({
+        created: Math.floor(Date.now() / 1000),
+        data,
+      }),
+    }
+  } catch (err) {
+    return {
+      ok: false,
+      httpStatus: 504,
+      error: `ChatGPT 网页版生图超时或异常: ${(err as Error).message}`,
     }
   }
 }

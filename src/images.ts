@@ -8,7 +8,9 @@
  *  - response_format 只接受 url | b64_json
  *  - quality / style 等 OpenAI 常见字段会被上游拒绝，必须过滤
  */
-import type { UpstreamRoute } from "./types";
+import type { Env, UpstreamRoute } from "./types";
+
+export type ImageEngine = "agnes" | "codex" | "chatgptweb" | "duckai";
 
 /** 该路由是否走 agnes 图片协议：模型名以 agnes-image 开头，或渠道显式声明 agnes_image */
 export function isAgnesImageRoute(route: Pick<UpstreamRoute, "providerKind" | "upstreamModel">): boolean {
@@ -16,6 +18,22 @@ export function isAgnesImageRoute(route: Pick<UpstreamRoute, "providerKind" | "u
   const model = (route.upstreamModel || "").toLowerCase();
   if (kind === "agnes_image" || kind === "agnes-image") return true;
   return /^agnes-image/.test(model);
+}
+
+/** 识别生图渠道引擎 */
+export function resolveImageEngine(route: Pick<UpstreamRoute, "providerKind" | "upstreamModel" | "providerSlug">): ImageEngine | null {
+  if (isAgnesImageRoute(route)) return "agnes";
+  const kind = (route.providerKind || "").toLowerCase();
+  const slug = (route.providerSlug || "").toLowerCase();
+  if (kind === "oauth:codex" || slug === "codex-oauth" || slug === "codex") return "codex";
+  if (kind === "web:chatgptweb" || slug === "chatgpt-web" || slug === "chatgptweb") return "chatgptweb";
+  if (kind === "duckai" || slug === "duckai") return "duckai";
+  return null;
+}
+
+/** 路由是否支持图片生成 */
+export function isSupportedImageRoute(route: Pick<UpstreamRoute, "providerKind" | "upstreamModel" | "providerSlug">): boolean {
+  return resolveImageEngine(route) !== null;
 }
 
 /** 只保留上游认识的字段，避免 quality/style 这类字段触发 400 */
@@ -106,4 +124,37 @@ export function countGeneratedImages(raw?: string | null): number {
     // ignore
   }
   return 0;
+}
+
+/** 根据路由绑定的渠道类型，派发到对应上游生图引擎 */
+export async function generateImageByRoute(
+  env: Env,
+  route: UpstreamRoute,
+  upstreamKey: string,
+  body: Record<string, any>
+): Promise<ImageResult> {
+  const engine = resolveImageEngine(route);
+  if (engine === "agnes") {
+    return generateAgnesImage(route.baseUrl, upstreamKey, { ...body, model: route.upstreamModel });
+  }
+  if (engine === "codex") {
+    const { generateCodexImage } = await import("./oauth/codex");
+    return generateCodexImage(env, upstreamKey, {
+      ...body,
+      providerId: route.providerId,
+      model: route.upstreamModel || body.model,
+    });
+  }
+  if (engine === "chatgptweb") {
+    const { generateChatgptWebImage } = await import("./web/chatgptweb");
+    return generateChatgptWebImage(env, upstreamKey, {
+      ...body,
+      model: route.upstreamModel || body.model,
+    });
+  }
+  if (engine === "duckai") {
+    const { generateDuckAiImage } = await import("./duckai");
+    return generateDuckAiImage(env, route.upstreamModel || "gpt-5.4-mini", body);
+  }
+  return { ok: false, httpStatus: 400, error: `不支持的生图渠道类型: ${route.providerKind}` };
 }
