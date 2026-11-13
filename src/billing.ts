@@ -32,6 +32,12 @@ export function estimateCost(p: Pricing, promptTokens: number, completionTokens:
   return (promptTokens / 1_000_000) * p.inputPerMillion + (completionTokens / 1_000_000) * p.outputPerMillion;
 }
 
+/**
+ * 取模型定价。
+ * 只做精确匹配：定价表以模型的 publicName 为键，调用方应传入库里登记的规范名
+ * （路由解析后的 model.publicName），避免大小写模糊匹配在同名歧义时取错价格，
+ * 更不能因为取不到价格就把付费模型当成免费模型放行。
+ */
 export async function getPricing(env: any, publicName: string): Promise<Pricing | null> {
   const map = await getAllPricing(env);
   const p = map[publicName];

@@ -238,7 +238,13 @@ export async function runChatPipeline(
     if (keyRow.modelWhitelist) {
       try {
         const whitelist = JSON.parse(keyRow.modelWhitelist) as string[];
-        if (Array.isArray(whitelist) && whitelist.length && !whitelist.includes(publicModel) && !whitelist.includes(subModelName)) {
+        // 大小写不敏感比较：用户写 GLM-4.7-Flash 而白名单登记的是 glm-4.7-flash 时也应放行
+        const allowed =
+          Array.isArray(whitelist) &&
+          whitelist.some(
+            (w) => w === publicModel || w === subModelName || w.toLowerCase() === publicModel.toLowerCase() || w.toLowerCase() === subModelName.toLowerCase()
+          );
+        if (Array.isArray(whitelist) && whitelist.length && !allowed) {
           throw new ApiError(403, ErrorCode.MODEL_NOT_ALLOWED, `该 Key 无权调用模型 ${publicModel}`);
         }
       } catch (err) {
@@ -253,7 +259,14 @@ export async function runChatPipeline(
 
     /* ---- 路由规划（配置已缓存，零 I/O）+ 定价 ---- */
     const plans = await planModelRoutes(env, publicModel);
-    const pricing = (await getPricing(env, publicModel)) || (subModelName !== publicModel ? await getPricing(env, subModelName) : null);
+    // 定价一律取「路由解析后模型的规范名」对应的价格条目：
+    // 用户可能用大小写变体（GLM-4.7-Flash / bigmodel/GLM-4.7-Flash）请求，
+    // 直接按用户原文查会取不到价格，进而把付费模型误判为免费。
+    const canonicalName = plans[0]?.model.publicName;
+    const pricing =
+      (canonicalName ? await getPricing(env, canonicalName) : null) ||
+      (await getPricing(env, publicModel)) ||
+      (subModelName !== publicModel ? await getPricing(env, subModelName) : null);
     const modelRpm = pricing?.rpmLimit;
     const isPaidModel = !!pricing && (pricing.inputPerMillion > 0 || pricing.outputPerMillion > 0);
 

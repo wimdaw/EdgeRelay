@@ -14,7 +14,7 @@
     "build:bundle": "node scripts/build-bundle.mjs",
     "build": "npm run build:typecheck && npm run build:check && npm run build:console && npm run build:site-html && npm run build:assets && npm run build:bundle",
     "deploy": "npm run build && edgeone makers deploy --json",
-    "test": "node tests/test-email-code.mjs && node tests/test-auth-policy.mjs && node tests/test-runner.mjs"
+    "test": "node tests/test-email-code.mjs && node tests/test-auth-policy.mjs && node tests/test-model-case-insensitive.mjs && node tests/test-runner.mjs"
   },
   "dependencies": {
     "@edgeone/pages-blob": "^0.0.17",

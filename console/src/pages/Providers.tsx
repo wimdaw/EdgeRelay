@@ -29,6 +29,7 @@ const PRESETS: Record<string, { name: string; slug: string; kind: string; url: s
   kilo: { name: "Kilo (免Key)", slug: "kilo", kind: "openai_compat", url: "https://api.kilo.ai/api/gateway" },
   opencode: { name: "OpenCode (免Key)", slug: "opencode", kind: "openai_compat", url: "https://opencode.ai/zen/v1" },
   duckai: { name: "Duck.ai (免Key)", slug: "duckai", kind: "openai_compat", url: "https://duck.ai" },
+  bigmodel: { name: "智谱 GLM (BigModel)", slug: "bigmodel", kind: "openai_compat", url: "https://open.bigmodel.cn/api/paas/v4" },
 };
 
 const isKeylessSlug = (slug?: string) => slug === "opencode" || slug === "duckai" || slug === "kilo";

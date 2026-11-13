@@ -66,13 +66,17 @@ export async function authenticateSkGwKey(c: any): Promise<ApiKeyAuth> {
   };
 }
 
-/** 模型白名单校验（支持 slug/model 定向写法） */
+/** 模型白名单校验（支持 slug/model 定向写法；大小写不敏感） */
 export function assertModelAllowed(row: { modelWhitelist?: string | null }, publicModel: string): void {
   if (!row.modelWhitelist) return;
   try {
     const whitelist = JSON.parse(row.modelWhitelist) as string[];
     const sub = publicModel.includes("/") ? publicModel.slice(publicModel.indexOf("/") + 1) : publicModel;
-    if (Array.isArray(whitelist) && whitelist.length && !whitelist.includes(publicModel) && !whitelist.includes(sub)) {
+    // 大小写不敏感比较：用户写 GLM-4.7-Flash 而白名单登记的是 glm-4.7-flash 时也应放行
+    const allowed = whitelist.some(
+      (w) => w === publicModel || w === sub || w.toLowerCase() === publicModel.toLowerCase() || w.toLowerCase() === sub.toLowerCase()
+    );
+    if (Array.isArray(whitelist) && whitelist.length && !allowed) {
       throw new ApiError(403, ErrorCode.MODEL_NOT_ALLOWED, `该 Key 无权调用模型 ${publicModel}`);
     }
   } catch (err) {

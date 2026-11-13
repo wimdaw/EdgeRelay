@@ -166,7 +166,10 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
     const publicModel = body.model;
     assertModelAllowed(auth.row, publicModel);
 
-    const pricing = (await getPricing(env, publicModel)) ?? null;
+    // 定价取路由解析后的规范名（用户可能用大小写变体请求），用于取该模型的 RPM 限额
+    const plans = await planModelRoutes(env, publicModel);
+    const canonicalName = plans[0]?.model.publicName;
+    const pricing = (canonicalName ? await getPricing(env, canonicalName) : null) ?? (await getPricing(env, publicModel)) ?? null;
     const limitResult = await checkRateLimit(env, auth.keyId, auth.limits, pricing?.rpmLimit, publicModel);
     if (!limitResult.ok) {
       await commitRateLimits(env);

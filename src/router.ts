@@ -16,6 +16,17 @@ export const MAX_KEY_CANDIDATES = 64;
 
 export type RoutePlan = { model: ModelRouteRecord; provider: ProviderRecord };
 
+/**
+ * 判定大小写不敏感匹配出的候选是否「无歧义」。
+ * 判据是 (providerId, upstreamModel) 组合唯一：同一渠道同一上游模型的多个 public_name
+ * 别名不算歧义（它们指向同一个上游）；不同渠道或不同上游模型才算歧义。
+ */
+function isUnambiguous(candidates: ModelRouteRecord[]): boolean {
+  if (candidates.length === 0) return false;
+  const distinct = new Set(candidates.map((m) => `${m.providerId}::${m.upstreamModel}`));
+  return distinct.size === 1;
+}
+
 function sampleKeys<T>(keys: T[], size: number): T[] {
   const pool = keys.slice();
   for (let i = 0; i < size; i++) {
@@ -48,7 +59,28 @@ export async function planModelRoutes(env: any, publicName: string): Promise<Rou
           (m.publicName === subName || m.upstreamModel === subName) &&
           m.enabled === 1
       );
+      // 定向渠道内仍无精确命中时，回退到大小写不敏感匹配。
+      // 同一渠道内若存在多个仅大小写不同的模型，视为歧义不做回退，避免选错上游。
+      if (!matched.length) {
+        const ci = subName.toLowerCase();
+        const ciCandidates = allModels.filter(
+          (m) =>
+            m.providerId === targetProvider.id &&
+            m.enabled === 1 &&
+            (m.publicName.toLowerCase() === ci || m.upstreamModel.toLowerCase() === ci)
+        );
+        if (isUnambiguous(ciCandidates)) matched = ciCandidates;
+      }
     }
+  }
+
+  // 裸模型名（无渠道前缀）未精确命中时，回退到大小写不敏感匹配。
+  // 仅当候选唯一时生效：例如 glm-5.3-flash（nvidia）与 GLM-5.3-Flash（amd）分属不同渠道，
+  // 视为歧义并保持查不到，由调用方用「渠道/模型」精确定向，避免静默路由到错误渠道。
+  if (!matched.length && !publicName.includes("/")) {
+    const ci = publicName.toLowerCase();
+    const ciCandidates = allModels.filter((m) => m.enabled === 1 && m.publicName.toLowerCase() === ci);
+    if (isUnambiguous(ciCandidates)) matched = ciCandidates;
   }
   if (!matched.length) return [];
 
