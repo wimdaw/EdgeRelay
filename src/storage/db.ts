@@ -1225,7 +1225,7 @@ export async function seedInitialData(env: any): Promise<void> {
     { id: "m_gpt4o_1", publicName: "gpt-4o", providerId: "openai", upstreamModel: "gpt-4o", priority: 10, costWeight: 1.0, maxContext: 128000, enabled: 1, createdAt: now },
     { id: "m_gpt4o_mini", publicName: "gpt-4o-mini", providerId: "openai", upstreamModel: "gpt-4o-mini", priority: 10, costWeight: 1.0, maxContext: 128000, enabled: 1, createdAt: now },
     { id: "m_sonnet_1", publicName: "claude-sonnet", providerId: "anthropic", upstreamModel: "claude-sonnet-4-5", priority: 10, costWeight: 1.0, maxContext: 200000, enabled: 1, createdAt: now },
-    { id: "m_gemini_1", publicName: "gemini-flash", providerId: "google", upstreamModel: "gemini-2.0-flash", priority: 10, costWeight: 1.0, maxContext: 1000000, enabled: 1, createdAt: now },
+    { id: "m_gemini_1", publicName: "gemini-flash", providerId: "google", upstreamModel: "gemini-3.5-flash", priority: 10, costWeight: 1.0, maxContext: 1000000, enabled: 1, createdAt: now },
     { id: "m_deepseek_1", publicName: "deepseek-chat", providerId: "deepseek", upstreamModel: "deepseek-chat", priority: 10, costWeight: 1.0, maxContext: 64000, enabled: 1, createdAt: now },
     { id: "m_deepseek_2", publicName: "deepseek-reasoner", providerId: "deepseek", upstreamModel: "deepseek-reasoner", priority: 10, costWeight: 1.0, maxContext: 64000, enabled: 1, createdAt: now },
   ];

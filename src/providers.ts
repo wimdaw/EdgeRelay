@@ -23,12 +23,21 @@ export function aiGatewayUrl(env: Env, providerSlug: string, upstreamUrl: string
  * 拼接上游 API 路径，兼容 baseUrl 带不带版本前缀两种写法：
  *  - https://integrate.api.nvidia.com         + /v1/chat/completions => .../v1/chat/completions
  *  - https://integrate.api.nvidia.com/v1      + /v1/chat/completions => .../v1/chat/completions（不重复 /v1）
+ *  - https://generativelanguage.googleapis.com/v1beta/openai
+ *                                             + /v1/chat/completions => .../v1beta/openai/chat/completions
  * 与 ai-gateway-edgeone 的 baseUrl 口径对齐（该口径下 baseUrl 常带 /v1）。
+ *
+ * 注意：版本段不一定在结尾（Google 的 OpenAI 兼容端点是 /v1beta/openai），
+ * 旧实现只匹配结尾的版本段，会把 Google 渠道拼成 /v1beta/openai/v1/chat/completions，
+ * 上游直接 404（对话与模型列表同时失败）。
  */
 export function joinApiPath(baseUrl: string, apiPath: string): string {
   const base = baseUrl.replace(/\/+$/, "");
-  if (/\/v\d+(?:beta)?$/i.test(base) && /^\/v\d+(?:beta)?\//i.test(apiPath)) {
-    return base + apiPath.replace(/^\/v\d+(?:beta)?/i, "");
+  const versionSeg = "v\\d+(?:beta|alpha)?\\d*";
+  const baseHasVersion = new RegExp(`(?:^|/)${versionSeg}(?:/|$)`, "i").test(base);
+  const pathHasVersion = new RegExp(`^/${versionSeg}/`, "i").test(apiPath);
+  if (baseHasVersion && pathHasVersion) {
+    return base + apiPath.replace(new RegExp(`^/${versionSeg}`, "i"), "");
   }
   return base + apiPath;
 }

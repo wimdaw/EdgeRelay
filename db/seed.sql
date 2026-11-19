@@ -16,7 +16,7 @@ INSERT OR IGNORE INTO models (id, public_name, provider_id, upstream_model, prio
   ('m_gpt4o_1',      'gpt-4o',         'p_openai',    'gpt-4o',             10, 1.0, 128000, 1, unixepoch()),
   ('m_gpt4o_2',      'gpt-4o',         'p_openai',    'gpt-4o-2024-11-20',  20, 1.2, 128000, 1, unixepoch()),
   ('m_sonnet_1',     'claude-sonnet',  'p_anthropic', 'claude-sonnet-4-5',  10, 1.0, 200000, 1, unixepoch()),
-  ('m_gemini_1',     'gemini-flash',   'p_google',    'gemini-2.0-flash',   10, 1.0, 1000000, 1, unixepoch()),
+  ('m_gemini_1',     'gemini-flash',   'p_google',    'gemini-3.5-flash',   10, 1.0, 1000000, 1, unixepoch()),
   ('m_deepseek_1',   'deepseek-chat',  'p_deepseek',  'deepseek-chat',      10, 1.0,  64000, 1, unixepoch()),
   ('m_deepseek_2',   'deepseek-reasoner','p_deepseek','deepseek-reasoner',  10, 1.0,  64000, 1, unixepoch());
 
