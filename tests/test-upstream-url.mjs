@@ -29,6 +29,7 @@ const mod = await import(
   "data:text/javascript;base64," + Buffer.from(out.outputFiles[0].text).toString("base64")
 );
 const { joinApiPath } = mod;
+const { normalizeUpstreamModel } = mod;
 
 let pass = 0;
 const fails = [];
@@ -113,6 +114,34 @@ eq(
   "非版本段路径不误判",
   joinApiPath("https://api.example.com/v1abc", "/v1/chat/completions"),
   "https://api.example.com/v1abc/v1/chat/completions"
+);
+
+/* ---- 模型名归一化：Google 列表返回 models/xxx，对话接口只认裸名 ---- */
+const GOOGLE_BASE = "https://generativelanguage.googleapis.com/v1beta/openai";
+eq(
+  "Google 剥离 models/ 前缀",
+  normalizeUpstreamModel("google", GOOGLE_BASE, "models/gemini-3.5-flash"),
+  "gemini-3.5-flash"
+);
+eq(
+  "Google 裸名保持不变",
+  normalizeUpstreamModel("google", GOOGLE_BASE, "gemini-3.5-flash"),
+  "gemini-3.5-flash"
+);
+eq(
+  "Google 按 Base URL 识别（slug 非 google）",
+  normalizeUpstreamModel("my-google", GOOGLE_BASE, "models/gemini-3.5-flash"),
+  "gemini-3.5-flash"
+);
+eq(
+  "非 Google 渠道不剥前缀",
+  normalizeUpstreamModel("nvidia", "https://integrate.api.nvidia.com", "google/codegemma-7b"),
+  "google/codegemma-7b"
+);
+eq(
+  "其它渠道的 models/ 字面名原样保留",
+  normalizeUpstreamModel("custom", "https://api.example.com/v1", "models/custom-model"),
+  "models/custom-model"
 );
 
 if (fails.length) {

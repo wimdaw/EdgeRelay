@@ -48,6 +48,23 @@ export function resolveTarget(env: Env, route: UpstreamRoute, chatPath = "/v1/ch
   return { url, headers: {} };
 }
 
+/**
+ * 归一化上游模型名。
+ *
+ * Google 的 OpenAI 兼容模型列表（/v1beta/openai/models）返回的 id 带 `models/` 前缀，
+ * 例如 models/gemini-3.5-flash；但同一个兼容层的对话接口只认裸模型名
+ * （gemini-3.5-flash）。把列表里的名字原样回填到 model 字段，上游会返回 400/404。
+ * 这里在「路由构建」这一处统一剥离，既修正历史上已入库的 models/xxx 映射，
+ * 也保证新导入的模型不会再把前缀带进请求体。
+ * 仅对 Google 生效，其它渠道的模型名（含 nvidia 的 google/xxx）原样透传。
+ */
+export function normalizeUpstreamModel(providerSlug: string, baseUrl: string, model: string): string {
+  const isGoogle =
+    providerSlug === "google" || /generativelanguage\.googleapis\.com/i.test(baseUrl || "");
+  if (isGoogle && /^models\//i.test(model)) return model.replace(/^models\//i, "");
+  return model;
+}
+
 export async function buildHeaders(env: Env, route: UpstreamRoute): Promise<Record<string, string>> {
   const headers: Record<string, string> = {
     "content-type": "application/json",

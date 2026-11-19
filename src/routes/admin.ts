@@ -10,7 +10,7 @@ import { uuid, encryptSecret, decryptSecret, sha256Hex } from "../crypto";
 import { getSettings, updateSettings, json } from "../settings";
 import { audit, verifyAuditChain } from "../audit";
 import { topup } from "../billing";
-import { joinApiPath } from "../providers";
+import { joinApiPath, normalizeUpstreamModel } from "../providers";
 import {
   listAllUsers,
   getUserById,
@@ -760,7 +760,11 @@ adminRouter.post("/actions", async (c) => {
               });
               if (mRes.ok) {
                 const data = (await mRes.json()) as { data?: { id?: string }[] };
-                const mList = (data.data ?? []).map((m) => m.id).filter((x): x is string => !!x);
+                // Google 兼容列表返回 models/xxx，对话接口只认裸名，导入时统一剥前缀
+                const mList = (data.data ?? [])
+                  .map((m) => m.id)
+                  .filter((x): x is string => !!x)
+                  .map((id) => normalizeUpstreamModel(prov.slug, prov.baseUrl, id));
                 if (mList.length) return json({ ok: true, models: mList });
               }
             } catch {}

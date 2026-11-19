@@ -10,6 +10,7 @@ import type { UpstreamRoute, ProviderRecord, ModelRouteRecord, ProviderKeyRecord
 import { ApiError, ErrorCode } from "./errors";
 import { getModels, getProviders } from "./storage/db";
 import { sortKeysByHealth, type HealthMap } from "./key-health";
+import { normalizeUpstreamModel } from "./providers";
 
 /** 单渠道每次请求最多参与调度的 Key 数（万级 Key 池只做随机抽样，避免全量洗牌开销） */
 export const MAX_KEY_CANDIDATES = 64;
@@ -132,7 +133,7 @@ function keylessRoute(m: ModelRouteRecord, p: ProviderRecord): UpstreamRoute {
     extraHeaders: parseExtraHeaders(p.extraHeaders),
     providerKeyId: "keyless",
     encryptedKey: "",
-    upstreamModel: m.upstreamModel,
+    upstreamModel: normalizeUpstreamModel(p.slug, p.baseUrl, m.upstreamModel),
     priority: m.priority,
     costWeight: m.costWeight,
   };
@@ -174,7 +175,7 @@ export function buildRoutesFromPlan(
     extraHeaders: headers,
     providerKeyId: pk.id,
     encryptedKey: pk.encryptedKey,
-    upstreamModel: m.upstreamModel,
+    upstreamModel: normalizeUpstreamModel(p.slug, p.baseUrl, m.upstreamModel),
     priority: m.priority,
     costWeight: m.costWeight,
   }));
