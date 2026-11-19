@@ -575,6 +575,8 @@ export async function handleAntigravityRequest(p: AntigravityCallParams): Promis
   const { request: geminiRequest, nameMap } = openAIToGeminiRequest(p.body, translateOpts)
   let lastError = ''
   let lastStatus = 502
+  /** 记录每个账号的失败原因，全部失败时一次性透出，便于区分封号/配额/网络问题 */
+  const failures: string[] = []
 
 
   for (let i = 0; i < ordered.length; i++) {
@@ -585,17 +587,27 @@ export async function handleAntigravityRequest(p: AntigravityCallParams): Promis
       const projectId = await resolveProjectId(p.env, accessToken, hash, accountProject || p.project)
       const envelope = await buildEnvelope(p.modelId, projectId, geminiRequest)
       const url = `${AG_GEN_BASE}/${AG_API_VERSION}:${wantStream ? 'streamGenerateContent?alt=sse' : 'generateContent'}`
-      const upstream = await fetch(url, {
+      const send = (): Promise<Response> => fetch(url, {
         method: 'POST',
         headers: agHeaders(accessToken),
         body: JSON.stringify(envelope),
         signal: AbortSignal.timeout(300000),
       })
+      let upstream = await send()
+      // 429 可能是「每分钟突发限流」而不是账号配额耗尽：短退避重试一次，
+      // 避免一次瞬时 429 直接把账号冷却 30 分钟、整条渠道跟着不可用。
+      if (upstream.status === 429) {
+        const retryAfterSec = Number(upstream.headers.get('retry-after'))
+        const waitMs = retryAfterSec > 0 ? Math.min(retryAfterSec * 1000, 5000) : 1500
+        await sleep(waitMs)
+        upstream = await send()
+      }
 
       if (!upstream.ok) {
         lastStatus = upstream.status
         const detail = (await readErrorBody(upstream)).slice(0, 300)
         lastError = `HTTP ${upstream.status}: ${detail}`
+        failures.push(`#${accountIndex} HTTP ${upstream.status} ${detail.slice(0, 100)}`)
         if ([401, 403, 429].includes(upstream.status) || upstream.status >= 500) {
           // 429 通常是按账号的配额耗尽：冷却到上游给出的重置时间，别再让后续请求白撞
           if (upstream.status === 429) {
@@ -651,12 +663,14 @@ export async function handleAntigravityRequest(p: AntigravityCallParams): Promis
     } catch (err) {
       lastError = (err as Error).message || '未知错误'
       lastStatus = 502
+      failures.push(`#${accountIndex} ${lastError.slice(0, 100)}`)
       markFailed(hash, `exception ${lastError.slice(0, 120)}`, AG_COOLDOWN_TRANSIENT_MS)
       continue
     }
   }
   await persistHealth()
-  return errorResponse(`所有 Antigravity 账号均失败，最后一次错误: ${lastError || '未知'}`, lastStatus, 'key_exhausted')
+  const detail = failures.length ? failures.join(' | ') : (lastError || '未知')
+  return errorResponse(`所有 Antigravity 账号均失败（${ordered.length} 个）：${detail}`, lastStatus, 'key_exhausted')
 }
 
 function extractUsage(body: unknown): AgUsage {

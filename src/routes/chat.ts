@@ -535,7 +535,9 @@ export async function runChatPipeline(
           lastUpstreamError = `status ${resp.status}`;
           lastUpstreamStatus = resp.status;
           await recordFailure(route, resp.status);
-          const isAuthOrQuota = resp.status === 401 || resp.status === 402;
+          // 401/402/403 都可能是「该账号/该渠道」的问题（如 Antigravity 账号被 Google 封禁），
+          // 只要还有候选路由就继续故障转移，避免一个坏账号拖死整条模型。
+          const isAuthOrQuota = resp.status === 401 || resp.status === 402 || resp.status === 403;
           if (RETRYABLE_STATUS.has(resp.status) || (isAuthOrQuota && attempts < candidateRoutes.length)) {
             continue;
           }

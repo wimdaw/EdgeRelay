@@ -2025,6 +2025,90 @@ let apiKeyId = "";
   assert(newLogin.status === 200, "改密用例：新密码可登录");
 }
 
+// 31. 403 账号级失败应故障转移到下一条路由（Antigravity 封号/权限场景）
+{
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_provider",
+      payload: { id: "p_mock_403", name: "Mock 403", slug: "mock403", kind: "openai_compat", baseUrl: "https://mock403.test/v1", authScheme: "bearer", status: "active" },
+    },
+  });
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: { action: "upsert_provider_key", payload: { providerId: "p_mock_403", key: "mock-403-key", label: "prod" } },
+  });
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_provider",
+      payload: { id: "p_mock_ok2", name: "Mock OK", slug: "mockok2", kind: "openai_compat", baseUrl: "https://mockok2.test/v1", authScheme: "bearer", status: "active" },
+    },
+  });
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: { action: "upsert_provider_key", payload: { providerId: "p_mock_ok2", key: "mock-ok-key", label: "prod" } },
+  });
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_model",
+      payload: { publicName: "mock-failover-model", providerId: "p_mock_403", upstreamModel: "blocked-model", priority: 0, inputPerMillion: 0, outputPerMillion: 0 },
+    },
+  });
+  await request("/api/admin/actions", {
+    method: "POST",
+    headers: { cookie: adminCookie, "content-type": "application/json" },
+    body: {
+      action: "upsert_model",
+      payload: { publicName: "mock-failover-model", providerId: "p_mock_ok2", upstreamModel: "ok-model", priority: 10, inputPerMillion: 0, outputPerMillion: 0 },
+    },
+  });
+
+  const realFetch = globalThis.fetch;
+  let firstCalled = false;
+  let secondCalled = false;
+  globalThis.fetch = async (url, init) => {
+    const target = String(url);
+    if (target.includes("mock403.test")) {
+      firstCalled = true;
+      return new Response(JSON.stringify({ error: { message: "This service has been disabled for violation of Terms of Service." } }), {
+        status: 403,
+        headers: { "content-type": "application/json" },
+      });
+    }
+    if (target.includes("mockok2.test")) {
+      secondCalled = true;
+      return new Response(JSON.stringify({
+        id: "chatcmpl-ok",
+        object: "chat.completion",
+        choices: [{ index: 0, message: { role: "assistant", content: "pong" }, finish_reason: "stop" }],
+        usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    return realFetch(url, init);
+  };
+
+  try {
+    const res = await request("/v1/chat/completions", {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKeyPlaintext}`, "content-type": "application/json" },
+      body: { model: "mock-failover-model", stream: false, messages: [{ role: "user", content: "hi" }] },
+    });
+    assert(res.status === 200, "403 路由失败后自动切换到下一条路由 HTTP 200");
+    const data = await res.json();
+    assert(data.choices?.[0]?.message?.content === "pong", "故障转移后返回健康路由内容");
+    assert(firstCalled && secondCalled, "先尝试 403 路由，再切换到健康路由");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);
