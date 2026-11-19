@@ -18,6 +18,9 @@ export interface Env {
   OPENCODE_MIRRORS_URL?: string;
   MODERATION_API_URL?: string;
   BILLING_CURRENCY?: string;
+  /** Antigravity（Google Code Assist）OAuth 客户端凭据，缺失时该渠道授权/刷新会明确报错 */
+  AG_CLIENT_ID?: string;
+  AG_CLIENT_SECRET?: string;
   // EdgeOne 相关
   EDGEONE_TOKEN?: string;
   EDGEONE_TOKEN_NEW?: string;

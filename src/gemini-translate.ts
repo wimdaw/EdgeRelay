@@ -600,6 +600,36 @@ function restoreName(nameMap: Record<string, string>, name: string | undefined):
   return nameMap[name] || name
 }
 
+/**
+ * 上游会把「函数调用畸形 / 非法工具调用」当作正常结束返回，此时若没有任何可见输出，
+ * 客户端会收到一条 content 为空、finish_reason=stop 的“成功”回复——比报错更难排查。
+ * 对齐 CLIProxyAPI 的 gemini_zero_output 兜底：这类结束按可重试的上游错误处理。
+ */
+export function isAbnormalFinishReason(reason?: string): boolean {
+  switch ((reason || '').toUpperCase().trim()) {
+    case 'MALFORMED_FUNCTION_CALL':
+    case 'UNEXPECTED_TOOL_CALL':
+    case 'MALFORMED_RESPONSE':
+      return true
+    default:
+      return false
+  }
+}
+
+/** 上游零可见输出 + 异常结束原因。渠道侧据此切换账号重试，全部失败后再回 502。 */
+export class GeminiZeroOutputError extends Error {
+  readonly finishReason: string
+  constructor(finishReason: string) {
+    super(
+      finishReason
+        ? `upstream returned zero output with finishReason ${finishReason}`
+        : 'upstream returned zero output',
+    )
+    this.name = 'GeminiZeroOutputError'
+    this.finishReason = finishReason
+  }
+}
+
 /** 非流式：Gemini 响应 -> OpenAI ChatCompletion */
 export function geminiResponseToOpenAI(
   body: unknown,
@@ -643,6 +673,10 @@ export function geminiResponseToOpenAI(
   }
 
   const usage = extractUsage(data.usageMetadata)
+  // 零可见输出 + 异常结束原因：交给渠道侧按失败重试，不要伪装成空回复
+  if (!content && !hasToolCall && isAbnormalFinishReason(candidate?.finishReason)) {
+    throw new GeminiZeroOutputError(candidate?.finishReason || '')
+  }
   const message: Record<string, unknown> = { role: 'assistant', content: content || (toolCalls.length > 0 ? null : '') }
   if (reasoning) message.reasoning_content = reasoning
   if (toolCalls.length > 0) message.tool_calls = toolCalls
@@ -680,6 +714,8 @@ export function createOpenAIStream(
   let toolIndex = 0
   let finishReason = ''
   let hasToolCall = false
+  /** 是否出现过「非 thought」的可见输出（正文或工具调用），用于零输出兜底 */
+  let sawVisibleOutput = false
   let model = requestedModel
   let id = `chatcmpl-${randomId().replace(/-/g, '').slice(0, 24)}`
   let usage: GeminiUsage = { promptTokens: 0, completionTokens: 0, totalTokens: 0, reasoningTokens: 0, cachedTokens: 0 }
@@ -722,9 +758,13 @@ export function createOpenAIStream(
     for (const part of parts) {
       if (typeof part.text === 'string' && part.text) {
         if (part.thought) emitDelta(controller, { reasoning_content: part.text }, null)
-        else emitDelta(controller, { content: part.text }, null)
+        else {
+          sawVisibleOutput = true
+          emitDelta(controller, { content: part.text }, null)
+        }
       } else if (part.functionCall) {
         hasToolCall = true
+        sawVisibleOutput = true
         const name = restoreName(nameMap, part.functionCall.name)
         let args = ''
         try {
@@ -770,6 +810,19 @@ export function createOpenAIStream(
       },
       flush(controller) {
         if (buffer) processLine(controller, buffer)
+        // 零可见输出 + 异常结束原因：下发一条明确的错误帧，避免客户端把空回复当成功
+        if (!sawVisibleOutput && isAbnormalFinishReason(finishReason)) {
+          emit(controller, {
+            error: {
+              message: `upstream returned zero output with finishReason ${finishReason}`,
+              type: 'upstream_error',
+              code: 'zero_output',
+            },
+          })
+          controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+          if (onEnd) onEnd(usage)
+          return
+        }
         // 结束块：finish_reason + usage
         emit(controller, {
           id,

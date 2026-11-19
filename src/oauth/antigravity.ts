@@ -18,7 +18,7 @@
 import type { Env } from '../types'
 import { getKV } from '../storage/blob-store'
 import { resolveAccessToken } from './common'
-import { openAIToGeminiRequest, geminiResponseToOpenAI, createOpenAIStream } from '../gemini-translate'
+import { openAIToGeminiRequest, geminiResponseToOpenAI, createOpenAIStream, GeminiZeroOutputError } from '../gemini-translate'
 
 const AG_HEALTH_PREFIX = 'ag:health:'
 
@@ -629,7 +629,19 @@ export async function handleAntigravityRequest(p: AntigravityCallParams): Promis
       const rawText = await upstream.text()
       let json: unknown
       try { json = JSON.parse(rawText) } catch { return errorResponse(`上游返回非 JSON: ${rawText.slice(0, 200)}`, 502, 'upstream_error') }
-      const openai = geminiResponseToOpenAI(json, p.requestedModel, nameMap, translateOpts)
+      let openai: Record<string, unknown>
+      try {
+        openai = geminiResponseToOpenAI(json, p.requestedModel, nameMap, translateOpts)
+      } catch (err) {
+        // 零可见输出 + 畸形结束：当作可重试的上游失败，换下一个账号
+        if (err instanceof GeminiZeroOutputError) {
+          lastError = err.message
+          lastStatus = 502
+          markFailed(hash, `zero_output ${err.finishReason}`, AG_COOLDOWN_TRANSIENT_MS)
+          continue
+        }
+        throw err
+      }
       const usage = extractUsage(json)
       await recordUsage(p, usage, true, 200)
       return new Response(JSON.stringify(openai), {
