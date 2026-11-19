@@ -91,6 +91,44 @@ npm run deploy
 
 ---
 
+## 📱 接入灵宝 UI 桥接（本地 UI 自动化渠道）
+
+[lingbao-ui-bridge](https://github.com/Although-now/lingbao-ui-bridge) 用 ADB + Windows OCR
+驱动安卓模拟器里的《王者荣耀》灵宝聊天，对外提供 OpenAI 兼容接口（模型名 `lingbao-ui`）。
+本网关把它当作普通 `openai_compat` 上游即可，无需改路由代码。
+
+**桥接侧准备**
+
+1. 启动桥接（固定监听 `127.0.0.1:20141`），首次启动会生成 `ui-bridge.key`。
+2. 在桥接目录新建 `gateway.key`，写入一串随机密钥；桥接会把它与 `ui-bridge.key` 一并接受。
+   这一步是为了让网关用独立密钥调用，不必共用你的个人密钥。
+
+**网关侧接入**
+
+1. 控制台「供应商 → 新增」点「灵宝 UI 桥接」预设，Base URL 默认 `http://127.0.0.1:20141`。
+2. 凭据填 `gateway.key` 的内容，协议选 OpenAI 兼容，鉴权方式 Bearer。
+3. 建一条模型映射：对外名 `lingbao-ui`，上游模型名同为 `lingbao-ui`。
+4. 启用渠道后即可通过统一接口调用：`POST /v1/chat/completions`，`model` 填 `lingbao/lingbao-ui`。
+
+**云端部署的关键前提**
+
+EdgeOne 云函数运行在公网，**无法访问本机 `127.0.0.1`**。若网关部署在云端，
+需先把桥接暴露到公网并把 Base URL 换成该地址，例如 cloudflared 临时隧道：
+
+```bash
+cloudflared tunnel --url http://127.0.0.1:20141
+# 将输出的 https://xxx.trycloudflare.com 填入渠道 Base URL
+```
+
+**已知限制（来自桥接本身）**
+
+- 单实例单并发：同时只处理一个请求，忙时返回 `429 Emulator busy`。
+- 只取最后一条 user 文本，忽略历史、system 与工具定义；单条最多 120 字符，超长直接报错。
+- `stream: true` 是在 OCR 完成后一次性下发 SSE，不是逐字流式。
+- 回复必须完整落在当前屏幕内，长回复会被截断；OCR 与固定坐标对分辨率敏感。
+
+---
+
 ## 📋 API 路由一览
 
 | 路径 | 方法 | 说明 |

@@ -30,6 +30,9 @@ const PRESETS: Record<string, { name: string; slug: string; kind: string; url: s
   opencode: { name: "OpenCode (免Key)", slug: "opencode", kind: "openai_compat", url: "https://opencode.ai/zen/v1" },
   duckai: { name: "Duck.ai (免Key)", slug: "duckai", kind: "openai_compat", url: "https://duck.ai" },
   bigmodel: { name: "智谱 GLM (BigModel)", slug: "bigmodel", kind: "openai_compat", url: "https://open.bigmodel.cn/api/paas/v4" },
+  // 灵宝 UI 桥接：本地 Windows 服务（ADB + OCR 驱动模拟器），默认只监听 127.0.0.1。
+  // EdgeOne 云端访问不到本机回环地址，云端使用时需把 baseUrl 换成隧道/公网地址。
+  lingbao: { name: "灵宝 UI 桥接", slug: "lingbao", kind: "openai_compat", url: "http://127.0.0.1:20141" },
 };
 
 const isKeylessSlug = (slug?: string) => slug === "opencode" || slug === "duckai" || slug === "kilo";
