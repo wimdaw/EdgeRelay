@@ -87,6 +87,9 @@ export async function runCodebuddyCheckinAll(
   }
 
   const providers = (await getProviders(env)).filter((p) => (p.kind || "") === "oauth:codebuddy");
+  if (!providers.length) {
+    return { ran: false, day, skipped: "未配置 CodeBuddy（WorkBuddy）渠道", providers: [], total: 0, success: 0 };
+  }
   const { checkinCodebuddy } = await import("./oauth/codebuddy");
 
   const result: CheckinRunResult = { ran: true, day, providers: [], total: 0, success: 0 };
