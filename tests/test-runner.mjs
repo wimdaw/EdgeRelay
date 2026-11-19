@@ -2109,6 +2109,21 @@ let apiKeyId = "";
   }
 }
 
+// 32. Antigravity/Gemini reasoning_effort 归一化（ZCode 发送 enabled 会触发上游 400）
+{
+  const { generationConfigFrom } = await import("../src/gemini-translate.ts");
+  const enabled = generationConfigFrom({ reasoning_effort: "enabled" }, "gemini-3.8-flash-high");
+  assert(enabled.thinkingConfig?.thinkingLevel === "high", "reasoning_effort=enabled 映射为 thinkingLevel=high");
+  const disabled = generationConfigFrom({ reasoning_effort: "disabled" }, "gemini-3.8-flash-high");
+  assert(!disabled.thinkingConfig, "reasoning_effort=disabled 不下发 thinkingConfig");
+  const high = generationConfigFrom({ reasoning_effort: "high" }, "gemini-3.8-flash-high");
+  assert(high.thinkingConfig?.thinkingLevel === "high", "reasoning_effort=high 原样下发");
+  const auto = generationConfigFrom({ reasoning_effort: "auto" }, "gemini-3.8-flash-high");
+  assert(auto.thinkingConfig?.thinkingBudget === -1, "reasoning_effort=auto 使用 thinkingBudget=-1");
+  const weird = generationConfigFrom({ reasoning_effort: "weird-value" }, "gemini-3.8-flash-high");
+  assert(!weird.thinkingConfig, "未知 reasoning_effort 直接丢弃，避免上游 400");
+}
+
 console.log(`\n========================================`);
 console.log(`🎉 全部测试通过！成功: ${passed}, 失败: ${failed}`);
 console.log(`========================================\n`);

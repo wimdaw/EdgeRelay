@@ -298,7 +298,23 @@ function contentToParts(content: unknown): GeminiPart[] {
   return parts
 }
 
-function generationConfigFrom(body: Record<string, any>, modelId?: string): Record<string, unknown> {
+const THINKING_LEVELS = new Set(['minimal', 'low', 'medium', 'high'])
+/** 常见客户端枚举 → Gemini ThinkingLevel；unknown 值直接丢弃，避免上游 400 */
+const THINKING_ALIASES: Record<string, string> = {
+  enabled: 'high',
+  on: 'high',
+  true: 'high',
+  xhigh: 'high',
+  extended: 'high',
+  max: 'high',
+  standard: 'medium',
+  disabled: 'none',
+  off: 'none',
+  false: 'none',
+  none: 'none',
+}
+
+export function generationConfigFrom(body: Record<string, any>, modelId?: string): Record<string, unknown> {
   const cfg: Record<string, unknown> = {}
   const num = (v: unknown): number | undefined => (typeof v === 'number' && Number.isFinite(v) ? v : undefined)
   const temperature = num(body.temperature)
@@ -323,8 +339,15 @@ function generationConfigFrom(body: Record<string, any>, modelId?: string): Reco
     if (typeof effort === 'number') {
       cfg.thinkingConfig = { thinkingBudget: effort }
     } else if (typeof effort === 'string' && effort.trim()) {
-      const e = effort.trim().toLowerCase()
-      cfg.thinkingConfig = e === 'auto' ? { thinkingBudget: -1 } : { thinkingLevel: e }
+      const raw = effort.trim().toLowerCase()
+      const e = THINKING_ALIASES[raw] ?? raw
+      if (e === 'auto') {
+        cfg.thinkingConfig = { thinkingBudget: -1 }
+      } else if (e !== 'none' && THINKING_LEVELS.has(e)) {
+        // 只下发 Gemini 认识的枚举；ZCode 的 "enabled" 等 UI 值不能直接透传，
+        // 否则上游报 Invalid value at ...thinking_level
+        cfg.thinkingConfig = { thinkingLevel: e }
+      }
     }
   }
 
