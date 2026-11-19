@@ -244,17 +244,6 @@ export default function AccountPool() {
     }
   };
 
-  /** 复制定时链接：贴到 cron-job.org / UptimeRobot，每天调用一次即可自动签到 */
-  const copyCheckinLink = async () => {
-    try {
-      const r = await adminAction<{ result: { url: string } }>("codebuddy_checkin_link");
-      await navigator.clipboard.writeText(r.result.url);
-      toast("签到链接已复制，贴到 cron-job.org 每天调用一次", "ok");
-    } catch (e) {
-      toast((e as Error).message, "err");
-    }
-  };
-
   return (
     <div className="flex flex-col gap-4">
       <Card className="p-4 sm:p-5">
@@ -272,14 +261,9 @@ export default function AccountPool() {
             {lastUpdated && <span className="text-xs text-muted">上次更新 {new Date(lastUpdated).toLocaleTimeString("zh-CN", { hour12: false })}</span>}
             <span className="text-xs text-muted"><Users size={12} className="mr-1 inline" />{rows ? `${rows.length} 个渠道 / ${totalAccounts} 个账号` : "未查询"}</span>
             {codebuddy && (
-              <>
-                <Button variant="soft" onClick={runCheckin} disabled={checking}>
-                  <CheckCircle2 size={14} className={cn(checking && "animate-pulse")} />{checking ? "签到中…" : "立即签到"}
-                </Button>
-                <Button variant="soft" onClick={copyCheckinLink}>
-                  <Clock size={14} />定时链接
-                </Button>
-              </>
+              <Button variant="soft" onClick={runCheckin} disabled={checking}>
+                <CheckCircle2 size={14} className={cn(checking && "animate-pulse")} />{checking ? "签到中…" : "立即签到"}
+              </Button>
             )}
             <Button variant="soft" onClick={load} disabled={loading}>
               <RefreshCw size={14} className={cn(loading && "animate-spin")} />{loading ? "查询中…" : "刷新额度"}

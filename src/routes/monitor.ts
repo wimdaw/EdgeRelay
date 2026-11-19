@@ -61,6 +61,16 @@ monitorRouter.get("/video", async (c) => {
       }
     }
 
+    // 全站心跳顺带驱动 CodeBuddy 每日签到：当日去重 + 09:00 前跳过，
+    // 因此每分钟一次的心跳里只有当天首次会真正签到，不需要再单独建定时任务。
+    let checkin: unknown;
+    try {
+      const { maybeRunDailyCheckin } = await import("../checkin");
+      checkin = await maybeRunDailyCheckin(env);
+    } catch (err) {
+      checkin = { ran: false, skipped: (err as Error).message || "签到异常" };
+    }
+
     return new Response(
       JSON.stringify({
         ok: true,
@@ -68,6 +78,7 @@ monitorRouter.get("/video", async (c) => {
         pending: pending.length - completed.length,
         queue_waiting: refreshed.filter((x) => x.waiting_slot).length,
         retried,
+        checkin,
         newly_completed: completed,
         tasks: all.slice(0, 20).map((t) => {
           const fresh = refreshed.find((x) => x.id === t.id);

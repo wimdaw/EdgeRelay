@@ -43,6 +43,31 @@ function cstDay(): string {
   return new Date(Date.now() + 8 * 3600_000).toISOString().slice(0, 10);
 }
 
+/** 北京时间整点（0-23），用于把签到限定在白天的第一个心跳 */
+function cstHour(): number {
+  return new Date(Date.now() + 8 * 3600_000).getUTCHours();
+}
+
+/** 签到最早触发时间（北京时间）：早于该时刻的心跳不签到，避免零点刚过就撞上游刷新窗口 */
+const CHECKIN_START_HOUR = 9;
+
+/**
+ * 供「全站定时任务」调用：已并入 /api/monitor/video 心跳，不需要额外定时器。
+ *  - 09:00 之前直接跳过（不再读 Blob，几乎零成本）
+ *  - 当日已签到由 runCodebuddyCheckinAll 的日期戳挡掉
+ * 因此每 60 秒一次的心跳里，只有当天 09:00 后的第一次会真正执行签到。
+ */
+export async function maybeRunDailyCheckin(env: Env): Promise<{
+  ran: boolean;
+  skipped?: string;
+  total?: number;
+  success?: number;
+}> {
+  if (cstHour() < CHECKIN_START_HOUR) return { ran: false, skipped: "未到签到时间（北京时间 09:00 后）" };
+  const r = await runCodebuddyCheckinAll(env);
+  return { ran: r.ran, skipped: r.skipped, total: r.total, success: r.success };
+}
+
 export async function runCodebuddyCheckinAll(
   env: Env,
   opts: { force?: boolean } = {}

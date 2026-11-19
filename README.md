@@ -129,6 +129,27 @@ cloudflared tunnel --url http://127.0.0.1:20141
 
 ---
 
+## ⏱️ 全站定时任务（外部巡检）
+
+视频排队重投与 CodeBuddy（WorkBuddy）每日签到**共用同一个心跳**，不需要分别建定时任务：
+
+```text
+GET /api/monitor/video?token=…     # cron-job.org / UptimeRobot，建议每 60 秒
+```
+
+每轮会：
+
+- 刷新未完成的视频任务、按 60 秒节奏重投排队中的任务
+- 顺带触发 CodeBuddy 每日签到：**北京时间 09:00 前跳过**，当天只真正执行一次
+  （日期戳去重，心跳误配成秒级也不会重复签到）
+- 响应里的 `checkin` 字段返回本轮签到结果（`ran` / `skipped` / `total` / `success`）
+
+签到失败不会影响视频巡检，`checkin` 会带上失败原因。需要人工补签时，在控制台
+「账号池」点「立即签到」即可；`/api/monitor/checkin` 仅作为独立补签入口保留，
+无需为它单独配置定时器。
+
+---
+
 ## 📋 API 路由一览
 
 | 路径 | 方法 | 说明 |
