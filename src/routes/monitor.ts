@@ -91,3 +91,28 @@ monitorRouter.get("/video", async (c) => {
     return errorResponse(c, err);
   }
 });
+
+/** 签到定时链接的签名主体（与视频监控链接分开，互不通用） */
+export const CODEBUDDY_CHECKIN_SUBJECT = "__codebuddy_checkin__";
+
+/**
+ * 外部定时入口 /api/monitor/checkin?token=…
+ *
+ * 给 cron-job.org / UptimeRobot 每天打一次，自动跑完所有 CodeBuddy（WorkBuddy）账号的每日签到。
+ * 同日重复调用会被 src/checkin.ts 的日期戳挡掉，误配成分钟级也不会重复签到。
+ */
+monitorRouter.get("/checkin", async (c) => {
+  const env = c.env;
+  try {
+    if (!(await verifyVideoToken(env, CODEBUDDY_CHECKIN_SUBJECT, c.req.query("token")))) {
+      throw new ApiError(403, ErrorCode.FORBIDDEN, "签到链接无效或已过期");
+    }
+    const { runCodebuddyCheckinAll } = await import("../checkin");
+    const r = await runCodebuddyCheckinAll(env);
+    return new Response(JSON.stringify({ ok: true, ...r, checked_at: Math.floor(Date.now() / 1000) }), {
+      headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+    });
+  } catch (err) {
+    return errorResponse(c, err);
+  }
+});

@@ -117,8 +117,8 @@ adminRouter.post("/actions", async (c) => {
     } else if (action === "oauth_poll") {
       // 授权轮询不要求二次验证，但仅限超级管理员
       requireRole(user, ["superadmin"]);
-    } else if (action === "account_pool") {
-      // 账号池会解密凭据并查询上游额度，仅限超级管理员
+    } else if (action === "account_pool" || action === "codebuddy_checkin" || action === "codebuddy_checkin_link") {
+      // 账号池会解密凭据并查询上游额度；签到同样要解密 refresh_token，仅限超级管理员
       requireRole(user, ["superadmin"]);
     } else if (READ_ACTIONS.has(action)) {
       requireRole(user, ["superadmin", "admin", "auditor"]);
@@ -564,6 +564,36 @@ adminRouter.post("/actions", async (c) => {
         const { buildAccountPool } = await import("../account-pool");
         const rows = await buildAccountPool(env, list);
         return json({ ok: true, providers: rows });
+      }
+
+      /* ---- CodeBuddy（WorkBuddy）每日签到 ---- */
+      case "codebuddy_checkin": {
+        // 控制台手动触发：force 跳过去重，便于人工核对今日签到结果
+        const { runCodebuddyCheckinAll } = await import("../checkin");
+        const run = await runCodebuddyCheckinAll(env, { force: true });
+        return done(run, "checkin", "codebuddy");
+      }
+
+      case "codebuddy_checkin_link": {
+        // 签发外部定时链接（免登录，仅能触发签到），默认 30 天，days=0 表示永久
+        const { signVideoToken } = await import("../video");
+        const { CODEBUDDY_CHECKIN_SUBJECT } = await import("./monitor");
+        const rawDays = p.days === undefined || p.days === null || p.days === "" ? 30 : Number(p.days);
+        const days = Number.isFinite(rawDays) ? Math.max(0, Math.min(3650, rawDays)) : 30;
+        const forever = days === 0;
+        const ttl = forever ? 0 : days * 86_400;
+        const token = await signVideoToken(env, CODEBUDDY_CHECKIN_SUBJECT, ttl);
+        const { publicOrigin } = await import("../public-url");
+        const origin = publicOrigin({ req: { header: (n: string) => hCtx.req.header(n) } }, env);
+        return json({
+          ok: true,
+          result: {
+            url: `${origin}/api/monitor/checkin?token=${encodeURIComponent(token)}`,
+            never_expires: forever,
+            expires_at: forever ? null : Math.floor(Date.now() / 1000) + ttl,
+            interval_hint: "建议每天调用一次（09:00 前后）",
+          },
+        });
       }
 
       /* ---- OAuth 渠道授权 ---- */

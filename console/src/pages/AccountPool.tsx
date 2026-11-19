@@ -203,6 +203,8 @@ export default function AccountPool() {
   const [rows, setRows] = useState<PoolProvider[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
+  const [tab, setTab] = useState<string>("all");
+  const [checking, setChecking] = useState(false);
   const toast = useToast();
 
   const load = async () => {
@@ -221,6 +223,37 @@ export default function AccountPool() {
   };
 
   const totalAccounts = (rows || []).reduce((n, p) => n + p.accounts.length, 0);
+  const codebuddy = (rows || []).find((p) => p.kind === "oauth:codebuddy");
+  const visibleRows = (rows || []).filter((p) => tab === "all" || p.id === tab);
+
+  /** 立即签到：手动跑一轮，force 跳过后端「今日已签」去重，方便核对结果 */
+  const runCheckin = async () => {
+    setChecking(true);
+    try {
+      const r = await adminAction<{ result: { total: number; success: number; day: string; providers: Array<{ name: string; accounts: Array<{ ok: boolean; message?: string }> }> } }>("codebuddy_checkin");
+      const res = r.result;
+      const failed = (res?.providers || []).flatMap((p) => p.accounts.filter((a) => !a.ok));
+      if (!res || !res.total) toast("没有可签到的 CodeBuddy 账号", "err");
+      else if (failed.length) toast(`签到完成：成功 ${res.success}/${res.total}，${failed.length} 个失败：${failed[0].message || "未知原因"}`, "err");
+      else toast(`签到完成：${res.success}/${res.total} 个账号成功`, "ok");
+      await load();
+    } catch (e) {
+      toast((e as Error).message, "err");
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  /** 复制定时链接：贴到 cron-job.org / UptimeRobot，每天调用一次即可自动签到 */
+  const copyCheckinLink = async () => {
+    try {
+      const r = await adminAction<{ result: { url: string } }>("codebuddy_checkin_link");
+      await navigator.clipboard.writeText(r.result.url);
+      toast("签到链接已复制，贴到 cron-job.org 每天调用一次", "ok");
+    } catch (e) {
+      toast((e as Error).message, "err");
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -238,6 +271,16 @@ export default function AccountPool() {
           <div className="flex items-center gap-2">
             {lastUpdated && <span className="text-xs text-muted">上次更新 {new Date(lastUpdated).toLocaleTimeString("zh-CN", { hour12: false })}</span>}
             <span className="text-xs text-muted"><Users size={12} className="mr-1 inline" />{rows ? `${rows.length} 个渠道 / ${totalAccounts} 个账号` : "未查询"}</span>
+            {codebuddy && (
+              <>
+                <Button variant="soft" onClick={runCheckin} disabled={checking}>
+                  <CheckCircle2 size={14} className={cn(checking && "animate-pulse")} />{checking ? "签到中…" : "立即签到"}
+                </Button>
+                <Button variant="soft" onClick={copyCheckinLink}>
+                  <Clock size={14} />定时链接
+                </Button>
+              </>
+            )}
             <Button variant="soft" onClick={load} disabled={loading}>
               <RefreshCw size={14} className={cn(loading && "animate-spin")} />{loading ? "查询中…" : "刷新额度"}
             </Button>
@@ -246,6 +289,26 @@ export default function AccountPool() {
         <p className="mt-3 rounded-lg border border-line bg-surface2/40 px-3 py-2 text-[11px] text-muted">
           进入页面不会自动查询；点击「刷新额度」后才会实时请求，账号较多时可能需要几秒。查询失败不会影响账号正常调用，只影响本页展示。
         </p>
+
+        {rows && rows.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            <button
+              onClick={() => setTab("all")}
+              className={cn("rounded-lg px-2.5 py-1 text-[11px] transition-colors", tab === "all" ? "bg-brand/15 text-brand" : "bg-surface2/60 text-muted hover:text-ink")}
+            >
+              全部 · {rows.length}
+            </button>
+            {rows.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setTab(p.id)}
+                className={cn("rounded-lg px-2.5 py-1 text-[11px] transition-colors", tab === p.id ? "bg-brand/15 text-brand" : "bg-surface2/60 text-muted hover:text-ink")}
+              >
+                {p.name} · {p.accounts.length}
+              </button>
+            ))}
+          </div>
+        )}
       </Card>
 
       {rows === null ? (
@@ -254,7 +317,7 @@ export default function AccountPool() {
         <Card><EmptyState icon={<Wallet size={32} />} title="暂无 OAuth / Web 账号" hint="先在「供应商」页的 OAuth 授权或 Web 反代选项卡接入渠道账号。" /></Card>
       ) : (
         <div className="flex flex-col gap-3.5">
-          {rows.map((p) => (
+          {visibleRows.map((p) => (
             <Card key={p.id} className={cn("p-4", p.status === "disabled" && "opacity-75 border-dashed")}>
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2.5">
                 <div className="flex min-w-0 items-center gap-2.5">
