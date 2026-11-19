@@ -594,11 +594,13 @@ export async function handleAntigravityRequest(p: AntigravityCallParams): Promis
         signal: AbortSignal.timeout(300000),
       })
       let upstream = await send()
-      // 429 可能是「每分钟突发限流」而不是账号配额耗尽：短退避重试一次，
-      // 避免一次瞬时 429 直接把账号冷却 30 分钟、整条渠道跟着不可用。
-      if (upstream.status === 429) {
+      // 429 可能是「每分钟/每秒突发限流」而不是账号配额耗尽：退避重试两次，
+      // 避免 Agent 类客户端并行请求时一次瞬时 429 直接让整条渠道失败。
+      for (let retry = 0; retry < 2 && upstream.status === 429; retry++) {
         const retryAfterSec = Number(upstream.headers.get('retry-after'))
-        const waitMs = retryAfterSec > 0 ? Math.min(retryAfterSec * 1000, 5000) : 1500
+        const waitMs = retryAfterSec > 0
+          ? Math.min(retryAfterSec * 1000, 10_000)
+          : (retry === 0 ? 4000 : 8000)
         await sleep(waitMs)
         upstream = await send()
       }
