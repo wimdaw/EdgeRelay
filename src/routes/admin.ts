@@ -29,6 +29,7 @@ import {
   getModels,
   upsertModel,
   deleteModel,
+  deletePricing,
   getAllPricing,
   setPricing,
   getAuditLogs,
@@ -135,6 +136,7 @@ adminRouter.post("/actions", async (c) => {
         "delete_model",
         "import_models",
         "set_pricing",
+        "delete_pricing",
         "set_settings",
         "set_smtp",
         "delete_audit_log",
@@ -884,6 +886,20 @@ adminRouter.post("/actions", async (c) => {
         if (!p.id) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少模型 id");
         await deleteModel(env, String(p.id));
         return done(null, "model", String(p.id));
+      }
+      case "delete_pricing": {
+        // 支持单个 publicName 或批量 publicNames，用于清理已删模型遗留的孤儿定价
+        const names = Array.isArray(p.publicNames)
+          ? p.publicNames.map(String)
+          : p.publicName
+          ? [String(p.publicName)]
+          : [];
+        if (!names.length) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 publicName");
+        let removed = 0;
+        for (const name of names) {
+          if (await deletePricing(env, name)) removed++;
+        }
+        return done({ removed, total: names.length }, "pricing", `${removed}/${names.length}`);
       }
       case "list_pricing": {
         const pricing = await getAllPricing(env);

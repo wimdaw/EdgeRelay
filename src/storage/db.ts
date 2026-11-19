@@ -208,10 +208,13 @@ export async function upsertModel(env: any, model: ModelRouteRecord): Promise<vo
 
 export async function deleteModel(env: any, modelId: string): Promise<void> {
   const models = await getModels(env);
-  await setModels(
-    env,
-    models.filter((m) => m.id !== modelId)
-  );
+  const target = models.find((m) => m.id === modelId);
+  const remaining = models.filter((m) => m.id !== modelId);
+  await setModels(env, remaining);
+  // 同一对外名可能存在多条别名映射：只有当没有模型再用这个名字时才清定价，避免误删
+  if (target && !remaining.some((m) => m.publicName === target.publicName)) {
+    await deletePricing(env, target.publicName);
+  }
 }
 
 export async function getAllPricing(env: any): Promise<Record<string, ModelPricingRecord>> {
@@ -221,6 +224,16 @@ export async function getAllPricing(env: any): Promise<Record<string, ModelPrici
 export async function setPricing(env: any, pricing: ModelPricingRecord): Promise<void> {
   const map = await getAllPricing(env);
   await saveConfigSnapshot(env, { pricing: { ...map, [pricing.publicName]: pricing } });
+}
+
+/** 删除某对外名的定价；返回是否确实存在并已删除 */
+export async function deletePricing(env: any, publicName: string): Promise<boolean> {
+  const map = await getAllPricing(env);
+  if (!(publicName in map)) return false;
+  const next = { ...map };
+  delete next[publicName];
+  await saveConfigSnapshot(env, { pricing: next });
+  return true;
 }
 
 // ==========================================
