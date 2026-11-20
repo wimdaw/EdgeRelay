@@ -14,7 +14,7 @@ export default function ScheduledTasks({ me }: { me: Me }) {
 
   const tabs: Array<["videos" | "checkin", string]> = [
     ["videos", "视频任务"],
-    ...(isSuperadmin ? ([["checkin", "签到任务"]] as const) : []),
+    ...(isSuperadmin ? ([["checkin", "签到任务"]] as Array<["videos" | "checkin", string]>) : []),
   ];
 
   return (
