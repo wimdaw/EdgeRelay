@@ -429,9 +429,9 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     method: "POST",
     headers: await upstreamHeaders(p.refreshToken, isBigmodel ? "access" : "jwt"),
     body: JSON.stringify(upstreamBody),
-    // EdgeOne 云函数硬限 120s：超时上限必须收敛在平台限制内（留 10s 余量），
-    // 否则上游还在跑、函数已被平台杀掉，客户端表现为连接被切断后无限重连。
-    signal: AbortSignal.timeout(110_000),
+    // EdgeOne 云函数硬限 120s：上游超时直接对齐平台上限，把可用生成窗口用满。
+    // 到点后无论谁先终止，客户端都会看到连接结束并自行重试，不会无限挂起。
+    signal: AbortSignal.timeout(120_000),
   });
   const raw = await res.text().catch(() => "");
   let env: any = null;
