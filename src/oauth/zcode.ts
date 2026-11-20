@@ -421,14 +421,34 @@ export async function fetchZcodeModels(_env: Env, _jwt: string): Promise<{ succe
 export async function probeZcode(
   env: Env,
   jwt: string
-): Promise<{ balance: { status: number; body: string }; preview: { status: number; body: string } }> {
+): Promise<{
+  claims: Record<string, unknown>;
+  balance: { status: number; body: string };
+  preview: { status: number; body: string };
+}> {
   const headers = await upstreamHeaders(jwt);
   const get = async (url: string) => {
     const r = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
     const t = await r.text().catch(() => "");
     return { status: r.status, body: t.slice(0, 2000) };
   };
+  // JWT 明文声明（不校验签名，仅用于确认凭据属于哪个账号/是否过期）
+  let claims: Record<string, unknown> = {};
+  try {
+    const payload = jwt.split(".")[1] || "";
+    claims = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    const exp = Number(claims.exp) || 0;
+    claims = {
+      user_id: claims.user_id ?? claims.uid ?? null,
+      exp: exp ? new Date(exp * 1000).toISOString() : null,
+      expired: exp ? exp * 1000 < Date.now() : null,
+      keys: Object.keys(claims).slice(0, 12),
+    };
+  } catch {
+    claims = { error: "jwt 解析失败" };
+  }
   return {
+    claims,
     balance: await get(`${ZCODE_BASE}${BALANCE_PATH}`),
     preview: await get(`${ZCODE_BASE}${PREVIEW_PATH}`),
   };
