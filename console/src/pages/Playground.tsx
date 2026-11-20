@@ -62,6 +62,8 @@ export default function Playground({ me }: { me: Me }) {
   const [audioVolume, setAudioVolume] = useState("+0%");
   const [audioPitch, setAudioPitch] = useState("+0Hz");
   const [previewing, setPreviewing] = useState(false);
+  /** 用户手动点过端点选项卡后为 true：此后选模型不再自动跳端点（尊重手动选择） */
+  const [manualEndpoint, setManualEndpoint] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -114,18 +116,10 @@ export default function Playground({ me }: { me: Me }) {
 
   /** 规范调用格式：渠道ID/模型名（与模型池一致，可精确路由到渠道） */
   const canonicalId = (m: ModelItem) => `${m.slug}/${m.id}`;
-  /** 按当前端点过滤模型 */
+  /** 当前端点推荐模型（分类匹配） */
   const kindModels = useMemo(() => models.filter((m) => m.kind === endpoint), [models, endpoint]);
-  /** 当前分类下的模型按渠道分组（下拉 optgroup） */
-  const groupedModels = useMemo(() => {
-    const map = new Map<string, ModelItem[]>();
-    for (const m of kindModels) {
-      const arr = map.get(m.provider) || [];
-      arr.push(m);
-      map.set(m.provider, arr);
-    }
-    return [...map.entries()];
-  }, [kindModels]);
+  /** 其他模型（分类不匹配，但允许手动跨端点尝试，比如能生图的对话模型） */
+  const otherModels = useMemo(() => models.filter((m) => m.kind !== endpoint), [models, endpoint]);
   /** 音色按语言分组 */
   const voiceGroups = useMemo(() => {
     const map = new Map<string, VoiceItem[]>();
@@ -142,12 +136,13 @@ export default function Playground({ me }: { me: Me }) {
   /** 模型与端点不匹配时给出自动切换提示 */
   const modelMismatch = needModel && !!activeModel && activeModel.kind !== endpoint;
 
-  /** 切换端点：模型下拉自动切到该分类下第一个可用模型 */
+  /**
+   * 切换端点：手动操作。保留当前选择的模型（分类不匹配也能跨端点尝试），
+   * 下拉里会用「推荐」分组提示该端点的原生模型。
+   */
   const switchEndpoint = (next: EndpointKey) => {
+    setManualEndpoint(true);
     setEndpoint(next);
-    if (next === "audio") return;
-    const list = models.filter((m) => m.kind === next);
-    if (list.length && !list.some((m) => canonicalId(m) === model)) setModel(canonicalId(list[0]));
   };
 
   /** 选择模型：自动匹配对应端点（如选了图片模型自动切到图片端点） */
@@ -155,6 +150,10 @@ export default function Playground({ me }: { me: Me }) {
     setModel(id);
     const m = models.find((x) => canonicalId(x) === id);
     if (m && m.kind !== endpoint) {
+      if (manualEndpoint) {
+        // 用户手动选过端点：尊重当前端点，允许跨端点尝试（如能生图的对话模型走图片端点）
+        return;
+      }
       setEndpoint(m.kind);
       toast(`已自动切换到「${ENDPOINTS.find((e) => e.key === m.kind)?.label}」端点`);
     }
@@ -537,28 +536,38 @@ export default function Playground({ me }: { me: Me }) {
             {needModel ? (
               <div>
                 <label className="mb-1 block text-[11px] font-medium text-muted">模型</label>
-                {kindModels.length > 0 ? (
+                {models.length > 0 ? (
                   <Select value={model} onChange={(e) => pickModel(e.target.value)} className="w-full">
-                    {!kindModels.some((m) => canonicalId(m) === model) && <option value="">请选择模型</option>}
-                    {groupedModels.map(([prov, list]) => (
-                      <optgroup key={prov} label={prov}>
-                        {list.map((m) => (
+                    {!models.some((m) => canonicalId(m) === model) && <option value="">请选择模型</option>}
+                    {kindModels.length > 0 && (
+                      <optgroup label={`✓ 推荐 · ${ENDPOINTS.find((e) => e.key === endpoint)?.label}端点`}>
+                        {kindModels.map((m) => (
                           <option key={`${m.slug}/${m.id}`} value={canonicalId(m)}>
                             {canonicalId(m)}
                             {m.paid ? "（付费）" : ""}
                           </option>
                         ))}
                       </optgroup>
-                    ))}
+                    )}
+                    {otherModels.length > 0 && (
+                      <optgroup label="其他模型（可手动跨端点尝试）">
+                        {otherModels.map((m) => (
+                          <option key={`${m.slug}/${m.id}`} value={canonicalId(m)}>
+                            {canonicalId(m)}
+                            {m.paid ? "（付费）" : ""}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
                   </Select>
                 ) : (
                   <div className="rounded-lg border border-line bg-surface2 px-2.5 py-2 text-[11px] text-muted">{KIND_EMPTY_HINT[endpoint]}</div>
                 )}
                 <p className="mt-1 text-[10px] text-muted">
                   {modelMismatch
-                    ? `当前模型属于「${ENDPOINTS.find((e) => e.key === activeModel?.kind)?.label}」端点，已为你自动切换`
+                    ? `当前模型分类属于「${ENDPOINTS.find((e) => e.key === activeModel?.kind)?.label}」，已按你的手动选择保留在当前端点`
                     : me.user.role === "superadmin" || me.user.role === "admin"
-                    ? "管理员可见全部模型（含付费）"
+                    ? "管理员可见全部模型（含付费）；推荐组为该端点原生模型"
                     : "普通用户仅显示免费模型"}
                 </p>
               </div>
