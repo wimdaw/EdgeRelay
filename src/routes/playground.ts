@@ -103,7 +103,9 @@ function classifyPlaygroundModel(publicName: string, upstreamModel: string, prov
   const kind = (providerKind || "").toLowerCase();
   const up = (upstreamModel || "").toLowerCase();
   const name = (publicName || "").toLowerCase();
-  if (kind === "agnes_video" || kind === "agnes-video" || /^agnes-video/.test(up) || /(video|veo|kling|runway|sora|pika|hailuo|vidu)/i.test(name)) {
+  // 检测/审核类模型名字里常带 video/image 字样，但它们不是生成端点，归入 chat
+  const isDetector = /detect|detector|moderation|guard/i.test(name);
+  if (!isDetector && (kind === "agnes_video" || kind === "agnes-video" || /^agnes-video/.test(up) || /(video|veo|kling|runway|sora|pika|hailuo|vidu)/i.test(name))) {
     return "video";
   }
   if (kind === "agnes_image" || kind === "agnes-image" || /^agnes-image/.test(up) || /(dall-e|dalle|flux|sdxl|stable-diffusion|image|imagen|midjourney|seedream|banana)/i.test(name)) {
