@@ -415,6 +415,26 @@ export async function fetchZcodeModels(_env: Env, _jwt: string): Promise<{ succe
 }
 
 // =====================================================================
+// 诊断：原样返回余额与可领套餐（排查"体验额度没找对套餐"）
+// =====================================================================
+
+export async function probeZcode(
+  env: Env,
+  jwt: string
+): Promise<{ balance: { status: number; body: string }; preview: { status: number; body: string } }> {
+  const headers = await upstreamHeaders(jwt);
+  const get = async (url: string) => {
+    const r = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
+    const t = await r.text().catch(() => "");
+    return { status: r.status, body: t.slice(0, 2000) };
+  };
+  return {
+    balance: await get(`${ZCODE_BASE}${BALANCE_PATH}`),
+    preview: await get(`${ZCODE_BASE}${PREVIEW_PATH}`),
+  };
+}
+
+// =====================================================================
 // 签到（领取额度包）
 // =====================================================================
 
