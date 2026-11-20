@@ -387,3 +387,10 @@ git checkout edgeone
 | `b2e3e171` | 按站点选择接口与令牌 |
 | `45448d23` | ZCode 国内/国际双版本 + 站点×令牌矩阵 |
 | `99c167b2` | device_id 持久化 / metadata 恢复 / 登录过期判断 |
+
+### 4. 2026-11-20 收尾：对齐 angusdevgo/ZCode2api 基线
+
+- 网关侧实现以 `angusdevgo/ZCode2api` 为基线：`zcode.z.ai/api/v1/zcode-plan/anthropic/v1/messages`、官方 system 三段原文、`metadata.user_id` 按账号派生、签到走 `billing/preview` + 兜底包 id + `1003` 判定。
+- 额外补充（不改变基线行为）：凭据可携带 `access_token` 与真实 `device_id`（`jwt|access|device`），请求头 `x-device-mid` 优先用真实值。
+- 当前线上：渠道 `zcode-oauth`，baseUrl `https://zcode.z.ai`，1 个账号，模型 `GLM-5.3` / `GLM-5.3-Flash`，自动领额度开启。
+- 待测：账号为 start plan 体验额度，等本周末额度领取后再验证一次；若仍 `1005`，下一步对比客户端请求头（重点看是否含 captcha 类字段）。
