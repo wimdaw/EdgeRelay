@@ -565,15 +565,21 @@ export default function Providers() {
 
       let providerId = reuse ? existing!.id : "";
       if (!providerId) {
-        await adminActionStepUp("upsert_provider", {
-          name,
-          slug,
-          kind: `oauth:${meta.type}`,
-          baseUrl,
-        });
-        const d = await adminAction<{ providers: Provider[] }>("list_providers");
-        providerId = d.providers.find((x) => x.slug === slug)?.id || "";
-        setRows(d.providers);
+        // 创建前先按 slug 去重：同 slug 渠道已存在则直接复用，避免重复授权/重试时堆积同号空渠道
+        const d0 = await adminAction<{ providers: Provider[] }>("list_providers");
+        setRows(d0.providers);
+        providerId = d0.providers.find((x) => x.slug === slug)?.id || "";
+        if (!providerId) {
+          await adminActionStepUp("upsert_provider", {
+            name,
+            slug,
+            kind: `oauth:${meta.type}`,
+            baseUrl,
+          });
+          const d = await adminAction<{ providers: Provider[] }>("list_providers");
+          providerId = d.providers.find((x) => x.slug === slug)?.id || "";
+          setRows(d.providers);
+        }
       }
       if (!providerId) throw new Error("OAuth 渠道创建失败");
       const r = await adminActionStepUp<{ result?: { fingerprint?: string } }>("upsert_provider_key", {
@@ -647,16 +653,24 @@ export default function Providers() {
     // 保留创建通道 + 粘贴 access_token 的兜底，新用户请改用 zchat.z.ai 授权。
     if (meta.type === "zcode" && /bigmodel\.cn/i.test(baseUrl)) {
       try {
-        await adminActionStepUp("upsert_provider", {
-          name: "ZCode 国内版 (bigmodel·旧)",
-          slug: "zcode-bigmodel-oauth",
-          kind: "oauth:zcode",
-          baseUrl,
-        });
-        const d = await adminAction<{ providers: Provider[] }>("list_providers");
+        // 创建前先按 slug 去重：旧版国内渠道已存在则直接复用，避免每次进入授权兜底流程都堆积一个空渠道
+        const d0 = await adminAction<{ providers: Provider[] }>("list_providers");
+        let created = false;
+        if (!d0.providers.some((x) => x.slug === "zcode-bigmodel-oauth")) {
+          await adminActionStepUp("upsert_provider", {
+            name: "ZCode 国内版 (bigmodel·旧)",
+            slug: "zcode-bigmodel-oauth",
+            kind: "oauth:zcode",
+            baseUrl,
+          });
+          created = true;
+        }
+        const d = created ? await adminAction<{ providers: Provider[] }>("list_providers") : d0;
         setRows(d.providers);
         setOauthDlg(null);
-        toast("已创建旧版国内渠道：请粘贴客户端 access_token。注意 bigmodel 微信扫码已下线，建议改用 zchat.z.ai 重新授权", "ok");
+        toast(created
+          ? "已创建旧版国内渠道：请粘贴客户端 access_token。注意 bigmodel 微信扫码已下线，建议改用 zchat.z.ai 重新授权"
+          : "旧版国内渠道已存在，直接复用：请在该渠道卡片上粘贴客户端 access_token。注意 bigmodel 微信扫码已下线，建议改用 zchat.z.ai 重新授权", "ok");
       } catch (e) {
         setOauthDlg((x) => (x ? { ...x, step: "error", message: (e as Error).message } : x));
       }
