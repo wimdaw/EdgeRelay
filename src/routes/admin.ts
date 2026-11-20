@@ -2,7 +2,7 @@
  * 管理后台统一路由 /api/admin/*
  */
 import { Hono } from "hono";
-import type { Env, HandlerCtx, PlatformSettings, UserRole } from "../types";
+import type { Env, HandlerCtx, PlatformSettings, ProviderRecord, UserRole } from "../types";
 import { ROLE_HIERARCHY } from "../types";
 import { requireAdminStepUp, requireUser, requireRole, clientIp } from "../auth";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
@@ -77,6 +77,108 @@ async function withProviderKeyWriteLock<T>(providerId: string, fn: () => Promise
 /** 与落库字段一致的 Key 指纹（sha256 前 16 位十六进制） */
 async function fingerprintProviderKeys(rawKeys: string[]): Promise<string[]> {
   return mapLimit(rawKeys, 8, async (plaintext) => (await sha256Hex(plaintext)).slice(0, 16));
+}
+
+/**
+ * 保存凭据的共享实现（upsert_provider_key 与 oauth_add_account 复用）：
+ * 写锁内按既有指纹去重，OAuth 渠道按账号身份覆盖旧凭据（同号重新授权不重复入库）。
+ * precomputed 传入预加密凭据（单 key 场景）：调用方先把「可能失败的加密」做完再写库，
+ * 保证添加失败时一个字节都没落库。
+ */
+async function addProviderKeys(
+  env: Env,
+  providerId: string,
+  opts: {
+    rawKeys: string[];
+    email?: string;
+    identity?: string;
+    label?: string;
+    keyId?: string;
+    status?: "active" | "disabled";
+    now: number;
+    precomputed?: { encryptedKey: string; fingerprint: string };
+  }
+): Promise<{ added: { id: string; fingerprint: string }[]; skipped: string[]; replaced?: number }> {
+  const { rawKeys, email, identity, label, keyId, status, now, precomputed } = opts;
+  return withProviderKeyWriteLock(providerId, async () => {
+    // 以库内既有指纹为准做幂等：重复点击、刷新重提、同批粘贴重复都不会新增记录
+    const existing = await getProviderKeysAll(env, providerId);
+    const known = new Set(existing.map((k) => k.keyFingerprint).filter(Boolean));
+    const fingerprints = precomputed && rawKeys.length === 1 ? [precomputed.fingerprint] : await fingerprintProviderKeys(rawKeys);
+
+    // 同一账号重新授权：凭据内容变了（如新增 access_token），指纹也会变。
+    // 先按账号身份找到旧记录并原地覆盖，避免出现两个“同号”账号。
+    if (identity && rawKeys.length === 1) {
+      const providers = await getProviders(env);
+      const prov = providers.find((x) => x.id === providerId);
+      // 各 OAuth 渠道的账号身份提取方式不同：凭据内容变了（指纹随之变化）时，
+      // 必须按账号 uid 找到旧记录原地覆盖，否则会出现两个“同号”账号。
+      let extractUid: ((raw: string) => string) | null = null;
+      if (prov?.kind === "oauth:zcode") {
+        const { parseZcodeCredential, userIdFromJwt } = await import("../oauth/zcode");
+        extractUid = (raw) => userIdFromJwt(parseZcodeCredential(raw).jwt);
+      } else if (prov?.kind === "oauth:qoder") {
+        const { parseQoderCredential } = await import("../oauth/qoder");
+        extractUid = (raw) => parseQoderCredential(raw)?.uid || "";
+      } else if (prov?.kind === "oauth:trae") {
+        const { parseTraeCredential } = await import("../oauth/trae");
+        extractUid = (raw) => parseTraeCredential(raw, prov?.baseUrl)?.uid || "";
+      }
+      if (extractUid) {
+        for (const k of existing) {
+          try {
+            const rawOld = await decryptSecret(env, k.encryptedKey);
+            if (extractUid(rawOld) === identity) {
+              await bulkUpsertProviderKeys(env, providerId, [
+                {
+                  ...k,
+                  encryptedKey: precomputed?.encryptedKey ?? (await encryptSecret(env, rawKeys[0]!)),
+                  keyFingerprint: fingerprints[0]!,
+                  ...(email ? { email } : {}),
+                  status: "active",
+                  createdAt: k.createdAt,
+                },
+              ]);
+              return { added: [{ id: k.id, fingerprint: fingerprints[0]! }], skipped: [], replaced: 1 };
+            }
+          } catch {
+            /* 单条解密失败不影响其它记录 */
+          }
+        }
+      }
+    }
+    const picked: { plaintext: string; index: number; fingerprint: string }[] = [];
+    const skipped: string[] = [];
+    rawKeys.forEach((plaintext, i) => {
+      const fp = fingerprints[i]!;
+      if (known.has(fp)) {
+        skipped.push(fp);
+        return;
+      }
+      known.add(fp); // 同一次 payload 内的重复也只保留一条
+      picked.push({ plaintext, index: i, fingerprint: fp });
+    });
+
+    const added: { id: string; fingerprint: string }[] = [];
+    const records = await mapLimit(picked, 8, async ({ plaintext, index, fingerprint }) => {
+      const encryptedKey = rawKeys.length === 1 && precomputed ? precomputed.encryptedKey : await encryptSecret(env, plaintext);
+      const id = rawKeys.length === 1 && keyId ? keyId : uuid();
+      const recLabel = rawKeys.length > 1 && !label ? `key-${index + 1}` : String(label ?? "prod");
+      added.push({ id, fingerprint });
+      return {
+        id,
+        providerId,
+        label: recLabel,
+        encryptedKey,
+        keyFingerprint: fingerprint,
+        ...(email ? { email } : {}),
+        status: (status ?? "active") as "active" | "disabled",
+        createdAt: now,
+      };
+    });
+    if (records.length) await bulkUpsertProviderKeys(env, providerId, records);
+    return { added, skipped };
+  });
 }
 
 /** 管理操作统一入口 */
@@ -156,6 +258,7 @@ adminRouter.post("/actions", async (c) => {
         "save_announcements",
         "oauth_start",
         "oauth_complete",
+        "oauth_add_account",
         "oauth_test",
       ]);
       if (SUPERADMIN_ONLY_ACTIONS.has(action)) {
@@ -455,84 +558,14 @@ adminRouter.post("/actions", async (c) => {
         /** 账号身份（如 oauth 渠道的 uid）：重新授权同一账号时用它覆盖旧凭据，而不是新增一条 */
         const identity = typeof p.identity === "string" ? p.identity.trim() : "";
 
-        const outcome = await withProviderKeyWriteLock(providerId, async () => {
-          // 以库内既有指纹为准做幂等：重复点击、刷新重提、同批粘贴重复都不会新增记录
-          const existing = await getProviderKeysAll(env, providerId);
-          const known = new Set(existing.map((k) => k.keyFingerprint).filter(Boolean));
-          const fingerprints = await fingerprintProviderKeys(rawKeys);
-
-          // 同一账号重新授权：凭据内容变了（如新增 access_token），指纹也会变。
-          // 先按账号身份找到旧记录并原地覆盖，避免出现两个“同号”账号。
-          if (identity && rawKeys.length === 1) {
-            const providers = await getProviders(env);
-            const prov = providers.find((x) => x.id === providerId);
-            // 各 OAuth 渠道的账号身份提取方式不同：凭据内容变了（指纹随之变化）时，
-            // 必须按账号 uid 找到旧记录原地覆盖，否则会出现两个“同号”账号。
-            let extractUid: ((raw: string) => string) | null = null;
-            if (prov?.kind === "oauth:zcode") {
-              const { parseZcodeCredential, userIdFromJwt } = await import("../oauth/zcode");
-              extractUid = (raw) => userIdFromJwt(parseZcodeCredential(raw).jwt);
-            } else if (prov?.kind === "oauth:qoder") {
-              const { parseQoderCredential } = await import("../oauth/qoder");
-              extractUid = (raw) => parseQoderCredential(raw)?.uid || "";
-            } else if (prov?.kind === "oauth:trae") {
-              const { parseTraeCredential } = await import("../oauth/trae");
-              extractUid = (raw) => parseTraeCredential(raw, prov?.baseUrl)?.uid || "";
-            }
-            if (extractUid) {
-              for (const k of existing) {
-                try {
-                  const rawOld = await decryptSecret(env, k.encryptedKey);
-                  if (extractUid(rawOld) === identity) {
-                    await bulkUpsertProviderKeys(env, providerId, [
-                      {
-                        ...k,
-                        encryptedKey: await encryptSecret(env, rawKeys[0]!),
-                        keyFingerprint: fingerprints[0]!,
-                        ...(email ? { email } : {}),
-                        status: "active",
-                        createdAt: k.createdAt,
-                      },
-                    ]);
-                    return { added: [{ id: k.id, fingerprint: fingerprints[0]! }], skipped: [], replaced: 1 };
-                  }
-                } catch {
-                  /* 单条解密失败不影响其它记录 */
-                }
-              }
-            }
-          }
-          const picked: { plaintext: string; index: number; fingerprint: string }[] = [];
-          const skipped: string[] = [];
-          rawKeys.forEach((plaintext, i) => {
-            const fp = fingerprints[i]!;
-            if (known.has(fp)) {
-              skipped.push(fp);
-              return;
-            }
-            known.add(fp); // 同一次 payload 内的重复也只保留一条
-            picked.push({ plaintext, index: i, fingerprint: fp });
-          });
-
-          const added: { id: string; fingerprint: string }[] = [];
-          const records = await mapLimit(picked, 8, async ({ plaintext, index, fingerprint }) => {
-            const encryptedKey = await encryptSecret(env, plaintext);
-            const id = rawKeys.length === 1 && p.id ? String(p.id) : uuid();
-            const label = rawKeys.length > 1 && !p.label ? `key-${index + 1}` : String(p.label ?? "prod");
-            added.push({ id, fingerprint });
-            return {
-              id,
-              providerId,
-              label,
-              encryptedKey,
-              keyFingerprint: fingerprint,
-              ...(email ? { email } : {}),
-              status: ((p.status as "active" | "disabled") ?? "active") as "active" | "disabled",
-              createdAt: now,
-            };
-          });
-          if (records.length) await bulkUpsertProviderKeys(env, providerId, records);
-          return { added, skipped };
+        const outcome = await addProviderKeys(env, providerId, {
+          rawKeys,
+          email,
+          identity,
+          label: p.label === undefined ? undefined : String(p.label),
+          keyId: p.id === undefined ? undefined : String(p.id),
+          status: p.status === undefined ? undefined : (p.status as "active" | "disabled"),
+          now,
         });
 
         return done(
@@ -547,6 +580,83 @@ adminRouter.post("/actions", async (c) => {
           "provider_key",
           providerId
         );
+      }
+
+      case "oauth_add_account": {
+        // OAuth 授权收口：渠道 + 凭据一次性落库。「没添加成功就不要落库」——
+        // 指纹/加密等可能失败的步骤全部在写库前完成；写库阶段先建渠道、再存凭据，
+        // 凭据保存失败立即回滚刚建的渠道，任何失败路径都不会残留 0 账号的空渠道。
+        const type = String(p.provider || "");
+        const { isOAuthType, OAUTH_PROVIDERS } = await import("../oauth");
+        if (!isOAuthType(type)) throw new ApiError(400, ErrorCode.BAD_REQUEST, `不支持的 OAuth 渠道: ${type}`);
+        const refreshToken = String(p.refreshToken ?? p.key ?? "").trim();
+        if (!refreshToken) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 refreshToken");
+
+        const meta = OAUTH_PROVIDERS[type];
+        const slug = String(p.slug || "").trim() || meta.slug;
+        const name = String(p.name || "").trim() || meta.name;
+        const baseUrl = String(p.baseUrl || "").trim() || meta.baseUrl;
+        const email = typeof p.email === "string" && p.email.trim() ? p.email.trim() : undefined;
+        const identity = typeof p.identity === "string" ? p.identity.trim() : "";
+
+        // ① 写库前完成全部可能失败的准备
+        const fingerprints = await fingerprintProviderKeys([refreshToken]);
+        const encryptedKey = await encryptSecret(env, refreshToken);
+
+        // ② 解析渠道：同 slug 已存在则复用（双域渠道的区域变体 slug 由前端按区域定好传上来）
+        const providers = await getProviders(env);
+        const found = providers.find((x) => x.slug === slug);
+        if (found && found.kind !== `oauth:${type}`) {
+          throw new ApiError(400, ErrorCode.BAD_REQUEST, `渠道 slug "${slug}" 已被 ${found.kind} 渠道占用，请换一个 slug`);
+        }
+        const created: ProviderRecord | null = found
+          ? null
+          : {
+              id: uuid(),
+              name,
+              slug,
+              kind: `oauth:${type}`,
+              baseUrl,
+              authScheme: "oauth",
+              extraHeaders: null,
+              status: "active",
+              authorizationRef: null,
+              authorizationExpiresAt: null,
+              createdAt: now,
+            };
+        const providerId = found?.id ?? created!.id;
+        const keyCount = found ? (await getProviderKeysAll(env, providerId)).length : 0;
+        const label = `account-${keyCount + 1}`;
+
+        // ③ 写库：凭据保存失败回滚刚建的渠道；复用的渠道不动（里面已有其他账号）
+        try {
+          if (created) await setProviders(env, [...providers, created]);
+          const outcome = await addProviderKeys(env, providerId, {
+            rawKeys: [refreshToken],
+            email,
+            identity,
+            label,
+            now,
+            precomputed: { encryptedKey, fingerprint: fingerprints[0]! },
+          });
+          return done(
+            {
+              providerId,
+              created: !!created,
+              added: outcome.added,
+              count: outcome.added.length,
+              skipped: outcome.skipped.length,
+              replaced: outcome.replaced ?? 0,
+              duplicate: outcome.skipped.length > 0,
+              fingerprint: outcome.added[0]?.fingerprint ?? outcome.skipped[0],
+            },
+            "provider",
+            providerId
+          );
+        } catch (err) {
+          if (created) await deleteProvider(env, providerId).catch(() => {});
+          throw err;
+        }
       }
 
       /* ---- 生成外部监控链接（免凭据，可贴到 cron-job.org / UptimeRobot） ---- */

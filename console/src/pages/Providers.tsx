@@ -558,10 +558,9 @@ export default function Providers() {
     return [...slugs];
   };
 
-  /** 授权成功后：按需创建渠道 + 加密保存 refresh_token + 自动拉取模型 */
+  /** 授权成功后：渠道 + 凭据一次性原子落库（没添加成功就不落库），再自动拉取模型 */
   const finishOAuth = async (
     meta: OAuthMeta,
-    existing: Provider | null,
     baseUrl: string,
     refreshToken: string,
     email?: string,
@@ -573,37 +572,27 @@ export default function Providers() {
       const variant = oauthVariantOf(meta, baseUrl);
       const slug = variant?.slug ?? meta.slug;
       const name = variant?.name ?? meta.name;
-      // 编辑已有渠道时只在区域一致时复用，否则新建对应区域的渠道
-      const reuse = existing && existing.slug === slug;
-
-      let providerId = reuse ? existing!.id : "";
-      if (!providerId) {
-        // 创建前先按 slug 去重：同 slug 渠道已存在则直接复用，避免重复授权/重试时堆积同号空渠道
-        const d0 = await adminAction<{ providers: Provider[] }>("list_providers");
-        setRows(d0.providers);
-        providerId = d0.providers.find((x) => x.slug === slug)?.id || "";
-        if (!providerId) {
-          await adminActionStepUp("upsert_provider", {
-            name,
-            slug,
-            kind: `oauth:${meta.type}`,
-            baseUrl,
-          });
-          const d = await adminAction<{ providers: Provider[] }>("list_providers");
-          providerId = d.providers.find((x) => x.slug === slug)?.id || "";
-          setRows(d.providers);
-        }
-      }
-      if (!providerId) throw new Error("OAuth 渠道创建失败");
-      const r = await adminActionStepUp<{ result?: { fingerprint?: string } }>("upsert_provider_key", {
-        providerId,
-        key: refreshToken,
-        label: `account-${(reuse ? existing?.key_count ?? 0 : 0) + 1}`,
+      // 渠道创建与凭据保存合并为一次后端原子操作：凭据加密成功前不写库，
+      // 写库阶段失败由后端回滚刚建的渠道，前端不再先建渠道，杜绝残留空渠道
+      const r = await adminActionStepUp<{
+        result?: { providerId?: string; created?: boolean; fingerprint?: string; duplicate?: boolean; count?: number };
+      }>("oauth_add_account", {
+        provider: meta.type,
+        slug,
+        name,
+        baseUrl,
+        refreshToken,
         ...(email ? { email } : {}),
         // 同一账号重新授权时按身份覆盖旧凭据，避免多出一条重复账号
         ...(identity ? { identity } : {}),
       });
-      toast(`授权成功，账号已加密入库（指纹 ${r.result?.fingerprint ?? ""}）`);
+      const providerId = r.result?.providerId || "";
+      if (!providerId) throw new Error("OAuth 渠道保存失败");
+      toast(
+        r.result?.duplicate && r.result?.count === 0
+          ? "该凭据已在池中，未重复添加"
+          : `授权成功，账号已加密入库（指纹 ${r.result?.fingerprint ?? ""}）`
+      );
       stopOAuthPoll();
       setOauthDlg(null);
       const updated = await adminAction<{ providers: Provider[] }>("list_providers");
@@ -617,14 +606,14 @@ export default function Providers() {
     }
   };
 
-  const startOAuthPoll = (meta: OAuthMeta, existing: Provider | null, baseUrl: string, state: string, intervalSec: number) => {
+  const startOAuthPoll = (meta: OAuthMeta, baseUrl: string, state: string, intervalSec: number) => {
     const poll = async () => {
       try {
         const r = await adminAction<any>("oauth_poll", { provider: meta.type, state });
         const res = r.result ?? r;
         const token = res.refresh_token || res.refreshToken;
         if (res.status === "ok" && token) {
-          await finishOAuth(meta, existing, baseUrl, token as string, res.email, res.account?.uid);
+          await finishOAuth(meta, baseUrl, token as string, res.email, res.account?.uid);
           return;
         }
         if (res.status === "error") {
@@ -721,7 +710,7 @@ export default function Providers() {
         message: mode === "device" ? "等待你在浏览器中确认授权…" : mode === "redirect-poll" ? "等待你在浏览器中完成登录…" : undefined,
       });
       if (mode !== "redirect" && d.state) {
-        startOAuthPoll(meta, existing, baseUrl, d.state as string, Number(d.interval) || 5);
+        startOAuthPoll(meta, baseUrl, d.state as string, Number(d.interval) || 5);
       }
     } catch (e) {
       setOauthDlg((d) => (d ? { ...d, step: "error", message: (e as Error).message } : d));
@@ -743,7 +732,7 @@ export default function Providers() {
       });
       const token = r.result?.refreshToken;
       if (!token) throw new Error("上游未返回 refresh_token");
-      await finishOAuth(oauthDlg.meta, oauthDlg.provider, oauthDlg.baseUrl, token, r.result?.email, r.result?.account?.uid);
+      await finishOAuth(oauthDlg.meta, oauthDlg.baseUrl, token, r.result?.email, r.result?.account?.uid);
     } catch (e) {
       toast((e as Error).message, "err");
       setOauthDlg((d) => (d ? { ...d, step: "error", message: (e as Error).message, busy: false } : d));
@@ -1476,7 +1465,7 @@ export default function Providers() {
               该渠道国内版与国际版账号体系完全独立，请选择要授权的区域。选错区域会导致授权成功但无法调用。
             </p>
             {(oauthDlg.meta.regions || []).map((r) => {
-              // 区域选中后按变体 slug 复用该区域已有渠道；没有则走创建（finishOAuth 里还有一次按 slug 兜底去重）
+              // 区域选中后按变体 slug 复用该区域已有渠道；没有则由后端 oauth_add_account 按 slug 建新渠道
               const variant = oauthVariantOf(oauthDlg.meta, r.baseUrl);
               const matched = variant ? (rows ?? []).find((x) => x.slug === variant.slug) ?? null : null;
               return (
