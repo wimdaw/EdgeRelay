@@ -129,9 +129,9 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
       {/* 桌面侧边栏（支持平滑收缩/展开） */}
       <aside
         style={{
-          width: collapsed ? 68 : 224,
-          minWidth: collapsed ? 68 : 224,
-          maxWidth: collapsed ? 68 : 224,
+          width: collapsed ? 68 : 192,
+          minWidth: collapsed ? 68 : 192,
+          maxWidth: collapsed ? 68 : 192,
         }}
         className="hidden shrink-0 flex-col border-r border-line bg-sidebar transition-all duration-200 ease-in-out overflow-x-hidden lg:flex"
       >
