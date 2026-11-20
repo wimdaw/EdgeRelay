@@ -317,3 +317,73 @@ git checkout edgeone
   - 现状：`pull-ai-gateway.ps1` 含明文 GitHub token；`ai-gateway-koyeb` 源码含硬编码数据库凭据与默认管理员密码。
   - 原因：历史脚本与示例配置直接写死。
   - 前置条件：建议轮换相关 token / 密码并改为环境变量注入；需要用户确认轮换窗口与新的环境变量配置位置。
+
+---
+
+## 九、 2026-11-20 ZCode 渠道接入与 OAuth 双域改造
+
+### 1. 已完成
+
+- [x] **CodeBuddy / WorkBuddy 双域合并为单入口**（`console/src/pages/Providers.tsx`）
+  - OAuth 目录由「国内版 / 国际版」两条合并为一条 `CodeBuddy / WorkBuddy (腾讯)`，`regionSelect: true`。
+  - 点击授权先弹区域选择（`step: "region"`），国内 `copilot.tencent.com`、国际 `workbuddy.ai`。
+  - 底层仍落两个 provider（`codebuddy-oauth` / `codebuddy-global-oauth`），避免同一渠道混用两套账号体系导致鉴权错乱。
+
+- [x] **通用自动签到框架**（`src/checkin.ts`）
+  - `CHANNELS` 注册表：新增渠道只需注册 runner，开关 / 心跳 / 手动触发 / 账号池展示自动生效。
+  - 开关存 Blob `checkin:config` 的 `disabled` 数组，**默认全部开启**；按渠道分别记录当日去重 `checkin:day:<type>`。
+  - 全站心跳 `/api/monitor/video` 驱动，09:00（东八区）后当日首次执行。
+  - 动作名按渠道可配：CodeBuddy=`签到`，ZCode=`领额度`（`action` 字段）。
+  - 管理动作：`checkin_config` / `set_checkin` / `codebuddy_checkin`（支持 `type`）。
+  - 账号池每卡片展示「自动领额度/自动签到」开关 + 「立即领取/立即签到」按钮（`AccountPool.tsx`）。
+
+- [x] **ZCode（智谱）OAuth 渠道**（`src/oauth/zcode.ts`、`src/oauth/zcode-profile.ts`）
+  - 设备授权：`POST zcode.z.ai/api/v1/oauth/cli/init`（Bearer 随机 pollToken，`{provider:"zai"}`）→ `GET /api/v1/oauth/cli/poll/{flowId}`。
+  - 凭据格式 `jwt|access_token|device_id`，`device_id` 在授权时生成并持久化（对齐参考实现的 `account.device_mid`）。
+  - 协议：Anthropic Messages，内部完成 OpenAI ⇄ Anthropic 转换（对齐 ZCode2API 的 `openaiToAnthropic` / `anthropicToOpenAI`），上游固定 `stream:false`，流式由本层合成 SSE。
+  - 硬约束：`system` 必须是客户端官方三段原文（`zcode-profile.ts`，10701 字符，由 ZCode2api 的 `zcode-profile.json` 生成，MIT）；应用 system 降级为 `<pi_system_instructions>` 插入首条 user。
+  - 请求体恢复 `metadata.user_id`（device_id + session），带 `x-device-mid` / `x-session-id` 等 `x-zcode-*` 头。
+  - 登录过期：JWT 无 `exp`，按 `iat + 7 天` 判断，过期返回 401 `login_expired`。
+  - 错误映射：`1005/3009` → 429（额度/繁忙）；`3012` → 403（风控）；captcha/verification → 403 `verification_required`。
+  - 国内/国际双入口：国际版 `zcode.z.ai`（可设备授权）；国内版 `open.bigmodel.cn/api/anthropic`（该站无设备授权，建渠道后粘贴客户端 `access_token`）。
+  - 诊断：`zcode_probe` 返回 JWT claims、balance、preview 及「2 站点 × 2 令牌」矩阵状态。
+
+- [x] **重新授权覆盖旧凭据**（`src/routes/admin.ts`）
+  - `upsert_provider_key` 支持 `identity`（账号 uid）：命中旧记录时原地覆盖 `encryptedKey`，不再因指纹变化新增重复账号。
+
+- [x] **可观测性修正**
+  - `testZcode` 由「只看 HTTP 状态」改为校验响应体（业务码非 0 / `content` 非数组即判失败），修掉「200 其实 1005」的假阳性。
+  - `chat.ts` 非 2xx 时保留上游错误正文（截断 240 字），不再是裸 `status 502`。
+
+### 2. 已知边界（待办）
+
+- [ ] **ZCode 额度校验仍返回 1005**
+  - 现状：JWT 在 `zcode.z.ai` 鉴权通过（HTTP 200）但返回 `{"code":1005,"msg":"exceed quota limit"}`；`access_token` 在两个站点均 401；`bigmodel` 站 JWT/access 均 401。
+  - 已排除：请求体字段（与后台直测逐字段一致）、站点选择、IP/地域、`max_tokens`、并发放大（已移除渠道内重试）。
+  - 待验证：真实 `device_mid`（已改为授权时持久化，需重新授权才生效）、推理请求的 captcha 头（参考实现 `captchasdk`）、客户端 `oauth:bigmodel:access_token`（加密存于 `~/.zcode/v2/credentials.json`）。
+
+- [ ] **captcha 流程未移植**
+  - 参考实现 `7sen1ot/zcode2api` 在推理请求前调用 `captchaHeaders(..., CaptchaPurposeInference, ...)`，依赖其 `captchasdk`；协议细节未获取，暂只做错误识别与提示。
+
+- [ ] **ZCode 单账号并发上限低**
+  - 上游会返回 `3009 model concurrency limit exceeded`；本层已不叠加重试，建议客户端串行调用。
+
+### 3. 相关提交
+
+| 提交 | 内容 |
+|---|---|
+| `84a6def` | CodeBuddy 双域合并 + 通用签到框架 |
+| `b005e4d2` | ZCode 渠道接入（授权/转换/签到/模型） |
+| `5de18406` | 上游非 Anthropic 结构时暴露原始响应 |
+| `47786d84` | 非 2xx 保留上游错误正文 |
+| `2d9bc5ac` | 并发/频控退避重试 + 签到补齐兜底包 |
+| `18805f4c` | 动作名按渠道可配（签到 / 领额度） |
+| `4b16a4a1` | 对齐最小可用请求载荷 |
+| `7714d05c` | 去掉渠道内重试，避免放大并发限流 |
+| `f559afd0` | 连通性测试校验响应体 |
+| `85a0c366` | `zcode_probe` 诊断动作 |
+| `495ff5ef` | 诊断返回 JWT 身份声明 |
+| `f3ae2f99` | 重新授权覆盖旧凭据（identity） |
+| `b2e3e171` | 按站点选择接口与令牌 |
+| `45448d23` | ZCode 国内/国际双版本 + 站点×令牌矩阵 |
+| `99c167b2` | device_id 持久化 / metadata 恢复 / 登录过期判断 |
