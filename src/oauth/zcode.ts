@@ -326,29 +326,20 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     ...(inbound.stop_sequences ? { stop_sequences: inbound.stop_sequences } : {}),
   };
 
-  // 上游对单账号有并发/频控（3009 / 1005），既可能是 HTTP 429，也可能是 200 + code。
-  // 统一在这里做短退避重试，避免把「等一下就好」误判成渠道故障。
-  let res!: Response;
-  let raw = "";
+  // 注意：上游对单账号并发上限很低（3009），本层**不要**叠加重试，
+  // 否则一次客户端调用会连打多次上游，直接把账号打到限流。限流交给上层按 429 退避。
+  const res = await fetch(`${ZCODE_BASE}${CHAT_PATH}`, {
+    method: "POST",
+    headers: await upstreamHeaders(p.refreshToken),
+    body: JSON.stringify(upstreamBody),
+    signal: AbortSignal.timeout(300000),
+  });
+  const raw = await res.text().catch(() => "");
   let env: any = null;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    res = await fetch(`${ZCODE_BASE}${CHAT_PATH}`, {
-      method: "POST",
-      headers: await upstreamHeaders(p.refreshToken),
-      body: JSON.stringify(upstreamBody),
-      signal: AbortSignal.timeout(300000),
-    });
-    raw = await res.text().catch(() => "");
-    try {
-      env = JSON.parse(raw);
-    } catch {
-      return errorResponse(`ZCode 上游返回非 JSON（HTTP ${res.status}）: ${raw.slice(0, 200)}`, 502, "upstream_error");
-    }
-    const c = Number(env?.error?.biz_code ?? env?.biz_code ?? env?.code) || 0;
-    const connBusy = c === 1005 || c === 3009;
-    if (res.ok && !connBusy) break;
-    if (!connBusy) break;
-    if (attempt < 2) await new Promise((ok) => setTimeout(ok, 800 * (attempt + 1)));
+  try {
+    env = JSON.parse(raw);
+  } catch {
+    return errorResponse(`ZCode 上游返回非 JSON（HTTP ${res.status}）: ${raw.slice(0, 200)}`, 502, "upstream_error");
   }
 
   // 上游业务错误：顶层 code（ZCode 用 {code,msg,logid} 包）或 error.biz_code
