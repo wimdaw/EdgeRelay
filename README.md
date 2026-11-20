@@ -150,6 +150,66 @@ GET /api/monitor/video?token=…     # cron-job.org / UptimeRobot，建议每 60
 
 ---
 
+## 🧭 Trae 双区渠道（国内版 / 国际版）
+
+Trae 由字节跳动出品，**国内版（trae.cn）与国际版（trae.ai）是两套独立账号体系**，域名、鉴权方案、模型目录都不同，因此接入为两条独立渠道，共用一个 OAuth 类型 `trae`，靠渠道 Base URL 区分区域。
+
+| 项目 | 国内版 | 国际版 |
+| --- | --- | --- |
+| 授权页 | `https://www.trae.cn/authorization` | `https://www.trae.ai/authorization` |
+| 数据面（对话/模型） | `https://trae-api-cn.mchost.guru` | `https://core-normal.traeapi.us`（备选 `core-normal.trae.ai` / `coresg-normal.trae.ai`） |
+| 账号面（换票/用户信息） | `https://api.trae.com.cn` | `https://grow-normal.trae.ai` |
+| 鉴权头 | `Authorization: Cloud-IDE-JWT <token>` | `Authorization: Bearer <token>` |
+| 模型目录 | `GET /api/ide/v1/model_list`（实时） | 不开放（403），使用内置快照 |
+| 渠道 slug | `trae-cn-oauth` | `trae-global-oauth` |
+
+### 接入步骤
+
+1. 控制台 → **渠道** → 「Trae (字节跳动)」→ 选择 **国内版** 或 **国际版**；
+2. 点「打开授权页」登录 Trae 账号并确认授权；
+3. 浏览器会跳转到 `http://127.0.0.1:<port>/authorize?...`，**页面打不开是正常的**；
+4. 复制地址栏**整段回调 URL**粘贴回控制台，点「完成授权」；
+5. 凭据（含 refresh_token、设备指纹、uid、区域）加密入库，随后拉取/导入模型即可调用。
+
+### 调用与路由规则
+
+- 统一入口：`POST /v1/chat/completions`（另支持 `/v1/models` 查询已上架模型）。
+- 请求按「模型 → 渠道」映射路由；国内版与国际版是两条渠道，**同名模型需分别上架**。
+- 双区同名的模型（如 `glm-5.3`、`minimax-m3`）可用前缀显式选边：`trae-cn/glm-5.3`、`trae-intl/Claude-Sonnet-4.6`；前缀只用于选边，不会发给上游。
+- 上游通道优先 `POST /api/ide/v1/llm_raw_chat`；返回 404/405 或 `code 4001` 时自动退到兼容通道 `POST /api/agent/v3/llm_utils_chat`（`function=chat_v3`）。
+- 上游恒为 SSE：流式请求逐事件转发为标准 OpenAI SSE；非流式请求在网关内聚合后一次性返回。
+
+```bash
+curl https://your-domain/v1/chat/completions \
+  -H "Authorization: Bearer sk-your-key" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"Gemini-3.1-Pro-Preview","messages":[{"role":"user","content":"hi"}],"stream":true}'
+```
+
+### 环境变量（均可选）
+
+| 变量 | 说明 | 默认值 |
+| --- | --- | --- |
+| `TRAE_CN_CORE_URL` | 国内版数据面 | `https://trae-api-cn.mchost.guru` |
+| `TRAE_GLOBAL_CORE_URL` | 国际版数据面 | `https://core-normal.traeapi.us` |
+| `TRAE_CN_ACCOUNT_URL` | 国内版账号面 | `https://api.trae.com.cn` |
+| `TRAE_GLOBAL_ACCOUNT_URL` | 国际版账号面 | `https://grow-normal.trae.ai` |
+| `TRAE_CLIENT_ID` / `TRAE_CN_CLIENT_ID` / `TRAE_GLOBAL_CLIENT_ID` | 授权 client_id | `ono9krqynydwx5` |
+
+> 区域由渠道 Base URL 决定，不需要额外配置；上游改域时改环境变量即可，无需改代码。
+
+### 本地验证
+
+```bash
+npm run build:typecheck                 # 类型检查
+node tests/test-trae-region.mjs         # 双区单测：89 项（区域/端点/鉴权头/协议体/回调/错误码）
+node tests/test-trae-handler.mjs        # 对话链路：27 项（mock 上游验证鉴权头 / SSE 转换 / 路由与授权入口）
+npm run test                            # 全量回归（含上述两项）
+npm run build:bundle                    # 云函数打包
+```
+
+---
+
 ## 📋 API 路由一览
 
 | 路径 | 方法 | 说明 |

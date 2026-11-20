@@ -153,6 +153,20 @@ const OAUTH_CATALOG: OAuthMeta[] = [
     models: ["auto", "qmodel_38max", "qfmodel", "qmodel_latest", "gmodel", "dmodel"],
   },
   {
+    type: "trae",
+    name: "Trae (字节跳动)",
+    slug: "trae-oauth",
+    baseUrl: "https://core-normal.traeapi.us",
+    mode: "redirect" as const,
+    regionSelect: true,
+    regions: [
+      { label: "国际版（trae.ai）", baseUrl: "https://core-normal.traeapi.us", desc: "core-normal.traeapi.us / coresg-normal.trae.ai，Bearer 鉴权" },
+      { label: "国内版（trae.cn）", baseUrl: "https://trae-api-cn.mchost.guru", desc: "trae-api-cn.mchost.guru，Cloud-IDE-JWT 鉴权，与国内账号绑定" },
+    ],
+    desc: "Trae IDE 账号授权（国内版 / 国际版账号体系独立）。授权后浏览器会跳到 127.0.0.1 回调地址，把地址栏整段 URL 粘贴回来即可。",
+    models: ["Gemini-3.1-Pro-Preview", "Claude-Sonnet-4.6", "GPT-5.5", "glm-5.3", "kimi-k3", "deepseek-V3"],
+  },
+  {
     type: "cline",
     name: "Cline",
     slug: "cline-oauth",
@@ -536,6 +550,10 @@ export default function Providers() {
           ? /qoder\.com\.cn/i.test(baseUrl)
             ? { slug: "qoder-cn-oauth", name: "Qoder 国内版" }
             : { slug: "qoder-oauth", name: "Qoder 国际版 (qoder.com)" }
+          : meta.type === "trae"
+          ? /trae\.cn|trae\.com\.cn|mchost\.guru/i.test(baseUrl)
+            ? { slug: "trae-cn-oauth", name: "Trae 国内版 (trae.cn)" }
+            : { slug: "trae-global-oauth", name: "Trae 国际版 (trae.ai)" }
           : /workbuddy\.ai/i.test(baseUrl)
           ? { slug: "codebuddy-global-oauth", name: "CodeBuddy 国际版" }
           : { slug: "codebuddy-oauth", name: "CodeBuddy 国内版" }
@@ -692,6 +710,7 @@ export default function Providers() {
         provider: oauthDlg.meta.type,
         code: oauthDlg.codeInput.trim(),
         state: oauthDlg.state,
+        baseUrl: oauthDlg.baseUrl,
       });
       const token = r.result?.refreshToken;
       if (!token) throw new Error("上游未返回 refresh_token");
@@ -1509,8 +1528,10 @@ export default function Providers() {
           <div className="space-y-4">
             <p className="text-xs leading-relaxed text-muted">
               1. 点击下方按钮打开 {oauthDlg?.meta.name} 授权页并登录；<br />
-              2. 授权后浏览器会跳转到 <code className="rounded bg-line px-1">localhost</code> 回调地址（页面打不开属正常现象）；<br />
-              3. 复制地址栏 <code className="rounded bg-line px-1">code=</code> 后的整段内容（或整段回调 URL）粘贴到下方。
+              2. 授权后浏览器会跳转到 <code className="rounded bg-line px-1">127.0.0.1</code> 回调地址（页面打不开属正常现象）；<br />
+              3. {oauthDlg?.meta.type === "trae"
+                ? "直接复制地址栏的整段回调 URL（必须含 refreshToken / authCode）粘贴到下方。"
+                : <>复制地址栏 <code className="rounded bg-line px-1">code=</code> 后的整段内容（或整段回调 URL）粘贴到下方。</>}
             </p>
             <div className="flex items-center gap-2">
               <Input readOnly value={oauthDlg?.url ?? ""} className="!py-1 flex-1 text-[11px] font-mono" />

@@ -16,6 +16,18 @@ export default defineEnv({
   // 可选：外部内容审核 API（POST {input} -> {flagged, rule}）
   MODERATION_API_URL: string().optional(),
 
+  /* ---- Trae 双区（可选覆盖，默认值见 src/oauth/trae.ts） ---- */
+  // 数据面（对话 / model_list）：国内默认 trae-api-cn.mchost.guru，国际默认 core-normal.traeapi.us
+  TRAE_CN_CORE_URL: string().optional(),
+  TRAE_GLOBAL_CORE_URL: string().optional(),
+  // 账号面（OAuth 换票 / GetUserInfo）：国内默认 api.trae.com.cn，国际默认 grow-normal.trae.ai
+  TRAE_CN_ACCOUNT_URL: string().optional(),
+  TRAE_GLOBAL_ACCOUNT_URL: string().optional(),
+  // 授权 client_id：两区默认 ono9krqynydwx5；上游换 client 时无需改代码
+  TRAE_CLIENT_ID: string().optional(),
+  TRAE_CN_CLIENT_ID: string().optional(),
+  TRAE_GLOBAL_CLIENT_ID: string().optional(),
+
   /* ---- 密钥（secrets，用 void secret put 设置） ---- */
   // AES-256-GCM 主密钥（加密上游供应商密钥），建议 32+ 字节随机串
   ENCRYPTION_KEY: string(),

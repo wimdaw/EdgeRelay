@@ -475,6 +475,9 @@ adminRouter.post("/actions", async (c) => {
             } else if (prov?.kind === "oauth:qoder") {
               const { parseQoderCredential } = await import("../oauth/qoder");
               extractUid = (raw) => parseQoderCredential(raw)?.uid || "";
+            } else if (prov?.kind === "oauth:trae") {
+              const { parseTraeCredential } = await import("../oauth/trae");
+              extractUid = (raw) => parseTraeCredential(raw, prov?.baseUrl)?.uid || "";
             }
             if (extractUid) {
               for (const k of existing) {
@@ -675,6 +678,20 @@ adminRouter.post("/actions", async (c) => {
         return done(await probeQoder(env, raw, prov.baseUrl), "oauth_account", key.id);
       }
 
+      /* ---- Trae 诊断：凭据元信息 + 区域端点 + model_list 可达性 ---- */
+      case "trae_probe": {
+        const providerId = String(p.providerId || "");
+        const providers = await getProviders(env);
+        const prov = providers.find((x) => x.id === providerId || x.slug === providerId);
+        if (!prov) throw new ApiError(404, ErrorCode.NOT_FOUND, "渠道不存在");
+        const keys = await getProviderKeysAll(env, prov.id);
+        const key = keys.find((k) => k.status === "active") || keys[0];
+        if (!key) throw new ApiError(400, ErrorCode.BAD_REQUEST, "该渠道还没有已授权的账号");
+        const { probeTrae } = await import("../oauth/trae");
+        const raw = await decryptSecret(env, key.encryptedKey);
+        return done(await probeTrae(env, raw, prov.baseUrl), "oauth_account", key.id);
+      }
+
       /* ---- 自动签到开关（按渠道，默认开启） ---- */
       case "checkin_config": {
         const { listCheckinChannels, readCheckinConfig } = await import("../checkin");
@@ -744,8 +761,14 @@ adminRouter.post("/actions", async (c) => {
         const { completeOAuth, isOAuthType } = await import("../oauth");
         if (!isOAuthType(type)) throw new ApiError(400, ErrorCode.BAD_REQUEST, `不支持的 OAuth 渠道: ${type}`);
         if (!p.code || !p.state) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 code 或 state");
-        const { refreshToken, email } = await completeOAuth(env, type, String(p.code), String(p.state));
-        return done({ refreshToken, email }, "oauth", type);
+        const result = await completeOAuth(
+          env,
+          type,
+          String(p.code),
+          String(p.state),
+          p.baseUrl ? String(p.baseUrl) : undefined
+        );
+        return done({ refreshToken: result.refreshToken, email: result.email, account: result.account }, "oauth", type);
       }
       case "oauth_poll": {
         const type = String(p.provider || "");

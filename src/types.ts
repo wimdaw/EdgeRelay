@@ -21,6 +21,14 @@ export interface Env {
   /** Antigravity（Google Code Assist）OAuth 客户端凭据，缺失时该渠道授权/刷新会明确报错 */
   AG_CLIENT_ID?: string;
   AG_CLIENT_SECRET?: string;
+  /** Trae 双区端点覆盖（可选；缺省用 src/oauth/trae.ts 内置默认值） */
+  TRAE_CN_CORE_URL?: string;
+  TRAE_GLOBAL_CORE_URL?: string;
+  TRAE_CN_ACCOUNT_URL?: string;
+  TRAE_GLOBAL_ACCOUNT_URL?: string;
+  TRAE_CLIENT_ID?: string;
+  TRAE_CN_CLIENT_ID?: string;
+  TRAE_GLOBAL_CLIENT_ID?: string;
   // EdgeOne 相关
   EDGEONE_TOKEN?: string;
   EDGEONE_TOKEN_NEW?: string;

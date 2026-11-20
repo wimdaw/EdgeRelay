@@ -476,3 +476,137 @@ git checkout edgeone
 
 - 真号走一遍 `zai_cn` 授权：重点确认 poll 返回的 access_token 字段名（若是 `data.bigmodel` 已被兜底覆盖，但如果两边都没有就是空）。
 - 国内号对话仍走 `zcode.z.ai/api/v1/zcode-plan/...`，未按站点切换；若上游按站点隔离，需要在 `handleZcodeRequest` 里按 provider 改 chat host。
+
+---
+
+## 十二、 2026-11-20 Trae 渠道接入（国内版 / 国际版双区）
+
+### 1. 为什么拆成两条渠道
+
+Trae 的国内版与国际版不是"同一套接口换个域名"，而是**两套账号体系 + 两套鉴权方案**：
+
+| 维度 | 国内版 | 国际版 |
+| --- | --- | --- |
+| 授权页 | `https://www.trae.cn/authorization` | `https://www.trae.ai/authorization` |
+| 数据面 | `https://trae-api-cn.mchost.guru` | `https://core-normal.traeapi.us`（备选 `core-normal.trae.ai`、`coresg-normal.trae.ai`） |
+| 账号面 | `https://api.trae.com.cn`（备选 `api.trae.cn`） | `https://grow-normal.trae.ai`（备选 `grow-normal.traeapi.us`） |
+| 对话鉴权 | `Authorization: Cloud-IDE-JWT <token>` | `Authorization: Bearer <token>` |
+| 版本头 | `x-ide-version: 3.4.3` / `code 20260212` | `x-ide-version: 3.6.2` / `code 20260924` |
+| UA | `Trae CN/3.4.3` | `TraeClient/TTNet` |
+| 区域头 | 无 | `store-country-code: us` |
+| 模型目录 | `GET /api/ide/v1/model_list` 可用 | 固定 403 `no schema found`，只能静态目录 |
+
+混用会直接失败：国内号用 `Bearer` 打国际数据面、或国际号用 `Cloud-IDE-JWT`，上游返回 `4015`（被判定风控）而不是 401，非常容易误诊为账号问题。所以按区域落成 `trae-cn-oauth` / `trae-global-oauth` 两条渠道，区域由**渠道 Base URL** 唯一决定。
+
+### 2. 已完成
+
+- [x] **双区注册表**（`src/oauth/trae.ts`）
+  - `regionFromBaseUrl()` 判定区域：`trae.cn` / `trae.com.cn` / `mchost.guru` → `cn`，其余 → `global`。
+  - `traeEndpoints()` 输出区域端点；`TRAE_CN_CORE_URL` 等环境变量可覆盖，上游改域无需改代码。
+  - `TRAE_CN_MODELS` / `TRAE_GLOBAL_MODELS` 兜底目录；国内优先实时 `model_list`。
+- [x] **浏览器 OAuth（PKCE S256 + 粘贴回调）**
+  - 授权链接按官方客户端参数拼装：`login_version / auth_from=trae / login_channel=native_ide / plugin_version / auth_type=local / client_id / redirect=0 / login_trace_id / auth_callback_url / machine_id / device_id / x_* / code_challenge(S256)`。
+  - 回调固定 `http://127.0.0.1:<port>/authorize`：云端收不到 loopback，所以复用 `redirect` 模式的「粘贴回调」交互（与 claude / codex 一致）。
+  - `parseTraeCallback()` 兼容五种粘贴形态：完整 URL、纯 query、`authCodeInfo` JSON、`userJwt` JSON、裸 authCode。
+- [x] **换票与续期**
+  - 回调带 `refreshToken`：直接走 `POST {account}/cloudide/api/v3/trae/oauth/ExchangeToken`（`ClientID/RefreshToken/ClientSecret:"-"/UserID:""`），换票同时完成有效性校验。
+  - 回调只带 `authCodeInfo`：走 `POST {account}/trae/api/v3/oauth/ExchangeToken`，带 `CodeVerifier` 与 `DeviceInfo`（P-256 SPKI 公钥）。
+  - **refresh_token 轮换**：上游每次换票都签发新 refresh_token 并消费旧的，沿用 `common.resolveAccessToken` 的 KV 链式缓存（`currentRefreshToken`），避免重放导致整条会话作废。
+- [x] **对话反代**
+  - 主通道 `POST /api/ide/v1/llm_raw_chat`：`{model_name, messages, stream:true, ...采样参数}`；`messages.content` 强制转 parts 数组（字符串会 4001）。
+  - 兼容通道 `POST /api/agent/v3/llm_utils_chat`：`function:"chat_v3"` + `request_id` / `session_id`；主通道 404/405 或 4001 时自动降级。
+  - SSE 解析 `metadata / output / token_usage / done / error`，转成标准 OpenAI chunk（含 `reasoning_content`、`tool_calls`、末帧 `usage`），非流式在网关内聚合。
+  - 未验证的字段（`tools` / `config_name` / `conversation_id` 等）一律不下发，避免 4001。
+- [x] **错误码分层**（`mapTraeErrorCode`）
+  - `1001/401/403/20101/10101` → 401 鉴权；`4001/400/2001` → 400 参数；
+  - `4008/1005/4011/4029` → 429 额度；`4015/4019` → 403 风控；`4023/3003` → 400 模型；其余 → 502。
+- [x] **控制台与后台**
+  - `OAUTH_CATALOG` 新增 Trae 单入口 + 国内/国际区域选择；按 baseUrl 落 `trae-cn-oauth` / `trae-global-oauth`。
+  - `oauth_complete` 透传 `baseUrl`（区域兜底）；`oauth:trae` 纳入「同 uid 重新授权原地覆盖」逻辑，避免重复账号。
+- [x] **配置与示例**
+  - `env.ts` / `src/types.ts` / `.env.example` 增加 7 个可选变量；默认值即可用，不配置也能跑。
+
+### 3. 入口与路由规则
+
+| 层 | 规则 |
+| --- | --- |
+| 对外入口 | `POST /v1/chat/completions`、`GET /v1/models`（不新增对外路由） |
+| 渠道选择 | 沿用「模型 → 渠道」映射；国内/国际分别上架模型 |
+| 区域裁决 | 渠道 `baseUrl` 优先；`baseUrl` 为空时回落凭据内 `region` |
+| 显式选边 | 模型前缀 `trae-cn/`、`trae-intl/`、`trae-global/`，前缀不进上游 |
+| 前缀冲突 | 前缀区域与渠道区域不一致直接 400，避免"以为走了国际版其实打国内" |
+| 上游降级 | `llm_raw_chat` → `llm_utils_chat`；数据面主机 5xx 时按 `coreFallbacks` 切换 |
+| 账号池 | 同一渠道多账号时按 `providerKey` 轮换；401/403/429/5xx 换下一个凭据 |
+
+### 4. 配置项
+
+| 变量 | 必填 | 说明 |
+| --- | --- | --- |
+| `TRAE_CN_CORE_URL` | 否 | 国内数据面，默认 `https://trae-api-cn.mchost.guru` |
+| `TRAE_GLOBAL_CORE_URL` | 否 | 国际数据面，默认 `https://core-normal.traeapi.us` |
+| `TRAE_CN_ACCOUNT_URL` | 否 | 国内账号面，默认 `https://api.trae.com.cn` |
+| `TRAE_GLOBAL_ACCOUNT_URL` | 否 | 国际账号面，默认 `https://grow-normal.trae.ai` |
+| `TRAE_CLIENT_ID` | 否 | 两区共用 client_id 覆盖，默认 `ono9krqynydwx5` |
+| `TRAE_CN_CLIENT_ID` / `TRAE_GLOBAL_CLIENT_ID` | 否 | 按区覆盖，优先级高于 `TRAE_CLIENT_ID` |
+
+其余依赖（`ENCRYPTION_KEY`、`SESSION_SECRET`、Blob 凭据）与现有渠道一致，无新增必填项。
+
+### 5. 本地验证
+
+```bash
+# 1) 静态检查
+npm run build:typecheck      # tsc --noEmit
+npm run build:check          # 未定义标识符扫描
+
+# 2) 双区单测（89 项，锁定区域/端点/鉴权头/协议体/回调/错误码）
+node tests/test-trae-region.mjs
+
+# 3) 对话链路（27 项，mock 上游验证鉴权头、SSE → OpenAI、非流式聚合、前缀冲突 400、授权链接）
+node tests/test-trae-handler.mjs
+
+# 4) 全量回归（含上面两项，当前 419 项）
+npm run test
+
+# 5) 打包（产物 cloud-functions/[[default]].js）
+npm run build:bundle
+```
+
+控制台手工验证（本地起服务或部署后）：
+
+1. 渠道 → Trae → 选「国内版」：授权页应以 `www.trae.cn` 打开；完成后渠道 slug 为 `trae-cn-oauth`，Base URL 为 `trae-api-cn.mchost.guru`。
+2. 再选「国际版」：授权页应以 `www.trae.ai` 打开；渠道 slug 为 `trae-global-oauth`，Base URL 为 `core-normal.traeapi.us`。
+3. 两条渠道各点一次「测试」：国内走 `Cloud-IDE-JWT`，国际走 `Bearer`；返回内容即连通。
+4. 用 curl 验证路由与降级：
+
+```bash
+# 直连国内渠道上架的模型
+curl -s http://127.0.0.1:8787/v1/chat/completions \
+  -H "Authorization: Bearer sk-xxx" -H "Content-Type: application/json" \
+  -d '{"model":"glm-5.3","messages":[{"role":"user","content":"只回答好"}],"stream":false}'
+
+# 双区同名模型用前缀选边（需两条渠道都已上架）
+curl -s http://127.0.0.1:8787/v1/chat/completions \
+  -H "Authorization: Bearer sk-xxx" -H "Content-Type: application/json" \
+  -d '{"model":"trae-intl/glm-5.3","messages":[{"role":"user","content":"hi"}]}'
+```
+
+### 6. 关键差异与兼容处理（易踩坑）
+
+1. **鉴权前缀不能混用**：国内 `Cloud-IDE-JWT`、国际 `Bearer`；且 `x-ide-token` 必须与 `Authorization` 里的 token 完全一致，否则 4015。
+2. **版本头是硬门槛**：国际版必须带当前客户端版本（`3.6.2 / 20260924`），旧版本头会触发 4015；国内版同理（`3.4.3 / 20260212`）。
+3. **`messages.content` 必须是 parts 数组**：`[{"type":"text","text":"..."}]`，传字符串返回 400/4001。
+4. **上游恒为 SSE**：即使 `stream:false` 也返回事件流，非流式响应必须由网关聚合。
+5. **`model_list` 只在国内开放**：国际版固定 403，导入模型时用内置快照，新增模型手动添加。
+6. **refresh_token 一次性**：每次换票都会轮换，必须持久化新 token；并发刷新要用同一份缓存，否则旧 token 重放会作废会话。
+7. **设备指纹要稳定**：`machine_id` / `device_id` 按 refresh_token 派生并随凭据落库，重新授权会换新指纹（等同换设备），属于预期行为。
+8. **区域不匹配要早失败**：`trae-cn/` 前缀打到国际渠道直接 400，比让上游返回 4015 更容易排查。
+9. **工具调用与图片**：`llm_raw_chat` 只验证过文本，`tools` 与图片 part 当前不透传（会 4001）；需要工具调用请走 `llm_utils_chat` 兼容通道或后续单独适配。
+10. **不影响既有渠道**：本次全部为新增类型 `oauth:trae` 与新增文件；`parseOAuthKind` 未命中时行为不变，既有 claude/codex/kimi/qwen/grok/codebuddy/cline/zcode/qoder 链路零改动。
+
+### 7. 已知边界（待办）
+
+- [ ] **未用真实账号端到端验证**：协议按 trae2api-hub / trae-api-proxy / cockpit 的公开实现对齐，但当前环境没有 Trae 账号，需真号跑一次授权 + 对话。
+- [ ] **AuthCode 换票的设备证明**：只带 `authCodeInfo` 的回调用 `DeviceInfo`（P-256 公钥）换票；若上游要求 `DeviceProof` 签名（CN 设备绑定续期），需要补 ECDSA 签名链路。
+- [ ] **模型目录精度**：国内实时目录可用；国际版内置 10 个快照模型，官方新增模型需手动补。
+- [ ] **工具调用未验证**：`output.tool_calls` 的字段形态按 OpenAI 风格防御式解析，未用真实工具调用回归。
+- [ ] **签到 / 额度查询未接入**：Trae 有 `checkin_credits`（国内）与 `user_current_entitlement_list`（国际），本轮未纳入每日心跳。

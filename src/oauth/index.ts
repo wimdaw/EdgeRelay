@@ -54,8 +54,16 @@ import {
   handleQoderRequest,
   QODER_MODELS,
 } from "./qoder";
+import {
+  buildTraeAuthUrl,
+  completeTraeOAuth,
+  testTrae,
+  fetchTraeModels,
+  handleTraeRequest,
+  TRAE_GLOBAL_MODELS,
+} from "./trae";
 
-export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok" | "codebuddy" | "cline" | "zcode" | "qoder";
+export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok" | "codebuddy" | "cline" | "zcode" | "qoder" | "trae";
 
 export type OAuthProviderMeta = {
   type: OAuthProviderType;
@@ -170,6 +178,17 @@ export const OAUTH_PROVIDERS: Record<OAuthProviderType, OAuthProviderMeta> = {
     desc: "Qoder 账号设备授权（国内/国际双区），COSY 签名反代，OpenAI 兼容协议直通；支持每日签到领 Credits。",
     defaultModels: QODER_MODELS.slice(0, 6),
   },
+  trae: {
+    type: "trae",
+    name: "Trae (字节跳动)",
+    slug: "trae-oauth",
+    baseUrl: "https://core-normal.traeapi.us",
+    mode: "redirect",
+    regionSelect: true,
+    desc: "Trae AI IDE 账号授权（国内 trae.cn / 国际 trae.ai 双区，账号体系独立），上游走 llm_raw_chat；授权后需粘贴浏览器回调 URL。",
+    // 国际版不开放 model_list，用内置目录；国内版会优先实时拉取
+    defaultModels: TRAE_GLOBAL_MODELS,
+  },
 };
 
 export const OAUTH_KIND_PREFIX = "oauth:";
@@ -217,6 +236,12 @@ export async function startOAuth(env: Env, type: OAuthProviderType, baseUrl?: st
     const flow = await startQoderDeviceFlow(env, baseUrl);
     return { mode: "redirect-poll", url: flow.url, state: flow.state };
   }
+  if (type === "trae") {
+    // Trae 是浏览器授权码 + PKCE，回调落在 127.0.0.1，云端收不到：
+    // 前端展示授权链接，用户授权后把地址栏整段 URL 粘回来完成换票。
+    const flow = await buildTraeAuthUrl(env, baseUrl);
+    return { mode: "redirect", url: flow.url, state: flow.state };
+  }
   const flow =
     type === "kimi"
       ? await startKimiDeviceFlow(env, baseUrl)
@@ -237,7 +262,16 @@ export async function startOAuth(env: Env, type: OAuthProviderType, baseUrl?: st
 }
 
 /** redirect 模式：用 code + state 换取 refresh_token */
-export async function completeOAuth(env: Env, type: OAuthProviderType, code: string, state: string): Promise<{ refreshToken: string; email?: string }> {
+export async function completeOAuth(
+  env: Env,
+  type: OAuthProviderType,
+  code: string,
+  state: string,
+  baseUrl?: string
+): Promise<{ refreshToken: string; email?: string; account?: { uid?: string } }> {
+  if (type === "trae") {
+    return completeTraeOAuth(env, code, state, baseUrl);
+  }
   if (type === "claude") {
     const { refreshToken } = await exchangeClaudeCode(env, code, state);
     return { refreshToken };
@@ -319,6 +353,10 @@ export async function fetchOAuthModels(
       const r = await fetchQoderModels(env, refreshToken, baseUrl);
       return { models: r.models.length ? r.models : fallback, message: r.message };
     }
+    if (type === "trae") {
+      const r = await fetchTraeModels(env, refreshToken, baseUrl);
+      return { models: r.models.length ? r.models : fallback, message: r.message };
+    }
     if (type === "cline") {
       const r = await fetchClineModels(env, refreshToken);
       return r.success && r.models.length ? { models: r.models } : { models: fallback, message: r.message };
@@ -345,6 +383,7 @@ export async function testOAuth(
   if (type === "codebuddy") return testCodebuddy(env, refreshToken, modelId, baseUrl);
   if (type === "zcode") return testZcode(env, refreshToken, modelId, baseUrl);
   if (type === "qoder") return testQoder(env, refreshToken, modelId, baseUrl);
+  if (type === "trae") return testTrae(env, refreshToken, modelId, baseUrl);
   if (type === "cline") return testCline(env, refreshToken, modelId);
   return testGrok(env, refreshToken, modelId);
 }
@@ -402,6 +441,8 @@ export async function handleOAuthChat(args: OAuthChatArgs): Promise<Response> {
       return handleCodebuddyRequest(p, args.baseUrl);
     case "cline":
       return handleClineRequest(p);
+    case "trae":
+      return handleTraeRequest(p, args.baseUrl);
     case "qoder":
       return handleQoderRequest({
         env: args.env,
