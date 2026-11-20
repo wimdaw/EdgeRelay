@@ -124,6 +124,7 @@ adminRouter.post("/actions", async (c) => {
       action === "checkin_config" ||
       action === "zcode_probe" ||
       action === "zcode_set_device" ||
+      action === "qoder_probe" ||
       action === "set_checkin"
     ) {
       // 账号池会解密凭据并查询上游额度；签到同样要解密 refresh_token，仅限超级管理员
@@ -658,6 +659,20 @@ adminRouter.post("/actions", async (c) => {
         const { probeZcode } = await import("../oauth/zcode");
         const token = await decryptSecret(env, key.encryptedKey);
         return done(await probeZcode(env, token, prov.baseUrl), "oauth_account", key.id);
+      }
+
+      /* ---- Qoder 诊断：凭据元信息 + 额度/活动候选路径矩阵 ---- */
+      case "qoder_probe": {
+        const providerId = String(p.providerId || "");
+        const providers = await getProviders(env);
+        const prov = providers.find((x) => x.id === providerId || x.slug === providerId);
+        if (!prov) throw new ApiError(404, ErrorCode.NOT_FOUND, "渠道不存在");
+        const keys = await getProviderKeysAll(env, prov.id);
+        const key = keys.find((k) => k.status === "active") || keys[0];
+        if (!key) throw new ApiError(400, ErrorCode.BAD_REQUEST, "该渠道还没有已授权的账号");
+        const { probeQoder } = await import("../oauth/qoder");
+        const raw = await decryptSecret(env, key.encryptedKey);
+        return done(await probeQoder(env, raw, prov.baseUrl), "oauth_account", key.id);
       }
 
       /* ---- 自动签到开关（按渠道，默认开启） ---- */

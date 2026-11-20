@@ -996,6 +996,131 @@ export async function testQoder(
   }
 }
 
+/**
+ * 诊断探针：授权后不确认「有没有额度 / 是不是登录态」时用。
+ *
+ * 为什么是一个路径矩阵：参考实现实测国际版 openapi 上的 /api/v2/quota/usage
+ * 经常 404/403，而 /sash/api/v1/me/* 才有数据，且国内/国际不是同一套。
+ * 与其猜，不如把候选路径全打一遍，把状态码和响应片段原样回给控制台。
+ */
+export type QoderProbeEntry = { path: string; status: number; body: string };
+
+export type QoderProbeResult = {
+  credential: {
+    region: QoderRegion;
+    host: string;
+    uid: string;
+    name: string;
+    userType: string;
+    orgName: string;
+    hasRefreshToken: boolean;
+    refreshTokenPrefix: string;
+    issuedAt: string | null;
+    ageDays: number | null;
+  };
+  probes: QoderProbeEntry[];
+  credits: number | null;
+  hint: string;
+};
+
+const PROBE_PATHS = [
+  "/api/v1/userinfo",
+  "/api/v2/user/plan",
+  "/api/v2/quota/usage",
+  "/api/v1/quota/usage",
+  "/sash/api/v1/me/quota",
+  "/sash/api/v1/me/credits",
+  "/sash/api/v1/me/campaigns",
+];
+
+/** 从任意结构的 JSON 里捞第一个像「剩余额度」的数字 */
+function findCreditNumber(node: unknown, depth = 0): number | null {
+  if (depth > 4 || node == null) return null;
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const hit = findCreditNumber(item, depth + 1);
+      if (hit != null) return hit;
+    }
+    return null;
+  }
+  if (typeof node !== "object") return null;
+  for (const [k, v] of Object.entries(node as Record<string, unknown>)) {
+    if (typeof v === "number" && /credit|remain|balance|available|total/i.test(k)) return v;
+    if (v && typeof v === "object") {
+      const hit = findCreditNumber(v, depth + 1);
+      if (hit != null) return hit;
+    }
+  }
+  return null;
+}
+
+export async function probeQoder(_env: Env, raw: string, baseUrl?: string): Promise<QoderProbeResult> {
+  const cred = parseQoderCredential(raw);
+  if (!cred) throw new Error("凭据格式无效");
+  const region: QoderRegion = cred.region || regionFromBaseUrl(baseUrl);
+  const host = ENDPOINTS[region].openapi;
+  const headers: Record<string, string> = {
+    authorization: `Bearer ${cred.deviceToken}`,
+    accept: "application/json",
+    "user-agent": ENDPOINTS[region].userAgent,
+  };
+
+  const probes: QoderProbeEntry[] = [];
+  for (const path of PROBE_PATHS) {
+    try {
+      const r = await fetch(host + path, { headers, signal: AbortSignal.timeout(15000) });
+      const text = await r.text().catch(() => "");
+      probes.push({ path, status: r.status, body: text.slice(0, 600) });
+    } catch (err) {
+      probes.push({ path, status: 0, body: (err as Error).message || "请求失败" });
+    }
+  }
+
+  let credits: number | null = null;
+  for (const p of probes) {
+    if (p.status < 200 || p.status >= 300) continue;
+    try {
+      const hit = findCreditNumber(JSON.parse(p.body));
+      if (hit != null) {
+        credits = hit;
+        break;
+      }
+    } catch {
+      /* 非 JSON 直接跳过 */
+    }
+  }
+
+  const userinfo = probes.find((p) => p.path === "/api/v1/userinfo");
+  const campaigns = probes.find((p) => p.path === "/sash/api/v1/me/campaigns");
+  const allUnauthorized = probes.every((p) => p.status === 401 || p.status === 403);
+  const hint = allUnauthorized
+    ? "全部探测均为 401/403：设备令牌已失效，请重新授权该账号"
+    : userinfo && userinfo.status >= 200 && userinfo.status < 300
+    ? campaigns && campaigns.status === 404
+      ? "凭据有效；该区域未开放活动接口，签到会提示「无可用签到活动」"
+      : "凭据有效"
+    : "用户信息接口未通过，先核对区域选择（国内/国际）是否与账号一致";
+
+  const issuedAt = cred.issuedAt ? new Date(cred.issuedAt).toISOString() : null;
+  return {
+    credential: {
+      region,
+      host,
+      uid: cred.uid,
+      name: cred.name,
+      userType: cred.userType,
+      orgName: cred.orgName,
+      hasRefreshToken: Boolean(cred.refreshToken),
+      refreshTokenPrefix: cred.refreshToken ? cred.refreshToken.slice(0, 4) : "",
+      issuedAt,
+      ageDays: cred.issuedAt ? Math.floor((Date.now() - cred.issuedAt) / 86400000) : null,
+    },
+    probes,
+    credits,
+    hint,
+  };
+}
+
 export async function fetchQoderModels(
   _env: Env,
   _refreshToken: string,

@@ -420,6 +420,10 @@ git checkout edgeone
   - `src/checkin.ts` 注册 `qoder` runner，默认开启，随 `/api/monitor/video` 心跳执行。
 - [x] **重新授权去重**
   - `upsert_provider_key` 的 `identity` 覆盖逻辑从 ZCode 泛化到 Qoder：同一 uid 重新授权原地覆盖旧凭据，不再新增重复账号。
+- [x] **诊断探针**（`qoder_probe`）
+  - 一次打穿候选路径矩阵：`/api/v1/userinfo`、`/api/v2/user/plan`、`/api/v2/quota/usage`、`/api/v1/quota/usage`、`/sash/api/v1/me/quota`、`/sash/api/v1/me/credits`、`/sash/api/v1/me/campaigns`，原样回状态码 + 响应片段。
+  - 同时返回凭据元信息（区域 / uid / 是否有 refresh_token / 签发天数）与一句结论（令牌失效 / 区域不匹配 / 该区域无活动接口）。
+  - 存在原因：参考实现实测国际版 `openapi` 上 `/api/v2/quota/usage` 常 404/403，而 `/sash/api/v1/me/*` 才返回数据；真号接入后不必再猜端点。
 
 ### 2. 验证
 
