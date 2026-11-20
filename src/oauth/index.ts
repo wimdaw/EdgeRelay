@@ -315,7 +315,7 @@ export async function testOAuth(
   if (type === "kimi") return testKimi(env, refreshToken, modelId, baseUrl);
   if (type === "qwen") return testQwen(env, refreshToken, modelId);
   if (type === "codebuddy") return testCodebuddy(env, refreshToken, modelId, baseUrl);
-  if (type === "zcode") return testZcode(env, refreshToken, modelId);
+  if (type === "zcode") return testZcode(env, refreshToken, modelId, baseUrl);
   if (type === "cline") return testCline(env, refreshToken, modelId);
   return testGrok(env, refreshToken, modelId);
 }
@@ -357,6 +357,7 @@ export async function handleOAuthChat(args: OAuthChatArgs): Promise<Response> {
       return handleZcodeRequest({
         env: args.env,
         providerId: args.providerId,
+        baseUrl: args.baseUrl,
         modelId: args.upstreamModel,
         requestedModel: args.requestedModel,
         body: args.body,

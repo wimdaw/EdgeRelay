@@ -73,9 +73,10 @@ function metadataUserId(uid: string, deviceId: string, sessionId: string): strin
   return JSON.stringify({ device_id: deviceId, account_uuid: "", session_id: sessionId });
 }
 
-async function upstreamHeaders(rawCred: string): Promise<Record<string, string>> {
+async function upstreamHeaders(rawCred: string, prefer: "access" | "jwt" = "access"): Promise<Record<string, string>> {
   const cred = parseZcodeCredential(rawCred);
-  const bearer = bearerOf(cred);
+  // 不同站点认的令牌不同：bigmodel 用 OAuth access_token，zcode.z.ai 用 CLI JWT
+  const bearer = prefer === "jwt" ? cred.jwt || cred.accessToken : cred.accessToken || cred.jwt;
   const uid = userIdFromJwt(cred.jwt);
   const [deviceId, sessionId] = await Promise.all([deviceIdFor(uid), sessionIdFor(uid)]);
   return {
@@ -213,6 +214,8 @@ export async function pollZcodeDeviceFlow(env: Env, flowId: string): Promise<Zco
 export type ZcodeCallParams = {
   env: Env;
   providerId: string;
+  /** 渠道 baseUrl：bigmodel 站与国际站协议路径不同 */
+  baseUrl?: string;
   modelId: string;
   requestedModel: string;
   body: Record<string, any>;
@@ -346,9 +349,13 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
 
   // 注意：上游对单账号并发上限很低（3009），本层**不要**叠加重试，
   // 否则一次客户端调用会连打多次上游，直接把账号打到限流。限流交给上层按 429 退避。
-  const res = await fetch(`${ZCODE_BASE}${CHAT_PATH}`, {
+  const isBigmodel = /bigmodel\.cn/i.test(p.baseUrl || "");
+  const chatUrl = isBigmodel
+    ? `${(p.baseUrl || "").replace(/\/+$/, "")}/v1/messages`
+    : `${ZCODE_BASE}${CHAT_PATH}`;
+  const res = await fetch(chatUrl, {
     method: "POST",
-    headers: await upstreamHeaders(p.refreshToken),
+    headers: await upstreamHeaders(p.refreshToken, isBigmodel ? "access" : "jwt"),
     body: JSON.stringify(upstreamBody),
     signal: AbortSignal.timeout(300000),
   });
@@ -393,11 +400,13 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
 // 连通性测试 / 模型
 // =====================================================================
 
-export async function testZcode(_env: Env, jwt: string, modelId: string): Promise<{ success: boolean; message: string; statusCode?: number }> {
+export async function testZcode(_env: Env, jwt: string, modelId: string, baseUrl?: string): Promise<{ success: boolean; message: string; statusCode?: number }> {
   try {
-    const res = await fetch(`${ZCODE_BASE}${CHAT_PATH}`, {
+    const isBigmodel = /bigmodel\.cn/i.test(baseUrl || "");
+    const url = isBigmodel ? `${(baseUrl || "").replace(/\/+$/, "")}/v1/messages` : `${ZCODE_BASE}${CHAT_PATH}`;
+    const res = await fetch(url, {
       method: "POST",
-      headers: await upstreamHeaders(jwt),
+      headers: await upstreamHeaders(jwt, isBigmodel ? "access" : "jwt"),
       body: JSON.stringify({
         model: modelId,
         max_tokens: 32,
@@ -438,13 +447,14 @@ export async function fetchZcodeModels(_env: Env, _jwt: string): Promise<{ succe
 
 export async function probeZcode(
   env: Env,
-  jwt: string
+  jwt: string,
+  baseUrl?: string
 ): Promise<{
   claims: Record<string, unknown>;
   balance: { status: number; body: string };
   preview: { status: number; body: string };
 }> {
-  const headers = await upstreamHeaders(jwt);
+  const headers = await upstreamHeaders(jwt, /bigmodel\.cn/i.test(baseUrl || "") ? "access" : "jwt");
   const get = async (url: string) => {
     const r = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
     const t = await r.text().catch(() => "");

@@ -627,7 +627,7 @@ adminRouter.post("/actions", async (c) => {
         if (!key) throw new ApiError(400, ErrorCode.BAD_REQUEST, "该渠道还没有已授权的账号");
         const { probeZcode } = await import("../oauth/zcode");
         const token = await decryptSecret(env, key.encryptedKey);
-        return done(await probeZcode(env, token), "oauth_account", key.id);
+        return done(await probeZcode(env, token, prov.baseUrl), "oauth_account", key.id);
       }
 
       /* ---- 自动签到开关（按渠道，默认开启） ---- */
