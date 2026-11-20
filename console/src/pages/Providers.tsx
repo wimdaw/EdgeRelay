@@ -947,11 +947,11 @@ export default function Providers() {
           </div>
 
           {rows === null ? (
-            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-40 rounded-xl2" />)}
             </div>
           ) : (
-            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {OAUTH_CATALOG.map((meta) => {
                 const slugs = new Set(oauthSlugsOf(meta));
                 const matches = (rows ?? []).filter((x) => slugs.has(x.slug));
@@ -1056,11 +1056,11 @@ export default function Providers() {
           </div>
 
           {rows === null ? (
-            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-40 rounded-xl2" />)}
             </div>
           ) : (
-            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {WEB_CATALOG.map((meta) => {
                 const p = webProviderOf(meta);
                 return (
