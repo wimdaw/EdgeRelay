@@ -6,7 +6,8 @@ import { Button, Card, Select, useToast } from "../components/ui";
 import { cn } from "../lib/utils";
 
 type ModelKind = "chat" | "image" | "video" | "audio";
-type ModelItem = { id: string; provider: string; paid: boolean; kind: ModelKind };
+type ModelItem = { id: string; provider: string; slug: string; paid: boolean; kind: ModelKind };
+type VoiceItem = { id: string; label: string; group: string };
 type EndpointKey = ModelKind;
 
 /** 端点定义：与后端 /v1 对外暴露的能力一一对应 */
@@ -55,9 +56,12 @@ export default function Playground({ me }: { me: Me }) {
   const [imageN, setImageN] = useState(1);
   const [videoSize, setVideoSize] = useState("1280x720");
   const [videoSeconds, setVideoSeconds] = useState("5");
-  const [voices, setVoices] = useState<string[]>([]);
+  const [voices, setVoices] = useState<VoiceItem[]>([]);
   const [voice, setVoice] = useState("zh-CN-XiaoxiaoNeural");
   const [audioRate, setAudioRate] = useState("+0%");
+  const [audioVolume, setAudioVolume] = useState("+0%");
+  const [audioPitch, setAudioPitch] = useState("+0Hz");
+  const [previewing, setPreviewing] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -74,13 +78,13 @@ export default function Playground({ me }: { me: Me }) {
       .then((d) => {
         setModels(d.models);
         const firstChat = d.models.find((m) => m.kind === "chat");
-        setModel((m) => m || firstChat?.id || d.models[0]?.id || "");
+        setModel((m) => m || (firstChat ? canonicalId(firstChat) : d.models[0] ? canonicalId(d.models[0]) : ""));
       })
       .catch((e) => toast((e as Error).message, "err"));
-    api<{ voices: string[] }>("/api/playground/voices")
+    api<{ voices: VoiceItem[] }>("/api/playground/voices")
       .then((d) => {
         setVoices(d.voices || []);
-        setVoice((v) => v || d.voices?.[0] || "zh-CN-XiaoxiaoNeural");
+        setVoice((v) => v || d.voices?.[0]?.id || "zh-CN-XiaoxiaoNeural");
       })
       .catch(() => {});
   }, []);
@@ -108,11 +112,33 @@ export default function Playground({ me }: { me: Me }) {
   // 清理视频轮询
   useEffect(() => () => { if (videoPollRef.current) window.clearInterval(videoPollRef.current); }, []);
 
+  /** 规范调用格式：渠道ID/模型名（与模型池一致，可精确路由到渠道） */
+  const canonicalId = (m: ModelItem) => `${m.slug}/${m.id}`;
   /** 按当前端点过滤模型 */
   const kindModels = useMemo(() => models.filter((m) => m.kind === endpoint), [models, endpoint]);
+  /** 当前分类下的模型按渠道分组（下拉 optgroup） */
+  const groupedModels = useMemo(() => {
+    const map = new Map<string, ModelItem[]>();
+    for (const m of kindModels) {
+      const arr = map.get(m.provider) || [];
+      arr.push(m);
+      map.set(m.provider, arr);
+    }
+    return [...map.entries()];
+  }, [kindModels]);
+  /** 音色按语言分组 */
+  const voiceGroups = useMemo(() => {
+    const map = new Map<string, VoiceItem[]>();
+    for (const v of voices) {
+      const arr = map.get(v.group) || [];
+      arr.push(v);
+      map.set(v.group, arr);
+    }
+    return [...map.entries()];
+  }, [voices]);
   /** 音频端点不需要模型 */
   const needModel = endpoint !== "audio";
-  const activeModel = models.find((m) => m.id === model);
+  const activeModel = models.find((m) => canonicalId(m) === model);
   /** 模型与端点不匹配时给出自动切换提示 */
   const modelMismatch = needModel && !!activeModel && activeModel.kind !== endpoint;
 
@@ -121,13 +147,13 @@ export default function Playground({ me }: { me: Me }) {
     setEndpoint(next);
     if (next === "audio") return;
     const list = models.filter((m) => m.kind === next);
-    if (list.length && !list.some((m) => m.id === model)) setModel(list[0].id);
+    if (list.length && !list.some((m) => canonicalId(m) === model)) setModel(canonicalId(list[0]));
   };
 
   /** 选择模型：自动匹配对应端点（如选了图片模型自动切到图片端点） */
   const pickModel = (id: string) => {
     setModel(id);
-    const m = models.find((x) => x.id === id);
+    const m = models.find((x) => canonicalId(x) === id);
     if (m && m.kind !== endpoint) {
       setEndpoint(m.kind);
       toast(`已自动切换到「${ENDPOINTS.find((e) => e.key === m.kind)?.label}」端点`);
@@ -148,6 +174,33 @@ export default function Playground({ me }: { me: Me }) {
 
   const patch = (id: string, fn: (m: Msg) => Msg) =>
     setMsgs((prev) => prev.map((m) => (m.id === id ? fn(m) : m)));
+
+  /** 音色试听：用当前音色/语速/音量/音调合成一句固定示例 */
+  const previewVoice = async () => {
+    if (previewing) return;
+    setPreviewing(true);
+    try {
+      const resp = await fetch("/api/playground/speech", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ model: "edge-tts", input: "你好，这是当前音色的试听效果。", voice, rate: audioRate, volume: audioVolume, pitch: audioPitch, key_id: keyId }),
+      });
+      const ct = (resp.headers.get("content-type") || "").toLowerCase();
+      if (!resp.ok || !ct.startsWith("audio")) {
+        const data = await resp.json().catch(() => null);
+        toast(data?.error?.message ?? "试听失败", "err");
+        return;
+      }
+      const blob = await resp.blob();
+      const audio = new Audio(URL.createObjectURL(blob));
+      void audio.play();
+    } catch (e) {
+      toast((e as Error).message || "试听失败", "err");
+    } finally {
+      setPreviewing(false);
+    }
+  };
 
   const precheck = (text: string): boolean => {
     if (!text || busy) return false;
@@ -353,7 +406,7 @@ export default function Playground({ me }: { me: Me }) {
         method: "POST",
         credentials: "same-origin",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ model: "edge-tts", input: text, voice, rate: audioRate, key_id: keyId }),
+        body: JSON.stringify({ model: "edge-tts", input: text, voice, rate: audioRate, volume: audioVolume, pitch: audioPitch, key_id: keyId }),
       });
       const ct = (resp.headers.get("content-type") || "").toLowerCase();
       if (!resp.ok || !ct.startsWith("audio")) {
@@ -486,12 +539,16 @@ export default function Playground({ me }: { me: Me }) {
                 <label className="mb-1 block text-[11px] font-medium text-muted">模型</label>
                 {kindModels.length > 0 ? (
                   <Select value={model} onChange={(e) => pickModel(e.target.value)} className="w-full">
-                    {!kindModels.some((m) => m.id === model) && <option value="">请选择模型</option>}
-                    {kindModels.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.id}
-                        {m.paid ? "（付费）" : ""}
-                      </option>
+                    {!kindModels.some((m) => canonicalId(m) === model) && <option value="">请选择模型</option>}
+                    {groupedModels.map(([prov, list]) => (
+                      <optgroup key={prov} label={prov}>
+                        {list.map((m) => (
+                          <option key={`${m.slug}/${m.id}`} value={canonicalId(m)}>
+                            {canonicalId(m)}
+                            {m.paid ? "（付费）" : ""}
+                          </option>
+                        ))}
+                      </optgroup>
                     ))}
                   </Select>
                 ) : (
@@ -507,20 +564,53 @@ export default function Playground({ me }: { me: Me }) {
               </div>
             ) : (
               <div>
-                <label className="mb-1 block text-[11px] font-medium text-muted">音色</label>
+                <div className="flex items-center justify-between">
+                  <label className="mb-1 block text-[11px] font-medium text-muted">音色（{voices.length} 个，按语言分组）</label>
+                  <button
+                    type="button"
+                    className="text-[11px] font-medium text-brand hover:underline disabled:opacity-50"
+                    disabled={previewing || !keyId}
+                    onClick={previewVoice}
+                  >
+                    {previewing ? "生成试听中…" : "▶ 试听当前音色"}
+                  </button>
+                </div>
                 <Select value={voice} onChange={(e) => setVoice(e.target.value)} className="w-full">
-                  {voices.map((v) => (
-                    <option key={v} value={v}>{v}</option>
+                  {voiceGroups.map(([group, list]) => (
+                    <optgroup key={group} label={group}>
+                      {list.map((v) => (
+                        <option key={v.id} value={v.id}>{v.label} · {v.id.replace(/Neural$/, "")}</option>
+                      ))}
+                    </optgroup>
                   ))}
-                  {!voices.includes(voice) && <option value={voice}>{voice}</option>}
+                  {!voices.some((v) => v.id === voice) && <option value={voice}>{voice}</option>}
                 </Select>
-                <div className="mt-2">
-                  <label className="mb-1 block text-[11px] font-medium text-muted">语速</label>
-                  <Select value={audioRate} onChange={(e) => setAudioRate(e.target.value)} className="w-full">
-                    {["-50%", "-25%", "+0%", "+25%", "+50%", "+100%"].map((r) => (
-                      <option key={r} value={r}>{r}</option>
-                    ))}
-                  </Select>
+                <p className="mt-1 font-mono text-[10px] text-muted">{voice}</p>
+                <div className="mt-2 grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="mb-1 block text-[10px] font-medium text-muted">语速</label>
+                    <Select value={audioRate} onChange={(e) => setAudioRate(e.target.value)} className="w-full">
+                      {["-50%", "-25%", "-10%", "+0%", "+10%", "+25%", "+50%", "+100%"].map((r) => (
+                        <option key={r} value={r}>{r}</option>
+                      ))}
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-[10px] font-medium text-muted">音量</label>
+                    <Select value={audioVolume} onChange={(e) => setAudioVolume(e.target.value)} className="w-full">
+                      {["-50%", "-25%", "+0%", "+25%", "+50%"].map((r) => (
+                        <option key={r} value={r}>{r}</option>
+                      ))}
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-[10px] font-medium text-muted">音调</label>
+                    <Select value={audioPitch} onChange={(e) => setAudioPitch(e.target.value)} className="w-full">
+                      {["-20%", "-10%", "+0%", "+10%", "+20%"].map((r) => (
+                        <option key={r} value={r}>{r}</option>
+                      ))}
+                    </Select>
+                  </div>
                 </div>
               </div>
             )}

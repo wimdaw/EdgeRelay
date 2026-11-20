@@ -25,7 +25,7 @@ import { runChatPipeline, type ChatBody, type ChatRequestAuth } from "./chat";
 import { runImagesGenerations, type MediaAuthContext } from "./images";
 import { runVideoCreate } from "./video";
 import { loadVideoTask, refreshVideoTask, signVideoToken, toOpenAiVideoObject } from "../video";
-import { handleAzureTtsSpeech, AZURE_TTS_COMMON_VOICES } from "../azure-tts";
+import { handleAzureTtsSpeech, AZURE_TTS_VOICES_GROUPED } from "../azure-tts";
 import { publicOrigin } from "../public-url";
 
 export const playgroundRouter = new Hono<{ Bindings: Env }>();
@@ -127,20 +127,23 @@ playgroundRouter.get("/models", async (c) => {
 
     // embedding/rerank/moderation 等既非对话也非媒体端点，操练场不提供
     const UNSUPPORTED = /(^|[-_/])(embedding|embed|rerank|moderation|whisper|transcription)([-_/]|$)/i;
-    const rows: { id: string; provider: string; paid: boolean; kind: "chat" | "image" | "video" | "audio" }[] = [];
+    const rows: { id: string; provider: string; slug: string; paid: boolean; kind: "chat" | "image" | "video" | "audio" }[] = [];
     const seen = new Set<string>();
     for (const m of models) {
       if (m.enabled !== 1) continue;
       const p = activeProviders.get(m.providerId);
       if (!p) continue;
-      if (seen.has(m.publicName)) continue;
+      // 同名模型可存在于多个渠道（如 glm-5.3-flash 分属 nvidia/amd）：按 渠道/模型 规范格式各自保留，
+      // 前端展示带渠道前缀即可精确路由，不再跨渠道去重
+      const dedupeKey = `${p.slug}/${m.publicName}`;
+      if (seen.has(dedupeKey)) continue;
       if (UNSUPPORTED.test(m.publicName) || UNSUPPORTED.test(m.upstreamModel)) continue;
       const kind = classifyPlaygroundModel(m.publicName, m.upstreamModel, p.kind);
       const pricing = await getPricing(c.env, m.publicName);
       const paid = !!pricing && (pricing.inputPerMillion > 0 || pricing.outputPerMillion > 0);
       if (paid && !isAdminRole(user.role)) continue; // 普通用户不给付费模型
-      seen.add(m.publicName);
-      rows.push({ id: m.publicName, provider: p.name, paid, kind });
+      seen.add(dedupeKey);
+      rows.push({ id: m.publicName, provider: p.name, slug: p.slug, paid, kind });
     }
     rows.sort((a, b) => a.id.localeCompare(b.id));
     return json({ ok: true, models: rows, rpm_limit: RPM_LIMIT, can_use_paid: isAdminRole(user.role) });
@@ -312,7 +315,7 @@ playgroundRouter.get("/voices", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
     await requireUser(hCtx);
-    return json({ ok: true, voices: AZURE_TTS_COMMON_VOICES });
+    return json({ ok: true, voices: AZURE_TTS_VOICES_GROUPED });
   } catch (err) {
     return errorResponse(hCtx, err);
   }
