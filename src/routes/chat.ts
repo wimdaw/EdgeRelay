@@ -532,7 +532,23 @@ export async function runChatPipeline(
         if (!resp) throw new Error("no response from upstream");
 
         if (!resp.ok) {
-          lastUpstreamError = `status ${resp.status}`;
+          // 保留上游错误正文：可重试分支会直接 continue，不读 body 的话最终只剩 "status 502"
+          let detail = "";
+          try {
+            const t = await resp.clone().text();
+            if (t) {
+              try {
+                const j = JSON.parse(t);
+                detail = String(j?.error?.message || j?.message || t);
+              } catch {
+                detail = t;
+              }
+              detail = detail.replace(/\s+/g, " ").slice(0, 240);
+            }
+          } catch {
+            /* body 不可读就只留状态码 */
+          }
+          lastUpstreamError = `status ${resp.status}${detail ? `: ${detail}` : ""}`;
           lastUpstreamStatus = resp.status;
           await recordFailure(route, resp.status);
           // 401/402/403 都可能是「该账号/该渠道」的问题（如 Antigravity 账号被 Google 封禁），
