@@ -391,10 +391,18 @@ export async function testZcode(_env: Env, jwt: string, modelId: string): Promis
       }),
       signal: AbortSignal.timeout(60000),
     });
-    if (!res.ok) {
-      const t = (await res.text().catch(() => "")).slice(0, 200);
-      return { success: false, message: `HTTP ${res.status}: ${t}`, statusCode: res.status };
+    const text = await res.text().catch(() => "");
+    if (!res.ok) return { success: false, message: `HTTP ${res.status}: ${text.slice(0, 200)}`, statusCode: res.status };
+    // 上游错误也可能是 HTTP 200 + {code,msg}：必须校验响应体，否则会把额度耗尽误报成“连接成功”
+    let j: any = null;
+    try {
+      j = JSON.parse(text);
+    } catch {
+      return { success: false, message: `返回非 JSON: ${text.slice(0, 150)}`, statusCode: res.status };
     }
+    const biz = Number(j?.error?.biz_code ?? j?.biz_code ?? j?.code) || 0;
+    if (biz !== 0) return { success: false, message: `业务错误 ${biz}: ${j?.msg || j?.error?.message || ""}`, statusCode: res.status };
+    if (!Array.isArray(j?.content)) return { success: false, message: `返回结构异常: ${text.slice(0, 150)}`, statusCode: res.status };
     return { success: true, message: "连接成功", statusCode: res.status };
   } catch (e) {
     return { success: false, message: (e as Error).message || "请求失败" };
