@@ -130,7 +130,12 @@ const OAUTH_CATALOG: OAuthMeta[] = [
     slug: "zcode-oauth",
     baseUrl: "https://zcode.z.ai",
     mode: "redirect-poll" as const,
-    desc: "智谱 ZCode 客户端额度通道（GLM-5.3 / GLM-5.3-Flash），Anthropic 协议反代；国内/国际归属按账号身份自动识别。",
+    regionSelect: true,
+    regions: [
+      { label: "国际版（z.ai）", baseUrl: "https://zcode.z.ai", desc: "OAuth 设备授权，走 z.ai 的体验/编程套餐额度" },
+      { label: "国内版（bigmodel）", baseUrl: "https://open.bigmodel.cn/api/anthropic", desc: "走 open.bigmodel.cn；该站无设备授权，需填入客户端 access_token" },
+    ],
+    desc: "智谱 ZCode 客户端额度通道（GLM-5.3 / GLM-5.3-Flash），Anthropic 协议反代；国内版与国际版为两套独立站点与令牌。",
     models: ["GLM-5.3", "GLM-5.3-Flash"],
   },
   {
@@ -507,7 +512,11 @@ export default function Providers() {
     try {
       // 双域渠道：国内/国际账号体系独立，落到各自的底层渠道，避免同一渠道混用两套域
       const variant = meta.regionSelect
-        ? /workbuddy\.ai/i.test(baseUrl)
+        ? meta.type === "zcode"
+          ? /bigmodel\.cn/i.test(baseUrl)
+            ? { slug: "zcode-bigmodel-oauth", name: "ZCode 国内版 (bigmodel)" }
+            : { slug: "zcode-oauth", name: "ZCode 国际版 (z.ai)" }
+          : /workbuddy\.ai/i.test(baseUrl)
           ? { slug: "codebuddy-global-oauth", name: "CodeBuddy 国际版" }
           : { slug: "codebuddy-oauth", name: "CodeBuddy 国内版" }
         : null;
@@ -596,6 +605,24 @@ export default function Providers() {
   /** 真正发起授权；区域选择完成后由 startOAuthFlow 接手 */
   const startOAuthFlow = async (meta: OAuthMeta, existing: Provider | null, baseUrl: string) => {
     stopOAuthPoll();
+    // ZCode 国内版（bigmodel）：该站没有设备授权接口，先建渠道，凭据由用户从客户端粘贴
+    if (meta.type === "zcode" && /bigmodel\.cn/i.test(baseUrl)) {
+      try {
+        await adminActionStepUp("upsert_provider", {
+          name: "ZCode 国内版 (bigmodel)",
+          slug: "zcode-bigmodel-oauth",
+          kind: "oauth:zcode",
+          baseUrl,
+        });
+        const d = await adminAction<{ providers: Provider[] }>("list_providers");
+        setRows(d.providers);
+        setOauthDlg(null);
+        toast("已创建国内版渠道：请到该渠道里填入客户端的 access_token（bigmodel 站不支持设备授权）", "ok");
+      } catch (e) {
+        setOauthDlg((x) => (x ? { ...x, step: "error", message: (e as Error).message } : x));
+      }
+      return;
+    }
     setOauthDlg({
       meta,
       provider: existing,

@@ -451,6 +451,7 @@ export async function probeZcode(
   baseUrl?: string
 ): Promise<{
   claims: Record<string, unknown>;
+  matrix: Array<{ host: string; token: string; status: number; body: string }>;
   balance: { status: number; body: string };
   preview: { status: number; body: string };
 }> {
@@ -475,8 +476,50 @@ export async function probeZcode(
   } catch {
     claims = { error: "jwt 解析失败" };
   }
+  // 矩阵：两个站点 × 两种令牌，直接看哪一组能过（返回状态码 + 响应片段）
+  const cred = parseZcodeCredential(jwt);
+  const baseHeaders = await upstreamHeaders(jwt, "jwt");
+  const hosts = [
+    { name: "zai", url: `${ZCODE_BASE}${CHAT_PATH}` },
+    { name: "bigmodel", url: "https://open.bigmodel.cn/api/anthropic/v1/messages" },
+  ];
+  const tokens = [
+    { name: "jwt", value: cred.jwt },
+    { name: "access", value: cred.accessToken },
+  ];
+  const matrix: Array<{ host: string; token: string; status: number; body: string }> = [];
+  for (const h of hosts) {
+    for (const t of tokens) {
+      if (!t.value) {
+        matrix.push({ host: h.name, token: t.name, status: 0, body: "令牌缺失" });
+        continue;
+      }
+      try {
+        const r = await fetch(h.url, {
+          method: "POST",
+          headers: { ...baseHeaders, authorization: `Bearer ${t.value}`, "x-api-key": t.value },
+          body: JSON.stringify({
+            model: "GLM-5.3",
+            max_tokens: 16,
+            stream: false,
+            system: ZCODE_SYSTEM,
+            messages: [{ role: "user", content: "hi" }],
+            thinking: ZCODE_DEFAULTS.thinking,
+            output_config: ZCODE_DEFAULTS.output_config,
+          }),
+          signal: AbortSignal.timeout(30000),
+        });
+        const text = await r.text().catch(() => "");
+        matrix.push({ host: h.name, token: t.name, status: r.status, body: text.slice(0, 200) });
+      } catch (e) {
+        matrix.push({ host: h.name, token: t.name, status: 0, body: (e as Error).message });
+      }
+    }
+  }
+
   return {
     claims,
+    matrix,
     balance: await get(`${ZCODE_BASE}${BALANCE_PATH}`),
     preview: await get(`${ZCODE_BASE}${PREVIEW_PATH}`),
   };
