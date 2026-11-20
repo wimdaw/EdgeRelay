@@ -28,9 +28,11 @@ export default function CheckinTasks() {
   const load = async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const r = await adminAction<{ channels: CheckinChannel[]; providers: CheckinProvider[] }>("checkin_status");
-      setChannels(r.channels || []);
-      setProviders(r.providers || []);
+      // adminAction 返回完整 {ok, result}，需解一层 result
+      const r = await adminAction<{ result?: { channels: CheckinChannel[]; providers: CheckinProvider[] } }>("checkin_status");
+      const data = (r.result ?? (r as unknown as { channels: CheckinChannel[]; providers: CheckinProvider[] })) || { channels: [], providers: [] };
+      setChannels(data.channels || []);
+      setProviders(data.providers || []);
     } catch (e) {
       if (!silent) toast((e as Error).message, "err");
       setProviders([]);
