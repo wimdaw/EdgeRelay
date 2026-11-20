@@ -99,7 +99,7 @@ function Progress({ value }: { value: number }) {
   );
 }
 
-export default function VideoTasks({ me }: { me: Me }) {
+export default function VideoTasks({ me, embedded = false }: { me: Me; embedded?: boolean }) {
   const [data, setData] = useState<TasksResp | null>(null);
   const [scope, setScope] = useState<"own" | "all">("own");
   const [tab, setTab] = useState<TabKey>("all");
@@ -176,9 +176,76 @@ export default function VideoTasks({ me }: { me: Me }) {
   const waiting = tasks.filter((t) => t.waiting_slot).length;
   const shown = tasks.filter((t) => inTab(t, tab));
 
+  const renderSubTabs = (className: string) => (
+    <div className={className}>
+      {TABS.map((t) => {
+        const n = tasks.filter((x) => inTab(x, t.key)).length;
+        const active = tab === t.key;
+        return (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => setTab(t.key)}
+            title={t.hint}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors",
+              active ? "bg-brand/15 text-brand" : "text-muted hover:bg-surface2"
+            )}
+          >
+            {t.label}
+            <span className={cn("rounded px-1 text-[10px] font-mono", active ? "bg-brand/15" : "bg-surface2")}>{n}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className="flex flex-col gap-4">
       {confirmEl}
+      {embedded ? (
+        <>
+        {/* 定时任务页选项卡内嵌：隐藏大标题，只保留控制条 */}
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {canViewAll ? (
+            <div className="inline-flex overflow-hidden rounded-lg border border-line">
+              <button
+                type="button"
+                onClick={() => setScope("own")}
+                className={cn(
+                  "inline-flex h-8 items-center justify-center px-3 text-xs font-medium transition-colors",
+                  scope === "own" ? "bg-brand/15 text-brand" : "text-muted hover:bg-surface2"
+                )}
+              >
+                我的任务
+              </button>
+              <button
+                type="button"
+                onClick={() => setScope("all")}
+                className={cn(
+                  "inline-flex h-8 items-center justify-center px-3 text-xs font-medium transition-colors",
+                  scope === "all" ? "bg-brand/15 text-brand" : "text-muted hover:bg-surface2"
+                )}
+              >
+                全部任务
+              </button>
+            </div>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-surface2 px-3 py-1.5 text-xs font-medium text-muted">
+              <Film size={12} /> 我的任务
+            </span>
+          )}
+          <Button variant="soft" className="h-8" onClick={() => load(false, scope)} disabled={loading}>
+            <RefreshCw size={13} className={cn(loading && "animate-spin")} />
+            {loading ? "刷新中…" : "刷新"}
+          </Button>
+          <Button variant={auto ? "soft" : "ghost"} className="h-8" onClick={() => setAuto((v) => !v)} title="每 60 秒自动刷新未完成任务">
+            {auto ? `自动 ${countdown}s` : "已暂停"}
+          </Button>
+        </div>
+        {renderSubTabs("flex flex-wrap gap-1.5")}
+        </>
+      ) : (
       <Card className="p-4 sm:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
@@ -251,28 +318,9 @@ export default function VideoTasks({ me }: { me: Me }) {
           {data && <span className="ml-auto">上次刷新 {fmtTime(data.refreshed_at)}</span>}
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-1.5 border-t border-line/70 pt-3">
-          {TABS.map((t) => {
-            const n = tasks.filter((x) => inTab(x, t.key)).length;
-            const active = tab === t.key;
-            return (
-              <button
-                key={t.key}
-                type="button"
-                onClick={() => setTab(t.key)}
-                title={t.hint}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors",
-                  active ? "bg-brand/15 text-brand" : "text-muted hover:bg-surface2"
-                )}
-              >
-                {t.label}
-                <span className={cn("rounded px-1 text-[10px] font-mono", active ? "bg-brand/15" : "bg-surface2")}>{n}</span>
-              </button>
-            );
-          })}
-        </div>
+        {renderSubTabs("mt-3 flex flex-wrap gap-1.5 border-t border-line/70 pt-3")}
       </Card>
+      )}
 
       {data === null ? (
         <Card className="p-6">

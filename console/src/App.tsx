@@ -12,6 +12,7 @@ import { Dialog, Button } from "./components/ui";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Keys = lazy(() => import("./pages/Keys"));
 const VideoTasks = lazy(() => import("./pages/VideoTasks"));
+const ScheduledTasks = lazy(() => import("./pages/ScheduledTasks"));
 const Playground = lazy(() => import("./pages/Playground"));
 const Providers = lazy(() => import("./pages/Providers"));
 const AccountPool = lazy(() => import("./pages/AccountPool"));
@@ -121,7 +122,8 @@ function Shell() {
         <Route path="/dashboard" element={me ? <Dashboard /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/keys" element={me ? <Keys /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/playground" element={me ? <Playground me={me} /> : <Navigate to="/login" replace />} />
-        <Route path="/dashboard/videos" element={me ? <VideoTasks me={me} /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/tasks" element={me ? <ScheduledTasks me={me} /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard/videos" element={<Navigate to="/dashboard/tasks" replace />} />
         <Route path="/dashboard/models" element={me ? <ModelsPricing /> : <Navigate to="/login" replace />} />
         <Route path="/dashboard/pricing" element={<Navigate to="/dashboard/models" replace />} />
         <Route path="/dashboard/logs" element={me && canViewLogs ? <Logs me={me} /> : <Navigate to="/dashboard" replace />} />

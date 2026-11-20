@@ -86,16 +86,25 @@ async function logUsage(
   ]).catch(() => {});
 }
 
-imagesRouter.post("/generations", async (c) => {
-  const env = c.env as Env;
-  const requestId = c.req.header("x-request-id") || uuid();
-  const started = Date.now();
+/** 与 authenticateSkGwKey 返回一致的鉴权上下文（供操练场会话鉴权复用同一套管线） */
+export type MediaAuthContext = {
+  userId: string;
+  keyId: string;
+  ip: string;
+  row: { modelWhitelist?: string | null };
+  limits: { rpm: number; tpm: number; concurrency: number };
+};
+
+/** 图片生成管线：鉴权之后的所有逻辑（路由解析/限流/重试/计费审计），/v1 与操练场共用 */
+export async function runImagesGenerations(
+  env: Env,
+  auth: MediaAuthContext,
+  body: ImageBody,
+  requestId: string,
+  started: number
+): Promise<Response> {
   let concKeyId: string | null = null;
-
   try {
-    const auth = await authenticateSkGwKey(c);
-    const body = (await c.req.json<ImageBody>().catch(() => ({}))) as ImageBody;
-
     if (!body.model) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 model");
     const prompt = typeof body.prompt === "string" ? body.prompt : typeof body.input === "string" ? body.input : "";
     if (!prompt.trim()) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 prompt");
@@ -195,10 +204,26 @@ imagesRouter.post("/generations", async (c) => {
     }
     const status = lastStatus === 401 || lastStatus === 402 || (lastStatus >= 400 && lastStatus < 500) ? lastStatus : 502;
     return openAiError(status, ErrorCode.UPSTREAM_ERROR, lastError || "图片生成失败", { attempts });
-  } catch (err) {
-    return errorResponse(c, err);
   } finally {
     if (concKeyId) await releaseConcurrency(env, concKeyId).catch(() => {});
     await commitRateLimits(env).catch(() => {});
+  }
+}
+
+imagesRouter.post("/generations", async (c) => {
+  const env = c.env as Env;
+  const requestId = c.req.header("x-request-id") || uuid();
+  try {
+    const auth0 = await authenticateSkGwKey(c);
+    const body = (await c.req.json<ImageBody>().catch(() => ({}))) as ImageBody;
+    return await runImagesGenerations(
+      env,
+      { userId: auth0.userId, keyId: auth0.keyId, ip: auth0.ip, row: auth0.row, limits: auth0.limits },
+      body,
+      requestId,
+      Date.now()
+    );
+  } catch (err) {
+    return errorResponse(c, err);
   }
 });

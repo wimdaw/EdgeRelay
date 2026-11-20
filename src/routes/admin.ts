@@ -221,6 +221,7 @@ adminRouter.post("/actions", async (c) => {
       requireRole(user, ["superadmin"]);
     } else if (
       action === "account_pool" ||
+      action === "checkin_status" ||
       action === "codebuddy_checkin" ||
       action === "codebuddy_checkin_link" ||
       action === "checkin_config" ||
@@ -737,6 +738,35 @@ adminRouter.post("/actions", async (c) => {
         const types = typeof p.type === "string" && p.type ? [String(p.type)] : undefined;
         const run = await runCheckins(env, { force: true, types });
         return done(run, "checkin", types ? types.join(",") : "all");
+      }
+
+      /* ---- 签到任务总览（定时任务页）：渠道注册表 + 开关 + 各渠道账号数 ---- */
+      case "checkin_status": {
+        const { listCheckinChannels, readCheckinConfig } = await import("../checkin");
+        const [channels, cfg, providers] = await Promise.all([
+          Promise.resolve(listCheckinChannels()),
+          readCheckinConfig(env),
+          getProviders(env),
+        ]);
+        const rows = [];
+        for (const pr of providers) {
+          const type = (pr.kind || "").replace(/^oauth:/, "");
+          const meta = channels.find((x) => x.type === type);
+          if (!meta) continue;
+          const keys = await getProviderKeysAll(env, pr.id).catch(() => []);
+          rows.push({
+            id: pr.id,
+            name: pr.name,
+            slug: pr.slug,
+            type,
+            label: meta.label,
+            action: meta.action,
+            enabled: !cfg.disabled.includes(type),
+            status: pr.status,
+            accounts: keys.length,
+          });
+        }
+        return done({ ok: true, channels, providers: rows }, "checkin", "status");
       }
 
       /* ---- ZCode：把客户端真实 device_mid 写回凭据（无需重新授权） ---- */

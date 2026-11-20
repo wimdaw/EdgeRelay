@@ -18,6 +18,7 @@ import { profileRouter } from "./routes/profile";
 import { siteRouter } from "./routes/site";
 import { videoRouter } from "./routes/video";
 import { imagesRouter } from "./routes/images";
+import { audioRouter } from "./routes/audio";
 import { monitorRouter } from "./routes/monitor";
 import { videoManageRouter } from "./routes/video-manage";
 import { playgroundRouter } from "./routes/playground";
@@ -60,6 +61,7 @@ app.get("/health", (c) =>
 app.route("/v1/chat/completions", chatRouter);
 app.route("/v1/videos", videoRouter);
 app.route("/v1/images", imagesRouter);
+app.route("/v1/audio", audioRouter);
 app.route("/api/monitor", monitorRouter);
 app.route("/api/video", videoManageRouter);
 app.route("/api/playground", playgroundRouter);

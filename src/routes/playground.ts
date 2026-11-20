@@ -22,6 +22,11 @@ import { getApiKeyById, getModels, getProviders, listUserApiKeys, touchApiKeyUsa
 import { getBlobStore } from "../storage/blob-store";
 import { uuid } from "../crypto";
 import { runChatPipeline, type ChatBody, type ChatRequestAuth } from "./chat";
+import { runImagesGenerations, type MediaAuthContext } from "./images";
+import { runVideoCreate } from "./video";
+import { loadVideoTask, refreshVideoTask, signVideoToken, toOpenAiVideoObject } from "../video";
+import { handleAzureTtsSpeech, AZURE_TTS_COMMON_VOICES } from "../azure-tts";
+import { publicOrigin } from "../public-url";
 
 export const playgroundRouter = new Hono<{ Bindings: Env }>();
 
@@ -86,7 +91,31 @@ async function resolveAccountKey(env: Env, userId: string, keyId?: string): Prom
   return active[0];
 }
 
-/** 模型列表：普通用户看不到付费模型 */
+/**
+ * 模型分类：返回 chat / image / video / audio，前端据此做端点选项卡与自动匹配。
+ * 判定依据（对齐 images.ts / video.ts 的路由过滤口径）：
+ *  - video：provider kind 为 agnes_video 或 upstream 以 agnes-video 开头，或名称含视频模型特征
+ *  - image：provider kind 为 agnes_image 或 upstream 以 agnes-image 开头，或名称含图片模型特征
+ *  - audio：名称含 tts/speech 特征（走内置 Edge TTS，免费）
+ *  - 其余归入 chat；embedding/rerank/moderation 等既非对话也非媒体的不进操练场
+ */
+function classifyPlaygroundModel(publicName: string, upstreamModel: string, providerKind: string | null): "chat" | "image" | "video" | "audio" {
+  const kind = (providerKind || "").toLowerCase();
+  const up = (upstreamModel || "").toLowerCase();
+  const name = (publicName || "").toLowerCase();
+  if (kind === "agnes_video" || kind === "agnes-video" || /^agnes-video/.test(up) || /(video|veo|kling|runway|sora|pika|hailuo|vidu)/i.test(name)) {
+    return "video";
+  }
+  if (kind === "agnes_image" || kind === "agnes-image" || /^agnes-image/.test(up) || /(dall-e|dalle|flux|sdxl|stable-diffusion|image|imagen|midjourney|seedream|banana)/i.test(name)) {
+    return "image";
+  }
+  if (/(^|[-_/])(tts|speech|voice|text-to-speech)([-_/]|$)/i.test(name) || /edge-tts/i.test(name)) {
+    return "audio";
+  }
+  return "chat";
+}
+
+/** 模型列表：普通用户看不到付费模型；带分类供前端做端点选项卡 */
 playgroundRouter.get("/models", async (c) => {
   const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
   try {
@@ -94,21 +123,22 @@ playgroundRouter.get("/models", async (c) => {
     const [models, providers] = await Promise.all([getModels(c.env), getProviders(c.env)]);
     const activeProviders = new Map(providers.filter((p) => p.status === "active").map((p) => [p.id, p]));
 
-    // 操练场只做对话，过滤掉图片/视频/语音/向量等非对话模型
-    const NON_CHAT = /(^|[-_/])(image|video|tts|whisper|speech|embedding|embed|rerank|moderation)([-_/]|$)/i;
-    const rows: { id: string; provider: string; paid: boolean }[] = [];
+    // embedding/rerank/moderation 等既非对话也非媒体端点，操练场不提供
+    const UNSUPPORTED = /(^|[-_/])(embedding|embed|rerank|moderation|whisper|transcription)([-_/]|$)/i;
+    const rows: { id: string; provider: string; paid: boolean; kind: "chat" | "image" | "video" | "audio" }[] = [];
     const seen = new Set<string>();
     for (const m of models) {
       if (m.enabled !== 1) continue;
       const p = activeProviders.get(m.providerId);
       if (!p) continue;
       if (seen.has(m.publicName)) continue;
-      if (NON_CHAT.test(m.publicName) || NON_CHAT.test(m.upstreamModel)) continue;
+      if (UNSUPPORTED.test(m.publicName) || UNSUPPORTED.test(m.upstreamModel)) continue;
+      const kind = classifyPlaygroundModel(m.publicName, m.upstreamModel, p.kind);
       const pricing = await getPricing(c.env, m.publicName);
       const paid = !!pricing && (pricing.inputPerMillion > 0 || pricing.outputPerMillion > 0);
       if (paid && !isAdminRole(user.role)) continue; // 普通用户不给付费模型
       seen.add(m.publicName);
-      rows.push({ id: m.publicName, provider: p.name, paid });
+      rows.push({ id: m.publicName, provider: p.name, paid, kind });
     }
     rows.sort((a, b) => a.id.localeCompare(b.id));
     return json({ ok: true, models: rows, rpm_limit: RPM_LIMIT, can_use_paid: isAdminRole(user.role) });
@@ -175,6 +205,112 @@ playgroundRouter.post("/chat", async (c) => {
       keyRow: accountKey,
     };
     return await runChatPipeline(c, auth, outboundBody as ChatBody);
+  } catch (err) {
+    return errorResponse(hCtx, err);
+  }
+});
+
+/* =====================================================================
+ * 媒体端点：图片 / 视频 / 语音（与 /v1 共用同一套上游管线与计费审计）
+ * ===================================================================== */
+
+/** 会话鉴权 + Key 解析 + RPM 限制的公共前置，返回管线所需的鉴权上下文 */
+async function prepareMediaCall(c: any, keyId?: string): Promise<{ auth: MediaAuthContext; origin: string; user: { id: string } }> {
+  const env = c.env as Env;
+  const hCtx: HandlerCtx = { env, req: c.req as any };
+  const user = await requireUser(hCtx);
+  const accountKey = await resolveAccountKey(env, user.id, keyId);
+  const rpm = await checkKeyRpm(env, accountKey.id);
+  if (!rpm.ok) {
+    throw new ApiError(429, ErrorCode.RATE_LIMITED, `操练场每分钟最多 ${RPM_LIMIT} 次，请稍后再试`);
+  }
+  touchApiKeyUsage(env, accountKey.id, { lastUsedAt: Math.floor(Date.now() / 1000) });
+  const settings = await getSettings(env);
+  return {
+    auth: {
+      userId: user.id,
+      keyId: accountKey.id,
+      ip: clientIp(hCtx.req),
+      row: accountKey,
+      limits: { rpm: settings.defaultRpm, tpm: settings.defaultTpm, concurrency: 10 },
+    },
+    origin: publicOrigin(c, env),
+    user,
+  };
+}
+
+/** 图片生成：POST /api/playground/images（body 与 /v1/images/generations 一致 + key_id） */
+playgroundRouter.post("/images", async (c) => {
+  const env = c.env as Env;
+  const requestId = c.req.header("x-request-id") || uuid();
+  try {
+    const body = (await c.req.json().catch(() => ({}))) as Record<string, any>;
+    const { auth } = await prepareMediaCall(c, typeof body.key_id === "string" ? body.key_id : undefined);
+    delete body.key_id;
+    return await runImagesGenerations(env, auth, body as never, requestId, Date.now());
+  } catch (err) {
+    return errorResponse({ env, req: c.req as any } as HandlerCtx, err);
+  }
+});
+
+/** 视频任务提交：POST /api/playground/videos（body 与 /v1/videos/generations 一致 + key_id） */
+playgroundRouter.post("/videos", async (c) => {
+  const env = c.env as Env;
+  const requestId = c.req.header("x-request-id") || uuid();
+  try {
+    const body = (await c.req.json().catch(() => ({}))) as Record<string, any>;
+    const { auth, origin } = await prepareMediaCall(c, typeof body.key_id === "string" ? body.key_id : undefined);
+    delete body.key_id;
+    return await runVideoCreate(env, auth, body as never, 0, requestId, Date.now(), origin);
+  } catch (err) {
+    return errorResponse({ env, req: c.req as any } as HandlerCtx, err);
+  }
+});
+
+/** 视频任务查询（会话鉴权，只能看自己的任务）：GET /api/playground/videos/:id */
+playgroundRouter.get("/videos/:id", async (c) => {
+  const env = c.env as Env;
+  const hCtx: HandlerCtx = { env, req: c.req as any };
+  try {
+    const user = await requireUser(hCtx);
+    const rec = await loadVideoTask(env, c.req.param("id"));
+    if (!rec || rec.userId !== user.id) throw new ApiError(404, ErrorCode.NOT_FOUND, "视频任务不存在或已过期");
+    const updated = await refreshVideoTask(env, rec);
+    const origin = publicOrigin(c, env);
+    const token = await signVideoToken(env, rec.id);
+    return json({
+      ok: true,
+      task: {
+        ...toOpenAiVideoObject(updated),
+        poll_url: `${origin}/v1/videos/${rec.id}`,
+        watch_url: `${origin}/v1/videos/${rec.id}/watch?token=${encodeURIComponent(token)}`,
+      },
+    });
+  } catch (err) {
+    return errorResponse(hCtx, err);
+  }
+});
+
+/** 语音合成（内置免费 Edge TTS）：POST /api/playground/speech */
+playgroundRouter.post("/speech", async (c) => {
+  const env = c.env as Env;
+  try {
+    const body = (await c.req.json().catch(() => ({}))) as Record<string, any>;
+    const input = typeof body.input === "string" ? body.input : typeof body.prompt === "string" ? body.prompt : "";
+    if (!input.trim()) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 input 文本");
+    await prepareMediaCall(c, typeof body.key_id === "string" ? body.key_id : undefined);
+    return await handleAzureTtsSpeech({ ...body, input });
+  } catch (err) {
+    return errorResponse({ env, req: c.req as any } as HandlerCtx, err);
+  }
+});
+
+/** 音色清单（操练场下拉用） */
+playgroundRouter.get("/voices", async (c) => {
+  const hCtx: HandlerCtx = { env: c.env, req: c.req as any };
+  try {
+    await requireUser(hCtx);
+    return json({ ok: true, voices: AZURE_TTS_COMMON_VOICES });
   } catch (err) {
     return errorResponse(hCtx, err);
   }

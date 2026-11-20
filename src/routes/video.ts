@@ -150,15 +150,28 @@ async function keyOf(env: Env, rec: VideoTaskRecord): Promise<string> {
 }
 
 /** 创建视频任务（POST /v1/videos 与 POST /v1/videos/generations 共用） */
-async function createVideo(c: any, waitMs: number): Promise<Response> {
-  const env = c.env as Env;
-  const requestId = c.req.header("x-request-id") || uuid();
-  const started = Date.now();
+/** 与 authenticateSkGwKey 返回一致的鉴权上下文（供操练场会话鉴权复用同一套管线） */
+export type MediaAuthContext = {
+  userId: string;
+  keyId: string;
+  ip: string;
+  row: { modelWhitelist?: string | null };
+  limits: { rpm: number; tpm: number; concurrency: number };
+};
+
+/** 视频任务提交管线：鉴权之后的所有逻辑（路由解析/限流/排队/建任务），/v1 与操练场共用 */
+export async function runVideoCreate(
+  env: Env,
+  auth: MediaAuthContext,
+  body: VideoBody,
+  waitMs: number,
+  requestId: string,
+  started: number,
+  origin: string
+): Promise<Response> {
   let concKeyId: string | null = null;
 
   try {
-    const auth = await authenticateSkGwKey(c);
-    const body = (await c.req.json().catch(() => ({}))) as VideoBody;
     if (!body.model) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 model");
     const prompt = typeof body.prompt === "string" ? body.prompt : typeof body.input === "string" ? body.input : "";
     if (!prompt.trim()) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 prompt");
@@ -369,7 +382,6 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
       ip: auth.ip,
     });
 
-    const origin = publicOrigin(c, env);
     const pollUrl = `${origin}/v1/videos/${record.id}`;
     const watchToken = await signVideoToken(env, record.id);
     const watchUrl = `${origin}/v1/videos/${record.id}/watch?token=${encodeURIComponent(watchToken)}`;
@@ -394,11 +406,29 @@ async function createVideo(c: any, waitMs: number): Promise<Response> {
     return new Response(JSON.stringify({ ...toOpenAiVideoObject(record), poll_url: pollUrl, watch_url: watchUrl }), {
       headers: { "content-type": "application/json; charset=utf-8" },
     });
-  } catch (err) {
-    return errorResponse(c, err);
   } finally {
     if (concKeyId) await releaseConcurrency(env, concKeyId).catch(() => {});
     await commitRateLimits(env).catch(() => {});
+  }
+}
+
+async function createVideo(c: any, waitMs: number): Promise<Response> {
+  const env = c.env as Env;
+  const requestId = c.req.header("x-request-id") || uuid();
+  try {
+    const auth0 = await authenticateSkGwKey(c);
+    const body = (await c.req.json().catch(() => ({}))) as VideoBody;
+    return await runVideoCreate(
+      env,
+      { userId: auth0.userId, keyId: auth0.keyId, ip: auth0.ip, row: auth0.row, limits: auth0.limits },
+      body,
+      waitMs,
+      requestId,
+      Date.now(),
+      publicOrigin(c, env)
+    );
+  } catch (err) {
+    return errorResponse(c, err);
   }
 }
 
