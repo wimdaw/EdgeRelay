@@ -17,7 +17,7 @@ import { mapLimit } from "./storage/cache";
 import { WEB_PROVIDERS, type WebProviderType } from "./web";
 
 export type AccountQuota = {
-  type: "antigravity" | "cline" | "codebuddy" | "chatgptweb" | "codex" | "unknown";
+  type: "antigravity" | "cline" | "codebuddy" | "chatgptweb" | "codex" | "zcode" | "unknown";
   ok: boolean;
   email?: string;
   name?: string;
@@ -32,6 +32,10 @@ export type AccountQuota = {
   models?: Array<{ id: string; name?: string; remaining: number | null; resetTime?: string; recommended?: boolean }>;
   windows?: Array<{ label: string; usedPercent: number; remainPercent: number; windowMinutes?: number; resetTime?: string }>;
   credits?: { hasCredits: boolean; balance?: number; unlimited?: boolean };
+  /** zcode：billing/balance 的额度列表（balances 平面，JWT 身份可见的部分） */
+  zcodeBalances?: Array<{ showName: string; remaining: number; total: number; used: number; unitType?: string; expiresAt?: number }>;
+  /** zcode：当前可领取的套餐包数量 */
+  claimableCount?: number;
 };
 
 export type AccountPoolAccount = {
@@ -193,6 +197,23 @@ export async function buildAccountPool(env: Env, providers: ProviderRecord[]): P
             plan: r.plan,
             note: r.note,
             error: r.error,
+          };
+        });
+      } else if (info.type === "zcode") {
+        // billing 平面认 CLI JWT：balances[] 展示真实额度，顺带报告可领包数量
+        const { fetchZcodeBalance } = await import("./oauth/zcode");
+        const pairs = keys.map((k, i) => ({ key: k, token: plaintexts[i]! })).filter((x) => x.token);
+        const rows = await mapLimit(pairs, 4, async (x) => fetchZcodeBalance(env, x.token));
+        const byId = new Map(pairs.map((x, idx) => [x.key.id, rows[idx]]));
+        quotas = keys.map((k) => {
+          const r = byId.get(k.id);
+          if (!r) return null;
+          return {
+            type: "zcode" as const,
+            ok: r.ok,
+            error: r.error,
+            zcodeBalances: r.balances,
+            claimableCount: r.claimable.length,
           };
         });
       }

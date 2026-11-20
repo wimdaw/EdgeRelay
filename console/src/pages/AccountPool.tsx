@@ -6,7 +6,7 @@ import { cn } from "../lib/utils";
 
 type QuotaModel = { id: string; name?: string; remaining: number | null; resetTime?: string; recommended?: boolean };
 type AccountQuota = {
-  type: "antigravity" | "cline" | "codebuddy" | "chatgptweb" | "codex" | "unknown";
+  type: "antigravity" | "cline" | "codebuddy" | "chatgptweb" | "codex" | "zcode" | "unknown";
   ok: boolean;
   email?: string;
   name?: string;
@@ -21,6 +21,8 @@ type AccountQuota = {
   models?: QuotaModel[];
   windows?: Array<{ label: string; usedPercent: number; remainPercent: number; windowMinutes?: number; resetTime?: string }>;
   credits?: { hasCredits: boolean; balance?: number; unlimited?: boolean };
+  zcodeBalances?: Array<{ showName: string; remaining: number; total: number; used: number; unitType?: string; expiresAt?: number }>;
+  claimableCount?: number;
 };
 type PoolAccount = {
   id: string;
@@ -193,6 +195,34 @@ function QuotaView({ q }: { q: AccountQuota | null }) {
         {q.plan && <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand">{q.plan}</span>}
         {q.note && <span className="text-[10px] text-amber-500">{q.note}</span>}
         {!q.note && <span className="text-[10px] text-muted">网页版无额度接口</span>}
+      </div>
+    );
+  }
+
+  if (q.type === "zcode") {
+    const balances = q.zcodeBalances || [];
+    const fmt = (n: number) => (n >= 1e8 ? `${(n / 1e8).toFixed(1).replace(/\.0$/, "")}亿` : n >= 1e4 ? `${(n / 1e4).toFixed(1).replace(/\.0$/, "")}万` : String(n));
+    return (
+      <div className="space-y-1.5">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted">
+          <span className="inline-flex items-center gap-1"><Wallet size={11} />Start Plan 额度</span>
+          {(q.claimableCount ?? 0) > 0 && (
+            <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-500">有 {q.claimableCount} 个包可领</span>
+          )}
+          {balances.length === 0 && <span className="text-[10px] text-muted">该身份名下暂无生效额度（若客户端有额度，请在网关重新授权客户端正在使用的账号）</span>}
+        </div>
+        {balances.map((b, i) => (
+          <div key={`${b.showName}-${i}`} className="rounded-lg bg-surface2/50 px-2.5 py-1.5">
+            <Progress value={b.total > 0 ? b.remaining / b.total : null} label={b.showName} />
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-muted">
+              <span>剩 <b className="font-mono text-ink">{fmt(b.remaining)}</b>{b.total > 0 && <> / {fmt(b.total)}</>}{b.unitType && ` ${b.unitType}`}</span>
+              {b.used > 0 && <span>已用 {fmt(b.used)}</span>}
+              {b.expiresAt && (
+                <span className="inline-flex items-center gap-1"><Clock size={10} />到期 {new Date(b.expiresAt * 1000).toLocaleString("zh-CN", { hour12: false })}</span>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

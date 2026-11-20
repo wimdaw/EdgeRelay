@@ -161,20 +161,6 @@ function bearerOf(cred: { jwt: string; accessToken: string }): string {
   return cred.accessToken || cred.jwt;
 }
 
-/** JWT 是否过老（无 exp，按 iat + 7 天判断，对齐参考实现的 login_expired） */
-function loginExpired(jwt: string, ttlDays = 7): boolean {
-  try {
-    const payload = jwt.split(".")[1];
-    if (!payload) return false;
-    const claims = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
-    const iat = Number(claims?.iat) || 0;
-    if (!iat) return false;
-    return Date.now() / 1000 - iat > ttlDays * 86400;
-  } catch {
-    return false;
-  }
-}
-
 function jsonResponse(payload: unknown, status = 200): Response {
   return new Response(JSON.stringify(payload), {
     status,
@@ -411,9 +397,8 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
   if (!p.refreshToken) return errorResponse("该 zcode 渠道未配置凭据：请在「API Key」里填入 ZCode 账号的 JWT（可点「用 ZCode 账号授权」获取）", 400, "configuration_error");
 
   const inbound = openAIToAnthropicZcode({ ...p.body, model: p.modelId });
-  if (loginExpired(parseZcodeCredential(p.refreshToken).jwt)) {
-    return errorResponse("ZCode 登录已过期，请重新授权该账号", 401, "login_expired");
-  }
+  // 注意：不要按 JWT 年龄做本地拦截——上游计费网关不按 iat 拒绝（实测 8 天旧 JWT 照常可用），
+  // 只有上游真的回 401/3012 时才需要重新授权。误杀会把仍可用的号整个下线。
   const cred = parseZcodeCredential(p.refreshToken);
   const uid = userIdFromJwt(cred.jwt);
   const [deviceId, sessionId] = await Promise.all([deviceIdFor(uid), sessionIdFor(uid)]);
@@ -444,7 +429,9 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     method: "POST",
     headers: await upstreamHeaders(p.refreshToken, isBigmodel ? "access" : "jwt"),
     body: JSON.stringify(upstreamBody),
-    signal: AbortSignal.timeout(300000),
+    // EdgeOne 云函数硬限 120s：超时上限必须收敛在平台限制内（留 10s 余量），
+    // 否则上游还在跑、函数已被平台杀掉，客户端表现为连接被切断后无限重连。
+    signal: AbortSignal.timeout(110_000),
   });
   const raw = await res.text().catch(() => "");
   let env: any = null;
@@ -530,6 +517,59 @@ export async function testZcode(_env: Env, jwt: string, modelId: string, baseUrl
 export async function fetchZcodeModels(_env: Env, _jwt: string): Promise<{ success: boolean; models: string[]; message?: string }> {
   // 上游没有公开模型目录接口，用客户端固定清单
   return { success: true, models: ZCODE_MODELS };
+}
+
+// =====================================================================
+// 余额（billing 平面认 CLI JWT 身份：balances[] 是真实额度，preview.plans[] 是可领包）
+// =====================================================================
+
+export type ZcodeBalanceEntry = {
+  showName: string;
+  remaining: number;
+  total: number;
+  used: number;
+  unitType?: string;
+  expiresAt?: number;
+};
+
+export type ZcodeBalanceInfo = {
+  ok: boolean;
+  error?: string;
+  balances: ZcodeBalanceEntry[];
+  claimable: Array<{ planId: string; name: string }>;
+};
+
+/** 查询账号额度：billing/balance + billing/preview，都带 CLI JWT（对齐 zcode-api 的 quota 口径） */
+export async function fetchZcodeBalance(_env: Env, jwt: string): Promise<ZcodeBalanceInfo> {
+  const cred = parseZcodeCredential(jwt);
+  if (!cred.jwt) return { ok: false, error: "凭据中没有 CLI JWT", balances: [], claimable: [] };
+  const headers = await upstreamHeaders(jwt, "jwt");
+  const num = (v: unknown): number => (Number.isFinite(Number(v)) ? Number(v) : 0);
+  try {
+    const [bRes, pRes] = await Promise.all([
+      fetch(`${ZCODE_BASE}${BALANCE_PATH}`, { headers, signal: AbortSignal.timeout(15000) }),
+      fetch(`${ZCODE_BASE}${PREVIEW_PATH}`, { headers, signal: AbortSignal.timeout(15000) }),
+    ]);
+    const bj: any = await bRes.json().catch(() => null);
+    const pj: any = await pRes.json().catch(() => null);
+    if (Number(bj?.code) !== 0) {
+      return { ok: false, error: `余额查询失败: ${String(bj?.msg || `HTTP ${bRes.status}`).slice(0, 120)}`, balances: [], claimable: [] };
+    }
+    const balances: ZcodeBalanceEntry[] = (Array.isArray(bj?.data?.balances) ? bj.data.balances : []).map((b: any) => ({
+      showName: String(b?.show_name ?? b?.plan_id ?? "额度"),
+      remaining: num(b?.remaining_units ?? b?.remainingUnits),
+      total: num(b?.total_units ?? b?.totalUnits),
+      used: num(b?.used_units ?? b?.usedUnits),
+      ...(b?.unit_type || b?.unitType ? { unitType: String(b.unit_type ?? b.unitType) } : {}),
+      ...(num(b?.ends_at ?? b?.expires_at ?? b?.expiresAt) > 0 ? { expiresAt: num(b.ends_at ?? b.expires_at ?? b.expiresAt) } : {}),
+    }));
+    const claimable = (Array.isArray(pj?.data?.plans) ? pj.data.plans : [])
+      .map((p: any) => ({ planId: String(p?.plan_id ?? ""), name: String(p?.name ?? p?.plan_id ?? "") }))
+      .filter((p) => p.planId);
+    return { ok: true, balances, claimable };
+  } catch (e: any) {
+    return { ok: false, error: e?.message || "余额查询异常", balances: [], claimable: [] };
+  }
 }
 
 // =====================================================================
@@ -693,7 +733,10 @@ export type ZcodeCheckinResult = {
  */
 export async function checkinZcode(env: Env, jwt: string): Promise<ZcodeCheckinResult> {
   if (!jwt) return { ok: false, message: "未填写凭据" };
-  const headers = await upstreamHeaders(jwt);
+  // billing/preview、billing/claim 都认 CLI JWT（对齐 ZCode2api：claim 缺 JWT 直接失败）。
+  // 不能用默认 prefer "access"——OAuth access_token 短时效，过期后领包会静默全部失败，
+  // 被误报成"无可领取额度"。
+  const headers = await upstreamHeaders(jwt, "jwt");
   try {
     // 当前生效的包类型，避免重复领同一类
     const activeKinds = new Set<string>();
@@ -736,6 +779,7 @@ export async function checkinZcode(env: Env, jwt: string): Promise<ZcodeCheckinR
 
     let claimed = 0;
     let dup = 0;
+    let authFail = 0;
     let lastMsg = "";
     const seen = new Set<string>();
     for (const planId of candidates) {
@@ -751,10 +795,14 @@ export async function checkinZcode(env: Env, jwt: string): Promise<ZcodeCheckinR
       lastMsg = String(j?.data?.message || j?.msg || "");
       if (Number(j?.code) === 0) claimed++;
       else if (Number(j?.code) === 1003) dup++;
+      else if (!r.ok || Number(j?.code) === 1001 || r.status === 401) authFail++;
     }
 
     if (claimed > 0) return { ok: true, reward: claimed, remain, message: `领取 ${claimed} 个额度包` };
     if (dup > 0) return { ok: true, already: true, remain, message: lastMsg || "今日额度已领取" };
+    if (authFail > 0 && !lastMsg) {
+      return { ok: false, remain, message: "领包请求被上游鉴权拒绝（JWT 失效或风控），请在控制台重新授权该账号" };
+    }
     return { ok: false, remain, message: lastMsg || (candidates.length ? "无可领取额度" : "当前没有可领取的额度包") };
   } catch (e) {
     return { ok: false, message: (e as Error).message || "签到失败" };
