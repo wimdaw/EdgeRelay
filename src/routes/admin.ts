@@ -450,12 +450,45 @@ adminRouter.post("/actions", async (c) => {
         if (!rawKeys.length) throw new ApiError(400, ErrorCode.BAD_REQUEST, "请提供有效的 API Key");
 
         const email = typeof p.email === "string" && p.email.trim() ? p.email.trim() : undefined;
+        /** 账号身份（如 oauth 渠道的 uid）：重新授权同一账号时用它覆盖旧凭据，而不是新增一条 */
+        const identity = typeof p.identity === "string" ? p.identity.trim() : "";
 
         const outcome = await withProviderKeyWriteLock(providerId, async () => {
           // 以库内既有指纹为准做幂等：重复点击、刷新重提、同批粘贴重复都不会新增记录
           const existing = await getProviderKeysAll(env, providerId);
           const known = new Set(existing.map((k) => k.keyFingerprint).filter(Boolean));
           const fingerprints = await fingerprintProviderKeys(rawKeys);
+
+          // 同一账号重新授权：凭据内容变了（如新增 access_token），指纹也会变。
+          // 先按账号身份找到旧记录并原地覆盖，避免出现两个“同号”账号。
+          if (identity && rawKeys.length === 1) {
+            const providers = await getProviders(env);
+            const prov = providers.find((x) => x.id === providerId);
+            if (prov?.kind === "oauth:zcode") {
+              const { parseZcodeCredential, userIdFromJwt } = await import("../oauth/zcode");
+              for (const k of existing) {
+                try {
+                  const rawOld = await decryptSecret(env, k.encryptedKey);
+                  const uidOld = userIdFromJwt(parseZcodeCredential(rawOld).jwt);
+                  if (uidOld && uidOld === identity) {
+                    await bulkUpsertProviderKeys(env, providerId, [
+                      {
+                        ...k,
+                        encryptedKey: await encryptSecret(env, rawKeys[0]!),
+                        keyFingerprint: fingerprints[0]!,
+                        ...(email ? { email } : {}),
+                        status: "active",
+                        createdAt: k.createdAt,
+                      },
+                    ]);
+                    return { added: [{ id: k.id, fingerprint: fingerprints[0]! }], skipped: [], replaced: 1 };
+                  }
+                } catch {
+                  /* 单条解密失败不影响其它记录 */
+                }
+              }
+            }
+          }
           const picked: { plaintext: string; index: number; fingerprint: string }[] = [];
           const skipped: string[] = [];
           rawKeys.forEach((plaintext, i) => {
@@ -494,6 +527,7 @@ adminRouter.post("/actions", async (c) => {
             added: outcome.added,
             count: outcome.added.length,
             skipped: outcome.skipped.length,
+            replaced: (outcome as { replaced?: number }).replaced ?? 0,
             duplicate: outcome.skipped.length > 0,
             fingerprint: outcome.added[0]?.fingerprint ?? outcome.skipped[0],
           },

@@ -495,7 +495,14 @@ export default function Providers() {
   const oauthBaseUrl = (meta: OAuthMeta, existing?: Provider | null) => existing?.base_url || meta.baseUrl;
 
   /** 授权成功后：按需创建渠道 + 加密保存 refresh_token + 自动拉取模型 */
-  const finishOAuth = async (meta: OAuthMeta, existing: Provider | null, baseUrl: string, refreshToken: string, email?: string) => {
+  const finishOAuth = async (
+    meta: OAuthMeta,
+    existing: Provider | null,
+    baseUrl: string,
+    refreshToken: string,
+    email?: string,
+    identity?: string,
+  ) => {
     setOauthDlg((d) => (d ? { ...d, busy: true, message: "正在保存账号凭据…" } : d));
     try {
       // 双域渠道：国内/国际账号体系独立，落到各自的底层渠道，避免同一渠道混用两套域
@@ -527,6 +534,8 @@ export default function Providers() {
         key: refreshToken,
         label: `account-${(reuse ? existing?.key_count ?? 0 : 0) + 1}`,
         ...(email ? { email } : {}),
+        // 同一账号重新授权时按身份覆盖旧凭据，避免多出一条重复账号
+        ...(identity ? { identity } : {}),
       });
       toast(`授权成功，账号已加密入库（指纹 ${r.result?.fingerprint ?? ""}）`);
       stopOAuthPoll();
@@ -549,7 +558,7 @@ export default function Providers() {
         const res = r.result ?? r;
         const token = res.refresh_token || res.refreshToken;
         if (res.status === "ok" && token) {
-          await finishOAuth(meta, existing, baseUrl, token as string, res.email);
+          await finishOAuth(meta, existing, baseUrl, token as string, res.email, res.account?.uid);
           return;
         }
         if (res.status === "error") {
@@ -638,7 +647,7 @@ export default function Providers() {
       });
       const token = r.result?.refreshToken;
       if (!token) throw new Error("上游未返回 refresh_token");
-      await finishOAuth(oauthDlg.meta, oauthDlg.provider, oauthDlg.baseUrl, token, r.result?.email);
+      await finishOAuth(oauthDlg.meta, oauthDlg.provider, oauthDlg.baseUrl, token, r.result?.email, r.result?.account?.uid);
     } catch (e) {
       toast((e as Error).message, "err");
       setOauthDlg((d) => (d ? { ...d, step: "error", message: (e as Error).message, busy: false } : d));
