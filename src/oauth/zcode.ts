@@ -347,9 +347,18 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
   const biz = rawCode !== undefined && rawCode !== null && Number(rawCode) !== 0 ? Number(rawCode) : undefined;
   if (biz !== undefined) {
     const msg = String(env?.error?.message || env?.msg || "").slice(0, 300);
+    // 诊断：把实际发出的请求摘要一并带出（不含凭据），便于和后台直测逐字段比对
+    const sent = JSON.stringify({
+      model: upstreamBody.model,
+      max_tokens: upstreamBody.max_tokens,
+      stream: upstreamBody.stream,
+      msgs: Array.isArray(upstreamBody.messages) ? upstreamBody.messages.length : -1,
+      keys: Object.keys(upstreamBody),
+    });
+    console.log(`[zcode] upstream ${biz} sent=${sent}`);
     if (biz === 3012) return errorResponse(`ZCode 风控拒绝（3012，system/设备指纹不匹配）: ${msg}`, 403, "upstream_error");
-    if (biz === 1005 || biz === 3009) return errorResponse(`ZCode 账号额度不足或繁忙（${biz}）: ${msg}`, 429, "upstream_error");
-    return errorResponse(`ZCode 业务错误 ${biz}: ${msg}`, 402, "upstream_error");
+    if (biz === 1005 || biz === 3009) return errorResponse(`ZCode 账号额度不足或繁忙（${biz}）: ${msg} | sent=${sent}`, 429, "upstream_error");
+    return errorResponse(`ZCode 业务错误 ${biz}: ${msg} | sent=${sent}`, 402, "upstream_error");
   }
 
   if (!res.ok) return errorResponse(`ZCode 上游 HTTP ${res.status}: ${raw.slice(0, 300)}`, res.status, "upstream_error");
