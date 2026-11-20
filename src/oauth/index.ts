@@ -46,8 +46,16 @@ import {
   handleCodebuddyRequest,
 } from "./codebuddy";
 import { startClineDeviceFlow, pollClineDeviceFlow, testCline, fetchClineModels, handleClineRequest, CLINE_BUILTIN_MODELS } from "./cline";
+import {
+  startQoderDeviceFlow,
+  pollQoderDeviceFlow,
+  testQoder,
+  fetchQoderModels,
+  handleQoderRequest,
+  QODER_MODELS,
+} from "./qoder";
 
-export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok" | "codebuddy" | "cline" | "zcode";
+export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok" | "codebuddy" | "cline" | "zcode" | "qoder";
 
 export type OAuthProviderMeta = {
   type: OAuthProviderType;
@@ -152,6 +160,16 @@ export const OAUTH_PROVIDERS: Record<OAuthProviderType, OAuthProviderMeta> = {
     desc: "Cline 账号 WorkOS 设备码授权，自动适配免费通道与「账号×模型」冷却。",
     defaultModels: CLINE_BUILTIN_MODELS.slice(0, 6),
   },
+  qoder: {
+    type: "qoder",
+    name: "Qoder",
+    slug: "qoder-oauth",
+    baseUrl: "https://qoder.com",
+    mode: "redirect-poll",
+    regionSelect: true,
+    desc: "Qoder 账号设备授权（国内/国际双区），COSY 签名反代，OpenAI 兼容协议直通；支持每日签到领 Credits。",
+    defaultModels: QODER_MODELS.slice(0, 6),
+  },
 };
 
 export const OAUTH_KIND_PREFIX = "oauth:";
@@ -192,6 +210,10 @@ export async function startOAuth(env: Env, type: OAuthProviderType, baseUrl?: st
   }
   if (type === "zcode") {
     const flow = await startZcodeDeviceFlow(env);
+    return { mode: "redirect-poll", url: flow.url, state: flow.state };
+  }
+  if (type === "qoder") {
+    const flow = await startQoderDeviceFlow(env, baseUrl);
     return { mode: "redirect-poll", url: flow.url, state: flow.state };
   }
   const flow =
@@ -246,6 +268,7 @@ export async function pollOAuth(env: Env, type: OAuthProviderType, state: string
   if (type === "grok") return pollGrokDeviceFlow(env, state);
   if (type === "codebuddy") return pollCodebuddyDeviceFlow(env, state);
   if (type === "zcode") return pollZcodeDeviceFlow(env, state);
+  if (type === "qoder") return pollQoderDeviceFlow(env, state);
   if (type === "cline") {
     const r = await pollClineDeviceFlow(env, state);
     return { status: r.status, message: r.message, refreshToken: r.refreshToken, email: r.email };
@@ -291,6 +314,10 @@ export async function fetchOAuthModels(
       const r = await fetchZcodeModels(env, refreshToken);
       return { models: r.models.length ? r.models : fallback, message: r.message };
     }
+    if (type === "qoder") {
+      const r = await fetchQoderModels(env, refreshToken, baseUrl);
+      return { models: r.models.length ? r.models : fallback, message: r.message };
+    }
     if (type === "cline") {
       const r = await fetchClineModels(env, refreshToken);
       return r.success && r.models.length ? { models: r.models } : { models: fallback, message: r.message };
@@ -316,6 +343,7 @@ export async function testOAuth(
   if (type === "qwen") return testQwen(env, refreshToken, modelId);
   if (type === "codebuddy") return testCodebuddy(env, refreshToken, modelId, baseUrl);
   if (type === "zcode") return testZcode(env, refreshToken, modelId, baseUrl);
+  if (type === "qoder") return testQoder(env, refreshToken, modelId, baseUrl);
   if (type === "cline") return testCline(env, refreshToken, modelId);
   return testGrok(env, refreshToken, modelId);
 }
@@ -373,6 +401,16 @@ export async function handleOAuthChat(args: OAuthChatArgs): Promise<Response> {
       return handleCodebuddyRequest(p, args.baseUrl);
     case "cline":
       return handleClineRequest(p);
+    case "qoder":
+      return handleQoderRequest({
+        env: args.env,
+        providerId: args.providerId,
+        baseUrl: args.baseUrl,
+        modelId: args.upstreamModel,
+        requestedModel: args.requestedModel,
+        body: args.body,
+        refreshToken: args.refreshToken,
+      });
     default:
       return new Response(JSON.stringify({ error: { message: `未知 OAuth 渠道: ${args.type}` } }), {
         status: 400,

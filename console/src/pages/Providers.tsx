@@ -139,6 +139,20 @@ const OAUTH_CATALOG: OAuthMeta[] = [
     models: ["GLM-5.3", "GLM-5.3-Flash"],
   },
   {
+    type: "qoder",
+    name: "Qoder",
+    slug: "qoder-oauth",
+    baseUrl: "https://qoder.com",
+    mode: "redirect-poll" as const,
+    regionSelect: true,
+    regions: [
+      { label: "国际版（qoder.com）", baseUrl: "https://qoder.com", desc: "api3.qoder.sh 推理集群，账号与国内版独立" },
+      { label: "国内版（qoder.com.cn）", baseUrl: "https://qoder.com.cn", desc: "gateway.qoder.com.cn，QoderWork 账号体系" },
+    ],
+    desc: "Qoder 账号设备授权（COSY 签名反代），OpenAI 兼容协议直通，支持每日签到领 Credits。",
+    models: ["auto", "qmodel_38max", "qfmodel", "qmodel_latest", "gmodel", "dmodel"],
+  },
+  {
     type: "cline",
     name: "Cline",
     slug: "cline-oauth",
@@ -516,6 +530,10 @@ export default function Providers() {
           ? /bigmodel\.cn/i.test(baseUrl)
             ? { slug: "zcode-bigmodel-oauth", name: "ZCode 国内版 (bigmodel)" }
             : { slug: "zcode-oauth", name: "ZCode 国际版 (z.ai)" }
+          : meta.type === "qoder"
+          ? /qoder\.com\.cn/i.test(baseUrl)
+            ? { slug: "qoder-cn-oauth", name: "Qoder 国内版" }
+            : { slug: "qoder-oauth", name: "Qoder 国际版 (qoder.com)" }
           : /workbuddy\.ai/i.test(baseUrl)
           ? { slug: "codebuddy-global-oauth", name: "CodeBuddy 国际版" }
           : { slug: "codebuddy-oauth", name: "CodeBuddy 国内版" }

@@ -465,13 +465,21 @@ adminRouter.post("/actions", async (c) => {
           if (identity && rawKeys.length === 1) {
             const providers = await getProviders(env);
             const prov = providers.find((x) => x.id === providerId);
+            // 各 OAuth 渠道的账号身份提取方式不同：凭据内容变了（指纹随之变化）时，
+            // 必须按账号 uid 找到旧记录原地覆盖，否则会出现两个“同号”账号。
+            let extractUid: ((raw: string) => string) | null = null;
             if (prov?.kind === "oauth:zcode") {
               const { parseZcodeCredential, userIdFromJwt } = await import("../oauth/zcode");
+              extractUid = (raw) => userIdFromJwt(parseZcodeCredential(raw).jwt);
+            } else if (prov?.kind === "oauth:qoder") {
+              const { parseQoderCredential } = await import("../oauth/qoder");
+              extractUid = (raw) => parseQoderCredential(raw)?.uid || "";
+            }
+            if (extractUid) {
               for (const k of existing) {
                 try {
                   const rawOld = await decryptSecret(env, k.encryptedKey);
-                  const uidOld = userIdFromJwt(parseZcodeCredential(rawOld).jwt);
-                  if (uidOld && uidOld === identity) {
+                  if (extractUid(rawOld) === identity) {
                     await bulkUpsertProviderKeys(env, providerId, [
                       {
                         ...k,

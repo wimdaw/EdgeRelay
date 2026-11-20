@@ -394,3 +394,44 @@ git checkout edgeone
 - 额外补充（不改变基线行为）：凭据可携带 `access_token` 与真实 `device_id`（`jwt|access|device`），请求头 `x-device-mid` 优先用真实值。
 - 当前线上：渠道 `zcode-oauth`，baseUrl `https://zcode.z.ai`，1 个账号，模型 `GLM-5.3` / `GLM-5.3-Flash`，自动领额度开启。
 - 待测：账号为 start plan 体验额度，等本周末额度领取后再验证一次；若仍 `1005`，下一步对比客户端请求头（重点看是否含 captcha 类字段）。
+
+---
+
+## 十、 2026-11-20 Qoder 渠道接入
+
+### 1. 已完成
+
+- [x] **设备授权**（`src/oauth/qoder.ts`）
+  - PKCE S256 + `/device/selectAccounts` + `/api/v1/deviceToken/poll`。
+  - 国内版：`qoder.com.cn`、QoderWork `client_id`、带 `redirect_uri=qoder-work-cn://`、nonce 为带横线 UUID。
+  - 国际版：`qoder.com`、Qoder `client_id`、不带 `redirect_uri`、nonce 为 32 位 hex。
+  - 授权结果落库为 JSON 凭据（`device_token` / `refresh_token` / `uid` / `user_type` / `region`）。
+- [x] **COSY 签名层**（`src/oauth/qoder-cosy.ts`）
+  - 自定义 base64 变体（换表 + 1/3 旋转）；9 字段身份体 AES-128-CBC；RSA PKCS#1 v1.5（WebCrypto 不支持，BigInt 模幂）；MD5 请求签名。
+  - machineId / machineToken / machineType / hostname 按账号 UID 稳定派生，与 `qoder2api-hub` 逐字节对齐。
+- [x] **对话反代**
+  - OpenAI ChatCompletions → Qoder `agent_chat_generation` 请求体（`request_id` / `session_id` / `chat_context` / `model_config` / `business` / `tools`）。
+  - 上游 SSE 信封解包、工具调用聚合；客户端流式由本层合成 SSE。
+- [x] **签到**
+  - `GET /sash/api/v1/me/campaigns` 找 `CLAIM_BENEFIT` 可领活动 → `POST .../claim`。
+  - 国内版不发指纹头（发了反而不下发活动）；国际版带账号派生指纹，尽力而为。
+- [x] **控制台与签到框架**
+  - `OAUTH_CATALOG` 新增 Qoder 单入口 + 国内/国际区域选择；按 baseUrl 落 `qoder-oauth` / `qoder-cn-oauth`。
+  - `src/checkin.ts` 注册 `qoder` runner，默认开启，随 `/api/monitor/video` 心跳执行。
+- [x] **重新授权去重**
+  - `upsert_provider_key` 的 `identity` 覆盖逻辑从 ZCode 泛化到 Qoder：同一 uid 重新授权原地覆盖旧凭据，不再新增重复账号。
+
+### 2. 验证
+
+- `tsc --noEmit -p tsconfig.server.json` ✓
+- console `tsc -b` + `vite build` ✓
+- `tests/test-qoder-cosy.mjs`：16 项（编码 / 指纹 / 签名形态，向量取自 `qoder2api-hub`）✓
+- `tests/test-runner.mjs`：303 项 ✓
+
+### 3. 已知边界（待办）
+
+- [ ] **未用真实账号验证**：授权链接与 COSY 请求体均按参考实现移植，但没有 Qoder 账号跑通过一次完整对话；需要真号点一次授权并测试 `auto` / `qmodel_38max`。
+- [ ] **动态模型目录不可用**：上游 `/algo/api/v2/model/list` 要求 GET 携带编码后的 body（签名覆盖 body），Workers/EdgeOne 的 fetch 禁止 GET body；当前使用官方客户端目录兜底。
+- [ ] **国际版签到指纹**：参考实现证实自造 `cosy-machinetoken` 不会下发 `CLAIM_BEFEFIT` 活动；当前用账号派生指纹尽力而为，失败时提示需要客户端真实指纹。
+- [ ] **Token 自动续期未实现**：Qoder 设备令牌 / refresh_token 约 15 天有效期，过期后需重新授权；参考实现的 jobToken `needRefresh` 续期链路尚未移植。
+- [ ] **流式为聚合后回放**：与 ZCode 渠道一致，先收完整条上游 SSE 再合成客户端 SSE，首字延迟等于整条响应耗时。
