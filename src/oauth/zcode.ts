@@ -12,11 +12,6 @@
  */
 import type { Env } from "../types";
 import { getBlobStore } from "../storage/blob-store";
-import {
-  openAIToAnthropicRequest,
-  anthropicResponseToOpenAI,
-  createOpenAIStreamFromAnthropic,
-} from "../anthropic-translate";
 import { ZCODE_SYSTEM, ZCODE_DEFAULTS } from "./zcode-profile";
 
 const ZCODE_BASE = "https://zcode.z.ai";
@@ -222,32 +217,113 @@ function demoteSystem(messages: any[], systemText: string): any[] {
   return out;
 }
 
+/**
+ * OpenAI ChatCompletions → Anthropic Messages。
+ * 与 ZCode2API 的 openaiToAnthropic 对齐：纯文本 + tool_calls 主流场景，
+ * tool 角色合并成 tool_result，system 单独抽出后由 demoteSystem 降级。
+ */
+function openAIToAnthropicZcode(body: Record<string, any>): Record<string, any> {
+  const msgs: any[] = [];
+  let system = "";
+  for (const m of Array.isArray(body.messages) ? body.messages : []) {
+    if (m?.role === "system" || m?.role === "developer") {
+      system += (typeof m.content === "string" ? m.content : (m.content ?? []).map((c: any) => c?.text ?? "").join("\n")) + "\n\n";
+    } else if (m?.role === "user" || m?.role === "assistant") {
+      const text =
+        typeof m.content === "string" ? m.content : (m.content ?? []).map((c: any) => (c?.type === "text" ? c.text : "")).join("");
+      msgs.push({ role: m.role, content: text || " " });
+    } else if (m?.role === "tool") {
+      msgs.push({ role: "user", content: [{ type: "tool_result", tool_use_id: m.tool_call_id, content: String(m.content ?? "") }] });
+    }
+  }
+  if (!msgs.length) msgs.push({ role: "user", content: " " });
+
+  const out: Record<string, any> = {
+    model: body.model,
+    max_tokens: body.max_tokens || body.max_completion_tokens || 8192,
+    stream: false,
+    messages: msgs,
+  };
+  if (system.trim()) out.system = system.trim();
+  if (body.temperature !== undefined) out.temperature = body.temperature;
+  if (body.top_p !== undefined) out.top_p = body.top_p;
+  if (body.stop) out.stop_sequences = Array.isArray(body.stop) ? body.stop : [body.stop];
+  return out;
+}
+
+/** Anthropic Messages → OpenAI ChatCompletion（对齐 ZCode2API 的 anthropicToOpenAI） */
+function anthropicToOpenAIZcode(env: any, model: string): Record<string, any> {
+  const blocks: any[] = Array.isArray(env?.content) ? env.content : [];
+  const text = blocks.filter((b) => b?.type === "text").map((b) => b.text ?? "").join("");
+  const toolCalls = blocks
+    .filter((b) => b?.type === "tool_use")
+    .map((b) => ({ id: b.id, type: "function", function: { name: b.name, arguments: JSON.stringify(b.input ?? {}) } }));
+  const message: Record<string, any> = { role: "assistant", content: text || null };
+  if (toolCalls.length) message.tool_calls = toolCalls;
+  const usage = env?.usage || {};
+  const prompt = Number(usage.input_tokens) || 0;
+  const completion = Number(usage.output_tokens) || 0;
+  return {
+    id: env?.id || `chatcmpl-${randomHex(8)}`,
+    object: "chat.completion",
+    created: Math.floor(Date.now() / 1000),
+    model,
+    choices: [
+      {
+        index: 0,
+        message,
+        finish_reason: env?.stop_reason === "tool_use" ? "tool_calls" : env?.stop_reason === "max_tokens" ? "length" : "stop",
+      },
+    ],
+    usage: { prompt_tokens: prompt, completion_tokens: completion, total_tokens: prompt + completion },
+  };
+}
+
+/** 非流式结果合成 SSE（OpenAI 客户端开 stream 时用，避免依赖上游 SSE 细节） */
+function completionToSse(completion: Record<string, any>): Response {
+  const enc = new TextEncoder();
+  const base = {
+    id: completion.id,
+    object: "chat.completion.chunk",
+    created: completion.created,
+    model: completion.model,
+  };
+  const choice = completion.choices?.[0];
+  const deltas = [
+    { role: "assistant", content: choice?.message?.content ?? "" },
+  ];
+  const body =
+    deltas
+      .map((d) => `data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta: d, finish_reason: null }] })}\n\n`)
+      .join("") +
+    `data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta: {}, finish_reason: choice?.finish_reason ?? "stop" }] })}\n\n` +
+    `data: ${JSON.stringify({ ...base, choices: [], usage: completion.usage })}\n\n` +
+    "data: [DONE]\n\n";
+  return new Response(enc.encode(body), {
+    headers: { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" },
+  });
+}
+
 export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> {
   if (!p.refreshToken) return errorResponse("该 zcode 渠道未配置凭据：请在「API Key」里填入 ZCode 账号的 JWT（可点「用 ZCode 账号授权」获取）", 400, "configuration_error");
 
-  const { request } = openAIToAnthropicRequest(p.body);
-  const systemText =
-    typeof request.system === "string"
-      ? request.system
-      : Array.isArray(request.system)
-      ? request.system.map((b: any) => b?.text || "").filter(Boolean).join("\n\n")
-      : "";
-
+  const inbound = openAIToAnthropicZcode({ ...p.body, model: p.modelId });
   const uid = userIdFromJwt(p.refreshToken);
   const [deviceId, sessionId] = await Promise.all([deviceIdFor(uid), sessionIdFor(uid)]);
-  const wantStream = p.body?.stream === true;
 
   const upstreamBody: Record<string, any> = {
     model: p.modelId,
-    max_tokens: Math.min(Number(request.max_tokens) || Number(ZCODE_DEFAULTS.max_tokens) || 32000, Number(ZCODE_DEFAULTS.max_tokens) || 32000),
-    stream: wantStream,
+    max_tokens: Math.min(Number(inbound.max_tokens) || 8192, Number(ZCODE_DEFAULTS.max_tokens) || 32000),
+    stream: false, // 上游固定非流式，流式由本层合成，避免 SSE 结构差异
     metadata: { user_id: metadataUserId(uid, deviceId, sessionId) },
     system: ZCODE_SYSTEM,
-    messages: demoteSystem(request.messages, systemText),
+    messages: demoteSystem(inbound.messages, String(inbound.system || "")),
     tool_choice: ZCODE_DEFAULTS.tool_choice ?? { type: "auto" },
     thinking: ZCODE_DEFAULTS.thinking ?? { type: "enabled" },
     output_config: ZCODE_DEFAULTS.output_config ?? { effort: "low" },
-    ...(Array.isArray(request.tools) && request.tools.length ? { tools: request.tools } : {}),
+    ...(inbound.temperature !== undefined ? { temperature: inbound.temperature } : {}),
+    ...(inbound.top_p !== undefined ? { top_p: inbound.top_p } : {}),
+    ...(inbound.stop_sequences ? { stop_sequences: inbound.stop_sequences } : {}),
   };
 
   const res = await fetch(`${ZCODE_BASE}${CHAT_PATH}`, {
@@ -257,31 +333,35 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     signal: AbortSignal.timeout(300000),
   });
 
-  if (!res.ok) {
-    const detail = (await res.text().catch(() => "")).slice(0, 300);
-    return errorResponse(`ZCode 上游 HTTP ${res.status}: ${detail}`, res.status, "upstream_error");
-  }
-
-  if (wantStream && res.body) {
-    return new Response(createOpenAIStreamFromAnthropic(res.body, p.requestedModel), {
-      status: 200,
-      headers: { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" },
-    });
-  }
-
   const raw = await res.text().catch(() => "");
-  let body: any = null;
+  let env: any = null;
   try {
-    body = JSON.parse(raw);
+    env = JSON.parse(raw);
   } catch {
-    return errorResponse(`ZCode 上游返回非 JSON: ${raw.slice(0, 200)}`, 502, "upstream_error");
+    return errorResponse(`ZCode 上游返回非 JSON（HTTP ${res.status}）: ${raw.slice(0, 200)}`, 502, "upstream_error");
   }
-  // 上游正常应是 Anthropic Messages 结构（content 数组）。若拿到错误包（code/msg）或其它形状，
-  // 直接暴露原始内容，避免翻译成一条 content=null 的“成功”回复。
-  if (!Array.isArray(body?.content)) {
+
+  // 上游业务错误：3012 = 风控（system 指纹/设备指纹不匹配）
+  const biz = env?.error?.biz_code ?? env?.biz_code;
+  if (biz !== undefined && biz !== null && Number(biz) !== 0) {
+    const msg = String(env?.error?.message || env?.msg || "").slice(0, 300);
+    const hint =
+      Number(biz) === 3012
+        ? "（3012 风控：system 指纹或设备指纹与客户端不一致）"
+        : Number(biz) === 1005 || Number(biz) === 3009
+        ? "（账号额度不足或繁忙）"
+        : "";
+    return errorResponse(`ZCode 业务错误 ${biz}${hint}: ${msg}`, 402, "upstream_error");
+  }
+
+  if (!res.ok) return errorResponse(`ZCode 上游 HTTP ${res.status}: ${raw.slice(0, 300)}`, res.status, "upstream_error");
+  if (!Array.isArray(env?.content)) {
     return errorResponse(`ZCode 上游返回异常结构: ${raw.slice(0, 400)}`, 502, "upstream_error");
   }
-  return jsonResponse(anthropicResponseToOpenAI(body, p.requestedModel));
+
+  const completion = anthropicToOpenAIZcode(env, p.requestedModel);
+  if (p.body?.stream === true) return completionToSse(completion);
+  return jsonResponse(completion);
 }
 
 // =====================================================================
