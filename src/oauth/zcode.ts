@@ -326,32 +326,39 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     ...(inbound.stop_sequences ? { stop_sequences: inbound.stop_sequences } : {}),
   };
 
-  const res = await fetch(`${ZCODE_BASE}${CHAT_PATH}`, {
-    method: "POST",
-    headers: await upstreamHeaders(p.refreshToken),
-    body: JSON.stringify(upstreamBody),
-    signal: AbortSignal.timeout(300000),
-  });
-
-  const raw = await res.text().catch(() => "");
+  // 上游对单账号有并发/频控（3009 / 1005），既可能是 HTTP 429，也可能是 200 + code。
+  // 统一在这里做短退避重试，避免把「等一下就好」误判成渠道故障。
+  let res!: Response;
+  let raw = "";
   let env: any = null;
-  try {
-    env = JSON.parse(raw);
-  } catch {
-    return errorResponse(`ZCode 上游返回非 JSON（HTTP ${res.status}）: ${raw.slice(0, 200)}`, 502, "upstream_error");
+  for (let attempt = 0; attempt < 3; attempt++) {
+    res = await fetch(`${ZCODE_BASE}${CHAT_PATH}`, {
+      method: "POST",
+      headers: await upstreamHeaders(p.refreshToken),
+      body: JSON.stringify(upstreamBody),
+      signal: AbortSignal.timeout(300000),
+    });
+    raw = await res.text().catch(() => "");
+    try {
+      env = JSON.parse(raw);
+    } catch {
+      return errorResponse(`ZCode 上游返回非 JSON（HTTP ${res.status}）: ${raw.slice(0, 200)}`, 502, "upstream_error");
+    }
+    const c = Number(env?.error?.biz_code ?? env?.biz_code ?? env?.code) || 0;
+    const connBusy = c === 1005 || c === 3009;
+    if (res.ok && !connBusy) break;
+    if (!connBusy) break;
+    if (attempt < 2) await new Promise((ok) => setTimeout(ok, 800 * (attempt + 1)));
   }
 
-  // 上游业务错误：3012 = 风控（system 指纹/设备指纹不匹配）
-  const biz = env?.error?.biz_code ?? env?.biz_code;
-  if (biz !== undefined && biz !== null && Number(biz) !== 0) {
+  // 上游业务错误：顶层 code（ZCode 用 {code,msg,logid} 包）或 error.biz_code
+  const rawCode = env?.error?.biz_code ?? env?.biz_code ?? env?.code;
+  const biz = rawCode !== undefined && rawCode !== null && Number(rawCode) !== 0 ? Number(rawCode) : undefined;
+  if (biz !== undefined) {
     const msg = String(env?.error?.message || env?.msg || "").slice(0, 300);
-    const hint =
-      Number(biz) === 3012
-        ? "（3012 风控：system 指纹或设备指纹与客户端不一致）"
-        : Number(biz) === 1005 || Number(biz) === 3009
-        ? "（账号额度不足或繁忙）"
-        : "";
-    return errorResponse(`ZCode 业务错误 ${biz}${hint}: ${msg}`, 402, "upstream_error");
+    if (biz === 3012) return errorResponse(`ZCode 风控拒绝（3012，system/设备指纹不匹配）: ${msg}`, 403, "upstream_error");
+    if (biz === 1005 || biz === 3009) return errorResponse(`ZCode 账号额度不足或繁忙（${biz}）: ${msg}`, 429, "upstream_error");
+    return errorResponse(`ZCode 业务错误 ${biz}: ${msg}`, 402, "upstream_error");
   }
 
   if (!res.ok) return errorResponse(`ZCode 上游 HTTP ${res.status}: ${raw.slice(0, 300)}`, res.status, "upstream_error");
@@ -412,21 +419,62 @@ export type ZcodeCheckinResult = {
 };
 
 /**
- * 签到 = 领取当前可领的额度包：
- *  preview 给出可领 plan_id → 逐个 claim；1003 表示已领过。
+ * 签到 = 领取当前可领的额度包。
+ *
+ * preview 只覆盖「当前正在发放」的包；新号的注册礼包/周活动包要靠 id 推算兜底
+ * （对齐 ZCode2API 的 claimFor）：活动包 id 带日期编码 `zcode-v3-start-plan-<MMDD>-wk`，
+ * 北京时间 0 点跳日，所以候选要跨 ±1 天；每日体验包是固定 id `-0817`，领过即 1003。
  */
 export async function checkinZcode(env: Env, jwt: string): Promise<ZcodeCheckinResult> {
   if (!jwt) return { ok: false, message: "未填写凭据" };
   const headers = await upstreamHeaders(jwt);
   try {
-    const pvRes = await fetch(`${ZCODE_BASE}${PREVIEW_PATH}`, { headers, signal: AbortSignal.timeout(20000) });
-    const pv: any = await pvRes.json().catch(() => null);
-    const plans: string[] = (pv?.data?.plans ?? []).map((x: any) => String(x?.plan_id || "")).filter(Boolean);
+    // 当前生效的包类型，避免重复领同一类
+    const activeKinds = new Set<string>();
+    let remain: number | undefined;
+    try {
+      const bRes = await fetch(`${ZCODE_BASE}${BALANCE_PATH}`, { headers, signal: AbortSignal.timeout(15000) });
+      const bj: any = await bRes.json().catch(() => null);
+      const now = Date.now() / 1000;
+      const plans: any[] = (bj?.data?.plans ?? []).filter((p: any) => p?.status === "active" && (p?.ends_at ?? 0) > now);
+      for (const p of plans) {
+        const s = `${p?.plan_id ?? ""} ${p?.name ?? ""}`.toUpperCase();
+        if (s.includes("WEEKEND") || /(^|[-_ ])WK($|[-_ ])/.test(s)) activeKinds.add("promo");
+        if (s.includes("START-PLAN") || s.includes("START PLAN")) activeKinds.add("daily");
+      }
+      const units = (bj?.data?.plans ?? []).map((x: any) => Number(x?.remaining_units) || 0);
+      if (units.length) remain = units.reduce((a: number, b: number) => a + b, 0);
+    } catch {
+      /* 余额读取失败不阻塞领取 */
+    }
+
+    const candidates: string[] = [];
+    try {
+      const pvRes = await fetch(`${ZCODE_BASE}${PREVIEW_PATH}`, { headers, signal: AbortSignal.timeout(20000) });
+      const pv: any = await pvRes.json().catch(() => null);
+      for (const x of pv?.data?.plans ?? []) {
+        const id = String(x?.plan_id || "");
+        if (id) candidates.push(id);
+      }
+    } catch {
+      /* preview 失败仍可用兜底 id */
+    }
+
+    const bj = Date.now() + 8 * 3600_000;
+    const stamps = [0, -1, 1].map((delta) => {
+      const d = new Date(bj + delta * 86400_000);
+      return `${String(d.getUTCMonth() + 1).padStart(2, "0")}${String(d.getUTCDate()).padStart(2, "0")}`;
+    });
+    if (!activeKinds.has("promo")) for (const s of stamps) candidates.push(`zcode-v3-start-plan-${s}-wk`);
+    if (!activeKinds.has("daily")) candidates.push("zcode-v3-start-plan-0817");
 
     let claimed = 0;
     let dup = 0;
     let lastMsg = "";
-    for (const planId of plans) {
+    const seen = new Set<string>();
+    for (const planId of candidates) {
+      if (seen.has(planId)) continue;
+      seen.add(planId);
       const r = await fetch(`${ZCODE_BASE}${CLAIM_PATH}`, {
         method: "POST",
         headers,
@@ -434,26 +482,14 @@ export async function checkinZcode(env: Env, jwt: string): Promise<ZcodeCheckinR
         signal: AbortSignal.timeout(15000),
       });
       const j: any = await r.json().catch(() => null);
-      const code = Number(j?.code);
       lastMsg = String(j?.data?.message || j?.msg || "");
-      if (code === 0) claimed++;
-      else if (code === 1003) dup++;
-    }
-
-    // 顺带回读余额，便于账号池展示
-    let remain: number | undefined;
-    try {
-      const bRes = await fetch(`${ZCODE_BASE}${BALANCE_PATH}`, { headers, signal: AbortSignal.timeout(15000) });
-      const bj: any = await bRes.json().catch(() => null);
-      const units = (bj?.data?.plans ?? []).map((x: any) => Number(x?.remaining_units) || 0);
-      if (units.length) remain = units.reduce((a: number, b: number) => a + b, 0);
-    } catch {
-      /* 余额失败不影响签到结论 */
+      if (Number(j?.code) === 0) claimed++;
+      else if (Number(j?.code) === 1003) dup++;
     }
 
     if (claimed > 0) return { ok: true, reward: claimed, remain, message: `领取 ${claimed} 个额度包` };
     if (dup > 0) return { ok: true, already: true, remain, message: lastMsg || "今日额度已领取" };
-    return { ok: false, remain, message: plans.length ? lastMsg || "无可领取额度" : "当前没有可领取的额度包" };
+    return { ok: false, remain, message: lastMsg || (candidates.length ? "无可领取额度" : "当前没有可领取的额度包") };
   } catch (e) {
     return { ok: false, message: (e as Error).message || "签到失败" };
   }
