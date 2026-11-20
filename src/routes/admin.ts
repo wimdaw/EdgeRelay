@@ -123,6 +123,7 @@ adminRouter.post("/actions", async (c) => {
       action === "codebuddy_checkin_link" ||
       action === "checkin_config" ||
       action === "zcode_probe" ||
+      action === "zcode_set_device" ||
       action === "set_checkin"
     ) {
       // 账号池会解密凭据并查询上游额度；签到同样要解密 refresh_token，仅限超级管理员
@@ -614,6 +615,27 @@ adminRouter.post("/actions", async (c) => {
         const types = typeof p.type === "string" && p.type ? [String(p.type)] : undefined;
         const run = await runCheckins(env, { force: true, types });
         return done(run, "checkin", types ? types.join(",") : "all");
+      }
+
+      /* ---- ZCode：把客户端真实 device_mid 写回凭据（无需重新授权） ---- */
+      case "zcode_set_device": {
+        const providerId = String(p.providerId || "");
+        const deviceId = String(p.deviceId || "").trim();
+        if (!deviceId) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 deviceId");
+        const providers = await getProviders(env);
+        const prov = providers.find((x) => x.id === providerId || x.slug === providerId);
+        if (!prov) throw new ApiError(404, ErrorCode.NOT_FOUND, "渠道不存在");
+        const keys = await getProviderKeysAll(env, prov.id);
+        const key = keys.find((k) => k.status === "active") || keys[0];
+        if (!key) throw new ApiError(400, ErrorCode.BAD_REQUEST, "该渠道还没有已授权的账号");
+        const { parseZcodeCredential } = await import("../oauth/zcode");
+        const raw = await decryptSecret(env, key.encryptedKey);
+        const cred = parseZcodeCredential(raw);
+        const next = [cred.jwt, cred.accessToken, deviceId].filter(Boolean).join("|");
+        await bulkUpsertProviderKeys(env, prov.id, [
+          { ...key, encryptedKey: await encryptSecret(env, next) },
+        ]);
+        return done({ deviceId }, "oauth_account", key.id);
       }
 
       /* ---- ZCode 诊断：余额 + 可领套餐原始返回 ---- */
