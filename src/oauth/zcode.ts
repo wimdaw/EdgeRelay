@@ -826,6 +826,7 @@ export async function checkinZcode(env: Env, jwt: string): Promise<ZcodeCheckinR
     let dup = 0;
     let authFail = 0;
     let lastMsg = "";
+    let firstFail = "";
     const claimedNames: string[] = [];
     for (const [planId, name] of candidates) {
       const r = await fetch(`${ZCODE_BASE}${CLAIM_PATH}`, {
@@ -841,8 +842,11 @@ export async function checkinZcode(env: Env, jwt: string): Promise<ZcodeCheckinR
         claimedNames.push(name);
       } else if (Number(j?.code) === 1003) {
         dup++;
-      } else if (!r.ok || Number(j?.code) === 1001 || r.status === 401) {
-        authFail++;
+      } else {
+        if (!r.ok || Number(j?.code) === 1001 || r.status === 401) authFail++;
+        if (!firstFail) {
+          firstFail = `${planId} HTTP ${r.status} code=${j?.code ?? "?"} msg=${lastMsg.slice(0, 80) || "(空)"}`;
+        }
       }
     }
 
@@ -863,13 +867,14 @@ export async function checkinZcode(env: Env, jwt: string): Promise<ZcodeCheckinR
     const listed = candidates.size;
     if (claimed > 0) return { ok: true, reward: claimed, remain, message: `领取 ${claimed} 个额度包（${claimedNames.join("、")}）` };
     if (dup > 0) return { ok: true, already: true, remain, message: lastMsg || `今日额度已领取（枚举 ${listed} 个候选）` };
-    if (authFail > 0 && !lastMsg) {
-      return { ok: false, remain, message: "领包请求被上游鉴权拒绝（JWT 失效或风控），请在控制台重新授权该账号" };
+    const diag = `枚举 ${listed} 个候选（preview+banner）${firstFail ? `；首个失败: ${firstFail}` : ""}`;
+    if (authFail > 0) {
+      return { ok: false, remain, message: `领包请求被上游鉴权拒绝（JWT 失效或风控）。${diag}` };
     }
     return {
       ok: false,
       remain,
-      message: lastMsg || (listed > 0 ? `枚举到 ${listed} 个候选包但均不可领（已领完/未开始/资格不符）` : "当前没有可领取的额度包"),
+      message: lastMsg || (listed > 0 ? `候选包均不可领（已领完/未开始/资格不符）。${diag}` : "当前没有可领取的额度包"),
     };
   } catch (e) {
     return { ok: false, message: (e as Error).message || "签到失败" };
