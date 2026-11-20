@@ -119,10 +119,41 @@ async function upstreamHeaders(rawCred: string, prefer: "access" | "jwt" = "acce
   };
 }
 
-/** 凭据格式：`jwt` / `jwt|access_token` / `jwt|access_token|device_id` */
-export function parseZcodeCredential(raw: string): { jwt: string; accessToken: string; deviceId: string } {
+/** 凭据格式：`jwt` / `jwt|access_token` / `jwt|access_token|device_id`（后续段保留兼容） */
+export function parseZcodeCredential(raw: string): { jwt: string; accessToken: string; deviceId: string; extra: string[] } {
   const parts = (raw || "").split("|").map((x) => x.trim());
-  return { jwt: parts[0] || "", accessToken: parts[1] || "", deviceId: parts[2] || "" };
+  return { jwt: parts[0] || "", accessToken: parts[1] || "", deviceId: parts[2] || "", extra: parts.slice(3) };
+}
+
+/**
+ * OAuth access_token → 业务 access_token（对齐官方客户端 ZaiBusinessTokenResolver）：
+ * POST api.z.ai/api/auth/z/login {"token"} → data.access_token + expires_in。
+ * billing/额度体系挂在业务 token 身份上；授权时存的原始 OAuth token 未经这一步，
+ * 直接拿去调 billing/对话会 401/3009，余额也显示为空。
+ */
+export async function fetchZaiBusinessToken(
+  oauthAccessToken: string,
+  timeoutMs = 15000
+): Promise<{ ok: boolean; token?: string; expiresIn?: number; error?: string }> {
+  const token = (oauthAccessToken || "").trim();
+  if (!token) return { ok: false, error: "凭据中没有 OAuth access_token" };
+  try {
+    const res = await fetch("https://api.z.ai/api/auth/z/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token }),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    const j: any = await res.json().catch(() => null);
+    const codeOk = j?.code == null || Number(j?.code) === 0 || Number(j?.code) === 200;
+    const token2 = String(j?.data?.access_token || j?.data?.accessToken || "").trim();
+    if (!res.ok || j?.success === false || !codeOk || !token2) {
+      return { ok: false, error: `兑换失败 HTTP ${res.status}: ${String(j?.msg || "无 data.access_token").slice(0, 150)}` };
+    }
+    return { ok: true, token: token2, expiresIn: Number(j?.data?.expires_in) || undefined };
+  } catch (e: any) {
+    return { ok: false, error: e?.message || "业务 token 兑换异常" };
+  }
 }
 
 /** 上游 Bearer：优先 OAuth access_token（体验/套餐额度挂在它上面），没有则回退 CLI JWT */
@@ -513,6 +544,11 @@ export async function probeZcode(
   claims: Record<string, unknown>;
   login: { provider: ZcodeProvider; authorizeHost: string; note: string };
   matrix: Array<{ host: string; token: string; status: number; body: string }>;
+  business: {
+    exchange: { ok: boolean; expiresIn?: number | null; tokenPrefix?: string; error?: string };
+    balance: { status: number; body: string };
+    chat: { status: number; body: string };
+  };
   balance: { status: number; body: string };
   preview: { status: number; body: string };
 }> {
@@ -528,8 +564,9 @@ export async function probeZcode(
         : "国际版：chat.z.ai OAuth（邮箱登录）",
   };
   const headers = await upstreamHeaders(jwt, /bigmodel\.cn/i.test(baseUrl || "") ? "access" : "jwt");
-  const get = async (url: string) => {
-    const r = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
+  const get = async (url: string, bearer?: string) => {
+    const h = bearer ? { ...headers, authorization: `Bearer ${bearer}`, "x-api-key": bearer } : headers;
+    const r = await fetch(url, { headers: h, signal: AbortSignal.timeout(20000) });
     const t = await r.text().catch(() => "");
     return { status: r.status, body: t.slice(0, 2000) };
   };
@@ -589,10 +626,47 @@ export async function probeZcode(
     }
   }
 
+  // 业务 token 诊断：官方客户端会先把 OAuth access_token 兑换成业务 token（api.z.ai/api/auth/z/login），
+  // billing/套餐挂在业务身份上。这里验证：能否兑换 → 业务 token 查余额 → 业务 token 发起对话。
+  const biz = await fetchZaiBusinessToken(cred.accessToken);
+  const bizBalance = biz.ok
+    ? await get(`${ZCODE_BASE}${BALANCE_PATH}`, biz.token!)
+    : { status: 0, body: biz.error || "" };
+  let bizChat = { status: 0, body: biz.error || "" };
+  if (biz.ok) {
+    try {
+      const r = await fetch(`${ZCODE_BASE}${CHAT_PATH}`, {
+        method: "POST",
+        headers: { ...baseHeaders, authorization: `Bearer ${biz.token!}`, "x-api-key": biz.token! },
+        body: JSON.stringify({
+          model: "GLM-5.3",
+          max_tokens: 16,
+          stream: false,
+          system: ZCODE_SYSTEM,
+          messages: [{ role: "user", content: "hi" }],
+          thinking: ZCODE_DEFAULTS.thinking,
+          output_config: ZCODE_DEFAULTS.output_config,
+        }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const text = await r.text().catch(() => "");
+      bizChat = { status: r.status, body: text.slice(0, 300) };
+    } catch (e: any) {
+      bizChat = { status: 0, body: e?.message || "业务 token 对话异常" };
+    }
+  }
+
   return {
     claims,
     login,
     matrix,
+    business: {
+      exchange: biz.ok
+        ? { ok: true, expiresIn: biz.expiresIn ?? null, tokenPrefix: `${biz.token!.slice(0, 10)}…` }
+        : { ok: false, error: biz.error },
+      balance: bizBalance,
+      chat: bizChat,
+    },
     balance: await get(`${ZCODE_BASE}${BALANCE_PATH}`),
     preview: await get(`${ZCODE_BASE}${PREVIEW_PATH}`),
   };

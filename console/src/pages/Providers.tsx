@@ -527,6 +527,37 @@ export default function Providers() {
   /** 渠道默认 Base URL（CodeBuddy 国内版/国际版各有独立目录项与 baseUrl） */
   const oauthBaseUrl = (meta: OAuthMeta, existing?: Provider | null) => existing?.base_url || meta.baseUrl;
 
+  /** 双域渠道按 Base URL 落到各区域的底层渠道 slug；非双域渠道返回 null */
+  const oauthVariantOf = (meta: OAuthMeta, baseUrl: string): { slug: string; name: string } | null => {
+    if (!meta.regionSelect) return null;
+    if (meta.type === "zcode") {
+      if (/zchat\.z\.ai/i.test(baseUrl)) return { slug: "zcode-cn-oauth", name: "ZCode 国内版 (zchat)" };
+      if (/bigmodel\.cn/i.test(baseUrl)) return { slug: "zcode-bigmodel-oauth", name: "ZCode 国内版 (bigmodel·旧)" };
+      return { slug: "zcode-oauth", name: "ZCode 国际版 (chat.z.ai)" };
+    }
+    if (meta.type === "qoder") {
+      if (/qoder\.com\.cn/i.test(baseUrl)) return { slug: "qoder-cn-oauth", name: "Qoder 国内版" };
+      return { slug: "qoder-oauth", name: "Qoder 国际版 (qoder.com)" };
+    }
+    if (meta.type === "trae") {
+      if (/trae\.cn|trae\.com\.cn|mchost\.guru/i.test(baseUrl)) return { slug: "trae-cn-oauth", name: "Trae 国内版 (trae.cn)" };
+      return { slug: "trae-global-oauth", name: "Trae 国际版 (trae.ai)" };
+    }
+    if (/workbuddy\.ai/i.test(baseUrl)) return { slug: "codebuddy-global-oauth", name: "CodeBuddy 国际版" };
+    return { slug: "codebuddy-oauth", name: "CodeBuddy 国内版" };
+  };
+
+  /** OAuth 卡片匹配的 slug：目录默认 slug + 双域渠道的各区域变体（与 oauthVariantOf 落库结果一致） */
+  const oauthSlugsOf = (meta: OAuthMeta): string[] => {
+    const slugs = new Set([meta.slug]);
+    for (const r of meta.regions ?? []) {
+      const v = oauthVariantOf(meta, r.baseUrl);
+      if (v) slugs.add(v.slug);
+    }
+    if (meta.type === "zcode") slugs.add("zcode-bigmodel-oauth");
+    return [...slugs];
+  };
+
   /** 授权成功后：按需创建渠道 + 加密保存 refresh_token + 自动拉取模型 */
   const finishOAuth = async (
     meta: OAuthMeta,
@@ -539,25 +570,7 @@ export default function Providers() {
     setOauthDlg((d) => (d ? { ...d, busy: true, message: "正在保存账号凭据…" } : d));
     try {
       // 双域渠道：国内/国际账号体系独立，落到各自的底层渠道，避免同一渠道混用两套域
-      const variant = meta.regionSelect
-        ? meta.type === "zcode"
-          ? /zchat\.z\.ai/i.test(baseUrl)
-            ? { slug: "zcode-cn-oauth", name: "ZCode 国内版 (zchat)" }
-            : /bigmodel\.cn/i.test(baseUrl)
-            ? { slug: "zcode-bigmodel-oauth", name: "ZCode 国内版 (bigmodel·旧)" }
-            : { slug: "zcode-oauth", name: "ZCode 国际版 (chat.z.ai)" }
-          : meta.type === "qoder"
-          ? /qoder\.com\.cn/i.test(baseUrl)
-            ? { slug: "qoder-cn-oauth", name: "Qoder 国内版" }
-            : { slug: "qoder-oauth", name: "Qoder 国际版 (qoder.com)" }
-          : meta.type === "trae"
-          ? /trae\.cn|trae\.com\.cn|mchost\.guru/i.test(baseUrl)
-            ? { slug: "trae-cn-oauth", name: "Trae 国内版 (trae.cn)" }
-            : { slug: "trae-global-oauth", name: "Trae 国际版 (trae.ai)" }
-          : /workbuddy\.ai/i.test(baseUrl)
-          ? { slug: "codebuddy-global-oauth", name: "CodeBuddy 国际版" }
-          : { slug: "codebuddy-oauth", name: "CodeBuddy 国内版" }
-        : null;
+      const variant = oauthVariantOf(meta, baseUrl);
       const slug = variant?.slug ?? meta.slug;
       const name = variant?.name ?? meta.name;
       // 编辑已有渠道时只在区域一致时复用，否则新建对应区域的渠道
@@ -629,11 +642,13 @@ export default function Providers() {
 
   const beginOAuth = async (meta: OAuthMeta, existing?: Provider) => {
     stopOAuthPoll();
-    // 双域渠道（CodeBuddy 国内/国际）：先选区域，再发起授权
-    if (meta.regionSelect && !existing) {
+    // 双域渠道（ZCode/Qoder/Trae/CodeBuddy）：每次都先选区域再授权。
+    // 已有渠道时也必须弹区域选择，否则永远只能续授权入的那个区域，无法补另一区域；
+    // 区域选中后会自动复用（或新建）对应区域的渠道。
+    if (meta.regionSelect) {
       setOauthDlg({
         meta,
-        provider: null,
+        provider: existing ?? null,
         mode: meta.mode,
         baseUrl: meta.baseUrl,
         url: "",
@@ -803,7 +818,8 @@ export default function Providers() {
 
   /* ---------------- 渲染 ---------------- */
 
-  const oauthProviderOf = (meta: OAuthMeta) => (rows ?? []).find((x) => x.slug === meta.slug);
+  // 双域渠道（ZCode/Qoder/Trae/CodeBuddy）落库的是区域变体 slug（如 trae-cn-oauth / trae-global-oauth），
+  // 只按目录默认 slug 匹配会让 OAuth 卡片永远显示「未接入」，而账号池里其实已有账号
   const webProviderOf = (meta: WebMeta) => (rows ?? []).find((x) => x.slug === meta.slug || x.kind === `web:${meta.type}`);
   const webMetaOf = (p?: Provider | null) => (p ? WEB_CATALOG.find((m) => m.slug === p.slug || p.kind === `web:${m.type}`) : undefined);
   const keyWebMeta = webMetaOf(keyDlg);
@@ -948,7 +964,10 @@ export default function Providers() {
           ) : (
             <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {OAUTH_CATALOG.map((meta) => {
-                const p = oauthProviderOf(meta);
+                const slugs = new Set(oauthSlugsOf(meta));
+                const matches = (rows ?? []).filter((x) => slugs.has(x.slug));
+                const p = matches[0] ?? null;
+                const extraRegions = Math.max(0, matches.length - 1);
                 return (
                   <Card key={meta.slug} className={cn("p-4 flex flex-col justify-between transition-all", p?.status === "disabled" && "opacity-75 border-dashed bg-surface/50")}>
                     <div>
@@ -960,8 +979,13 @@ export default function Providers() {
                           <div className="min-w-0">
                             <div className="truncate text-xs font-semibold leading-tight">{meta.name}</div>
                             <div className="mt-0.5 flex items-center gap-1.5">
-                              <code className="text-[10px] text-muted font-mono">{meta.slug}</code>
+                              <code className="text-[10px] text-muted font-mono">{p?.slug ?? meta.slug}</code>
                               <span className="rounded bg-brand/10 px-1 text-[9px] font-medium text-brand">OAuth</span>
+                              {extraRegions > 0 && (
+                                <span className="rounded bg-line px-1 text-[9px] text-muted" title={`${meta.name} 还有 ${extraRegions} 个其他区域的渠道，可在「账号池」中查看`}>
+                                  +{extraRegions} 区域
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -1451,16 +1475,24 @@ export default function Providers() {
             <p className="text-xs leading-relaxed text-muted">
               该渠道国内版与国际版账号体系完全独立，请选择要授权的区域。选错区域会导致授权成功但无法调用。
             </p>
-            {(oauthDlg.meta.regions || []).map((r) => (
-              <button
-                key={r.baseUrl}
-                onClick={() => void startOAuthFlow(oauthDlg.meta, null, r.baseUrl)}
-                className="flex flex-col gap-1 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 text-left transition-colors hover:border-brand/40 hover:bg-brand/5"
-              >
-                <span className="text-sm font-semibold text-ink">{r.label}</span>
-                <span className="text-[11px] text-muted">{r.desc}</span>
-              </button>
-            ))}
+            {(oauthDlg.meta.regions || []).map((r) => {
+              // 区域选中后按变体 slug 复用该区域已有渠道；没有则走创建（finishOAuth 里还有一次按 slug 兜底去重）
+              const variant = oauthVariantOf(oauthDlg.meta, r.baseUrl);
+              const matched = variant ? (rows ?? []).find((x) => x.slug === variant.slug) ?? null : null;
+              return (
+                <button
+                  key={r.baseUrl}
+                  onClick={() => void startOAuthFlow(oauthDlg.meta, matched, r.baseUrl)}
+                  className="flex flex-col gap-1 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 text-left transition-colors hover:border-brand/40 hover:bg-brand/5"
+                >
+                  <span className="flex items-center gap-2 text-sm font-semibold text-ink">
+                    {r.label}
+                    {matched && <span className="rounded bg-brand/10 px-1 text-[10px] font-medium text-brand">复用已有渠道</span>}
+                  </span>
+                  <span className="text-[11px] text-muted">{r.desc}</span>
+                </button>
+              );
+            })}
           </div>
         ) : oauthDlg?.step === "loading" ? (
           <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted">
