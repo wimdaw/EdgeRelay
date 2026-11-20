@@ -10,6 +10,18 @@
     <meta property="og:type" content="website" />
     <link rel="icon" href="./logo.png" />
     <script>
+      // 主题预置：首帧渲染前按 localStorage/系统偏好挂 data-theme，
+      // 与 Layout.useTheme 同一套逻辑（gw-theme → prefers-color-scheme 兜底），
+      // 杜绝暗色用户刷新时「加载中…」一闪而过的白色背景
+      (function () {
+        try {
+          var t = localStorage.getItem("gw-theme");
+          if (t !== "light" && t !== "dark") {
+            t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          }
+          document.documentElement.dataset.theme = t;
+        } catch (e) {}
+      })();
       // 兼容旧书签：访问 /#/login 自动无缝迁移至 /login
       if (window.location.hash && window.location.hash.startsWith("#/")) {
         window.location.replace(window.location.hash.slice(1));
