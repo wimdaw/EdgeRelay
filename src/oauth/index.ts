@@ -30,6 +30,15 @@ import {
 import { startQwenDeviceFlow, pollQwenDeviceFlow, testQwen, fetchQwenModels, handleQwenRequest } from "./qwen";
 import { startGrokDeviceFlow, pollGrokDeviceFlow, testGrok, handleGrokRequest } from "./grok";
 import {
+  startZcodeDeviceFlow,
+  pollZcodeDeviceFlow,
+  testZcode,
+  fetchZcodeModels,
+  handleZcodeRequest,
+  checkinZcode,
+  ZCODE_MODELS,
+} from "./zcode";
+import {
   startCodebuddyDeviceFlow,
   pollCodebuddyDeviceFlow,
   testCodebuddy,
@@ -38,7 +47,7 @@ import {
 } from "./codebuddy";
 import { startClineDeviceFlow, pollClineDeviceFlow, testCline, fetchClineModels, handleClineRequest, CLINE_BUILTIN_MODELS } from "./cline";
 
-export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok" | "codebuddy" | "cline";
+export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok" | "codebuddy" | "cline" | "zcode";
 
 export type OAuthProviderMeta = {
   type: OAuthProviderType;
@@ -125,6 +134,15 @@ export const OAUTH_PROVIDERS: Record<OAuthProviderType, OAuthProviderMeta> = {
     desc: "腾讯 CodeBuddy / WorkBuddy 账号授权（国内版/国际版双域），OpenAI 兼容协议直通。",
     defaultModels: ["deepseek-v4.1-flash"],
   },
+  zcode: {
+    type: "zcode",
+    name: "ZCode (智谱)",
+    slug: "zcode-oauth",
+    baseUrl: "https://zcode.z.ai",
+    mode: "redirect-poll",
+    desc: "智谱 ZCode 桌面客户端额度通道（GLM-5.3 / GLM-5.3-Flash），Anthropic 协议反代；国内/国际归属由账号身份自动识别。",
+    defaultModels: ZCODE_MODELS,
+  },
   cline: {
     type: "cline",
     name: "Cline",
@@ -171,6 +189,10 @@ export async function startOAuth(env: Env, type: OAuthProviderType, baseUrl?: st
   if (type === "codebuddy") {
     const flow = await startCodebuddyDeviceFlow(env, baseUrl);
     return { mode: "redirect-poll", url: flow.authUrl, state: flow.state, realm: flow.realm };
+  }
+  if (type === "zcode") {
+    const flow = await startZcodeDeviceFlow(env);
+    return { mode: "redirect-poll", url: flow.url, state: flow.state };
   }
   const flow =
     type === "kimi"
@@ -223,6 +245,7 @@ export async function pollOAuth(env: Env, type: OAuthProviderType, state: string
   if (type === "qwen") return pollQwenDeviceFlow(env, state);
   if (type === "grok") return pollGrokDeviceFlow(env, state);
   if (type === "codebuddy") return pollCodebuddyDeviceFlow(env, state);
+  if (type === "zcode") return pollZcodeDeviceFlow(env, state);
   if (type === "cline") {
     const r = await pollClineDeviceFlow(env, state);
     return { status: r.status, message: r.message, refreshToken: r.refreshToken, email: r.email };
@@ -264,6 +287,10 @@ export async function fetchOAuthModels(
       const r = await fetchCodebuddyModels(env, refreshToken, baseUrl);
       return r.success && r.models.length ? { models: r.models } : { models: fallback, message: r.message };
     }
+    if (type === "zcode") {
+      const r = await fetchZcodeModels(env, refreshToken);
+      return { models: r.models.length ? r.models : fallback, message: r.message };
+    }
     if (type === "cline") {
       const r = await fetchClineModels(env, refreshToken);
       return r.success && r.models.length ? { models: r.models } : { models: fallback, message: r.message };
@@ -288,6 +315,7 @@ export async function testOAuth(
   if (type === "kimi") return testKimi(env, refreshToken, modelId, baseUrl);
   if (type === "qwen") return testQwen(env, refreshToken, modelId);
   if (type === "codebuddy") return testCodebuddy(env, refreshToken, modelId, baseUrl);
+  if (type === "zcode") return testZcode(env, refreshToken, modelId);
   if (type === "cline") return testCline(env, refreshToken, modelId);
   return testGrok(env, refreshToken, modelId);
 }
@@ -325,6 +353,15 @@ export async function handleOAuthChat(args: OAuthChatArgs): Promise<Response> {
       return handleCodexRequest(p, "");
     case "antigravity":
       return handleAntigravityRequest({ ...p, project: undefined });
+    case "zcode":
+      return handleZcodeRequest({
+        env: args.env,
+        providerId: args.providerId,
+        modelId: args.upstreamModel,
+        requestedModel: args.requestedModel,
+        body: args.body,
+        refreshToken: args.refreshToken,
+      });
     case "kimi":
       return handleKimiRequest(p, args.baseUrl);
     case "qwen":

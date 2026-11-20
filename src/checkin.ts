@@ -97,8 +97,26 @@ async function runCodebuddyProvider(env: Env, provider: ProviderRecord): Promise
   });
 }
 
+/** ZCode（智谱）：领取每日/活动额度包 */
+async function runZcodeProvider(env: Env, provider: ProviderRecord): Promise<CheckinAccountResult[]> {
+  const keys = (await getProviderKeysAll(env, provider.id)).filter((k) => k.status === "active");
+  if (!keys.length) return [];
+  const { checkinZcode } = await import("./oauth/zcode");
+  return mapLimit(keys, 2, async (k): Promise<CheckinAccountResult> => {
+    const base = { keyId: k.id, email: k.email, fingerprint: k.keyFingerprint || k.id.slice(0, 8) };
+    try {
+      const token = await decryptSecret(env, k.encryptedKey);
+      const r = await checkinZcode(env, token);
+      return { ...base, ok: r.ok, already: r.already, reward: r.reward, remain: r.remain, message: r.message };
+    } catch (err) {
+      return { ...base, ok: false, message: (err as Error).message || "签到异常" };
+    }
+  });
+}
+
 const CHANNELS: Record<string, ChannelRunner> = {
   codebuddy: { label: "CodeBuddy / WorkBuddy", oauthType: "codebuddy", run: runCodebuddyProvider },
+  zcode: { label: "ZCode (智谱)", oauthType: "zcode", run: runZcodeProvider },
 };
 
 /** 支持签到的渠道清单（供控制台渲染开关） */

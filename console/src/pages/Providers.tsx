@@ -125,6 +125,15 @@ const OAUTH_CATALOG: OAuthMeta[] = [
     models: ["deepseek-v4.1-flash"],
   },
   {
+    type: "zcode",
+    name: "ZCode (智谱)",
+    slug: "zcode-oauth",
+    baseUrl: "https://zcode.z.ai",
+    mode: "redirect-poll" as const,
+    desc: "智谱 ZCode 客户端额度通道（GLM-5.3 / GLM-5.3-Flash），Anthropic 协议反代；国内/国际归属按账号身份自动识别。",
+    models: ["GLM-5.3", "GLM-5.3-Flash"],
+  },
+  {
     type: "cline",
     name: "Cline",
     slug: "cline-oauth",
