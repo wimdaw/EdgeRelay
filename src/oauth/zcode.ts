@@ -311,14 +311,14 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
   const uid = userIdFromJwt(p.refreshToken);
   const [deviceId, sessionId] = await Promise.all([deviceIdFor(uid), sessionIdFor(uid)]);
 
+  // 与后台连通性测试（testZcode）保持同一套最小载荷：实测带 metadata / tool_choice 时
+  // 上游会回 1005（exceed quota limit），不带则正常；先按能用的形态发。
   const upstreamBody: Record<string, any> = {
     model: p.modelId,
     max_tokens: Math.min(Number(inbound.max_tokens) || 8192, Number(ZCODE_DEFAULTS.max_tokens) || 32000),
     stream: false, // 上游固定非流式，流式由本层合成，避免 SSE 结构差异
-    metadata: { user_id: metadataUserId(uid, deviceId, sessionId) },
     system: ZCODE_SYSTEM,
     messages: demoteSystem(inbound.messages, String(inbound.system || "")),
-    tool_choice: ZCODE_DEFAULTS.tool_choice ?? { type: "auto" },
     thinking: ZCODE_DEFAULTS.thinking ?? { type: "enabled" },
     output_config: ZCODE_DEFAULTS.output_config ?? { effort: "low" },
     ...(inbound.temperature !== undefined ? { temperature: inbound.temperature } : {}),
