@@ -90,11 +90,7 @@ function metadataUserId(uid: string, deviceId: string, sessionId: string): strin
   return JSON.stringify({ device_id: deviceId, account_uuid: "", session_id: sessionId });
 }
 
-async function upstreamHeaders(
-  rawCred: string,
-  prefer: "access" | "jwt" = "access",
-  baseUrl?: string
-): Promise<Record<string, string>> {
+async function upstreamHeaders(rawCred: string, prefer: "access" | "jwt" = "access"): Promise<Record<string, string>> {
   const cred = parseZcodeCredential(rawCred);
   // 不同站点认的令牌不同：bigmodel 用 OAuth access_token，zcode.z.ai 用 CLI JWT
   const bearer = prefer === "jwt" ? cred.jwt || cred.accessToken : cred.accessToken || cred.jwt;
@@ -102,8 +98,9 @@ async function upstreamHeaders(
   const derivedDevice = await deviceIdFor(uid);
   const deviceId = cred.deviceId || derivedDevice;
   const sessionId = await sessionIdFor(uid);
-  // 国内版登录已迁到 zchat.z.ai，referer 跟着站点走；其余保持 zcode.z.ai
-  const referer = zcodeProviderFor(baseUrl) === "zai_cn" ? AUTHORIZE_HOST.zai_cn : ZCODE_BASE;
+  // 注意：http-referer 固定 zcode.z.ai，不要跟着登录域走。
+  // 计费/领额度接口（billing/preview、billing/claim）就在 zcode.z.ai 上，
+  // 现有账号一直是这个值且能正常领包，改动属于无依据的风险。
   return {
     ...(ZCODE_DEFAULTS.headers as unknown as Record<string, string>),
     authorization: `Bearer ${bearer}`,
@@ -112,7 +109,7 @@ async function upstreamHeaders(
     "anthropic-version": "2023-06-01",
     "anthropic-beta": "mid-conversation-system-2026-04-07",
     "user-agent": `ZCode/${APP_VERSION} ai-sdk/provider-utils/4.0.27 runtime/node.js/24`,
-    "http-referer": referer,
+    "http-referer": ZCODE_BASE,
     "x-zcode-app-version": APP_VERSION,
     "x-device-mid": deviceId,
     "x-session-id": sessionId,
@@ -414,7 +411,7 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     : `${ZCODE_BASE}${CHAT_PATH}`;
   const res = await fetch(chatUrl, {
     method: "POST",
-    headers: await upstreamHeaders(p.refreshToken, isBigmodel ? "access" : "jwt", p.baseUrl),
+    headers: await upstreamHeaders(p.refreshToken, isBigmodel ? "access" : "jwt"),
     body: JSON.stringify(upstreamBody),
     signal: AbortSignal.timeout(300000),
   });
@@ -469,7 +466,7 @@ export async function testZcode(_env: Env, jwt: string, modelId: string, baseUrl
     const url = isBigmodel ? `${(baseUrl || "").replace(/\/+$/, "")}/v1/messages` : `${ZCODE_BASE}${CHAT_PATH}`;
     const res = await fetch(url, {
       method: "POST",
-      headers: await upstreamHeaders(jwt, isBigmodel ? "access" : "jwt", baseUrl),
+      headers: await upstreamHeaders(jwt, isBigmodel ? "access" : "jwt"),
       body: JSON.stringify({
         model: modelId,
         max_tokens: 32,
@@ -530,7 +527,7 @@ export async function probeZcode(
         ? "国内版：zchat.z.ai OAuth（手机号登录）"
         : "国际版：chat.z.ai OAuth（邮箱登录）",
   };
-  const headers = await upstreamHeaders(jwt, /bigmodel\.cn/i.test(baseUrl || "") ? "access" : "jwt", baseUrl);
+  const headers = await upstreamHeaders(jwt, /bigmodel\.cn/i.test(baseUrl || "") ? "access" : "jwt");
   const get = async (url: string) => {
     const r = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
     const t = await r.text().catch(() => "");
@@ -553,7 +550,7 @@ export async function probeZcode(
   }
   // 矩阵：两个站点 × 两种令牌，直接看哪一组能过（返回状态码 + 响应片段）
   const cred = parseZcodeCredential(jwt);
-  const baseHeaders = await upstreamHeaders(jwt, "jwt", baseUrl);
+  const baseHeaders = await upstreamHeaders(jwt, "jwt");
   const hosts = [
     { name: "zai", url: `${ZCODE_BASE}${CHAT_PATH}` },
     { name: "bigmodel", url: "https://open.bigmodel.cn/api/anthropic/v1/messages" },
@@ -620,9 +617,9 @@ export type ZcodeCheckinResult = {
  * （对齐 ZCode2API 的 claimFor）：活动包 id 带日期编码 `zcode-v3-start-plan-<MMDD>-wk`，
  * 北京时间 0 点跳日，所以候选要跨 ±1 天；每日体验包是固定 id `-0817`，领过即 1003。
  */
-export async function checkinZcode(env: Env, jwt: string, baseUrl?: string): Promise<ZcodeCheckinResult> {
+export async function checkinZcode(env: Env, jwt: string): Promise<ZcodeCheckinResult> {
   if (!jwt) return { ok: false, message: "未填写凭据" };
-  const headers = await upstreamHeaders(jwt, "access", baseUrl);
+  const headers = await upstreamHeaders(jwt);
   try {
     // 当前生效的包类型，避免重复领同一类
     const activeKinds = new Set<string>();

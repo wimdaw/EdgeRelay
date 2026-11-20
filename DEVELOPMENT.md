@@ -463,8 +463,12 @@ git checkout edgeone
 
 - `startZcodeDeviceFlow(env, baseUrl)`：按渠道 `baseUrl` 选 provider，flow 记录 provider 供 poll 使用。
 - `pollZcodeDeviceFlow`：`access_token` 兼容 `data.zai` / `data.bigmodel` / `data.access_token` 三种形态；realm 以登录入口为主信号（`zai_cn`/`bigmodel` → cn），避免 customerInfo 缺失时误判国际号。
-- `upstreamHeaders(..., baseUrl)`：`zai_cn` 的 `http-referer` 改用 `https://zchat.z.ai`，其余保持 `zcode.z.ai`。
-- `checkinZcode(env, jwt, baseUrl)`：签到沿用渠道区域，referer 同步。
+- `upstreamHeaders` **保持不变**：`http-referer` 固定 `https://zcode.z.ai`，不跟着登录域走。
+  领额度走的 `billing/preview`、`billing/claim` 就在这个域上，现有账号一直用这个值且能正常领包；
+  跟着登录域改成 `zchat.z.ai` 属于无依据的改动，只会给已跑通的链路添风险。
+- `checkinZcode` / `runZcodeProvider` **零改动**：与迁移前逐字节一致，本次迁移不触碰签到链路。
+  重新授权后凭据格式不变（`jwt|access|device_id`），签到按 provider `kind` 运行、不依赖 slug，
+  因此每日自动领额度不受影响。
 - `probeZcode`：返回新增 `login`（provider / authorizeHost / 提示），旧 bigmodel 渠道直接提示「微信扫码已下线」。
 - 控制台：ZCode 区域改为「国际版 chat.z.ai」「国内版 zchat.z.ai」；slug 分流 `zcode-oauth` / `zcode-cn-oauth`；bigmodel 仅保留旧渠道兼容并改名「bigmodel·旧」。
 
