@@ -73,13 +73,15 @@ function metadataUserId(uid: string, deviceId: string, sessionId: string): strin
   return JSON.stringify({ device_id: deviceId, account_uuid: "", session_id: sessionId });
 }
 
-async function upstreamHeaders(jwt: string): Promise<Record<string, string>> {
-  const uid = userIdFromJwt(jwt);
+async function upstreamHeaders(rawCred: string): Promise<Record<string, string>> {
+  const cred = parseZcodeCredential(rawCred);
+  const bearer = bearerOf(cred);
+  const uid = userIdFromJwt(cred.jwt);
   const [deviceId, sessionId] = await Promise.all([deviceIdFor(uid), sessionIdFor(uid)]);
   return {
     ...(ZCODE_DEFAULTS.headers as unknown as Record<string, string>),
-    authorization: `Bearer ${jwt}`,
-    "x-api-key": jwt,
+    authorization: `Bearer ${bearer}`,
+    "x-api-key": bearer,
     "content-type": "application/json",
     "anthropic-version": "2023-06-01",
     "anthropic-beta": "mid-conversation-system-2026-04-07",
@@ -92,6 +94,19 @@ async function upstreamHeaders(jwt: string): Promise<Record<string, string>> {
     "x-request-id": randomHex(16),
     "x-zcode-trace-id": crypto.randomUUID(),
   };
+}
+
+/** 凭据可能是 `jwt` 或 `jwt|access_token`（新版授权会同时保存两者） */
+export function parseZcodeCredential(raw: string): { jwt: string; accessToken: string } {
+  const text = (raw || "").trim();
+  const sep = text.indexOf("|");
+  if (sep < 0) return { jwt: text, accessToken: "" };
+  return { jwt: text.slice(0, sep).trim(), accessToken: text.slice(sep + 1).trim() };
+}
+
+/** 上游 Bearer：优先 OAuth access_token（体验/套餐额度挂在它上面），没有则回退 CLI JWT */
+function bearerOf(cred: { jwt: string; accessToken: string }): string {
+  return cred.accessToken || cred.jwt;
 }
 
 function jsonResponse(payload: unknown, status = 200): Response {
@@ -182,7 +197,9 @@ export async function pollZcodeDeviceFlow(env: Env, flowId: string): Promise<Zco
   await store.delete(FLOW_KEY(flowId)).catch(() => {});
   return {
     status: "ok",
-    refreshToken: jwt,
+    // 同时保存 CLI JWT 与 OAuth access_token：体验额度（start plan）绑定的是后者，
+    // 只用 JWT 会出现 balance 为空、请求 1005 的现象。
+    refreshToken: accessToken ? `${jwt}|${accessToken}` : jwt,
     // 账号池按 email 展示；只有手机号的国内号用手机号占位
     email: email || phone || undefined,
     account: { uid, nickname: String(info?.nickName || info?.customerName || "").trim() || undefined, realm },
@@ -308,7 +325,8 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
   if (!p.refreshToken) return errorResponse("该 zcode 渠道未配置凭据：请在「API Key」里填入 ZCode 账号的 JWT（可点「用 ZCode 账号授权」获取）", 400, "configuration_error");
 
   const inbound = openAIToAnthropicZcode({ ...p.body, model: p.modelId });
-  const uid = userIdFromJwt(p.refreshToken);
+  const cred = parseZcodeCredential(p.refreshToken);
+  const uid = userIdFromJwt(cred.jwt);
   const [deviceId, sessionId] = await Promise.all([deviceIdFor(uid), sessionIdFor(uid)]);
 
   // 与后台连通性测试（testZcode）保持同一套最小载荷：实测带 metadata / tool_choice 时
