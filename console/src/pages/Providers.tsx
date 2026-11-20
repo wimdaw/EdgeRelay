@@ -50,6 +50,9 @@ type OAuthMeta = {
   mode: "redirect" | "device" | "redirect-poll";
   desc: string;
   models: string[];
+  /** 双域渠道：同一入口下分国内/国际两套账号体系，授权前先选区域 */
+  regionSelect?: boolean;
+  regions?: { label: string; baseUrl: string; desc: string }[];
 };
 
 const OAUTH_CATALOG: OAuthMeta[] = [
@@ -109,20 +112,16 @@ const OAUTH_CATALOG: OAuthMeta[] = [
   },
   {
     type: "codebuddy",
-    name: "CodeBuddy 国内版",
+    name: "CodeBuddy / WorkBuddy (腾讯)",
     slug: "codebuddy-oauth",
     baseUrl: "https://copilot.tencent.com",
     mode: "redirect-poll",
-    desc: "腾讯 CodeBuddy 国内版账号授权（copilot.tencent.com / codebuddy.cn），OpenAI 兼容协议直通。",
-    models: ["deepseek-v4.1-flash"],
-  },
-  {
-    type: "codebuddy",
-    name: "CodeBuddy 国际版",
-    slug: "codebuddy-global-oauth",
-    baseUrl: "https://www.workbuddy.ai",
-    mode: "redirect-poll",
-    desc: "WorkBuddy 国际版账号授权（workbuddy.ai），与国内版账号体系完全独立。",
+    regionSelect: true,
+    regions: [
+      { label: "国内版", baseUrl: "https://copilot.tencent.com", desc: "copilot.tencent.com / codebuddy.cn，腾讯云账号体系" },
+      { label: "国际版", baseUrl: "https://www.workbuddy.ai", desc: "workbuddy.ai，与国内版账号完全独立" },
+    ],
+    desc: "腾讯 CodeBuddy / WorkBuddy 账号授权，国内版与国际版共用同一入口，授权时选择区域。",
     models: ["deepseek-v4.1-flash"],
   },
   {
@@ -147,7 +146,7 @@ type OAuthDialogState = {
   verificationUri?: string;
   verificationUriComplete?: string;
   interval?: number;
-  step: "loading" | "ready" | "polling" | "error";
+  step: "region" | "loading" | "ready" | "polling" | "error";
   message?: string;
   codeInput: string;
   busy?: boolean;
@@ -490,23 +489,34 @@ export default function Providers() {
   const finishOAuth = async (meta: OAuthMeta, existing: Provider | null, baseUrl: string, refreshToken: string, email?: string) => {
     setOauthDlg((d) => (d ? { ...d, busy: true, message: "正在保存账号凭据…" } : d));
     try {
-      let providerId = existing?.id || "";
+      // 双域渠道：国内/国际账号体系独立，落到各自的底层渠道，避免同一渠道混用两套域
+      const variant = meta.regionSelect
+        ? /workbuddy\.ai/i.test(baseUrl)
+          ? { slug: "codebuddy-global-oauth", name: "CodeBuddy 国际版" }
+          : { slug: "codebuddy-oauth", name: "CodeBuddy 国内版" }
+        : null;
+      const slug = variant?.slug ?? meta.slug;
+      const name = variant?.name ?? meta.name;
+      // 编辑已有渠道时只在区域一致时复用，否则新建对应区域的渠道
+      const reuse = existing && existing.slug === slug;
+
+      let providerId = reuse ? existing!.id : "";
       if (!providerId) {
         await adminActionStepUp("upsert_provider", {
-          name: meta.name,
-          slug: meta.slug,
+          name,
+          slug,
           kind: `oauth:${meta.type}`,
           baseUrl,
         });
         const d = await adminAction<{ providers: Provider[] }>("list_providers");
-        providerId = d.providers.find((x) => x.slug === meta.slug)?.id || "";
+        providerId = d.providers.find((x) => x.slug === slug)?.id || "";
         setRows(d.providers);
       }
       if (!providerId) throw new Error("OAuth 渠道创建失败");
       const r = await adminActionStepUp<{ result?: { fingerprint?: string } }>("upsert_provider_key", {
         providerId,
         key: refreshToken,
-        label: `account-${(existing?.key_count ?? 0) + 1}`,
+        label: `account-${(reuse ? existing?.key_count ?? 0 : 0) + 1}`,
         ...(email ? { email } : {}),
       });
       toast(`授权成功，账号已加密入库（指纹 ${r.result?.fingerprint ?? ""}）`);
@@ -514,8 +524,8 @@ export default function Providers() {
       setOauthDlg(null);
       const updated = await adminAction<{ providers: Provider[] }>("list_providers");
       setRows(updated.providers);
-      setImportStep({ providerId, providerName: meta.name, models: [], picked: new Set(), loading: true });
-      await pullModels(providerId, meta.name, baseUrl, "");
+      setImportStep({ providerId, providerName: name, models: [], picked: new Set(), loading: true });
+      await pullModels(providerId, name, baseUrl, "");
     } catch (e) {
       const msg = (e as Error).message;
       toast(msg, "err");
@@ -548,10 +558,29 @@ export default function Providers() {
 
   const beginOAuth = async (meta: OAuthMeta, existing?: Provider) => {
     stopOAuthPoll();
-    const baseUrl = oauthBaseUrl(meta, existing ?? null);
+    // 双域渠道（CodeBuddy 国内/国际）：先选区域，再发起授权
+    if (meta.regionSelect && !existing) {
+      setOauthDlg({
+        meta,
+        provider: null,
+        mode: meta.mode,
+        baseUrl: meta.baseUrl,
+        url: "",
+        state: "",
+        step: "region",
+        codeInput: "",
+      });
+      return;
+    }
+    await startOAuthFlow(meta, existing ?? null, oauthBaseUrl(meta, existing ?? null));
+  };
+
+  /** 真正发起授权；区域选择完成后由 startOAuthFlow 接手 */
+  const startOAuthFlow = async (meta: OAuthMeta, existing: Provider | null, baseUrl: string) => {
+    stopOAuthPoll();
     setOauthDlg({
       meta,
-      provider: existing ?? null,
+      provider: existing,
       mode: meta.mode,
       baseUrl,
       url: "",
@@ -565,7 +594,7 @@ export default function Providers() {
       const mode = (d.mode as "redirect" | "device" | "redirect-poll") || meta.mode;
       setOauthDlg({
         meta,
-        provider: existing ?? null,
+        provider: existing,
         mode,
         baseUrl,
         url: d.url ?? "",
@@ -579,7 +608,7 @@ export default function Providers() {
         message: mode === "device" ? "等待你在浏览器中确认授权…" : mode === "redirect-poll" ? "等待你在浏览器中完成登录…" : undefined,
       });
       if (mode !== "redirect" && d.state) {
-        startOAuthPoll(meta, existing ?? null, baseUrl, d.state as string, Number(d.interval) || 5);
+        startOAuthPoll(meta, existing, baseUrl, d.state as string, Number(d.interval) || 5);
       }
     } catch (e) {
       setOauthDlg((d) => (d ? { ...d, step: "error", message: (e as Error).message } : d));
@@ -1318,7 +1347,23 @@ export default function Providers() {
 
       {/* OAuth 授权弹窗 */}
       <Dialog open={!!oauthDlg} onClose={closeOAuth} title={`OAuth 授权 — ${oauthDlg?.meta.name ?? ""}`} width={560}>
-        {oauthDlg?.step === "loading" ? (
+        {oauthDlg?.step === "region" ? (
+          <div className="flex flex-col gap-3">
+            <p className="text-xs leading-relaxed text-muted">
+              该渠道国内版与国际版账号体系完全独立，请选择要授权的区域。选错区域会导致授权成功但无法调用。
+            </p>
+            {(oauthDlg.meta.regions || []).map((r) => (
+              <button
+                key={r.baseUrl}
+                onClick={() => void startOAuthFlow(oauthDlg.meta, null, r.baseUrl)}
+                className="flex flex-col gap-1 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 text-left transition-colors hover:border-brand/40 hover:bg-brand/5"
+              >
+                <span className="text-sm font-semibold text-ink">{r.label}</span>
+                <span className="text-[11px] text-muted">{r.desc}</span>
+              </button>
+            ))}
+          </div>
+        ) : oauthDlg?.step === "loading" ? (
           <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted">
             <RefreshCw size={16} className="animate-spin" />正在向 {oauthDlg.meta.name} 发起授权请求…
           </div>

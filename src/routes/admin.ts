@@ -117,7 +117,13 @@ adminRouter.post("/actions", async (c) => {
     } else if (action === "oauth_poll") {
       // 授权轮询不要求二次验证，但仅限超级管理员
       requireRole(user, ["superadmin"]);
-    } else if (action === "account_pool" || action === "codebuddy_checkin" || action === "codebuddy_checkin_link") {
+    } else if (
+      action === "account_pool" ||
+      action === "codebuddy_checkin" ||
+      action === "codebuddy_checkin_link" ||
+      action === "checkin_config" ||
+      action === "set_checkin"
+    ) {
       // 账号池会解密凭据并查询上游额度；签到同样要解密 refresh_token，仅限超级管理员
       requireRole(user, ["superadmin"]);
     } else if (READ_ACTIONS.has(action)) {
@@ -568,10 +574,44 @@ adminRouter.post("/actions", async (c) => {
 
       /* ---- CodeBuddy（WorkBuddy）每日签到 ---- */
       case "codebuddy_checkin": {
-        // 控制台手动触发：force 跳过去重，便于人工核对今日签到结果
-        const { runCodebuddyCheckinAll } = await import("../checkin");
-        const run = await runCodebuddyCheckinAll(env, { force: true });
-        return done(run, "checkin", "codebuddy");
+        // 控制台手动触发：force 跳过去重；不传 type 时跑所有已开启渠道
+        const { runCheckins } = await import("../checkin");
+        const types = typeof p.type === "string" && p.type ? [String(p.type)] : undefined;
+        const run = await runCheckins(env, { force: true, types });
+        return done(run, "checkin", types ? types.join(",") : "all");
+      }
+
+      /* ---- 自动签到开关（按渠道，默认开启） ---- */
+      case "checkin_config": {
+        const { listCheckinChannels, readCheckinConfig } = await import("../checkin");
+        const cfg = await readCheckinConfig(env);
+        return json({
+          ok: true,
+          result: {
+            channels: listCheckinChannels().map((c) => ({
+              type: c.type,
+              label: c.label,
+              enabled: !cfg.disabled.includes(c.type),
+            })),
+          },
+        });
+      }
+
+      case "set_checkin": {
+        const type = String(p.type || "");
+        if (!type || typeof p.enabled !== "boolean") {
+          throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 type 或 enabled");
+        }
+        const { listCheckinChannels, readCheckinConfig, writeCheckinConfig } = await import("../checkin");
+        if (!listCheckinChannels().some((c) => c.type === type)) {
+          throw new ApiError(400, ErrorCode.BAD_REQUEST, `渠道 "${type}" 不支持自动签到`);
+        }
+        const cfg = await readCheckinConfig(env);
+        const set = new Set(cfg.disabled);
+        if (p.enabled) set.delete(type);
+        else set.add(type);
+        await writeCheckinConfig(env, { disabled: [...set] });
+        return done({ type, enabled: p.enabled }, "checkin", type);
       }
 
       case "codebuddy_checkin_link": {
