@@ -727,83 +727,150 @@ export type ZcodeCheckinResult = {
 /**
  * 签到 = 领取当前可领的额度包。
  *
- * preview 只覆盖「当前正在发放」的包；新号的注册礼包/周活动包要靠 id 推算兜底
- * （对齐 ZCode2API 的 claimFor）：活动包 id 带日期编码 `zcode-v3-start-plan-<MMDD>-wk`，
- * 北京时间 0 点跳日，所以候选要跨 ±1 天；每日体验包是固定 id `-0817`，领过即 1003。
+ * 枚举两路合并（对齐 zcode-api 的 listPlans）：wk-1030（2026-10-30）起周末包改走
+ * marketing banner 下发，plan_id 不再是日期编码——纯猜 id 会整个漏掉，所以：
+ *  1. billing/preview：billing 面登记的包（Bearer JWT + X-Device-Mid，缺 UUID 回 3001）
+ *  2. marketing/touch：banner/popup 按钮 action=claim_zcode_plan 携带 plan_id，
+ *     投递体里的 zcode_plan 对象补充名称/时间窗
+ * 领取 POST 头对齐官方客户端 claimManualPlan：Authorization/Content-Type/
+ * X-ZCode-App-Version/X-Platform/X-Device-Mid。人机验证：3.16.3 的 captcha 门是关的，
+ * 这里不带头；若网关侧开启，失败信息会透出到消息里。
  */
 export async function checkinZcode(env: Env, jwt: string): Promise<ZcodeCheckinResult> {
   if (!jwt) return { ok: false, message: "未填写凭据" };
-  // billing/preview、billing/claim 都认 CLI JWT（对齐 ZCode2api：claim 缺 JWT 直接失败）。
-  // 不能用默认 prefer "access"——OAuth access_token 短时效，过期后领包会静默全部失败，
-  // 被误报成"无可领取额度"。
-  const headers = await upstreamHeaders(jwt, "jwt");
+  // billing/preview、billing/claim 都认 CLI JWT。不能用默认 prefer "access"——
+  // OAuth access_token 短时效，过期后领包会静默全部失败。
+  const cred = parseZcodeCredential(jwt);
+  const uid = userIdFromJwt(cred.jwt);
+  const deviceMid = cred.deviceId || (await deviceIdFor(uid));
   try {
-    // 当前生效的包类型，避免重复领同一类
-    const activeKinds = new Set<string>();
-    let remain: number | undefined;
-    try {
-      const bRes = await fetch(`${ZCODE_BASE}${BALANCE_PATH}`, { headers, signal: AbortSignal.timeout(15000) });
-      const bj: any = await bRes.json().catch(() => null);
-      const now = Date.now() / 1000;
-      const plans: any[] = (bj?.data?.plans ?? []).filter((p: any) => p?.status === "active" && (p?.ends_at ?? 0) > now);
-      for (const p of plans) {
-        const s = `${p?.plan_id ?? ""} ${p?.name ?? ""}`.toUpperCase();
-        if (s.includes("WEEKEND") || /(^|[-_ ])WK($|[-_ ])/.test(s)) activeKinds.add("promo");
-        if (s.includes("START-PLAN") || s.includes("START PLAN")) activeKinds.add("daily");
-      }
-      const units = (bj?.data?.plans ?? []).map((x: any) => Number(x?.remaining_units) || 0);
-      if (units.length) remain = units.reduce((a: number, b: number) => a + b, 0);
-    } catch {
-      /* 余额读取失败不阻塞领取 */
-    }
+    // --- 枚举：preview + marketing banner 合并 ---
+    const candidates = new Map<string, string>(); // planId -> 展示名
 
-    const candidates: string[] = [];
     try {
-      const pvRes = await fetch(`${ZCODE_BASE}${PREVIEW_PATH}`, { headers, signal: AbortSignal.timeout(20000) });
+      const pvRes = await fetch(`${ZCODE_BASE}${PREVIEW_PATH}`, {
+        headers: { authorization: `Bearer ${cred.jwt}`, "x-device-mid": deviceMid },
+        signal: AbortSignal.timeout(20000),
+      });
       const pv: any = await pvRes.json().catch(() => null);
-      for (const x of pv?.data?.plans ?? []) {
-        const id = String(x?.plan_id || "");
-        if (id) candidates.push(id);
+      for (const x of (pv?.data?.plans ?? []) as any[]) {
+        const id = String(x?.plan_id || "").trim();
+        if (id) candidates.set(id, String(x?.name || id));
       }
     } catch {
-      /* preview 失败仍可用兜底 id */
+      /* preview 失败不阻塞 banner 枚举 */
     }
 
-    const bj = Date.now() + 8 * 3600_000;
+    // banner 投递体里深度受限地收集 zcode_plan 对象（用于富化名称）
+    const collectPlans = (node: unknown, out: any[], depth = 0): void => {
+      if (depth > 4 || node === null || typeof node !== "object") return;
+      if (Array.isArray(node)) {
+        for (const x of node) collectPlans(x, out, depth + 1);
+        return;
+      }
+      const rec = node as Record<string, unknown>;
+      const zp = rec.zcode_plan;
+      if (zp && typeof zp === "object" && !Array.isArray(zp)) out.push(zp);
+      for (const v of Object.values(rec)) collectPlans(v, out, depth + 1);
+    };
+    try {
+      const mRes = await fetch(`${ZCODE_BASE}/api/v1/marketing/touch?seq=0`, {
+        headers: {
+          "x-device-mid": deviceMid,
+          "x-client-language": "zh-CN",
+          "x-zcode-app-version": APP_VERSION,
+          authorization: `Bearer ${cred.jwt}`,
+        },
+        signal: AbortSignal.timeout(20000),
+      });
+      const m: any = await mRes.json().catch(() => null);
+      const deliveries: any[] = (m?.data?.deliveries ?? []) as any[];
+      for (const d of deliveries) {
+        if (!d || typeof d !== "object") continue;
+        const rich: any[] = [];
+        collectPlans(d, rich);
+        const richById = new Map(rich.map((p) => [String(p?.plan_id ?? ""), p]));
+        for (const host of [d.banner, d.popup]) {
+          for (const btn of (host?.buttons ?? []) as any[]) {
+            if (btn?.action?.type !== "claim_zcode_plan") continue;
+            const id = String(btn?.action?.args?.plan_id ?? "").trim();
+            if (!id || candidates.has(id)) continue;
+            const rp = richById.get(id);
+            candidates.set(id, String(rp?.name || id));
+          }
+        }
+      }
+    } catch {
+      /* banner 失败不阻塞 */
+    }
+
+    // 兜底：老日期编码包仍试一下（早期活动形态，preview/banner 都没有时还能捡漏）
+    const bjTime = Date.now() + 8 * 3600_000;
     const stamps = [0, -1, 1].map((delta) => {
-      const d = new Date(bj + delta * 86400_000);
+      const d = new Date(bjTime + delta * 86400_000);
       return `${String(d.getUTCMonth() + 1).padStart(2, "0")}${String(d.getUTCDate()).padStart(2, "0")}`;
     });
-    if (!activeKinds.has("promo")) for (const s of stamps) candidates.push(`zcode-v3-start-plan-${s}-wk`);
-    if (!activeKinds.has("daily")) candidates.push("zcode-v3-start-plan-0817");
+    for (const s of stamps) if (!candidates.has(`zcode-v3-start-plan-${s}-wk`)) candidates.set(`zcode-v3-start-plan-${s}-wk`, `周末包 ${s}`);
+    if (!candidates.has("zcode-v3-start-plan-0817")) candidates.set("zcode-v3-start-plan-0817", "每日体验包");
+
+    // --- 领取（对齐官方 claimManualPlan 头）---
+    const claimHeaders: Record<string, string> = {
+      authorization: `Bearer ${cred.jwt}`,
+      "content-type": "application/json",
+      "x-zcode-app-version": APP_VERSION,
+      "x-platform": "win32-x64",
+      "x-device-mid": deviceMid,
+    };
 
     let claimed = 0;
     let dup = 0;
     let authFail = 0;
     let lastMsg = "";
-    const seen = new Set<string>();
-    for (const planId of candidates) {
-      if (seen.has(planId)) continue;
-      seen.add(planId);
+    const claimedNames: string[] = [];
+    for (const [planId, name] of candidates) {
       const r = await fetch(`${ZCODE_BASE}${CLAIM_PATH}`, {
         method: "POST",
-        headers,
+        headers: claimHeaders,
         body: JSON.stringify({ plan_id: planId }),
         signal: AbortSignal.timeout(15000),
       });
       const j: any = await r.json().catch(() => null);
       lastMsg = String(j?.data?.message || j?.msg || "");
-      if (Number(j?.code) === 0) claimed++;
-      else if (Number(j?.code) === 1003) dup++;
-      else if (!r.ok || Number(j?.code) === 1001 || r.status === 401) authFail++;
+      if (Number(j?.code) === 0) {
+        claimed++;
+        claimedNames.push(name);
+      } else if (Number(j?.code) === 1003) {
+        dup++;
+      } else if (!r.ok || Number(j?.code) === 1001 || r.status === 401) {
+        authFail++;
+      }
     }
 
-    if (claimed > 0) return { ok: true, reward: claimed, remain, message: `领取 ${claimed} 个额度包` };
-    if (dup > 0) return { ok: true, already: true, remain, message: lastMsg || "今日额度已领取" };
+    // 回读余额（展示用）
+    let remain: number | undefined;
+    try {
+      const bRes = await fetch(`${ZCODE_BASE}${BALANCE_PATH}`, {
+        headers: { authorization: `Bearer ${cred.jwt}`, "x-device-mid": deviceMid },
+        signal: AbortSignal.timeout(15000),
+      });
+      const bj: any = await bRes.json().catch(() => null);
+      const units = (bj?.data?.balances ?? bj?.data?.plans ?? []).map((x: any) => Number(x?.remaining_units) || 0);
+      if (units.length) remain = units.reduce((a: number, b: number) => a + b, 0);
+    } catch {
+      /* 展示用，失败忽略 */
+    }
+
+    const listed = candidates.size;
+    if (claimed > 0) return { ok: true, reward: claimed, remain, message: `领取 ${claimed} 个额度包（${claimedNames.join("、")}）` };
+    if (dup > 0) return { ok: true, already: true, remain, message: lastMsg || `今日额度已领取（枚举 ${listed} 个候选）` };
     if (authFail > 0 && !lastMsg) {
       return { ok: false, remain, message: "领包请求被上游鉴权拒绝（JWT 失效或风控），请在控制台重新授权该账号" };
     }
-    return { ok: false, remain, message: lastMsg || (candidates.length ? "无可领取额度" : "当前没有可领取的额度包") };
+    return {
+      ok: false,
+      remain,
+      message: lastMsg || (listed > 0 ? `枚举到 ${listed} 个候选包但均不可领（已领完/未开始/资格不符）` : "当前没有可领取的额度包"),
+    };
   } catch (e) {
     return { ok: false, message: (e as Error).message || "签到失败" };
   }
