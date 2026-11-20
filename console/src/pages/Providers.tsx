@@ -132,10 +132,10 @@ const OAUTH_CATALOG: OAuthMeta[] = [
     mode: "redirect-poll" as const,
     regionSelect: true,
     regions: [
-      { label: "国际版（z.ai）", baseUrl: "https://zcode.z.ai", desc: "OAuth 设备授权，走 z.ai 的体验/编程套餐额度" },
-      { label: "国内版（bigmodel）", baseUrl: "https://open.bigmodel.cn/api/anthropic", desc: "走 open.bigmodel.cn；该站无设备授权，需填入客户端 access_token" },
+      { label: "国际版（chat.z.ai）", baseUrl: "https://chat.z.ai", desc: "chat.z.ai OAuth（邮箱登录），走 z.ai 的体验/编程套餐额度" },
+      { label: "国内版（zchat.z.ai）", baseUrl: "https://zchat.z.ai", desc: "zchat.z.ai OAuth（手机号登录）；旧的 bigmodel 微信扫码入口已下线" },
     ],
-    desc: "智谱 ZCode 客户端额度通道（GLM-5.3 / GLM-5.3-Flash），Anthropic 协议反代；国内版与国际版为两套独立站点与令牌。",
+    desc: "智谱 ZCode 客户端额度通道（GLM-5.3 / GLM-5.3-Flash），Anthropic 协议反代；登录已迁到 Z.ai OAuth：国际 chat.z.ai、国内 zchat.z.ai，bigmodel 微信扫码已不可用。",
     models: ["GLM-5.3", "GLM-5.3-Flash"],
   },
   {
@@ -527,9 +527,11 @@ export default function Providers() {
       // 双域渠道：国内/国际账号体系独立，落到各自的底层渠道，避免同一渠道混用两套域
       const variant = meta.regionSelect
         ? meta.type === "zcode"
-          ? /bigmodel\.cn/i.test(baseUrl)
-            ? { slug: "zcode-bigmodel-oauth", name: "ZCode 国内版 (bigmodel)" }
-            : { slug: "zcode-oauth", name: "ZCode 国际版 (z.ai)" }
+          ? /zchat\.z\.ai/i.test(baseUrl)
+            ? { slug: "zcode-cn-oauth", name: "ZCode 国内版 (zchat)" }
+            : /bigmodel\.cn/i.test(baseUrl)
+            ? { slug: "zcode-bigmodel-oauth", name: "ZCode 国内版 (bigmodel·旧)" }
+            : { slug: "zcode-oauth", name: "ZCode 国际版 (chat.z.ai)" }
           : meta.type === "qoder"
           ? /qoder\.com\.cn/i.test(baseUrl)
             ? { slug: "qoder-cn-oauth", name: "Qoder 国内版" }
@@ -623,11 +625,12 @@ export default function Providers() {
   /** 真正发起授权；区域选择完成后由 startOAuthFlow 接手 */
   const startOAuthFlow = async (meta: OAuthMeta, existing: Provider | null, baseUrl: string) => {
     stopOAuthPoll();
-    // ZCode 国内版（bigmodel）：该站没有设备授权接口，先建渠道，凭据由用户从客户端粘贴
+    // ZCode 旧国内版（bigmodel）：无设备授权接口，且微信扫码登录已于 2026-11 下线；
+    // 保留创建通道 + 粘贴 access_token 的兜底，新用户请改用 zchat.z.ai 授权。
     if (meta.type === "zcode" && /bigmodel\.cn/i.test(baseUrl)) {
       try {
         await adminActionStepUp("upsert_provider", {
-          name: "ZCode 国内版 (bigmodel)",
+          name: "ZCode 国内版 (bigmodel·旧)",
           slug: "zcode-bigmodel-oauth",
           kind: "oauth:zcode",
           baseUrl,
@@ -635,7 +638,7 @@ export default function Providers() {
         const d = await adminAction<{ providers: Provider[] }>("list_providers");
         setRows(d.providers);
         setOauthDlg(null);
-        toast("已创建国内版渠道：请到该渠道里填入客户端的 access_token（bigmodel 站不支持设备授权）", "ok");
+        toast("已创建旧版国内渠道：请粘贴客户端 access_token。注意 bigmodel 微信扫码已下线，建议改用 zchat.z.ai 重新授权", "ok");
       } catch (e) {
         setOauthDlg((x) => (x ? { ...x, step: "error", message: (e as Error).message } : x));
       }

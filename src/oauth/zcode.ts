@@ -13,10 +13,27 @@
 import type { Env } from "../types";
 import { getBlobStore } from "../storage/blob-store";
 import { ZCODE_SYSTEM, ZCODE_DEFAULTS } from "./zcode-profile";
+// 登录区域映射（纯函数，见 ./zcode-region；改这里等于改登录落点）
+import {
+  ZCODE_AUTHORIZE_HOST as AUTHORIZE_HOST,
+  zcodeProviderFor,
+  type ZcodeProvider,
+} from "./zcode-region";
+
+export { zcodeProviderFor };
+export type { ZcodeProvider };
 
 const ZCODE_BASE = "https://zcode.z.ai";
 const ZAI_BASE = "https://api.z.ai";
 const APP_VERSION = "3.16.3";
+
+/**
+ * 登录已经搬到 Z.ai 的 OAuth（2026-11-20 实测）：
+ *  - 国际版 provider=zai     → https://chat.z.ai/api/oauth/authorize
+ *  - 国内版 provider=zai_cn  → https://zchat.z.ai/api/oauth/authorize
+ *  - 旧国内版 provider=bigmodel → https://bigmodel.cn/login（微信扫码已下线，仅存量兼容）
+ */
+
 const CHAT_PATH = "/api/v1/zcode-plan/anthropic/v1/messages";
 const INIT_PATH = "/api/v1/oauth/cli/init";
 const pollPath = (id: string) => `/api/v1/oauth/cli/poll/${encodeURIComponent(id)}`;
@@ -73,7 +90,11 @@ function metadataUserId(uid: string, deviceId: string, sessionId: string): strin
   return JSON.stringify({ device_id: deviceId, account_uuid: "", session_id: sessionId });
 }
 
-async function upstreamHeaders(rawCred: string, prefer: "access" | "jwt" = "access"): Promise<Record<string, string>> {
+async function upstreamHeaders(
+  rawCred: string,
+  prefer: "access" | "jwt" = "access",
+  baseUrl?: string
+): Promise<Record<string, string>> {
   const cred = parseZcodeCredential(rawCred);
   // 不同站点认的令牌不同：bigmodel 用 OAuth access_token，zcode.z.ai 用 CLI JWT
   const bearer = prefer === "jwt" ? cred.jwt || cred.accessToken : cred.accessToken || cred.jwt;
@@ -81,6 +102,8 @@ async function upstreamHeaders(rawCred: string, prefer: "access" | "jwt" = "acce
   const derivedDevice = await deviceIdFor(uid);
   const deviceId = cred.deviceId || derivedDevice;
   const sessionId = await sessionIdFor(uid);
+  // 国内版登录已迁到 zchat.z.ai，referer 跟着站点走；其余保持 zcode.z.ai
+  const referer = zcodeProviderFor(baseUrl) === "zai_cn" ? AUTHORIZE_HOST.zai_cn : ZCODE_BASE;
   return {
     ...(ZCODE_DEFAULTS.headers as unknown as Record<string, string>),
     authorization: `Bearer ${bearer}`,
@@ -89,7 +112,7 @@ async function upstreamHeaders(rawCred: string, prefer: "access" | "jwt" = "acce
     "anthropic-version": "2023-06-01",
     "anthropic-beta": "mid-conversation-system-2026-04-07",
     "user-agent": `ZCode/${APP_VERSION} ai-sdk/provider-utils/4.0.27 runtime/node.js/24`,
-    "http-referer": ZCODE_BASE,
+    "http-referer": referer,
     "x-zcode-app-version": APP_VERSION,
     "x-device-mid": deviceId,
     "x-session-id": sessionId,
@@ -139,27 +162,29 @@ function errorResponse(message: string, status: number, type = "zcode_error"): R
 // 设备授权
 // =====================================================================
 
-export type ZcodeFlow = { state: string; url: string; interval: number; expiresIn?: number };
+export type ZcodeFlow = { state: string; url: string; interval: number; expiresIn?: number; provider?: ZcodeProvider };
 
 /** 发起设备授权：poll token 只保存在服务端，回调由 state(flow_id) 关联 */
-export async function startZcodeDeviceFlow(env: Env): Promise<ZcodeFlow> {
+export async function startZcodeDeviceFlow(env: Env, baseUrl?: string): Promise<ZcodeFlow> {
+  const provider = zcodeProviderFor(baseUrl);
   const pollToken = randomHex(32);
   const res = await fetch(`${ZCODE_BASE}${INIT_PATH}`, {
     method: "POST",
     headers: { authorization: `Bearer ${pollToken}`, "content-type": "application/json" },
-    body: JSON.stringify({ provider: "zai" }),
+    body: JSON.stringify({ provider }),
     signal: AbortSignal.timeout(20000),
   });
   const j: any = await res.json().catch(() => null);
   if (!res.ok || j?.code !== 0) throw new Error(`ZCode 授权初始化失败：${j?.msg || `HTTP ${res.status}`}`);
   const { flow_id, authorize_url, poll_interval_sec, expires_at } = j.data || {};
   if (!flow_id || !authorize_url) throw new Error("ZCode 授权初始化返回缺少 flow_id / authorize_url");
-  await getBlobStore(env).setJSON(FLOW_KEY(flow_id), { pollToken, at: Date.now() });
+  await getBlobStore(env).setJSON(FLOW_KEY(flow_id), { pollToken, provider, at: Date.now() });
   return {
     state: flow_id,
     url: authorize_url,
     interval: Number(poll_interval_sec) || 5,
     expiresIn: typeof expires_at === "number" ? Math.max(0, expires_at - Math.floor(Date.now() / 1000)) : undefined,
+    provider,
   };
 }
 
@@ -185,7 +210,9 @@ export type ZcodePollResult = {
 
 export async function pollZcodeDeviceFlow(env: Env, flowId: string): Promise<ZcodePollResult> {
   const store = getBlobStore(env);
-  const flow = (await store.get(FLOW_KEY(flowId), { type: "json", consistency: "strong" })) as { pollToken?: string } | null;
+  const flow = (await store.get(FLOW_KEY(flowId), { type: "json", consistency: "strong" })) as
+    | { pollToken?: string; provider?: ZcodeProvider }
+    | null;
   if (!flow?.pollToken) return { status: "error", message: "授权流程不存在或已过期，请重新发起" };
 
   const res = await fetch(`${ZCODE_BASE}${pollPath(flowId)}`, {
@@ -200,13 +227,25 @@ export async function pollZcodeDeviceFlow(env: Env, flowId: string): Promise<Zco
 
   const jwt = String(j.data?.token || "");
   if (!jwt) return { status: "error", message: "上游未返回 token" };
-  const accessToken = String(j.data?.zai?.access_token || j.data?.zai?.accessToken || "");
+  // zai / zai_cn 的 OAuth access_token 都挂在 data.zai 下；bigmodel 老流程字段名不同，
+  // 这里按优先级兜底，避免某一路径取不到 access_token 导致余额为空。
+  const accessToken = String(
+    j.data?.zai?.access_token ||
+      j.data?.zai?.accessToken ||
+      j.data?.bigmodel?.access_token ||
+      j.data?.access_token ||
+      ""
+  );
   const info = accessToken ? await fetchCustomerInfo(accessToken) : null;
 
   const email = String(info?.email || j.data?.user?.email || "").trim();
   const phone = String(info?.phoneNumber || "").trim();
-  // 归属是账号级的：邮箱 → 国际，手机号 → 国内
-  const realm: "cn" | "intl" | "unknown" = email ? "intl" : phone ? "cn" : "unknown";
+  // 归属是账号级的：邮箱 → 国际，手机号 → 国内；
+  // 但登录入口本身就是区域信号（zai_cn / bigmodel 一定是国内号），不要被 customerInfo 缺失带偏。
+  const provider: ZcodeProvider = flow.provider || "zai";
+  const inferred: "cn" | "intl" | "unknown" = email ? "intl" : phone ? "cn" : "unknown";
+  const realm: "cn" | "intl" | "unknown" =
+    provider === "zai_cn" || provider === "bigmodel" ? "cn" : inferred;
   const uid = userIdFromJwt(jwt);
 
   await store.delete(FLOW_KEY(flowId)).catch(() => {});
@@ -375,7 +414,7 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     : `${ZCODE_BASE}${CHAT_PATH}`;
   const res = await fetch(chatUrl, {
     method: "POST",
-    headers: await upstreamHeaders(p.refreshToken, isBigmodel ? "access" : "jwt"),
+    headers: await upstreamHeaders(p.refreshToken, isBigmodel ? "access" : "jwt", p.baseUrl),
     body: JSON.stringify(upstreamBody),
     signal: AbortSignal.timeout(300000),
   });
@@ -430,7 +469,7 @@ export async function testZcode(_env: Env, jwt: string, modelId: string, baseUrl
     const url = isBigmodel ? `${(baseUrl || "").replace(/\/+$/, "")}/v1/messages` : `${ZCODE_BASE}${CHAT_PATH}`;
     const res = await fetch(url, {
       method: "POST",
-      headers: await upstreamHeaders(jwt, isBigmodel ? "access" : "jwt"),
+      headers: await upstreamHeaders(jwt, isBigmodel ? "access" : "jwt", baseUrl),
       body: JSON.stringify({
         model: modelId,
         max_tokens: 32,
@@ -475,11 +514,23 @@ export async function probeZcode(
   baseUrl?: string
 ): Promise<{
   claims: Record<string, unknown>;
+  login: { provider: ZcodeProvider; authorizeHost: string; note: string };
   matrix: Array<{ host: string; token: string; status: number; body: string }>;
   balance: { status: number; body: string };
   preview: { status: number; body: string };
 }> {
-  const headers = await upstreamHeaders(jwt, /bigmodel\.cn/i.test(baseUrl || "") ? "access" : "jwt");
+  const loginProvider = zcodeProviderFor(baseUrl);
+  const login = {
+    provider: loginProvider,
+    authorizeHost: AUTHORIZE_HOST[loginProvider],
+    note:
+      loginProvider === "bigmodel"
+        ? "旧国内入口（bigmodel.cn/login）：微信扫码已下线，建议改用 zchat.z.ai 重新授权"
+        : loginProvider === "zai_cn"
+        ? "国内版：zchat.z.ai OAuth（手机号登录）"
+        : "国际版：chat.z.ai OAuth（邮箱登录）",
+  };
+  const headers = await upstreamHeaders(jwt, /bigmodel\.cn/i.test(baseUrl || "") ? "access" : "jwt", baseUrl);
   const get = async (url: string) => {
     const r = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
     const t = await r.text().catch(() => "");
@@ -502,7 +553,7 @@ export async function probeZcode(
   }
   // 矩阵：两个站点 × 两种令牌，直接看哪一组能过（返回状态码 + 响应片段）
   const cred = parseZcodeCredential(jwt);
-  const baseHeaders = await upstreamHeaders(jwt, "jwt");
+  const baseHeaders = await upstreamHeaders(jwt, "jwt", baseUrl);
   const hosts = [
     { name: "zai", url: `${ZCODE_BASE}${CHAT_PATH}` },
     { name: "bigmodel", url: "https://open.bigmodel.cn/api/anthropic/v1/messages" },
@@ -543,6 +594,7 @@ export async function probeZcode(
 
   return {
     claims,
+    login,
     matrix,
     balance: await get(`${ZCODE_BASE}${BALANCE_PATH}`),
     preview: await get(`${ZCODE_BASE}${PREVIEW_PATH}`),
@@ -568,9 +620,9 @@ export type ZcodeCheckinResult = {
  * （对齐 ZCode2API 的 claimFor）：活动包 id 带日期编码 `zcode-v3-start-plan-<MMDD>-wk`，
  * 北京时间 0 点跳日，所以候选要跨 ±1 天；每日体验包是固定 id `-0817`，领过即 1003。
  */
-export async function checkinZcode(env: Env, jwt: string): Promise<ZcodeCheckinResult> {
+export async function checkinZcode(env: Env, jwt: string, baseUrl?: string): Promise<ZcodeCheckinResult> {
   if (!jwt) return { ok: false, message: "未填写凭据" };
-  const headers = await upstreamHeaders(jwt);
+  const headers = await upstreamHeaders(jwt, "access", baseUrl);
   try {
     // 当前生效的包类型，避免重复领同一类
     const activeKinds = new Set<string>();

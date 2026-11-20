@@ -439,3 +439,36 @@ git checkout edgeone
 - [ ] **国际版签到指纹**：参考实现证实自造 `cosy-machinetoken` 不会下发 `CLAIM_BEFEFIT` 活动；当前用账号派生指纹尽力而为，失败时提示需要客户端真实指纹。
 - [ ] **Token 自动续期未实现**：Qoder 设备令牌 / refresh_token 约 15 天有效期，过期后需重新授权；参考实现的 jobToken `needRefresh` 续期链路尚未移植。
 - [ ] **流式为聚合后回放**：与 ZCode 渠道一致，先收完整条上游 SSE 再合成客户端 SSE，首字延迟等于整条响应耗时。
+
+---
+
+## 十一、 2026-11-20 ZCode 登录迁移（bigmodel → zchat.z.ai / chat.z.ai）
+
+### 1. 实测结论
+
+直接打 `POST https://zcode.z.ai/api/v1/oauth/cli/init` 拿 `authorize_url`，三种 provider 的真实落点：
+
+| provider | authorize host | callback |
+| --- | --- | --- |
+| `zai` | `https://chat.z.ai/api/oauth/authorize` | `/api/v1/oauth/cli/callback/zai` |
+| `zai_cn` | `https://zchat.z.ai/api/oauth/authorize` | `/api/v1/oauth/cli/callback/zai_cn` |
+| `bigmodel` | `https://bigmodel.cn/login?appId=zcode` | `/api/v1/oauth/cli/callback/bigmodel` |
+
+- 三者 `client_id` 相同（`client_P8X5CMWmlaRO9gyO-KSqtg`），poll 端点不变。
+- `zai_cn` 是唯一可用的国内写法；`cn` / `zhipu` / `zchat` / `glm` / `zai-cn` 等一律返回 `code:1000`。
+- `bigmodel.cn/login` 页面仍 200，但微信扫码入口已下线 → 国内只能走 `zai_cn`。
+- `zchat.z.ai` 与 `chat.z.ai` 是同一套 Z.ai 应用的两个区域域（首页标题一致），`/api/oauth/authorize` 都存在（缺参返回 422）。
+
+### 2. 本轮改动
+
+- `startZcodeDeviceFlow(env, baseUrl)`：按渠道 `baseUrl` 选 provider，flow 记录 provider 供 poll 使用。
+- `pollZcodeDeviceFlow`：`access_token` 兼容 `data.zai` / `data.bigmodel` / `data.access_token` 三种形态；realm 以登录入口为主信号（`zai_cn`/`bigmodel` → cn），避免 customerInfo 缺失时误判国际号。
+- `upstreamHeaders(..., baseUrl)`：`zai_cn` 的 `http-referer` 改用 `https://zchat.z.ai`，其余保持 `zcode.z.ai`。
+- `checkinZcode(env, jwt, baseUrl)`：签到沿用渠道区域，referer 同步。
+- `probeZcode`：返回新增 `login`（provider / authorizeHost / 提示），旧 bigmodel 渠道直接提示「微信扫码已下线」。
+- 控制台：ZCode 区域改为「国际版 chat.z.ai」「国内版 zchat.z.ai」；slug 分流 `zcode-oauth` / `zcode-cn-oauth`；bigmodel 仅保留旧渠道兼容并改名「bigmodel·旧」。
+
+### 3. 待验证
+
+- 真号走一遍 `zai_cn` 授权：重点确认 poll 返回的 access_token 字段名（若是 `data.bigmodel` 已被兜底覆盖，但如果两边都没有就是空）。
+- 国内号对话仍走 `zcode.z.ai/api/v1/zcode-plan/...`，未按站点切换；若上游按站点隔离，需要在 `handleZcodeRequest` 里按 provider 改 chat host。

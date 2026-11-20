@@ -110,7 +110,7 @@ async function runZcodeProvider(env: Env, provider: ProviderRecord): Promise<Che
     const base = { keyId: k.id, email: k.email, fingerprint: k.keyFingerprint || k.id.slice(0, 8) };
     try {
       const token = await decryptSecret(env, k.encryptedKey);
-      const r = await checkinZcode(env, token);
+      const r = await checkinZcode(env, token, provider.baseUrl);
       return { ...base, ok: r.ok, already: r.already, reward: r.reward, remain: r.remain, message: r.message };
     } catch (err) {
       return { ...base, ok: false, message: (err as Error).message || "签到异常" };

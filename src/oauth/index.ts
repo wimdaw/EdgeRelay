@@ -209,7 +209,8 @@ export async function startOAuth(env: Env, type: OAuthProviderType, baseUrl?: st
     return { mode: "redirect-poll", url: flow.authUrl, state: flow.state, realm: flow.realm };
   }
   if (type === "zcode") {
-    const flow = await startZcodeDeviceFlow(env);
+    // 国内版登录已迁到 zchat.z.ai（provider=zai_cn），靠渠道 baseUrl 区分区域
+    const flow = await startZcodeDeviceFlow(env, baseUrl);
     return { mode: "redirect-poll", url: flow.url, state: flow.state };
   }
   if (type === "qoder") {
