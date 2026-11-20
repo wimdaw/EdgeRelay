@@ -37,7 +37,7 @@ type PoolProvider = {
   slug: string;
   kind: string;
   status: "active" | "disabled";
-  checkin?: { supported: boolean; enabled: boolean; label?: string };
+  checkin?: { supported: boolean; enabled: boolean; label?: string; action?: string };
   accounts: PoolAccount[];
 };
 
@@ -227,16 +227,16 @@ export default function AccountPool() {
   const [checkinBusy, setCheckinBusy] = useState<string>("");
 
   /** 立即签到：对单个渠道手动跑一轮，force 跳过后端当日去重 */
-  const runCheckin = async (type: string, name: string) => {
+  const runCheckin = async (type: string, name: string, action = "签到") => {
     setCheckinBusy(type);
     try {
       const r = await adminAction<{ result: { total: number; success: number; skipped?: string; channels: Array<{ providerName: string; accounts: Array<{ ok: boolean; message?: string }> }> } }>("codebuddy_checkin", { type });
       const res = r.result;
       const accounts = (res?.channels || []).flatMap((c) => c.accounts);
       const failed = accounts.filter((a) => !a.ok);
-      if (!accounts.length) toast(res?.skipped || `${name} 暂无可签到账号`, "err");
-      else if (failed.length) toast(`${name} 签到：成功 ${accounts.length - failed.length}/${accounts.length}，${failed[0].message || "存在失败"}`, "err");
-      else toast(`${name} 签到完成：${accounts.length} 个账号成功`, "ok");
+      if (!accounts.length) toast(res?.skipped || `${name} 暂无可${action}账号`, "err");
+      else if (failed.length) toast(`${name} ${action}：成功 ${accounts.length - failed.length}/${accounts.length}，${failed[0].message || "存在失败"}`, "err");
+      else toast(`${name} ${action}完成：${accounts.length} 个账号成功`, "ok");
       await load();
     } catch (e) {
       toast((e as Error).message, "err");
@@ -246,10 +246,10 @@ export default function AccountPool() {
   };
 
   /** 自动签到开关（默认开启，写入后端 checkin:config） */
-  const toggleCheckin = async (type: string, enabled: boolean) => {
+  const toggleCheckin = async (type: string, enabled: boolean, action = "签到") => {
     try {
       await adminAction("set_checkin", { type, enabled });
-      toast(`${enabled ? "已开启" : "已关闭"}自动签到`, "ok");
+      toast(`${enabled ? "已开启" : "已关闭"}自动${action}`, "ok");
       await load();
     } catch (e) {
       toast((e as Error).message, "err");
@@ -332,17 +332,17 @@ export default function AccountPool() {
                           type="checkbox"
                           className="h-3 w-3 cursor-pointer accent-[var(--brand)]"
                           checked={p.checkin.enabled}
-                          onChange={(e) => void toggleCheckin(p.kind.replace(/^oauth:/, ""), e.target.checked)}
+                          onChange={(e) => void toggleCheckin(p.kind.replace(/^oauth:/, ""), e.target.checked, p.checkin?.action)}
                         />
-                        自动签到
+                        自动{p.checkin.action || "签到"}
                       </label>
                       <Button
                         variant="soft"
                         className="!h-7 !px-2 text-[11px]"
                         disabled={checkinBusy === p.kind.replace(/^oauth:/, "")}
-                        onClick={() => void runCheckin(p.kind.replace(/^oauth:/, ""), p.name)}
+                        onClick={() => void runCheckin(p.kind.replace(/^oauth:/, ""), p.name, p.checkin?.action)}
                       >
-                        <CheckCircle2 size={12} />{checkinBusy === p.kind.replace(/^oauth:/, "") ? "签到中…" : "立即签到"}
+                        <CheckCircle2 size={12} />{checkinBusy === p.kind.replace(/^oauth:/, "") ? `${p.checkin.action || "签到"}中…` : `立即${p.checkin.action || "签到"}`}
                       </Button>
                     </>
                   )}

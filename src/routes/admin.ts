@@ -591,6 +591,7 @@ adminRouter.post("/actions", async (c) => {
             channels: listCheckinChannels().map((c) => ({
               type: c.type,
               label: c.label,
+              action: c.action,
               enabled: !cfg.disabled.includes(c.type),
             })),
           },

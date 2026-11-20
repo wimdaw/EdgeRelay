@@ -75,6 +75,8 @@ const CHECKIN_START_HOUR = 9;
 
 type ChannelRunner = {
   label: string;
+  /** 动作名（签到 / 领额度），用于按钮与提示文案 */
+  action: string;
   /** 该渠道在 provider.kind 里的 oauth 类型（oauth:<type>） */
   oauthType: string;
   run: (env: Env, provider: ProviderRecord) => Promise<CheckinAccountResult[]>;
@@ -115,13 +117,13 @@ async function runZcodeProvider(env: Env, provider: ProviderRecord): Promise<Che
 }
 
 const CHANNELS: Record<string, ChannelRunner> = {
-  codebuddy: { label: "CodeBuddy / WorkBuddy", oauthType: "codebuddy", run: runCodebuddyProvider },
-  zcode: { label: "ZCode (智谱)", oauthType: "zcode", run: runZcodeProvider },
+  codebuddy: { label: "CodeBuddy / WorkBuddy", action: "签到", oauthType: "codebuddy", run: runCodebuddyProvider },
+  zcode: { label: "ZCode (智谱)", action: "领额度", oauthType: "zcode", run: runZcodeProvider },
 };
 
 /** 支持签到的渠道清单（供控制台渲染开关） */
-export function listCheckinChannels(): Array<{ type: string; label: string }> {
-  return Object.entries(CHANNELS).map(([type, c]) => ({ type, label: c.label }));
+export function listCheckinChannels(): Array<{ type: string; label: string; action: string }> {
+  return Object.entries(CHANNELS).map(([type, c]) => ({ type, label: c.label, action: c.action }));
 }
 
 // =====================================================================

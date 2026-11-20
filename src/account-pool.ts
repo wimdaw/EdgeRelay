@@ -52,7 +52,7 @@ export type AccountPoolProvider = {
   status: "active" | "disabled";
   accounts: AccountPoolAccount[];
   /** 该渠道是否支持自动签到，以及当前是否开启（未注册签到的渠道为 undefined） */
-  checkin?: { supported: boolean; enabled: boolean; label?: string };
+  checkin?: { supported: boolean; enabled: boolean; label?: string; action?: string };
 };
 
 function kindType(kind?: string | null): { scope: "oauth" | "web"; type: string } | null {
@@ -71,7 +71,7 @@ export async function buildAccountPool(env: Env, providers: ProviderRecord[]): P
   const checkinState = (type: string) => {
     const meta = checkinChannels.find((c) => c.type === type);
     if (!meta) return undefined;
-    return { supported: true, enabled: !checkinCfg.disabled.includes(type), label: meta.label };
+    return { supported: true, enabled: !checkinCfg.disabled.includes(type), label: meta.label, action: meta.action };
   };
 
   for (const provider of providers) {
