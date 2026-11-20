@@ -269,8 +269,18 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     });
   }
 
-  const body = await res.json().catch(() => null);
-  if (!body) return errorResponse("ZCode 上游返回非 JSON", 502, "upstream_error");
+  const raw = await res.text().catch(() => "");
+  let body: any = null;
+  try {
+    body = JSON.parse(raw);
+  } catch {
+    return errorResponse(`ZCode 上游返回非 JSON: ${raw.slice(0, 200)}`, 502, "upstream_error");
+  }
+  // 上游正常应是 Anthropic Messages 结构（content 数组）。若拿到错误包（code/msg）或其它形状，
+  // 直接暴露原始内容，避免翻译成一条 content=null 的“成功”回复。
+  if (!Array.isArray(body?.content)) {
+    return errorResponse(`ZCode 上游返回异常结构: ${raw.slice(0, 400)}`, 502, "upstream_error");
+  }
   return jsonResponse(anthropicResponseToOpenAI(body, p.requestedModel));
 }
 
