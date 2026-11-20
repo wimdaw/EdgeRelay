@@ -78,7 +78,9 @@ async function upstreamHeaders(rawCred: string, prefer: "access" | "jwt" = "acce
   // 不同站点认的令牌不同：bigmodel 用 OAuth access_token，zcode.z.ai 用 CLI JWT
   const bearer = prefer === "jwt" ? cred.jwt || cred.accessToken : cred.accessToken || cred.jwt;
   const uid = userIdFromJwt(cred.jwt);
-  const [deviceId, sessionId] = await Promise.all([deviceIdFor(uid), sessionIdFor(uid)]);
+  const derivedDevice = await deviceIdFor(uid);
+  const deviceId = cred.deviceId || derivedDevice;
+  const sessionId = await sessionIdFor(uid);
   return {
     ...(ZCODE_DEFAULTS.headers as unknown as Record<string, string>),
     authorization: `Bearer ${bearer}`,
@@ -97,17 +99,29 @@ async function upstreamHeaders(rawCred: string, prefer: "access" | "jwt" = "acce
   };
 }
 
-/** 凭据可能是 `jwt` 或 `jwt|access_token`（新版授权会同时保存两者） */
-export function parseZcodeCredential(raw: string): { jwt: string; accessToken: string } {
-  const text = (raw || "").trim();
-  const sep = text.indexOf("|");
-  if (sep < 0) return { jwt: text, accessToken: "" };
-  return { jwt: text.slice(0, sep).trim(), accessToken: text.slice(sep + 1).trim() };
+/** 凭据格式：`jwt` / `jwt|access_token` / `jwt|access_token|device_id` */
+export function parseZcodeCredential(raw: string): { jwt: string; accessToken: string; deviceId: string } {
+  const parts = (raw || "").split("|").map((x) => x.trim());
+  return { jwt: parts[0] || "", accessToken: parts[1] || "", deviceId: parts[2] || "" };
 }
 
 /** 上游 Bearer：优先 OAuth access_token（体验/套餐额度挂在它上面），没有则回退 CLI JWT */
 function bearerOf(cred: { jwt: string; accessToken: string }): string {
   return cred.accessToken || cred.jwt;
+}
+
+/** JWT 是否过老（无 exp，按 iat + 7 天判断，对齐参考实现的 login_expired） */
+function loginExpired(jwt: string, ttlDays = 7): boolean {
+  try {
+    const payload = jwt.split(".")[1];
+    if (!payload) return false;
+    const claims = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    const iat = Number(claims?.iat) || 0;
+    if (!iat) return false;
+    return Date.now() / 1000 - iat > ttlDays * 86400;
+  } catch {
+    return false;
+  }
 }
 
 function jsonResponse(payload: unknown, status = 200): Response {
@@ -200,7 +214,9 @@ export async function pollZcodeDeviceFlow(env: Env, flowId: string): Promise<Zco
     status: "ok",
     // 同时保存 CLI JWT 与 OAuth access_token：体验额度（start plan）绑定的是后者，
     // 只用 JWT 会出现 balance 为空、请求 1005 的现象。
-    refreshToken: accessToken ? `${jwt}|${accessToken}` : jwt,
+    // device_id 在授权时生成一次并随凭据保存：同一账号此后始终用同一台“设备”，
+    // 避免每次请求派生不同指纹被上游判为异常（对应参考实现的 account.device_mid）
+    refreshToken: [jwt, accessToken, crypto.randomUUID()].filter(Boolean).join("|"),
     // 账号池按 email 展示；只有手机号的国内号用手机号占位
     email: email || phone || undefined,
     account: { uid, nickname: String(info?.nickName || info?.customerName || "").trim() || undefined, realm },
@@ -328,6 +344,9 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
   if (!p.refreshToken) return errorResponse("该 zcode 渠道未配置凭据：请在「API Key」里填入 ZCode 账号的 JWT（可点「用 ZCode 账号授权」获取）", 400, "configuration_error");
 
   const inbound = openAIToAnthropicZcode({ ...p.body, model: p.modelId });
+  if (loginExpired(parseZcodeCredential(p.refreshToken).jwt)) {
+    return errorResponse("ZCode 登录已过期，请重新授权该账号", 401, "login_expired");
+  }
   const cred = parseZcodeCredential(p.refreshToken);
   const uid = userIdFromJwt(cred.jwt);
   const [deviceId, sessionId] = await Promise.all([deviceIdFor(uid), sessionIdFor(uid)]);
@@ -338,6 +357,7 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     model: p.modelId,
     max_tokens: Math.min(Number(inbound.max_tokens) || 8192, Number(ZCODE_DEFAULTS.max_tokens) || 32000),
     stream: false, // 上游固定非流式，流式由本层合成，避免 SSE 结构差异
+    metadata: { user_id: metadataUserId(uid, cred.deviceId || (await deviceIdFor(uid)), await sessionIdFor(uid)) },
     system: ZCODE_SYSTEM,
     messages: demoteSystem(inbound.messages, String(inbound.system || "")),
     thinking: ZCODE_DEFAULTS.thinking ?? { type: "enabled" },
@@ -382,6 +402,10 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     });
     console.log(`[zcode] upstream ${biz} sent=${sent}`);
     if (biz === 3012) return errorResponse(`ZCode 风控拒绝（3012，system/设备指纹不匹配）: ${msg}`, 403, "upstream_error");
+    const lower = msg.toLowerCase();
+    if (/captcha|verification_required|security/.test(lower)) {
+      return errorResponse(`ZCode 需要人机验证（${biz}）: ${msg}。请在 ZCode 客户端完成一次对话以刷新验证态后重试`, 403, "verification_required");
+    }
     if (biz === 1005 || biz === 3009) return errorResponse(`ZCode 账号额度不足或繁忙（${biz}）: ${msg} | sent=${sent}`, 429, "upstream_error");
     return errorResponse(`ZCode 业务错误 ${biz}: ${msg} | sent=${sent}`, 402, "upstream_error");
   }
