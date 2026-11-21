@@ -45,6 +45,9 @@ export default function MyProviders({ meEmail }: { meEmail: string }) {
   const [thread, setThread] = useState<{ sub: MySubmission; messages: ThreadMessage[] } | null>(null);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  /** 连通测试：key 为 "form" 或提交 id */
+  const [testing, setTesting] = useState<string>("");
+  const [testResults, setTestResults] = useState<Record<string, { ok: boolean; message: string }>>({});
   const toast = useToast();
 
   const [form, setForm] = useState({ name: "", slug: "", baseUrl: "", kind: "openai_compat", authScheme: "bearer", key: "", password: "" });
@@ -79,6 +82,21 @@ export default function MyProviders({ meEmail }: { meEmail: string }) {
       toast((e as Error).message, "err");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  /** 连通测试：提交前用表单凭据，已提交渠道用存库密钥（后端解密） */
+  const runTest = async (opts: { submissionId?: string; baseUrl?: string; kind?: string; authScheme?: string; key?: string }) => {
+    const key = opts.submissionId || "form";
+    setTesting(key);
+    try {
+      const r = await api<{ result: { ok: boolean; message: string } }>("/api/user/providers/test", "POST", opts);
+      setTestResults((prev) => ({ ...prev, [key]: r.result }));
+      if (!r.result.ok) toast(r.result.message, "err");
+    } catch (e) {
+      toast((e as Error).message, "err");
+    } finally {
+      setTesting("");
     }
   };
 
@@ -152,11 +170,22 @@ export default function MyProviders({ meEmail }: { meEmail: string }) {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] text-muted">{fmt(s.createdAt)}</span>
+                  {s.status === "pending" && (
+                    <Button variant="soft" className="!h-7 !px-2 text-[11px]" disabled={testing === s.id} onClick={() => void runTest({ submissionId: s.id })}>
+                      <RefreshCw size={12} className={cn(testing === s.id && "animate-spin")} />
+                      {testing === s.id ? "测试中…" : "测试连通"}
+                    </Button>
+                  )}
                   <Button variant="soft" className="!h-7 !px-2 text-[11px]" onClick={() => void openThread(s)}>
                     <MessageSquare size={12} />往来消息
                   </Button>
                 </div>
               </div>
+              {testResults[s.id] && (
+                <div className={cn("mt-2 rounded-lg px-2.5 py-1.5 text-[11px]", testResults[s.id].ok ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-err")}>
+                  连通测试：{testResults[s.id].message}
+                </div>
+              )}
             </Card>
           );
         })
@@ -182,9 +211,26 @@ export default function MyProviders({ meEmail }: { meEmail: string }) {
           <Field label="账户密码（敏感操作校验）" hint="提交属敏感操作，需验证你的登录密码">
             <Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete="current-password" />
           </Field>
-          <div className="flex justify-end gap-2 pt-1">
-            <Button variant="ghost" onClick={() => setSubmitOpen(false)}>取消</Button>
-            <Button onClick={() => void submit()} disabled={submitting}>{submitting ? "提交中…" : "提交审核"}</Button>
+          {testResults.form && (
+            <div className={cn("rounded-lg px-2.5 py-1.5 text-[11px]", testResults.form.ok ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-err")}>
+              连通测试：{testResults.form.message}
+            </div>
+          )}
+          <div className="flex items-center justify-between gap-2 pt-1">
+            <Button
+              variant="soft"
+              className="h-9"
+              disabled={testing === "form" || !form.baseUrl.trim()}
+              onClick={() => void runTest({ baseUrl: form.baseUrl, kind: form.kind, authScheme: form.authScheme, key: form.key })}
+              title="用当前表单的地址与密钥访问上游 /models，验证能否连通"
+            >
+              <RefreshCw size={13} className={cn(testing === "form" && "animate-spin")} />
+              {testing === "form" ? "测试中…" : "测试连通"}
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="ghost" onClick={() => setSubmitOpen(false)}>取消</Button>
+              <Button onClick={() => void submit()} disabled={submitting}>{submitting ? "提交中…" : "提交审核"}</Button>
+            </div>
           </div>
         </div>
       </Dialog>

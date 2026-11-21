@@ -40,6 +40,8 @@ export default function ProviderSubmissions() {
   const [thread, setThread] = useState<{ sub: Submission; messages: ThreadMessage[] } | null>(null);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  const [testing, setTesting] = useState("");
+  const [testResults, setTestResults] = useState<Record<string, { ok: boolean; message: string }>>({});
   const toast = useToast();
   const { confirm, confirmEl } = useConfirm();
 
@@ -99,6 +101,21 @@ export default function ProviderSubmissions() {
     }
   };
 
+  /** 连通测试：解密用户提交的密钥访问上游 /models，只读不落库 */
+  const runTest = async (sub: Submission) => {
+    setTesting(sub.id);
+    try {
+      const r = await adminAction<{ result?: { ok: boolean; message: string } }>("provider_submission_test", { id: sub.id });
+      const res = r.result ?? (r as unknown as { ok: boolean; message: string });
+      setTestResults((prev) => ({ ...prev, [sub.id]: res }));
+      if (!res.ok) toast(res.message, "err");
+    } catch (e) {
+      toast((e as Error).message, "err");
+    } finally {
+      setTesting("");
+    }
+  };
+
   const approve = async (sub: Submission) => {
     if (await confirm(`通过「${sub.name}」的提交？将创建正式渠道${sub.hasKey ? "并录入用户提交的密钥" : "（无密钥，需手动录入）"}。`)) {
       await review(sub, "approved");
@@ -152,6 +169,10 @@ export default function ProviderSubmissions() {
                   </Button>
                   {s.status === "pending" && (
                     <>
+                      <Button variant="soft" className="!h-7 !px-2 text-[11px]" disabled={testing === s.id} onClick={() => void runTest(s)} title="解密用户密钥访问上游 /models 验证连通">
+                        <RefreshCw size={12} className={cn(testing === s.id && "animate-spin")} />
+                        {testing === s.id ? "测试中…" : "测试连通"}
+                      </Button>
                       <Button variant="soft" className="!h-7 !px-2 text-[11px] !text-emerald-500" disabled={busy === s.id} onClick={() => void approve(s)}>
                         <Check size={12} />通过
                       </Button>
@@ -162,6 +183,11 @@ export default function ProviderSubmissions() {
                   )}
                 </div>
               </div>
+              {testResults[s.id] && (
+                <div className={cn("mt-2 rounded-lg px-2.5 py-1.5 text-[11px]", testResults[s.id].ok ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-err")}>
+                  连通测试：{testResults[s.id].message}
+                </div>
+              )}
             </Card>
           );
         })

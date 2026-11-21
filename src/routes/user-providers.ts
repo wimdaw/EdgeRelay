@@ -15,10 +15,12 @@
 import { Hono } from "hono";
 import type { Env, HandlerCtx, ProviderSubmission, ProviderSubmissionMessage } from "../types";
 import { requireUser } from "../auth";
+import { testUpstreamConnectivity } from "../provider-test";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
 import { json } from "../settings";
 import { uuid, verifyPassword, encryptSecret } from "../crypto";
 import { getUserById, getProviders, getProviderSubmissions, upsertProviderSubmission, appendProviderSubmissionMessage, getProviderSubmissionThread } from "../storage/db";
+import { decryptSecret } from "../crypto";
 
 export const userProvidersRouter = new Hono<{ Bindings: Env }>();
 
@@ -108,6 +110,38 @@ userProvidersRouter.post("/", async (c) => {
     await appendProviderSubmissionMessage(env, first);
 
     return json({ ok: true, submission: publicSubmission(sub) });
+  } catch (err) {
+    return errorResponse(hCtx, err);
+  }
+});
+
+/** 连通性测试：submissionId（用存库密钥，需归属）或内联 baseUrl/kind/authScheme/key（提交前预检，无需密码） */
+userProvidersRouter.post("/test", async (c) => {
+  const env = c.env as Env;
+  const hCtx: HandlerCtx = { env, req: c.req as any };
+  try {
+    const user = await requireUser(hCtx);
+    const body = (await c.req.json().catch(() => ({}))) as {
+      submissionId?: string; baseUrl?: string; kind?: string; authScheme?: string; key?: string;
+    };
+
+    let baseUrl = String(body.baseUrl || "").trim();
+    let kind = String(body.kind || "openai_compat");
+    let authScheme = String(body.authScheme || "bearer");
+    let key = String(body.key || "");
+
+    if (body.submissionId) {
+      // 已提交渠道：归属校验后解密存库凭据测试
+      const sub = await requireOwnSubmission(env, hCtx, user.id, String(body.submissionId));
+      baseUrl = sub.baseUrl;
+      kind = sub.kind;
+      authScheme = sub.authScheme;
+      key = sub.encryptedKey ? await decryptSecret(env, sub.encryptedKey) : "";
+    }
+
+    if (!/^https:\/\//i.test(baseUrl)) throw new ApiError(400, ErrorCode.BAD_REQUEST, "Base URL 必须是 https:// 开头的完整地址");
+    const r = await testUpstreamConnectivity({ baseUrl, kind, authScheme, key });
+    return json({ ok: true, result: r });
   } catch (err) {
     return errorResponse(hCtx, err);
   }
