@@ -131,9 +131,83 @@ function startS2TDom() {
   observer.observe(document.body, { childList: true, subtree: true, characterData: true });
 }
 
+/** en-US 短语替换（按长度降序最长匹配，单遍扫描文本节点） */
+let enPhraseRes: RegExp | null = null;
+let enPhraseMap: Record<string, string> | null = null;
+
+function enPhraseRe(): RegExp | null {
+  if (!enPhraseMap) return null;
+  if (enPhraseRes) return enPhraseRes;
+  const keys = Object.keys(enPhraseMap).sort((a, b) => b.length - a.length).map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  enPhraseRes = keys.length ? new RegExp(keys.join("|"), "g") : null;
+  return enPhraseRes;
+}
+
+function enPhraseReplace(text: string): string {
+  const re = enPhraseRe();
+  if (!re) return text;
+  return text.replace(re, (m) => enPhraseMap![m] || m);
+}
+
+function translateElementEn(root: Element) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent) return NodeFilter.FILTER_REJECT;
+      if (parent.closest("[data-i18n-done],input,textarea,code,pre")) return NodeFilter.FILTER_REJECT;
+      if (!/[\u4e00-\u9fff]/.test(node.nodeValue || "")) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
+  const nodes: Text[] = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+  for (const node of nodes) {
+    const converted = enPhraseReplace(node.nodeValue || "");
+    if (converted !== node.nodeValue) {
+      node.nodeValue = converted;
+      (node.parentElement as Element).setAttribute("data-i18n-done", "1");
+    }
+  }
+}
+
+function startEnDom() {
+  const run = () => translateElementEn(document.body);
+  run();
+  const observer = new MutationObserver((muts) => {
+    for (const mu of muts) {
+      for (const node of mu.addedNodes) {
+        if (node.nodeType === Node.ELEMENT_NODE && !(node as Element).closest("[data-i18n-done]")) translateElementEn(node as Element);
+        else if (node.nodeType === Node.TEXT_NODE && node.parentElement && !node.parentElement.closest("[data-i18n-done]")) {
+          const converted = enPhraseReplace(node.nodeValue || "");
+          if (converted !== node.nodeValue) node.nodeValue = converted;
+        }
+      }
+      if (mu.type === "characterData" && mu.target.parentElement) {
+        const p = mu.target.parentElement;
+        if (!p.closest("[data-i18n-done],input,textarea,code,pre")) {
+          const converted = enPhraseReplace(mu.target.nodeValue || "");
+          if (converted !== mu.target.nodeValue) mu.target.nodeValue = converted;
+        }
+      }
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+}
+
 export function applyLocaleDom(locale: Locale) {
   if (locale === ZH_TW) {
     // 等待首帧渲染完成再转换
     requestAnimationFrame(() => startS2TDom());
+  } else if (locale === EN_US && enPhraseMap) {
+    requestAnimationFrame(() => startEnDom());
+  }
+}
+
+/** 注册 en-US 短语字典并触发 DOM 层（Settings/模型加载后调用） */
+export function registerEnPhrases(map: Record<string, string>) {
+  enPhraseMap = map;
+  enPhraseRes = null;
+  if (current === EN_US) {
+    requestAnimationFrame(() => startEnDom());
   }
 }
