@@ -31,11 +31,11 @@ export default function ChatRoom({ me }: { me: Me }) {
   const lastTapRef = useRef<{ time: number } | null>(null);
   const patBusyRef = useRef(false);
   const [mentionIdx, setMentionIdx] = useState(0);
-  /** 打字机显现：revealed[id] = 已显示字符数；仅对「新到达」的 bot 消息生效（历史消息直接完整显示） */
-  const revealedRef = useRef<Record<string, number>>({});
-  const twTimersRef = useRef<Map<string, number>>(new Map());
-  const seenBotIdsRef = useRef<Set<string>>(new Set());
-  const [, setTwTick] = useState(0);
+  /** 打字机显现（纯时间驱动）：revealStart[id] = 显现开始时刻，进度 = 时间差的纯函数，无定时器竞争 */
+  const revealStartRef = useRef<Record<string, number>>({});
+  const [, setRevealTick] = useState(0);
+  /** 页面装载时刻：只有装载之后新到达的消息才做打字机显现（历史消息直接完整显示） */
+  const loadedAtRef = useRef(Date.now());
   /** @ 提及候选：输入 @ 后弹出房间内所有用户 */
   const [mention, setMention] = useState<{ query: string } | null>(null);
   /** 机器人名字：后台「网站设置 → 站点信息 → 聊天室机器人名字」可配 */
@@ -43,42 +43,25 @@ export default function ChatRoom({ me }: { me: Me }) {
   const listRef = useRef<HTMLDivElement | null>(null);
   const toast = useToast();
 
-  /** 消息入状态的统一入口：新到达的 bot 消息启动打字机显现，历史消息直接完整 */
-  const applyMsgs = (list: ChatMessage[], isInitial = false) => {
+  const TYPING_REVEAL_MS = 1600;
+
+  /** 消息入状态的统一入口：新到达的 bot 消息启动打字机显现（记开始时刻），历史消息直接完整 */
+  const applyMsgs = (list: ChatMessage[]) => {
     for (const m of list) {
       if (m.role !== "bot") continue;
-      if (seenBotIdsRef.current.has(m.id)) continue;
-      seenBotIdsRef.current.add(m.id);
-      if (isInitial) {
-        revealedRef.current[m.id] = m.content.length;
-      } else {
-        // 打字机：1800ms 内匀速显现完整个内容
-        const total = m.content.length;
-        revealedRef.current[m.id] = 0;
-        if (total > 0) {
-          const perTick = Math.max(1, Math.ceil(total / 60)); // 1800ms / 30ms ≈ 60 帧
-          const timer = window.setInterval(() => {
-            const next = (revealedRef.current[m.id] || 0) + perTick;
-            if (next >= total) {
-              window.clearInterval(timer);
-              twTimersRef.current.delete(m.id);
-              revealedRef.current[m.id] = total;
-            } else {
-              revealedRef.current[m.id] = next;
-            }
-            setTwTick((t) => t + 1);
-          }, 30);
-          twTimersRef.current.set(m.id, timer);
-        }
-      }
+      // 只对「装载之后新到达」的 bot 消息做打字机显现；历史消息（created 早于装载前 5 秒）直接完整
+      if (m.createdAt * 1000 < loadedAtRef.current - 5000) continue;
+      if (revealStartRef.current[m.id] !== undefined) continue;
+      revealStartRef.current[m.id] = Date.now();
     }
     setMsgs(list);
-    setTwTick((t) => t + 1);
+    setRevealTick((t) => t + 1);
   };
 
   const poll = async () => {
     try {
       const r = await api<{ messages: ChatMessage[]; botName?: string }>("/api/chatroom/messages");
+      // 首次装载是历史消息：直接完整显示，不做打字机显现
       applyMsgs(r.messages || []);
       if (r.botName) setBotName(r.botName);
     } catch {
@@ -94,14 +77,20 @@ export default function ChatRoom({ me }: { me: Me }) {
     return () => {
       window.clearInterval(tick);
       document.removeEventListener("visibilitychange", onVisible);
-      for (const timer of twTimersRef.current.values()) window.clearInterval(timer);
-      twTimersRef.current.clear();
     };
   }, []);
 
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [msgs]);
+
+  // 打字机显现的重绘节拍：仅在有显现进行中时触发（进度本身是时间的纯函数）
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      if (Object.keys(revealStartRef.current).length) setRevealTick((t) => t + 1);
+    }, 50);
+    return () => window.clearInterval(timer);
+  }, []);
 
   /** 拍一拍：后端落系统消息 + 机器人俏皮回应 */
   const pat = async () => {
@@ -266,14 +255,17 @@ export default function ChatRoom({ me }: { me: Me }) {
                       )}
                     >
                       {(() => {
-                        const rv = revealedRef.current[m.id];
-                        const streaming = m.role === "bot" && rv !== undefined && rv < m.content.length;
-                        const shown = streaming ? m.content.slice(0, rv) : m.content;
+                        // 打字机光标只属于 bot 消息；用户消息纯文本无光标
+                        if (m.role !== "bot") return m.content;
+                        const start = revealStartRef.current[m.id];
+                        const streaming = start !== undefined && Date.now() - start < TYPING_REVEAL_MS;
+                        const progress = streaming ? Math.min(1, (Date.now() - start) / TYPING_REVEAL_MS) : 1;
+                        const shown = m.content.slice(0, Math.round(m.content.length * progress));
                         return (
                           <>
                             {shown}
                             <span
-                              className={cn("msg-stream-caret", m.role === "bot" && !streaming && "msg-stream-caret--idle")}
+                              className={cn("msg-stream-caret", !streaming && "msg-stream-caret--idle")}
                               aria-hidden="true"
                             />
                           </>
