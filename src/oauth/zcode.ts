@@ -310,17 +310,43 @@ function demoteSystem(messages: any[], systemText: string): any[] {
  * OpenAI ChatCompletions → Anthropic Messages。
  * 与 ZCode2API 的 openaiToAnthropic 对齐：纯文本 + tool_calls 主流场景，
  * tool 角色合并成 tool_result，system 单独抽出后由 demoteSystem 降级。
+ *
+ * 工具链路必须完整透传（官方客户端就是 agent harness，上游接受 tools）：
+ *  - body.tools（OpenAI functions）→ Anthropic tools（name/description/input_schema）
+ *  - assistant 历史 tool_calls → tool_use 内容块（丢了模型就"看不见"自己发起过的调用，
+ *    agent 只能回一句话文本收尾——表现为"说一句就断、不执行任何工具"）
  */
-function openAIToAnthropicZcode(body: Record<string, any>): Record<string, any> {
+export function openAIToAnthropicZcode(body: Record<string, any>): Record<string, any> {
   const msgs: any[] = [];
   let system = "";
   for (const m of Array.isArray(body.messages) ? body.messages : []) {
     if (m?.role === "system" || m?.role === "developer") {
       system += (typeof m.content === "string" ? m.content : (m.content ?? []).map((c: any) => c?.text ?? "").join("\n")) + "\n\n";
-    } else if (m?.role === "user" || m?.role === "assistant") {
+    } else if (m?.role === "user") {
       const text =
         typeof m.content === "string" ? m.content : (m.content ?? []).map((c: any) => (c?.type === "text" ? c.text : "")).join("");
-      msgs.push({ role: m.role, content: text || " " });
+      msgs.push({ role: "user", content: text || " " });
+    } else if (m?.role === "assistant") {
+      const text =
+        typeof m.content === "string" ? m.content : (m.content ?? []).map((c: any) => (c?.type === "text" ? c.text : "")).join("");
+      const blocks: any[] = [];
+      if (text.trim()) blocks.push({ type: "text", text });
+      for (const tc of Array.isArray(m.tool_calls) ? m.tool_calls : []) {
+        let input: any = {};
+        const args = tc?.function?.arguments;
+        if (typeof args === "string" && args.trim()) {
+          try { input = JSON.parse(args); } catch { input = { _raw: args }; }
+        } else if (args && typeof args === "object") {
+          input = args;
+        }
+        blocks.push({
+          type: "tool_use",
+          id: String(tc?.id || `call_${randomHex(8)}`),
+          name: String(tc?.function?.name || tc?.name || ""),
+          input,
+        });
+      }
+      msgs.push({ role: "assistant", content: blocks.length ? blocks : text || " " });
     } else if (m?.role === "tool") {
       msgs.push({ role: "user", content: [{ type: "tool_result", tool_use_id: m.tool_call_id, content: String(m.content ?? "") }] });
     }
@@ -334,6 +360,25 @@ function openAIToAnthropicZcode(body: Record<string, any>): Record<string, any> 
     messages: msgs,
   };
   if (system.trim()) out.system = system.trim();
+  if (Array.isArray(body.tools) && body.tools.length) {
+    const tools = body.tools
+      .map((t: any) => {
+        if (t?.type === "function" && t?.function) {
+          return {
+            name: String(t.function.name || ""),
+            description: String(t.function.description || ""),
+            input_schema: t.function.parameters && typeof t.function.parameters === "object"
+              ? t.function.parameters
+              : { type: "object", properties: {} },
+          };
+        }
+        // 已是 Anthropic 形状（name + input_schema）则原样保留
+        if (t?.name && t?.input_schema) return { name: String(t.name), description: String(t.description || ""), input_schema: t.input_schema };
+        return null;
+      })
+      .filter(Boolean);
+    if (tools.length) out.tools = tools;
+  }
   if (body.temperature !== undefined) out.temperature = body.temperature;
   if (body.top_p !== undefined) out.top_p = body.top_p;
   if (body.stop) out.stop_sequences = Array.isArray(body.stop) ? body.stop : [body.stop];
@@ -369,7 +414,7 @@ function anthropicToOpenAIZcode(env: any, model: string): Record<string, any> {
 }
 
 /** 非流式结果合成 SSE（OpenAI 客户端开 stream 时用，避免依赖上游 SSE 细节） */
-function completionToSse(completion: Record<string, any>): Response {
+export function completionToSse(completion: Record<string, any>): Response {
   const enc = new TextEncoder();
   const base = {
     id: completion.id,
@@ -378,9 +423,23 @@ function completionToSse(completion: Record<string, any>): Response {
     model: completion.model,
   };
   const choice = completion.choices?.[0];
-  const deltas = [
+  const deltas: Record<string, any>[] = [
     { role: "assistant", content: choice?.message?.content ?? "" },
   ];
+  // tool_calls 必须进流：流式 agent 客户端靠 delta.tool_calls 拿工具调用，
+  // 只发 finish_reason="tool_calls" 而没有 delta 会让客户端拿到空工具列表直接收尾
+  const toolCalls = Array.isArray(choice?.message?.tool_calls) ? choice.message.tool_calls : [];
+  for (let i = 0; i < toolCalls.length; i++) {
+    const tc = toolCalls[i];
+    deltas.push({
+      tool_calls: [{
+        index: i,
+        id: String(tc?.id || `call_${i}`),
+        type: "function",
+        function: { name: String(tc?.function?.name || ""), arguments: String(tc?.function?.arguments ?? "{}") },
+      }],
+    });
+  }
   const body =
     deltas
       .map((d) => `data: ${JSON.stringify({ ...base, choices: [{ index: 0, delta: d, finish_reason: null }] })}\n\n`)
