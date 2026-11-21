@@ -104,7 +104,6 @@ export default function VideoTasks({ me, embedded = false }: { me: Me; embedded?
   const [scope, setScope] = useState<"own" | "all">("own");
   const [tab, setTab] = useState<TabKey>("all");
   const [loading, setLoading] = useState(false);
-  const [auto, setAuto] = useState(true);
   const [countdown, setCountdown] = useState(POLL_MS / 1000);
   const toast = useToast();
   const { confirm, confirmEl } = useConfirm();
@@ -127,7 +126,7 @@ export default function VideoTasks({ me, embedded = false }: { me: Me; embedded?
     load(false, scope);
     // 自动轮询：页面隐藏时暂停，回到前台立即刷新一次
     const tick = window.setInterval(() => {
-      if (!auto || document.hidden) return;
+      if (document.hidden) return;
       setCountdown((n) => {
         if (n <= 1) {
           load(true, scope);
@@ -137,7 +136,7 @@ export default function VideoTasks({ me, embedded = false }: { me: Me; embedded?
       });
     }, 1000);
     const onVisible = () => {
-      if (!document.hidden && auto) load(true, scope);
+      if (!document.hidden) load(true, scope);
     };
     document.addEventListener("visibilitychange", onVisible);
     return () => {
@@ -145,7 +144,7 @@ export default function VideoTasks({ me, embedded = false }: { me: Me; embedded?
       document.removeEventListener("visibilitychange", onVisible);
       if (timer.current) window.clearTimeout(timer.current);
     };
-  }, [auto, scope]);
+  }, [scope]);
 
   const copy = async (text: string, label: string) => {
     try {
@@ -239,9 +238,12 @@ export default function VideoTasks({ me, embedded = false }: { me: Me; embedded?
             <RefreshCw size={13} className={cn(loading && "animate-spin")} />
             {loading ? "刷新中…" : "刷新"}
           </Button>
-          <Button variant={auto ? "soft" : "ghost"} className="h-8" onClick={() => setAuto((v) => !v)} title="每 60 秒自动刷新未完成任务">
-            {auto ? `自动 ${countdown}s` : "已暂停"}
-          </Button>
+          <span
+            className="inline-flex h-8 items-center rounded-lg bg-surface2 px-3 text-xs font-medium text-muted"
+            title="每 60 秒自动刷新未完成任务"
+          >
+            {countdown}s
+          </span>
         </div>
         {renderSubTabs("flex flex-wrap gap-1.5")}
         </>
@@ -294,14 +296,12 @@ export default function VideoTasks({ me, embedded = false }: { me: Me; embedded?
               <RefreshCw size={14} className={cn(loading && "animate-spin")} />
               {loading ? "刷新中…" : "刷新"}
             </Button>
-            <Button
-              variant={auto ? "soft" : "ghost"}
-              className="h-9"
-              onClick={() => setAuto((v) => !v)}
+            <span
+              className="inline-flex h-9 items-center rounded-lg bg-surface2 px-3 text-[13px] font-medium text-muted"
               title="每 60 秒自动刷新未完成任务（与状态站监控同频）"
             >
-              {auto ? `自动 ${countdown}s` : "已暂停"}
-            </Button>
+              {countdown}s
+            </span>
           </div>
         </div>
 
