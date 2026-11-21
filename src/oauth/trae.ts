@@ -161,14 +161,24 @@ export const TRAE_GLOBAL_MODELS = [
   "GPT-6-Astra",
 ];
 
+// 2026-11 更新：model_list 接口已失效（上游 4001），目录取自 TRAE2API 维护的
+// 最新 Trae CN 模型映射（liaohuiwen666/TRAE2API trae_client.py MODEL_ALIASES）
 export const TRAE_CN_MODELS = [
   "auto",
   "glm-5.3",
   "glm-5.2",
-  "kimi-k3",
-  "deepseek-V3",
-  "deepseek-R1",
+  "glm-5.1",
+  "DeepSeek-V4-Pro",
+  "DeepSeek-V4-Flash",
+  "deepseek-v4.1-flash",
+  "Doubao-Seed-2.1-Pro",
   "Doubao-Seed-2.1-Turbo",
+  "Doubao-Seed-Code",
+  "kimi-k2.6",
+  "kimi-k3",
+  "qwen3.8-max",
+  "qwen-3.7-plus",
+  "minimax-m3",
 ];
 
 export function defaultModelsFor(region: TraeRegion): string[] {
