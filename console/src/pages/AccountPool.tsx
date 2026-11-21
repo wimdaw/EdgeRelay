@@ -337,7 +337,7 @@ export default function AccountPool() {
       ) : rows.length === 0 ? (
         <Card><EmptyState icon={<Wallet size={32} />} title="暂无 OAuth / Web 账号" hint="先在「供应商」页的 OAuth 授权或 Web 反代选项卡接入渠道账号。" /></Card>
       ) : (
-        <div className="flex flex-col gap-3.5">
+        <div className="grid gap-3.5 grid-cols-1 lg:grid-cols-2 items-start">
           {visibleRows.map((p) => (
             <Card key={p.id} className={cn("p-4", p.status === "disabled" && "opacity-75 border-dashed")}>
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2.5">
