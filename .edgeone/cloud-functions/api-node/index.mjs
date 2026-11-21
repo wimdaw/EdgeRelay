@@ -6572,7 +6572,7 @@ var server = http.createServer(async (req, res) => {
         const params = {};
         params["default"] = cleanPath.split("/");
         context.params = params;
-        const mod_21 = (() => {
+        const mod_22 = (() => {
           var __defProp = Object.defineProperty;
           var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
           var __publicField = (obj, key, value) => {
@@ -41319,7 +41319,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             let n = t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
             return new RegExp(`@(relay\u52A9\u624B|\u673A\u5668\u4EBA|\u5C0Fr|bot|assistant|${n})`, "i").test(e);
           }
-          var LP = "\u4F60\u662F Relay \u5E73\u53F0\uFF08EdgeOne \u8FB9\u7F18 AI API \u7F51\u5173\uFF09\u804A\u5929\u5BA4\u91CC\u7684\u5B98\u65B9\u52A9\u624B\u300CRelay \u52A9\u624B\u300D\uFF0C\u7528\u7B80\u4F53\u4E2D\u6587\u3001\u7B80\u77ED\u53CB\u597D\u5730\u56DE\u7B54\u5E73\u53F0\u4F7F\u7528\u95EE\u9898\uFF1A\u5982\u4F55\u6CE8\u518C\u767B\u5F55\u3001\u521B\u5EFA API Key\u3001\u67E5\u770B\u6A21\u578B\u4E0E\u5B9A\u4EF7\u3001\u5728\u64CD\u7EC3\u573A\u8BD5\u7528\u6A21\u578B\u3001\u8D26\u53F7\u6C60/\u6E20\u9053\u7684\u542B\u4E49\u3001\u989D\u5EA6\u4E0E\u8BA1\u8D39\u65B9\u5F0F\u7B49\u3002\u9047\u5230\u4F60\u65E0\u6CD5\u786E\u5B9A\u7684\u95EE\u9898\u3001\u7528\u6237\u6295\u8BC9\u3001\u8BF7\u6C42\u4EBA\u5DE5\u5904\u7406\u6216\u8981\u6C42\u8054\u7CFB\u7BA1\u7406\u5458\u65F6\uFF0C\u5148\u6B63\u5E38\u7B80\u77ED\u56DE\u5E94\uFF0C\u7136\u540E\u5728\u56DE\u590D\u672B\u5C3E\u53E6\u8D77\u4E00\u884C\u8F93\u51FA\uFF1A[ESCALATE] \u9700\u8981\u4EBA\u5DE5\u5904\u7406\u7684\u539F\u56E0\u3002\u4E0D\u8981\u7F16\u9020\u5E73\u53F0\u4E0D\u5B58\u5728\u7684\u529F\u80FD\u3002\u804A\u5929\u5BA4\u5185\u5BB9\u6240\u6709\u4EBA\u53EF\u89C1\uFF0C\u4E0D\u8981\u8BA9\u7528\u6237\u53D1\u9001\u5BC6\u7801\u7B49\u654F\u611F\u4FE1\u606F\u3002";
+          var LP = "\u4F60\u662F Relay \u5E73\u53F0\uFF08EdgeOne \u8FB9\u7F18 AI API \u7F51\u5173\uFF09\u804A\u5929\u5BA4\u91CC\u7684\u5B98\u65B9\u52A9\u624B\u300CRelay \u52A9\u624B\u300D\uFF0C\u7528\u7B80\u4F53\u4E2D\u6587\u3001\u7B80\u77ED\u53CB\u597D\u5730\u56DE\u7B54\u5E73\u53F0\u4F7F\u7528\u95EE\u9898\uFF1A\u5982\u4F55\u6CE8\u518C\u767B\u5F55\u3001\u521B\u5EFA API Key\u3001\u67E5\u770B\u6A21\u578B\u4E0E\u5B9A\u4EF7\u3001\u5728\u64CD\u7EC3\u573A\u8BD5\u7528\u6A21\u578B\u3001\u8D26\u53F7\u6C60/\u6E20\u9053\u7684\u542B\u4E49\u3001\u989D\u5EA6\u4E0E\u8BA1\u8D39\u65B9\u5F0F\u7B49\u3002\u9047\u5230\u4F60\u65E0\u6CD5\u786E\u5B9A\u7684\u95EE\u9898\u3001\u7528\u6237\u6295\u8BC9\u3001\u8BF7\u6C42\u4EBA\u5DE5\u5904\u7406\u6216\u8981\u6C42\u8054\u7CFB\u7BA1\u7406\u5458\u65F6\uFF0C\u5148\u6B63\u5E38\u7B80\u77ED\u56DE\u5E94\uFF0C\u7136\u540E\u5728\u56DE\u590D\u672B\u5C3E\u53E6\u8D77\u4E00\u884C\u8F93\u51FA\uFF1A[ESCALATE] \u9700\u8981\u4EBA\u5DE5\u5904\u7406\u7684\u539F\u56E0\u3002\u4E0D\u8981\u7F16\u9020\u5E73\u53F0\u4E0D\u5B58\u5728\u7684\u529F\u80FD\u3002\u804A\u5929\u5BA4\u5185\u5BB9\u6240\u6709\u4EBA\u53EF\u89C1\uFF0C\u4E0D\u8981\u8BA9\u7528\u6237\u53D1\u9001\u5BC6\u7801\u7B49\u654F\u611F\u4FE1\u606F\u3002\u5F53\u6D88\u606F @ \u7684\u662F\u5176\u4ED6\u7528\u6237\u800C\u975E\u4F60\u65F6\uFF0C\u53EA\u5728\u80FD\u8865\u5145\u5E73\u53F0\u4F7F\u7528\u76F8\u5173\u5E2E\u52A9\u65F6\u7B80\u77ED\u63D2\u8BDD\uFF0C\u4E0D\u8981\u4EE3\u66FF\u8BE5\u7528\u6237\u5BF9\u8BDD\u6216\u7EA0\u6B63\u5176\u79F0\u547C\u3002";
           async function Ew(e, t) {
             var _a, _b2, _c2, _d2;
             let n = await Ie(e), r = String(n.chatBotModel || "agnes-3.0-flash").trim(), a = r.includes("/") ? r.slice(r.indexOf("/") + 1) : r, s = String(n.chatBotName || "Relay \u52A9\u624B").trim(), i = String(n.chatBotSystemPrompt || "").trim() || LP.replace("\u300CRelay \u52A9\u624B\u300D", `\u300C${s}\u300D`), {
@@ -42810,22 +42810,22 @@ Error generating stack: \`+i.message+\`
         try {
           const handler = (() => {
             const method = req.method;
-            if (method === "GET" && mod_21.onRequestGet) {
-              return mod_21.onRequestGet;
-            } else if (method === "POST" && mod_21.onRequestPost) {
-              return mod_21.onRequestPost;
-            } else if (method === "PUT" && mod_21.onRequestPut) {
-              return mod_21.onRequestPut;
-            } else if (method === "DELETE" && mod_21.onRequestDelete) {
-              return mod_21.onRequestDelete;
-            } else if (method === "PATCH" && mod_21.onRequestPatch) {
-              return mod_21.onRequestPatch;
-            } else if (method === "HEAD" && mod_21.onRequestHead) {
-              return mod_21.onRequestHead;
-            } else if (method === "OPTIONS" && mod_21.onRequestOptions) {
-              return mod_21.onRequestOptions;
+            if (method === "GET" && mod_22.onRequestGet) {
+              return mod_22.onRequestGet;
+            } else if (method === "POST" && mod_22.onRequestPost) {
+              return mod_22.onRequestPost;
+            } else if (method === "PUT" && mod_22.onRequestPut) {
+              return mod_22.onRequestPut;
+            } else if (method === "DELETE" && mod_22.onRequestDelete) {
+              return mod_22.onRequestDelete;
+            } else if (method === "PATCH" && mod_22.onRequestPatch) {
+              return mod_22.onRequestPatch;
+            } else if (method === "HEAD" && mod_22.onRequestHead) {
+              return mod_22.onRequestHead;
+            } else if (method === "OPTIONS" && mod_22.onRequestOptions) {
+              return mod_22.onRequestOptions;
             } else {
-              return mod_21.onRequest;
+              return mod_22.onRequest;
             }
           })();
           if (handler) {

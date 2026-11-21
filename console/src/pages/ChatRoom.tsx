@@ -133,8 +133,12 @@ export default function ChatRoom({ me }: { me: Me }) {
       if (!map.has(uid)) map.set(uid, m.nickname || m.email.split("@")[0] || m.email);
     }
     const list = [...map.entries()].map(([uid, name]) => ({ uid, name }));
+    // 机器人置顶：@ 候选第一个永远是 Relay 助手
+    const botIdx = list.findIndex((x) => x.uid === "bot");
+    if (botIdx > 0) { const [b] = list.splice(botIdx, 1); list.unshift(b); }
     const q = (mention?.query || "").toLowerCase();
     const hit = q ? list.filter((x) => x.name.toLowerCase().includes(q)) : list;
+    if (q) { const bi = hit.findIndex((x) => x.uid === "bot"); if (bi > 0) { const [b] = hit.splice(bi, 1); hit.unshift(b); } }
     return hit.length ? hit : list;
   }, [msgs, mention]);
 
