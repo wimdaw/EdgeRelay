@@ -413,6 +413,160 @@ function anthropicToOpenAIZcode(env: any, model: string): Record<string, any> {
   };
 }
 
+// =====================================================================
+// 上游流式：Anthropic SSE → OpenAI 增量（思考 / 文本 / 工具调用实时透传）
+// =====================================================================
+
+/** 解析一帧 SSE（兼容 \n\n 与 \r\n\r\n 帧分隔），返回 {event, data} 或 null */
+function parseZcodeSseFrame(frame: string): { event: string; data: string } | null {
+  let event = "message";
+  const dataLines: string[] = [];
+  for (const rawLine of frame.split("\n")) {
+    const line = rawLine.replace(/\r$/, "");
+    if (!line || line.startsWith(":")) continue;
+    if (line.startsWith("event:")) event = line.slice(6).trim();
+    else if (line.startsWith("data:")) dataLines.push(line.slice(5).trim());
+  }
+  if (!dataLines.length) return null;
+  return { event, data: dataLines.join("\n") };
+}
+
+/**
+ * 上游 Anthropic Messages SSE → OpenAI chat.completion.chunk 流。
+ * 官方客户端的"思考过程"来自上游 thinking_delta 流；固定非流式时客户端在整个
+ * 生成期间什么都收不到，体感就是"卡住了"。这里逐帧翻译：
+ *  - thinking_delta → delta.reasoning_content
+ *  - text_delta     → delta.content
+ *  - tool_use 块    → delta.tool_calls（start 带 id/name，input_json_delta 追加参数）
+ *  - message_delta  → finish_reason / usage
+ */
+export function anthropicSseToOpenAIStream(body: ReadableStream<Uint8Array>, requestedModel: string): Response {
+  const enc = new TextEncoder();
+  const id = `chatcmpl-${randomHex(12)}`;
+  const created = Math.floor(Date.now() / 1000);
+
+  return new Response(
+    new ReadableStream<Uint8Array>({
+      async start(controller) {
+        const push = (s: string) => {
+          try { controller.enqueue(enc.encode(s)); } catch { /* 客户端已断开 */ }
+        };
+        const chunk = (delta: Record<string, any>, finish: string | null = null) => {
+          push(`data: ${JSON.stringify({
+            id,
+            object: "chat.completion.chunk",
+            created,
+            model: requestedModel,
+            choices: [{ index: 0, delta, finish_reason: finish }],
+          })}\n\n`);
+        };
+
+        chunk({ role: "assistant" });
+        const reader = body.getReader();
+        const decoder = new TextDecoder();
+        const SEP = /\r?\n\r?\n/;
+        let buffer = "";
+        const blocks = new Map<number, { type: string; toolIndex: number }>();
+        let nextToolIndex = 0;
+        let promptTokens = 0;
+        let completionTokens = 0;
+        let finishReason = "";
+        let streamError = "";
+        const handleFrame = (frame: string) => {
+              const parsed = parseZcodeSseFrame(frame);
+              if (!parsed || parsed.data === "[DONE]") return;
+              let ev: any = null;
+              try { ev = JSON.parse(parsed.data); } catch { return; }
+              const evName = parsed.event === "message" ? String(ev?.type || "message") : parsed.event;
+              if (evName === "error") {
+                streamError = String(ev?.error?.message || ev?.message || `上游错误帧 ${JSON.stringify(ev).slice(0, 150)}`);
+                return;
+              }
+              if (evName === "message_start") {
+                promptTokens = Number(ev?.message?.usage?.input_tokens) || 0;
+                return;
+              }
+              if (evName === "content_block_start") {
+                const idx = Number(ev?.index) || 0;
+                const cb = ev?.content_block || {};
+                if (cb?.type === "tool_use") {
+                  const toolIndex = nextToolIndex++;
+                  blocks.set(idx, { type: "tool_use", toolIndex });
+                  chunk({ tool_calls: [{ index: toolIndex, id: String(cb?.id || ""), type: "function", function: { name: String(cb?.name || ""), arguments: "" } }] });
+                } else {
+                  blocks.set(idx, { type: String(cb?.type || "text"), toolIndex: -1 });
+                }
+                return;
+              }
+              if (evName === "content_block_delta") {
+                const idx = Number(ev?.index) || 0;
+                const d = ev?.delta || {};
+                if (d?.type === "thinking_delta" && typeof d.thinking === "string" && d.thinking) {
+                  chunk({ reasoning_content: d.thinking });
+                } else if (d?.type === "text_delta" && typeof d.text === "string" && d.text) {
+                  chunk({ content: d.text });
+                } else if (d?.type === "input_json_delta" && typeof d.partial_json === "string" && d.partial_json) {
+                  const b = blocks.get(idx);
+                  if (b?.type === "tool_use") chunk({ tool_calls: [{ index: b.toolIndex, function: { arguments: d.partial_json } }] });
+                }
+                return;
+              }
+              if (evName === "message_delta") {
+                const sr = ev?.delta?.stop_reason;
+                if (sr) finishReason = sr === "tool_use" ? "tool_calls" : sr === "max_tokens" ? "length" : "stop";
+                const ut = Number(ev?.usage?.output_tokens) || 0;
+                if (ut) completionTokens = ut;
+                return;
+              }
+              // ping / content_block_stop / message_stop：无需动作
+        };
+        try {
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            let m = SEP.exec(buffer);
+            while (m) {
+              handleFrame(buffer.slice(0, m.index));
+              buffer = buffer.slice(m.index + m[0].length);
+              m = SEP.exec(buffer);
+            }
+          }
+          // 末尾残帧
+          if (buffer.trim()) handleFrame(buffer);
+        } catch (err) {
+          streamError = (err as Error).message || "ZCode 上游流异常";
+        } finally {
+          try { reader.releaseLock(); } catch { /* ignore */ }
+        }
+
+        const usage = {
+          prompt_tokens: promptTokens,
+          completion_tokens: completionTokens,
+          total_tokens: promptTokens + completionTokens,
+        };
+        if (streamError) {
+          push(`data: ${JSON.stringify({ error: { message: streamError, type: "upstream_error", code: "zcode_stream_error" } })}\n\n`);
+        } else {
+          chunk({}, finishReason || "stop");
+          push(`data: ${JSON.stringify({ id, object: "chat.completion.chunk", created, model: requestedModel, choices: [], usage })}\n\n`);
+        }
+        push("data: [DONE]\n\n");
+        controller.close();
+      },
+    }),
+    {
+      status: 200,
+      headers: {
+        "content-type": "text/event-stream; charset=utf-8",
+        "cache-control": "no-cache, no-transform",
+        connection: "keep-alive",
+        "x-accel-buffering": "no",
+      },
+    }
+  );
+}
+
 /** 非流式结果合成 SSE（OpenAI 客户端开 stream 时用，避免依赖上游 SSE 细节） */
 export function completionToSse(completion: Record<string, any>): Response {
   const enc = new TextEncoder();
@@ -464,10 +618,13 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
 
   // 与后台连通性测试（testZcode）保持同一套最小载荷：实测带 metadata / tool_choice 时
   // 上游会回 1005（exceed quota limit），不带则正常；先按能用的形态发。
+  // 客户端要流式就向上游要流式：thinking_delta / text_delta 逐帧透传，
+  // 否则整个生成期客户端什么都收不到，体感"卡住"。
+  const wantStream = p.body?.stream === true;
   const upstreamBody: Record<string, any> = {
     model: p.modelId,
     max_tokens: Math.min(Number(inbound.max_tokens) || 8192, Number(ZCODE_DEFAULTS.max_tokens) || 32000),
-    stream: false, // 上游固定非流式，流式由本层合成，避免 SSE 结构差异
+    stream: wantStream,
     metadata: { user_id: metadataUserId(uid, cred.deviceId || (await deviceIdFor(uid)), await sessionIdFor(uid)) },
     system: ZCODE_SYSTEM,
     messages: demoteSystem(inbound.messages, String(inbound.system || "")),
@@ -495,6 +652,21 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     // 到点后无论谁先终止，客户端都会看到连接结束并自行重试，不会无限挂起。
     signal: AbortSignal.timeout(120_000),
   });
+
+  // 流式：上游回 Anthropic SSE，逐帧翻译成 OpenAI chunk（错误同样落在错误映射里）
+  if (wantStream) {
+    const ct = res.headers.get("content-type") || "";
+    if (!res.ok || !ct.includes("text/event-stream")) {
+      const raw = await res.text().catch(() => "");
+      let env: any = null;
+      try { env = JSON.parse(raw); } catch { /* 非 JSON 错误体 */ }
+      const bizErr = zcodeBizErrorResponse(env, res.status, upstreamBody);
+      if (bizErr) return bizErr;
+      return errorResponse(`ZCode 上游流式响应异常（HTTP ${res.status}）: ${raw.slice(0, 200)}`, res.status || 502, "upstream_error");
+    }
+    return anthropicSseToOpenAIStream(res.body!, p.requestedModel);
+  }
+
   const raw = await res.text().catch(() => "");
   let env: any = null;
   try {
@@ -502,29 +674,8 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
   } catch {
     return errorResponse(`ZCode 上游返回非 JSON（HTTP ${res.status}）: ${raw.slice(0, 200)}`, 502, "upstream_error");
   }
-
-  // 上游业务错误：顶层 code（ZCode 用 {code,msg,logid} 包）或 error.biz_code
-  const rawCode = env?.error?.biz_code ?? env?.biz_code ?? env?.code;
-  const biz = rawCode !== undefined && rawCode !== null && Number(rawCode) !== 0 ? Number(rawCode) : undefined;
-  if (biz !== undefined) {
-    const msg = String(env?.error?.message || env?.msg || "").slice(0, 300);
-    // 诊断：把实际发出的请求摘要一并带出（不含凭据），便于和后台直测逐字段比对
-    const sent = JSON.stringify({
-      model: upstreamBody.model,
-      max_tokens: upstreamBody.max_tokens,
-      stream: upstreamBody.stream,
-      msgs: Array.isArray(upstreamBody.messages) ? upstreamBody.messages.length : -1,
-      keys: Object.keys(upstreamBody),
-    });
-    console.log(`[zcode] upstream ${biz} sent=${sent}`);
-    if (biz === 3012) return errorResponse(`ZCode 风控拒绝（3012，system/设备指纹不匹配）: ${msg}`, 403, "upstream_error");
-    const lower = msg.toLowerCase();
-    if (/captcha|verification_required|security/.test(lower)) {
-      return errorResponse(`ZCode 需要人机验证（${biz}）: ${msg}。请在 ZCode 客户端完成一次对话以刷新验证态后重试`, 403, "verification_required");
-    }
-    if (biz === 1005 || biz === 3009) return errorResponse(`ZCode 账号额度不足或繁忙（${biz}）: ${msg} | sent=${sent}`, 429, "upstream_error");
-    return errorResponse(`ZCode 业务错误 ${biz}: ${msg} | sent=${sent}`, 402, "upstream_error");
-  }
+  const bizErr = zcodeBizErrorResponse(env, res.status, upstreamBody);
+  if (bizErr) return bizErr;
 
   if (!res.ok) return errorResponse(`ZCode 上游 HTTP ${res.status}: ${raw.slice(0, 300)}`, res.status, "upstream_error");
   if (!Array.isArray(env?.content)) {
@@ -532,8 +683,31 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
   }
 
   const completion = anthropicToOpenAIZcode(env, p.requestedModel);
-  if (p.body?.stream === true) return completionToSse(completion);
   return jsonResponse(completion);
+}
+
+/** 上游业务错误 → OpenAI 错误响应（顶层 code 或 error.biz_code）；无业务码返回 null */
+function zcodeBizErrorResponse(env: any, status: number, upstreamBody: Record<string, any>): Response | null {
+  const rawCode = env?.error?.biz_code ?? env?.biz_code ?? env?.code;
+  const biz = rawCode !== undefined && rawCode !== null && Number(rawCode) !== 0 ? Number(rawCode) : undefined;
+  if (biz === undefined) return null;
+  const msg = String(env?.error?.message || env?.msg || "").slice(0, 300);
+  // 诊断：把实际发出的请求摘要一并带出（不含凭据），便于和后台直测逐字段比对
+  const sent = JSON.stringify({
+    model: upstreamBody.model,
+    max_tokens: upstreamBody.max_tokens,
+    stream: upstreamBody.stream,
+    msgs: Array.isArray(upstreamBody.messages) ? upstreamBody.messages.length : -1,
+    keys: Object.keys(upstreamBody),
+  });
+  console.log(`[zcode] upstream ${biz} sent=${sent}`);
+  if (biz === 3012) return errorResponse(`ZCode 风控拒绝（3012，system/设备指纹不匹配）: ${msg}`, 403, "upstream_error");
+  const lower = msg.toLowerCase();
+  if (/captcha|verification_required|security/.test(lower)) {
+    return errorResponse(`ZCode 需要人机验证（${biz}）: ${msg}。请在 ZCode 客户端完成一次对话以刷新验证态后重试`, 403, "verification_required");
+  }
+  if (biz === 1005 || biz === 3009) return errorResponse(`ZCode 账号额度不足或繁忙（${biz}）: ${msg} | sent=${sent}`, 429, "upstream_error");
+  return errorResponse(`ZCode 业务错误 ${biz}: ${msg} | sent=${sent}`, 402, "upstream_error");
 }
 
 // =====================================================================

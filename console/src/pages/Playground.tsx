@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { t as translate, useLocaleSync } from "../lib/i18n";
 import { Link } from "react-router-dom";
-import { AudioLines, Bot, Copy, Eraser, FlaskConical, Image as ImageIcon, Send, Square, User, Video as VideoIcon } from "lucide-react";
+import { AudioLines, Bot, Copy, Eraser, FlaskConical, Image as ImageIcon, Send, Square, User, Video as VideoIcon, Wrench } from "lucide-react";
 import { api, type KeyRow, type Me } from "../lib/api";
 import { Button, Card, Select, useToast } from "../components/ui";
 import { cn } from "../lib/utils";
@@ -34,6 +34,10 @@ type Msg = {
   error?: string;
   model?: string;
   tokens?: number;
+  /** 思考过程（流式 delta.reasoning_content 增量拼接） */
+  reasoning?: string;
+  /** 工具调用（流式 delta.tool_calls 增量拼接） */
+  tools?: { name: string; args: string }[];
   /** 图片：url 或 base64；视频/音频：播放地址 */
   mediaUrl?: string;
   mediaMime?: "image" | "video" | "audio";
@@ -278,9 +282,30 @@ export default function Playground({ me }: { me: Me }) {
             if (payload && payload !== "[DONE]") {
               try {
                 const j = JSON.parse(payload);
-                const delta = j?.choices?.[0]?.delta?.content;
-                if (typeof delta === "string" && delta) {
-                  patch(assistantId, (m) => ({ ...m, content: m.content + delta }));
+                const delta = j?.choices?.[0]?.delta || {};
+                const text = delta?.content;
+                if (typeof text === "string" && text) {
+                  patch(assistantId, (m) => ({ ...m, content: m.content + text }));
+                }
+                const reasoning = delta?.reasoning_content;
+                if (typeof reasoning === "string" && reasoning) {
+                  patch(assistantId, (m) => ({ ...m, reasoning: (m.reasoning || "") + reasoning }));
+                }
+                const tcs = delta?.tool_calls;
+                if (Array.isArray(tcs) && tcs.length) {
+                  patch(assistantId, (m) => {
+                    const tools = [...(m.tools || [])];
+                    for (const t of tcs) {
+                      const i = Number(t?.index) || 0;
+                      while (tools.length <= i) tools.push({ name: "", args: "" });
+                      const fn = t?.function || {};
+                      tools[i] = {
+                        name: tools[i].name + (typeof fn.name === "string" ? fn.name : ""),
+                        args: tools[i].args + (typeof fn.arguments === "string" ? fn.arguments : ""),
+                      };
+                    }
+                    return { ...m, tools };
+                  });
                 }
                 if (j?.usage) {
                   usageTokens =
@@ -759,6 +784,27 @@ export default function Playground({ me }: { me: Me }) {
                       {m.mediaMime === "audio" && m.mediaUrl && (
                         <audio src={m.mediaUrl} controls className="w-72" />
                       )}
+                      {m.role === "assistant" && m.reasoning && (
+                        <div className="mb-1.5 whitespace-pre-wrap rounded-lg border border-line px-2.5 py-1.5 text-[11px] leading-relaxed text-muted">
+                          <span className="font-medium">思考过程</span>
+                          {m.reasoning}
+                        </div>
+                      )}
+                      {m.role === "assistant" && m.tools?.length ? (
+                        <div className="mb-1.5 flex flex-wrap gap-1">
+                          {m.tools
+                            .filter((t) => t.name || t.args)
+                            .map((t, i) => (
+                              <span
+                                key={i}
+                                className="inline-flex max-w-[320px] items-center gap-1 rounded bg-brand/10 px-1.5 py-0.5 font-mono text-[10px] text-brand"
+                              >
+                                <Wrench size={9} className="shrink-0" />
+                                <span className="truncate">{t.name || "?"}{t.args ? `(${t.args})` : ""}</span>
+                              </span>
+                            ))}
+                        </div>
+                      ) : null}
                       {m.content ? (
                         <span>
                           {m.content}
