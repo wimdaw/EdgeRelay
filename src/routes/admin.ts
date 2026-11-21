@@ -727,7 +727,8 @@ adminRouter.post("/actions", async (c) => {
           .filter((pr) => (pr.kind || "").startsWith("oauth:") || (pr.kind || "").startsWith("web:"))
           .filter((pr) => !providerId || pr.id === providerId || pr.slug === providerId);
         const { buildAccountPool } = await import("../account-pool");
-        const rows = await buildAccountPool(env, list);
+        // quota=0：跳过解密与上游额度查询，进页快速列表（额度由各渠道按需刷新）
+        const rows = await buildAccountPool(env, list, { skipQuota: p.quota === 0 || p.quota === "0" });
         return json({ ok: true, providers: rows });
       }
 

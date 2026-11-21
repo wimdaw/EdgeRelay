@@ -85,7 +85,7 @@ function Progress({ value, label }: { value: number | null; label?: string }) {
   );
 }
 
-function QuotaView({ q }: { q: AccountQuota | null }) {
+function QuotaView({ q, notQueried }: { q: AccountQuota | null; notQueried?: boolean }) {
   if (!q) {
     return <span className="text-[11px] text-muted">该渠道暂无额度查询接口</span>;
   }
@@ -237,11 +237,15 @@ export default function AccountPool() {
   const [tab, setTab] = useState<string>("all");
   const toast = useToast();
 
-  const load = async () => {
+  const load = async (opts?: { skipQuota?: boolean }) => {
     setLoading(true);
     try {
-      const r = await adminAction<{ providers: PoolProvider[] }>("account_pool");
+      const r = await adminAction<{ providers: PoolProvider[] }>(
+        "account_pool",
+        opts?.skipQuota ? { quota: 0 } : {}
+      );
       setRows(r.providers);
+      if (!opts?.skipQuota) setQuotaFetched(true);
       setLastUpdated(Date.now());
     } catch (e) {
       toast((e as Error).message, "err");
@@ -251,13 +255,22 @@ export default function AccountPool() {
     }
   };
 
+  // 进页自动快载：只拉账号列表与健康态（不请求上游额度），秒开
+  useEffect(() => {
+    void load({ skipQuota: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   /** 单渠道刷新：只查询该渠道的额度与状态，不打扰其他渠道 */
   const refreshOne = async (p: PoolProvider) => {
     setRefreshing(p.id);
     try {
       const r = await adminAction<{ providers: PoolProvider[] }>("account_pool", { providerId: p.id });
       const one = r.providers?.[0];
-      if (one) setRows((prev) => (prev || []).map((x) => (x.id === one.id ? one : x)));
+      if (one) {
+        setRows((prev) => (prev || []).map((x) => (x.id === one.id ? one : x)));
+        setQuotaFetched(true);
+      }
       setLastUpdated(Date.now());
     } catch (e) {
       toast((e as Error).message, "err");
@@ -270,6 +283,8 @@ export default function AccountPool() {
   const visibleRows = (rows || []).filter((p) => tab === "all" || p.id === tab);
   const [checkinBusy, setCheckinBusy] = useState<string>("");
   const [refreshing, setRefreshing] = useState<string>("");
+  /** 是否执行过额度查询（进页快载不查上游，QuotaView 用它区分「未查询」与「无额度接口」） */
+  const [quotaFetched, setQuotaFetched] = useState(false);
 
   /** 立即签到：对单个渠道手动跑一轮，force 跳过后端当日去重 */
   const runCheckin = async (type: string, name: string, action = "签到") => {
@@ -310,20 +325,20 @@ export default function AccountPool() {
             <div>
               <h1 className="text-base font-bold text-ink">账号池</h1>
               <p className="mt-0.5 text-xs text-muted">
-                OAuth / Web 反代渠道的账号与额度总览。进入页面不会自动查询，点击「刷新额度」后实时查询上游额度（Antigravity、Cline、CodeBuddy、ChatGPT 网页版），其余渠道展示账号健康状态。
+                OAuth / Web 反代渠道的账号与额度总览。进入页面自动加载账号列表（不查上游额度，秒开）；额度按需查询——点渠道「刷新」只查该渠道，点「刷新额度」全站查询。
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {lastUpdated && <span className="text-xs text-muted">上次更新 {new Date(lastUpdated).toLocaleTimeString("zh-CN", { hour12: false })}</span>}
             <span className="text-xs text-muted"><Users size={12} className="mr-1 inline" />{rows ? `${rows.length} 个渠道 / ${totalAccounts} 个账号` : "未查询"}</span>
-            <Button variant="soft" onClick={load} disabled={loading}>
+            <Button variant="soft" onClick={() => void load()} disabled={loading}>
               <RefreshCw size={14} className={cn(loading && "animate-spin")} />{loading ? "查询中…" : "刷新额度"}
             </Button>
           </div>
         </div>
         <p className="mt-3 rounded-lg border border-line bg-surface2/40 px-3 py-2 text-[11px] text-muted">
-          进入页面不会自动查询；点「刷新额度」全站查询，或按渠道点「刷新」只查该渠道。查询失败不会影响账号正常调用，只影响本页展示。
+          账号列表进页即载；上游额度查询按渠道按需进行（ChatGPT 网页版等渠道较慢，建议用单渠道「刷新」）。查询失败不影响账号正常调用。
         </p>
 
         {rows && rows.length > 0 && (
@@ -417,7 +432,7 @@ export default function AccountPool() {
                       {(a.quota?.plan || a.quota?.email) && <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-muted"><Gauge size={10} />{a.quota?.email || a.quota?.plan}</span>}
                     </div>
                     <div className="mt-2 pl-0.5">
-                      <QuotaView q={a.quota} />
+                      <QuotaView q={a.quota} notQueried={!quotaFetched} />
                     </div>
                   </div>
                 ))}

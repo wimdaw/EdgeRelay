@@ -66,7 +66,11 @@ function kindType(kind?: string | null): { scope: "oauth" | "web"; type: string 
   return null;
 }
 
-export async function buildAccountPool(env: Env, providers: ProviderRecord[]): Promise<AccountPoolProvider[]> {
+export async function buildAccountPool(
+  env: Env,
+  providers: ProviderRecord[],
+  opts: { skipQuota?: boolean } = {}
+): Promise<AccountPoolProvider[]> {
   const out: AccountPoolProvider[] = [];
   // 签到能力与开关：由 src/checkin.ts 的注册表统一提供，账号池只负责展示
   const { listCheckinChannels, readCheckinConfig } = await import("./checkin");
@@ -91,8 +95,12 @@ export async function buildAccountPool(env: Env, providers: ProviderRecord[]): P
 
     const health = await readKeyHealth(env, provider.id);
 
-    // 解密凭据（同进程内有明文缓存）
+    // 解密凭据（同进程内有明文缓存）；skipQuota 模式跳过解密与上游额度查询（进页快速列表用）
+    let quotas: (AccountQuota | null)[] = keys.map(() => null);
     const plaintexts: string[] = [];
+    if (opts.skipQuota) {
+      quotas = keys.map(() => null);
+    } else {
     for (const k of keys) {
       try {
         plaintexts.push(await decryptSecret(env, k.encryptedKey));
@@ -101,7 +109,6 @@ export async function buildAccountPool(env: Env, providers: ProviderRecord[]): P
       }
     }
 
-    let quotas: (AccountQuota | null)[] = keys.map(() => null);
     try {
       if (info.type === "antigravity") {
         const { fetchAntigravityQuota } = await import("./oauth/antigravity");
@@ -220,6 +227,7 @@ export async function buildAccountPool(env: Env, providers: ProviderRecord[]): P
     } catch (err) {
       const error = (err as Error)?.message || "额度查询失败";
       quotas = keys.map(() => ({ type: "unknown" as const, ok: false, error }));
+    }
     }
 
     const accounts: AccountPoolAccount[] = keys.map((k, i) => {
