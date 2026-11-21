@@ -955,8 +955,16 @@ export default function Providers() {
               {OAUTH_CATALOG.map((meta) => {
                 const slugs = new Set(oauthSlugsOf(meta));
                 const matches = (rows ?? []).filter((x) => slugs.has(x.slug));
-                const p = matches[0] ?? null;
+                // 多区域渠道（如 zcode 国际/国内）：把「有账号」的渠道作为卡片主体，
+                // 避免空渠道排在前面把有效账号挡住（此前 zchat 渠道有账号但在供应商页不可见）
+                const p = matches.find((x) => (x.key_count ?? 0) > 0) ?? matches[0] ?? null;
                 const extraRegions = Math.max(0, matches.length - 1);
+                const totalAccounts = matches.reduce((n, x) => n + (x.key_count ?? 0), 0);
+                const hasDemoted = matches.some((x) => x.keys?.some((k) => k.health_status === "demoted"));
+                const regionLabel = (x: Provider) => {
+                  const v = oauthVariantOf(meta, x.base_url);
+                  return v ? v.name : x.name;
+                };
                 return (
                   <Card key={meta.slug} className={cn("p-4 flex flex-col justify-between transition-all", p?.status === "disabled" && "opacity-75 border-dashed bg-surface/50")}>
                     <div>
@@ -1000,14 +1008,25 @@ export default function Providers() {
                           <span className="shrink-0">账号</span>
                           <span className="inline-flex items-center gap-1 text-ink">
                             <Users size={11} className="text-muted" />
-                            {p ? `${p.key_count} 个` : "—"}
-                            {p && p.key_count > 0 && (
-                              p.keys?.some((k) => k.health_status === "demoted")
+                            {matches.length ? `${totalAccounts} 个` : "—"}
+                            {totalAccounts > 0 && (
+                              hasDemoted
                                 ? <span className="text-[10px] font-medium text-err">有熔断</span>
                                 : <span className="text-[10px] font-medium text-emerald-500">就绪</span>
                             )}
                           </span>
                         </div>
+                        {matches.length > 1 && (
+                          <div className="flex min-w-0 justify-between gap-2">
+                            <span className="shrink-0">区域</span>
+                            <span
+                              className="truncate text-ink"
+                              title={matches.map((x) => `${regionLabel(x)}（${x.key_count} 个账号${x.status === "disabled" ? " · 停用" : ""}）`).join("；")}
+                            >
+                              {matches.map((x) => `${regionLabel(x)} ${x.key_count}`).join(" / ")}
+                            </span>
+                          </div>
+                        )}
                         <div className="flex min-w-0 justify-between gap-2">
                           <span className="shrink-0">候选模型</span>
                           <code className="truncate text-ink max-w-[170px]" title={meta.models.join(", ")}>{meta.models[0]} 等 {meta.models.length} 个</code>
