@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Bell, Boxes, CalendarClock, CircleUser, DatabaseBackup, FlaskConical, MessagesSquare, Gauge, KeyRound, Layers, LogOut, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, Sun, Users, Wallet, X } from "lucide-react";
+import { useLocaleSync, t as translate, LOCALE_OPTIONS, setLocale, type Locale } from "../lib/i18n";
+import { Globe, Bell, Boxes, CalendarClock, CircleUser, DatabaseBackup, FlaskConical, MessagesSquare, Gauge, KeyRound, Layers, LogOut, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, Sun, Users, Wallet, X } from "lucide-react";
 import { api, type Me, type SiteInfo } from "../lib/api";
 import { getSeenAnnouncementIds, markAnnouncementsSeen } from "../lib/announcements";
 import { cn, fmtMoney } from "../lib/utils";
@@ -9,19 +10,19 @@ import { Button, useToast } from "./ui";
 const ALL_ROLES = ["user", "vip", "admin", "superadmin", "finance", "auditor"];
 
 const NAV = [
-  { to: "/dashboard", label: "仪表盘", icon: Gauge, roles: ALL_ROLES },
-  { to: "/dashboard/keys", label: "API Keys", icon: KeyRound, roles: ALL_ROLES },
-  { to: "/dashboard/providers", label: "供应商", icon: Server, roles: ["superadmin"] },
-  { to: "/dashboard/accounts", label: "账号池", icon: Wallet, roles: ["superadmin"] },
-  { to: "/dashboard/models", label: "模型与定价", icon: Layers, roles: ALL_ROLES },
-  { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ALL_ROLES },
-  { to: "/dashboard/playground", label: "操练场", icon: FlaskConical, roles: ALL_ROLES },
-  { to: "/dashboard/chatroom", label: "聊天室", icon: MessagesSquare, roles: ALL_ROLES },
-  { to: "/dashboard/logs", label: "运行日志", icon: ScrollText, roles: ["superadmin", "admin", "auditor"] },
-  { to: "/dashboard/profile", label: "个人主页", icon: CircleUser, roles: ALL_ROLES },
-  { to: "/dashboard/tasks", label: "定时任务", icon: CalendarClock, roles: ALL_ROLES },
-  { to: "/dashboard/backup", label: "数据备份", icon: DatabaseBackup, roles: ["superadmin"] },
-  { to: "/dashboard/settings", label: "网站设置", icon: SettingsIcon, roles: ["superadmin"] },
+  { to: "/dashboard", labelKey: "nav.dashboard", icon: Gauge, roles: ALL_ROLES },
+  { to: "/dashboard/keys", labelKey: "nav.keys", icon: KeyRound, roles: ALL_ROLES },
+  { to: "/dashboard/providers", labelKey: "nav.providers", icon: Server, roles: ["superadmin"] },
+  { to: "/dashboard/accounts", labelKey: "nav.accounts", icon: Wallet, roles: ["superadmin"] },
+  { to: "/dashboard/models", labelKey: "nav.models", icon: Layers, roles: ALL_ROLES },
+  { to: "/dashboard/users", labelKey: "nav.users", icon: Users, roles: ALL_ROLES },
+  { to: "/dashboard/playground", labelKey: "nav.playground", icon: FlaskConical, roles: ALL_ROLES },
+  { to: "/dashboard/chatroom", labelKey: "nav.chatroom", icon: MessagesSquare, roles: ALL_ROLES },
+  { to: "/dashboard/logs", labelKey: "nav.logs", icon: ScrollText, roles: ["superadmin", "admin", "auditor"] },
+  { to: "/dashboard/profile", labelKey: "nav.profile", icon: CircleUser, roles: ALL_ROLES },
+  { to: "/dashboard/tasks", labelKey: "nav.tasks", icon: CalendarClock, roles: ALL_ROLES },
+  { to: "/dashboard/backup", labelKey: "nav.backup", icon: DatabaseBackup, roles: ["superadmin"] },
+  { to: "/dashboard/settings", labelKey: "nav.settings", icon: SettingsIcon, roles: ["superadmin"] },
 ];
 
 export function useTheme() {
@@ -66,10 +67,12 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
   useEffect(() => setDrawer(false), [loc.pathname]);
 
   // 顶栏标题按最长路径匹配，避免 /dashboard 前缀把子页面全显示成"仪表盘"
-  const activeLabel =
+  const locale = useLocaleSync();
+  const activeLabel = translate(
     NAV.filter((n) => n.roles.includes(me.user.role))
       .filter((n) => loc.pathname === n.to || loc.pathname.startsWith(`${n.to}/`))
-      .sort((a, b) => b.to.length - a.to.length)[0]?.label ?? "仪表盘";
+      .sort((a, b) => b.to.length - a.to.length)[0]?.labelKey ?? "nav.dashboard"
+  );
 
   const [collapsed, setCollapsed] = useState(() => {
     try {
@@ -91,12 +94,12 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
 
   const renderNav = (isCollapsed: boolean) => (
     <nav className={cn("flex flex-col gap-1 transition-all", isCollapsed ? "px-2" : "px-3")} aria-label="主导航">
-      {NAV.filter((n) => n.roles.includes(me.user.role)).map(({ to, label, icon: Icon }) => (
+      {NAV.filter((n) => n.roles.includes(me.user.role)).map(({ to, labelKey, icon: Icon }) => (
         <NavLink
           key={to}
           to={to}
           end={to === "/dashboard"}
-          title={isCollapsed ? label : undefined}
+          title={isCollapsed ? translate(labelKey) : undefined}
           className={({ isActive }) =>
             cn(
               "relative flex items-center rounded-lg text-[13px] font-medium transition-all",
@@ -117,7 +120,7 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
                 />
               )}
               <Icon size={isCollapsed ? 18 : 16} className="shrink-0" />
-              {!isCollapsed && <span className="truncate">{label}</span>}
+              {!isCollapsed && <span className="truncate">{translate(labelKey)}</span>}
             </>
           )}
         </NavLink>
@@ -230,6 +233,19 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
               : `${fmtMoney(me.balance.available, me.balance.currency)}（冻结 ${me.balance.frozen.toFixed(4)}）`}
           </span>
           <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-medium text-brand">{me.user.role}</span>
+          <button
+            className="hidden sm:inline-flex items-center gap-1 rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink"
+            onClick={() => {
+              const order: Locale[] = ["zh-CN", "zh-TW", "en-US"];
+              const idx = order.indexOf(locale);
+              setLocale(order[(idx + 1) % order.length] as Locale);
+            }}
+            title={`${LOCALE_OPTIONS.map((o) => o.label).join(" / ")}（点击切换）`}
+            aria-label="切换语言"
+          >
+            <Globe size={16} />
+            <span className="hidden md:inline text-[11px] font-medium">{locale}</span>
+          </button>
           <button className="rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink" onClick={toggle} aria-label={theme === "dark" ? "切换浅色模式" : "切换深色模式"}>
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>

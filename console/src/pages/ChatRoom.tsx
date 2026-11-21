@@ -3,6 +3,7 @@ import { Bot, MessagesSquare, Send, User } from "lucide-react";
 import { api, type Me } from "../lib/api";
 import { Button, Card, useToast } from "../components/ui";
 import { cn } from "../lib/utils";
+import { t as translate } from "../lib/i18n";
 
 type ChatroomUser = { id: string; name: string };
 type ChatMessage = {
@@ -157,6 +158,7 @@ export default function ChatRoom({ me }: { me: Me }) {
   const isMine = (m: ChatMessage) => m.role === "user" && m.userId === me.user.id;
 
   /** 机器人回复等待中：最后一条是 @ 机器人的用户消息，但 bot 回复尚未经轮询落库 */
+  translate;
   const botTyping = !!msgs && msgs.length > 0 && (() => {
     const last = msgs[msgs.length - 1];
     if (last.role !== "user") return false;
@@ -216,7 +218,7 @@ export default function ChatRoom({ me }: { me: Me }) {
           ) : msgs.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
               <MessagesSquare size={30} className="text-muted" />
-              <p className="text-[13px] text-muted">还没有消息，来说第一句吧</p>
+              <p className="text-[13px] text-muted">{translate("chatroom.empty")}</p>
             </div>
           ) : (
             msgs.map((m) =>
@@ -245,7 +247,7 @@ export default function ChatRoom({ me }: { me: Me }) {
                   >
                     <div className="flex items-center gap-1.5 text-[10px] text-muted">
                       <span className="font-medium text-ink">{displayEmail(m)}</span>
-                      {m.role === "bot" && <span className="rounded bg-emerald-500/10 px-1 text-[9px] text-emerald-500">机器人</span>}
+                      {m.role === "bot" && <span className="rounded bg-emerald-500/10 px-1 text-[9px] text-emerald-500">{translate("chatroom.botTag")}</span>}
                       <span>{fmtTime(m.createdAt)}</span>
                     </div>
                     <div
@@ -285,7 +287,7 @@ export default function ChatRoom({ me }: { me: Me }) {
               <div className="max-w-[75%] space-y-0.5">
                 <div className="flex items-center gap-1.5 text-[10px] text-muted">
                   <span className="font-medium text-ink">{botName}</span>
-                  <span className="rounded bg-emerald-500/10 px-1 text-[9px] text-emerald-500">机器人</span>
+                  <span className="rounded bg-emerald-500/10 px-1 text-[9px] text-emerald-500">{translate("chatroom.botTag")}</span>
                 </div>
                 <div
                   className="inline-flex items-center gap-1 rounded-xl2 px-3 py-3"
@@ -303,7 +305,7 @@ export default function ChatRoom({ me }: { me: Me }) {
         <div className="relative border-t border-line p-3">
           {mention && (
             <div className="absolute bottom-full left-3 right-3 mb-2 max-h-56 overflow-y-auto rounded-xl border border-line bg-surface shadow-card">
-              <div className="border-b border-line/70 px-3 py-1.5 text-[10px] text-muted">选择要 @ 的用户</div>
+              <div className="border-b border-line/70 px-3 py-1.5 text-[10px] text-muted">{translate("chatroom.pickUser")}</div>
               {participants.map((u, i) => (
                 <button
                   key={u.id}
@@ -348,11 +350,11 @@ export default function ChatRoom({ me }: { me: Me }) {
                 }
               }}
               rows={2}
-              placeholder={botTyping ? "机器人正在回复…" : `输入消息，Enter 发送（${CHARS_LIMIT} 字以内）…`}
+              placeholder={botTyping ? translate("chatroom.botTyping") : translate("chatroom.placeholder", { n: CHARS_LIMIT })}
               className="max-h-32 min-h-[46px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink outline-none focus:border-brand/60"
             />
             <Button className="h-11" disabled={busy || !input.trim()} onClick={() => void send()}>
-              <Send size={14} />{busy ? "发送中…" : "发送"}
+              <Send size={14} />{busy ? translate("chatroom.sending") : translate("chatroom.send")}
             </Button>
           </div>
           <p className="mt-1 text-right text-[10px] text-muted">{input.length}/{CHARS_LIMIT}</p>
@@ -372,14 +374,14 @@ export default function ChatRoom({ me }: { me: Me }) {
               className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-surface2"
               onClick={() => mentionBot()}
             >
-              <span className="font-medium">@ 助手</span>
+              <span className="font-medium">{translate("chatroom.mention")}</span>
             </button>
             <button
               type="button"
               className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-surface2"
               onClick={() => void pat()}
             >
-              <span className="font-medium">拍一拍</span>
+              <span className="font-medium">{translate("chatroom.pat")}</span>
             </button>
           </div>
         </>

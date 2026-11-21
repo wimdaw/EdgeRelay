@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Github, Mail } from "lucide-react";
 import { api, type SiteInfo } from "../lib/api";
 import { Button, Card, Dialog, Field, Input, useToast } from "../components/ui";
+import { t as translate } from "../lib/i18n";
 
 export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogin: () => void }) {
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -89,22 +90,22 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
           <div><div className="text-lg font-bold">{site?.siteName ?? "Relay"}</div><div className="max-w-[260px] text-xs text-muted">{site?.siteDescription ?? "部署在 EdgeOne 边缘的 AI API 网关"}</div></div>
         </Link>
         <Card className="p-6">
-          <h1 className="text-base font-semibold">{mode === "login" ? "登录控制台" : "注册账号"}</h1>
-          <p className="mt-1 text-xs text-muted">{mode === "login" ? "使用平台账号登录" : "注册即表示已阅读并同意服务条款与隐私政策"}</p>
+          <h1 className="text-base font-semibold">{mode === "login" ? translate("login.title") : translate("register.title")}</h1>
+          <p className="mt-1 text-xs text-muted">{mode === "login" ? translate("login.subtitle") : translate("register.tos")}</p>
           <form className="mt-5 flex flex-col gap-3.5" onSubmit={(e) => { e.preventDefault(); submit(); }}>
             {mode === "login" && (
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted">登录方式</span>
+                <span className="text-xs font-medium text-muted">{translate("login.method")}</span>
                 <div className="flex gap-0.5 rounded-lg bg-surface2 p-0.5">
                   <button type="button" onClick={() => setLoginMethod("password")}
-                    className={`rounded-md px-3 py-1 text-[11px] font-medium transition-colors ${loginMethod === "password" ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>密码</button>
+                    className={`rounded-md px-3 py-1 text-[11px] font-medium transition-colors ${loginMethod === "password" ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{translate("login.method.password")}</button>
                   <button type="button" onClick={() => setLoginMethod("code")} disabled={!site?.smtpEnabled}
                     title={site?.smtpEnabled ? "使用邮箱验证码登录" : "管理员未开启邮箱验证码登录"}
-                    className={`rounded-md px-3 py-1 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${loginMethod === "code" ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>验证码</button>
+                    className={`rounded-md px-3 py-1 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${loginMethod === "code" ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{translate("login.method.code")}</button>
                 </div>
               </div>
             )}
-            <Field label="邮箱"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" /></Field>
+            <Field label="邮箱"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={translate("login.emailPlaceholder")} autoComplete="email" /></Field>
             {mode === "login" && loginMethod === "password" && (
               <Field label="密码"><Input type="password" required minLength={1} value={pass} onChange={(e) => setPass(e.target.value)} autoComplete="current-password" /></Field>
             )}
@@ -141,7 +142,7 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
               </Field>
             )}
             <Button type="submit" disabled={busy} className="mt-1 w-full !py-2.5">
-              {mode === "login" ? "登录" : "注册"}{!busy && <ArrowRight size={14} />}
+              {mode === "login" ? translate("login.submit") : translate("register.title")}{!busy && <ArrowRight size={14} />}
             </Button>
           </form>
           <div className="my-4 flex items-center gap-3 text-[11px] text-muted"><span className="h-px flex-1 bg-line" />或<span className="h-px flex-1 bg-line" /></div>
@@ -156,13 +157,13 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
               <Field label="邀请码（选填）"><Input value={inviteCode} onChange={(e) => setInviteCode(e.target.value.toUpperCase())} placeholder="有邀请码可获额外奖励" /></Field>
             </div>
           )}
-          <button className="mt-3 w-full text-center text-xs text-muted hover:text-brand" onClick={() => setResetOpen(true)}>忘记密码？</button>
+          <button className="mt-3 w-full text-center text-xs text-muted hover:text-brand" onClick={() => setResetOpen(true)}>{translate("login.forgot")}</button>
           <button className="mt-4 w-full text-center text-xs text-muted hover:text-brand" onClick={() => setMode(mode === "login" ? "register" : "login")}>
-            {mode === "login" ? "没有账号？立即注册" : "已有账号？返回登录"}
+            {mode === "login" ? <span>{translate("login.register")}</span> : <span>已有账号？返回登录</span>}
           </button>
         </Card>
         <p className="mt-4 text-center text-[11px] text-muted">
-          登录即表示同意 <a className="underline hover:text-brand" href="/terms.html" target="_blank" rel="noreferrer">服务条款</a> 与 <a className="underline hover:text-brand" href="/privacy.html" target="_blank" rel="noreferrer">隐私政策</a>
+          {translate("register.tos")} <a className="underline hover:text-brand" href="/terms.html" target="_blank" rel="noreferrer">服务条款</a> 与 <a className="underline hover:text-brand" href="/privacy.html" target="_blank" rel="noreferrer">隐私政策</a>
         </p>
       </div>
 
