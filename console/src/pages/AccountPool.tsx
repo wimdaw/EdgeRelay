@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { t as translate, useLocaleSync } from "../lib/i18n";
 import { AlertTriangle, CheckCircle2, Clock, Gauge, Mail, RefreshCw, ShieldAlert, Users, Wallet } from "lucide-react";
 import { adminAction } from "../lib/api";
 import { Button, Card, EmptyState, useToast } from "../components/ui";
@@ -233,6 +234,7 @@ function QuotaView({ q, notQueried }: { q: AccountQuota | null; notQueried?: boo
 }
 
 export default function AccountPool() {
+  useLocaleSync();
   const [rows, setRows] = useState<PoolProvider[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
@@ -325,7 +327,7 @@ export default function AccountPool() {
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand"><Wallet size={18} /></div>
             <div>
-              <h1 className="text-base font-bold text-ink">账号池</h1>
+              <h1 className="text-base font-bold text-ink">{translate("page.accounts.title")}</h1>
               <p className="mt-0.5 text-xs text-muted">
                 OAuth / Web 反代渠道的账号与额度总览。进入页面自动加载账号列表（不查上游额度，秒开）；额度按需查询——点渠道「刷新」只查该渠道，点「刷新额度」全站查询。
               </p>

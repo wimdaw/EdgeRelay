@@ -234,7 +234,7 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
           </span>
           <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-medium text-brand">{me.user.role}</span>
           <button
-            className="hidden sm:inline-flex items-center gap-1 rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink"
+            className="inline-flex items-center gap-1 rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink"
             onClick={() => {
               const order: Locale[] = ["zh-CN", "zh-TW", "en-US"];
               const idx = order.indexOf(locale);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { t as translate, useLocaleSync } from "../lib/i18n";
 import { Check, Copy, Cpu, Layers, Search, Server } from "lucide-react";
 import { api, type Me, type ModelRow } from "../lib/api";
 import { Card, EmptyState, Input, useToast } from "../components/ui";
@@ -109,7 +110,7 @@ export default function ModelPool({ me: _me }: { me: Me }) {
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand/10 text-brand">
                 <Layers size={16} />
               </span>
-              <h1 className="text-base font-bold text-ink">模型池 (Model Pool)</h1>
+              <h1 className="text-base font-bold text-ink">{translate("page.modelpool.title")}</h1>
             </div>
             <p className="mt-1 text-xs text-muted max-w-2xl">
               已就绪的所有上游大模型目录。模型调用格式统一规范为

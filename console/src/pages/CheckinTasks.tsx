@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { t as translate, useLocaleSync } from "../lib/i18n";
 import { CalendarCheck, Play, RefreshCw } from "lucide-react";
 import { adminAction } from "../lib/api";
 import { Button, Card, EmptyState, useToast } from "../components/ui";
@@ -19,6 +20,7 @@ type CheckinProvider = {
 
 /** 签到任务面板：渠道注册表 + 开关 + 手动触发（数据来自 checkin_status，仅超级管理员可见） */
 export default function CheckinTasks() {
+  useLocaleSync();
   const [providers, setProviders] = useState<CheckinProvider[] | null>(null);
   const [channels, setChannels] = useState<CheckinChannel[]>([]);
   const [busy, setBusy] = useState<string>("");
@@ -91,7 +93,7 @@ export default function CheckinTasks() {
               <CalendarCheck size={18} />
             </div>
             <div>
-              <h2 className="text-base font-bold text-ink">签到任务</h2>
+              <h2 className="text-base font-bold text-ink">{translate("tabs.tasks.checkin")}</h2>
               <p className="mt-0.5 text-xs text-muted">
                 每日 00:30 后全站首次访问时自动执行一次（当日去重）；也可在此手动立即执行。开关按渠道类型全局生效。
               </p>

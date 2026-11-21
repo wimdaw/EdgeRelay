@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { t as translate, useLocaleSync } from "../lib/i18n";
 import { CheckCircle2, Clock, Copy, ExternalLink, Film, RefreshCw, Trash2, XCircle } from "lucide-react";
 import { api, type Me } from "../lib/api";
 import { Button, Card, EmptyState, useConfirm, useToast } from "../components/ui";
@@ -100,6 +101,7 @@ function Progress({ value }: { value: number }) {
 }
 
 export default function VideoTasks({ me, embedded = false }: { me: Me; embedded?: boolean }) {
+  useLocaleSync();
   const [data, setData] = useState<TasksResp | null>(null);
   const [scope, setScope] = useState<"own" | "all">("own");
   const [tab, setTab] = useState<TabKey>("all");
@@ -255,7 +257,7 @@ export default function VideoTasks({ me, embedded = false }: { me: Me; embedded?
               <Film size={18} />
             </div>
             <div>
-              <h1 className="text-base font-bold text-ink">视频任务</h1>
+              <h1 className="text-base font-bold text-ink">{translate("page.videos.title")}</h1>
               <p className="mt-0.5 text-xs text-muted">
                 {isAdminView
                   ? "全部任务视图：可查看所有用户发起的视频任务，并清理任意记录。"

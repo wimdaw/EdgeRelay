@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { t as translate, useLocaleSync } from "../lib/i18n";
 import { Link } from "react-router-dom";
 import { AudioLines, Bot, Copy, Eraser, FlaskConical, Image as ImageIcon, Send, Square, User, Video as VideoIcon } from "lucide-react";
 import { api, type KeyRow, type Me } from "../lib/api";
@@ -46,6 +47,7 @@ type Msg = {
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 export default function Playground({ me }: { me: Me }) {
+  useLocaleSync();
   const [models, setModels] = useState<ModelItem[]>([]);
   const [endpoint, setEndpoint] = useState<EndpointKey>("chat");
   const [model, setModel] = useState("");
@@ -473,7 +475,7 @@ export default function Playground({ me }: { me: Me }) {
               <FlaskConical size={18} />
             </div>
             <div>
-              <h1 className="text-base font-bold text-ink">操练场</h1>
+              <h1 className="text-base font-bold text-ink">{translate("page.playground.title")}</h1>
               <p className="mt-0.5 text-xs text-muted">
                 使用你账户自己的 API Key 调用，走网关同一套路由；每分钟最多 20 次，不计量。
               </p>

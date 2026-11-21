@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { t as translate, useLocaleSync } from "../lib/i18n";
 import { MessageSquare, Plus, RefreshCw, ShieldCheck } from "lucide-react";
 import { api } from "../lib/api";
 import { Button, Card, Dialog, EmptyState, Field, Input, Select, useToast } from "../components/ui";
@@ -38,6 +39,7 @@ const fmt = (ts?: number) => (ts ? new Date(ts * 1000).toLocaleString("zh-CN", {
 
 /** 我的供应商：展示当前用户提交的渠道与审核状态；可提交新渠道、与管理员站内信往来 */
 export default function MyProviders({ meEmail }: { meEmail: string }) {
+  useLocaleSync();
   const [subs, setSubs] = useState<MySubmission[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
@@ -129,7 +131,7 @@ export default function MyProviders({ meEmail }: { meEmail: string }) {
       <Card className="p-4 sm:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-sm font-semibold">我的供应商</h2>
+            <h2 className="text-sm font-semibold">{translate("page.mysubs.title")}</h2>
             <p className="mt-0.5 text-xs text-muted">
               提交需校验账户密码；提交后进入待审核状态，不可自行修改或删除。需要调整时通过站内信联系管理员。
             </p>

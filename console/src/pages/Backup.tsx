@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { t as translate, useLocaleSync } from "../lib/i18n";
 import { Bot, DatabaseBackup, Download, RefreshCw, Save, Send, Trash2, Upload } from "lucide-react";
 import { api } from "../lib/api";
 import { Button, Card, Field, Input, useConfirm, useToast } from "../components/ui";
@@ -243,7 +244,7 @@ export default function Backup() {
       {/* 本地备份 */}
       {tab === "local" && (
       <Card className="p-4 sm:p-5">
-        <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold"><DatabaseBackup size={15} />本地备份</h2>
+        <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold"><DatabaseBackup size={15} />{translate("page.backup.local")}</h2>
         <p className="mb-4 text-xs text-muted">导出全站数据为 JSON 文件，或用备份文件覆盖恢复。备份包含用户、密钥、渠道、模型、计费、用量与审计日志，不含登录会话。</p>
         <div className="flex flex-wrap gap-2">
           <Button onClick={exportBackup} disabled={!!backupBusy}><Download size={14} />{backupBusy === "export" ? "导出中…" : "导出数据库"}</Button>
@@ -301,7 +302,7 @@ export default function Backup() {
       {/* Telegram 机器人备份 */}
       {tab === "telegram" && (
       <Card className="p-4 sm:p-5">
-        <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold"><Bot size={15} />Telegram 机器人备份</h2>
+        <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold"><Bot size={15} />{translate("page.backup.telegram")}</h2>
         <p className="mb-4 text-xs text-muted">配置 Telegram Bot 后，可把完整 JSON 备份作为文件推送到指定会话。Bot Token 会加密保存，页面只显示掩码。</p>
 
         <div className="grid gap-3 sm:grid-cols-2">
