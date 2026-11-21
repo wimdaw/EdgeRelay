@@ -8,6 +8,8 @@
  *  - codebuddy：CodeBuddy / WorkBuddy（国内版 + 国际版共用）
  *  - zcode：领取智谱 ZCode 的每日/活动额度包
  *  - qoder：领取 Qoder 每日 100 Credits
+ *  - trae：Trae 每日签到领积分
+ *  - doubao：豆包工作版每日签到领积分
  *
  * 触发入口：
  *  - 全站心跳 GET /api/monitor/video（09:00 后当日首次，见 maybeRunDailyCheckin）
@@ -157,11 +159,29 @@ async function runTraeProvider(env: Env, provider: ProviderRecord): Promise<Chec
   });
 }
 
+/** 豆包工作版（字节跳动）：每日签到领积分（工作模式「每日签到」活动） */
+async function runDoubaoProvider(env: Env, provider: ProviderRecord): Promise<CheckinAccountResult[]> {
+  const keys = (await getProviderKeysAll(env, provider.id)).filter((k) => k.status === "active");
+  if (!keys.length) return [];
+  const { checkinDoubao } = await import("./oauth/doubao");
+  return mapLimit(keys, 2, async (k): Promise<CheckinAccountResult> => {
+    const base = { keyId: k.id, email: k.email, fingerprint: k.keyFingerprint || k.id.slice(0, 8) };
+    try {
+      const token = await decryptSecret(env, k.encryptedKey);
+      const r = await checkinDoubao(env, token);
+      return { ...base, ok: r.ok, already: r.already, reward: r.reward, message: r.message };
+    } catch (err) {
+      return { ...base, ok: false, message: (err as Error).message || "签到异常" };
+    }
+  });
+}
+
 const CHANNELS: Record<string, ChannelRunner> = {
   codebuddy: { label: "CodeBuddy / WorkBuddy", action: "签到", oauthType: "codebuddy", run: runCodebuddyProvider },
   zcode: { label: "ZCode (智谱)", action: "领额度", oauthType: "zcode", run: runZcodeProvider },
   qoder: { label: "Qoder", action: "签到", oauthType: "qoder", run: runQoderProvider },
   trae: { label: "Trae (字节跳动)", action: "签到", oauthType: "trae", run: runTraeProvider },
+  doubao: { label: "豆包工作版 (字节跳动)", action: "签到", oauthType: "doubao", run: runDoubaoProvider },
 };
 
 /** 支持签到的渠道清单（供控制台渲染开关） */

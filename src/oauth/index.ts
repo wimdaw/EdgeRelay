@@ -62,8 +62,15 @@ import {
   handleTraeRequest,
   TRAE_GLOBAL_MODELS,
 } from "./trae";
+import {
+  handleDoubaoRequest,
+  testDoubao,
+  fetchDoubaoModels,
+  checkinDoubao,
+  DOUBAO_MODEL_NAMES,
+} from "./doubao";
 
-export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok" | "codebuddy" | "cline" | "zcode" | "qoder" | "trae";
+export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok" | "codebuddy" | "cline" | "zcode" | "qoder" | "trae" | "doubao";
 
 export type OAuthProviderMeta = {
   type: OAuthProviderType;
@@ -189,6 +196,15 @@ export const OAUTH_PROVIDERS: Record<OAuthProviderType, OAuthProviderMeta> = {
     // 国际版不开放 model_list，用内置目录；国内版会优先实时拉取
     defaultModels: TRAE_GLOBAL_MODELS,
   },
+  doubao: {
+    type: "doubao",
+    name: "豆包工作版 (字节跳动)",
+    slug: "doubao-oauth",
+    baseUrl: "https://www.doubao.com",
+    mode: "redirect",
+    desc: "豆包客户端「工作模式」Cookie 反代（协议移植自开源 doubao2api），OpenAI 兼容输出；授权方式为粘贴整段豆包 Cookie（需含 sessionid），支持每日签到领积分。",
+    defaultModels: DOUBAO_MODEL_NAMES,
+  },
 };
 
 export const OAUTH_KIND_PREFIX = "oauth:";
@@ -242,6 +258,11 @@ export async function startOAuth(env: Env, type: OAuthProviderType, baseUrl?: st
     const flow = await buildTraeAuthUrl(env, baseUrl);
     return { mode: "redirect", url: flow.url, state: flow.state };
   }
+  if (type === "doubao") {
+    // 豆包没有 OAuth 授权流：凭据是用户从豆包 Web/客户端抓的 Cookie。
+    // url 仅作为引导入口（打开豆包网页取 Cookie），state 透传给 complete 校验用。
+    return { mode: "redirect", url: "https://www.doubao.com", state: `doubao-${Date.now()}` };
+  }
   const flow =
     type === "kimi"
       ? await startKimiDeviceFlow(env, baseUrl)
@@ -271,6 +292,15 @@ export async function completeOAuth(
 ): Promise<{ refreshToken: string; email?: string; account?: { uid?: string } }> {
   if (type === "trae") {
     return completeTraeOAuth(env, code, state, baseUrl);
+  }
+  if (type === "doubao") {
+    // 「code」即用户粘贴的整段豆包 Cookie；校验 sessionid 存在即入库
+    const { parseDoubaoCookie } = await import("./doubao");
+    const cookie = parseDoubaoCookie(code);
+    if (!cookie) {
+      throw new Error("无效的豆包 Cookie：需要包含 sessionid= 的整段 Cookie（浏览器 F12 → Network → 请求头 Cookie）");
+    }
+    return { refreshToken: cookie };
   }
   if (type === "claude") {
     const { refreshToken } = await exchangeClaudeCode(env, code, state);
@@ -357,6 +387,10 @@ export async function fetchOAuthModels(
       const r = await fetchTraeModels(env, refreshToken, baseUrl);
       return { models: r.models.length ? r.models : fallback, message: r.message };
     }
+    if (type === "doubao") {
+      // 工作模式无模型目录接口，内置清单即权威
+      return { models: DOUBAO_MODEL_NAMES };
+    }
     if (type === "cline") {
       const r = await fetchClineModels(env, refreshToken);
       return r.success && r.models.length ? { models: r.models } : { models: fallback, message: r.message };
@@ -384,6 +418,7 @@ export async function testOAuth(
   if (type === "zcode") return testZcode(env, refreshToken, modelId, baseUrl);
   if (type === "qoder") return testQoder(env, refreshToken, modelId, baseUrl);
   if (type === "trae") return testTrae(env, refreshToken, modelId, baseUrl);
+  if (type === "doubao") return testDoubao(env, refreshToken, modelId);
   if (type === "cline") return testCline(env, refreshToken, modelId);
   return testGrok(env, refreshToken, modelId);
 }
@@ -443,6 +478,8 @@ export async function handleOAuthChat(args: OAuthChatArgs): Promise<Response> {
       return handleClineRequest(p);
     case "trae":
       return handleTraeRequest(p, args.baseUrl);
+    case "doubao":
+      return handleDoubaoRequest(p);
     case "qoder":
       return handleQoderRequest({
         env: args.env,

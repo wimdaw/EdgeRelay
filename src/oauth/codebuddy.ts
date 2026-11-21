@@ -1440,8 +1440,8 @@ export async function checkinCodebuddy(
       const bizMsg = String(json?.msg || json?.message || '')
 
       if (!res.ok || (json && json.code !== 0)) {
-        // 「已签到」是正常状态，不当失败
-        if (isAlreadyCheckedIn(bizMsg) || isAlreadyCheckedIn(text)) {
+        // 「已签到」是正常状态，不当失败（对照开源 88lin/workbuddy-auto-signin：code=10001 或文案含已签均视为已签）
+        if (json?.code === 10001 || isAlreadyCheckedIn(bizMsg) || isAlreadyCheckedIn(text)) {
           return attachBalance(env, refreshToken, baseUrl, regionCode, {
             ok: true,
             already: true,
@@ -1452,6 +1452,18 @@ export async function checkinCodebuddy(
           })
         }
         return { ok: false, message: `HTTP ${res.status} code=${json?.code} msg=${bizMsg || text.slice(0, 160)}` }
+      }
+
+      // 领取接口返回空体 = 服务端判定今日已领取（幂等命中，同参考实现）
+      if (!json || typeof json !== 'object') {
+        return attachBalance(env, refreshToken, baseUrl, regionCode, {
+          ok: true,
+          already: true,
+          message: '今日已签到（幂等命中）',
+          realm,
+          nickname: account.nickname,
+          uid: account.uid,
+        })
       }
 
       const inner = json?.data?.Response?.Data || json?.data?.data || json?.data || {}

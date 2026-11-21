@@ -168,6 +168,15 @@ const OAUTH_CATALOG: OAuthMeta[] = [
     models: ["Gemini-3.1-Pro-Preview", "Claude-Sonnet-4.6", "GPT-5.5", "glm-5.3", "kimi-k3", "deepseek-V3"],
   },
   {
+    type: "doubao",
+    name: "豆包工作版 (字节跳动)",
+    slug: "doubao-oauth",
+    baseUrl: "https://www.doubao.com",
+    mode: "redirect" as const,
+    desc: "豆包客户端「工作模式」Cookie 反代（协议移植自开源 doubao2api），OpenAI 兼容输出；凭据为整段豆包 Cookie（需含 sessionid），支持每日签到领积分。",
+    models: ["auto", "doubao-2.1-lite", "doubao-2.1-pro", "deepseek-v4-flash", "deepseek-v4-pro", "kimi-k3", "kimi-k3.1-pro", "kimi-k3.1-pro-fast", "glm-5.3", "glm-5.3-flash"],
+  },
+  {
     type: "cline",
     name: "Cline",
     slug: "cline-oauth",
@@ -1584,26 +1593,34 @@ export default function Providers() {
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-xs leading-relaxed text-muted">
-              1. 点击下方按钮打开 {oauthDlg?.meta.name} 授权页并登录；<br />
-              2. 授权后浏览器会跳转到 <code className="rounded bg-line px-1">127.0.0.1</code> 回调地址（页面打不开属正常现象）；<br />
-              3. {oauthDlg?.meta.type === "trae"
-                ? "直接复制地址栏的整段回调 URL（必须含 refreshToken / authCode）粘贴到下方。"
-                : <>复制地址栏 <code className="rounded bg-line px-1">code=</code> 后的整段内容（或整段回调 URL）粘贴到下方。</>}
-            </p>
+            {oauthDlg?.meta.type === "doubao" ? (
+              <p className="text-xs leading-relaxed text-muted">
+                1. 点击下方按钮打开豆包网页版并登录（www.doubao.com）；<br />
+                2. 浏览器按 <code className="rounded bg-line px-1">F12</code> 打开开发者工具 → Network（网络）面板 → 刷新页面 → 点击任一 doubao.com 请求；<br />
+                3. 复制请求头（Request Headers）里整段 <code className="rounded bg-line px-1">Cookie</code> 粘贴到下方（必须含 <code className="rounded bg-line px-1">sessionid=</code>）。
+              </p>
+            ) : (
+              <p className="text-xs leading-relaxed text-muted">
+                1. 点击下方按钮打开 {oauthDlg?.meta.name} 授权页并登录；<br />
+                2. 授权后浏览器会跳转到 <code className="rounded bg-line px-1">127.0.0.1</code> 回调地址（页面打不开属正常现象）；<br />
+                3. {oauthDlg?.meta.type === "trae"
+                  ? "直接复制地址栏的整段回调 URL（必须含 refreshToken / authCode）粘贴到下方。"
+                  : <>复制地址栏 <code className="rounded bg-line px-1">code=</code> 后的整段内容（或整段回调 URL）粘贴到下方。</>}
+              </p>
+            )}
             <div className="flex items-center gap-2">
               <Input readOnly value={oauthDlg?.url ?? ""} className="!py-1 flex-1 text-[11px] font-mono" />
               <Button variant="soft" className="!h-[34px] !px-2.5 shrink-0" onClick={() => copyText(oauthDlg?.url ?? "")} title="复制授权链接"><Copy size={12} /></Button>
               <Button className="!h-[34px] !px-3 shrink-0" onClick={() => window.open(oauthDlg?.url ?? "", "_blank", "noopener,noreferrer")}>
-                <ExternalLink size={12} />打开
+                <ExternalLink size={12} />{oauthDlg?.meta.type === "doubao" ? "打开豆包" : "打开"}
               </Button>
             </div>
-            <Field label="授权 code 或整段回调地址">
+            <Field label={oauthDlg?.meta.type === "doubao" ? "豆包 Cookie（整段）" : "授权 code 或整段回调地址"}>
               <textarea
                 value={oauthDlg?.codeInput ?? ""}
                 onChange={(e) => oauthDlg && setOauthDlg({ ...oauthDlg, codeInput: e.target.value })}
                 rows={3}
-                placeholder="粘贴 code 或 http://localhost:xxxxx/callback?code=..."
+                placeholder={oauthDlg?.meta.type === "doubao" ? "sessionid=...; sid_tt=...; ttwid=...; ..." : "粘贴 code 或 http://localhost:xxxxx/callback?code=..."}
                 className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
               />
             </Field>

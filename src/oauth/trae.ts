@@ -1449,16 +1449,28 @@ function traeCheckinDeviceId(token: string): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-8${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
 }
 
+/** 签到接口的客户端同款常量（对照开源 L0NE-6/Trae-AutoCheckin 抗 9074 逆向） */
+const TRAE_UG_UA = "Trae/1.107.1";
+const TRAE_UG_APP_VERSION = "1.107.1";
+/** 客户端签到请求体固定带 {"req_source":1}——空体会被服务端拒成 9074 */
+const TRAE_UG_BODY = JSON.stringify({ req_source: 1 });
+
 async function traeCheckinPost(path: string, token: string, deviceId?: string): Promise<any> {
   const headers: Record<string, string> = {
     Authorization: `Cloud-IDE-JWT ${token}`,
     "Content-Type": "application/json",
+    "User-Agent": TRAE_UG_UA,
+    "X-User-Region": "CN",
+    // 与桌面端 _applyUgDeviceHeaders 对齐：缺这些设备头会被服务端拒成 9074
     "x-device-id": deviceId || traeCheckinDeviceId(token),
+    "x-device-type": "Windows",
+    "x-os-version": "10.0.19045",
+    "x-app-version": TRAE_UG_APP_VERSION,
   };
   const res = await fetch(`https://api.trae.cn${path}`, {
     method: "POST",
     headers,
-    body: JSON.stringify({}),
+    body: TRAE_UG_BODY,
     signal: AbortSignal.timeout(30000),
   });
   const text = await res.text();
@@ -1492,23 +1504,45 @@ export async function checkinTrae(env: Env, refreshToken: string): Promise<TraeC
       return { ok: false, message: "当前账号签到活动未开启（enable=false）" };
     }
     if (status?.checked_in === true) {
-      const credits = typeof status?.credits === "number" ? status.credits : undefined;
-      return { ok: true, already: true, reward: credits, message: credits != null ? `今日已签到（积分 ${credits}）` : "今日已签到" };
+      const credits = traeCheckinCreditsOf(status);
+      return { ok: true, already: true, reward: credits || undefined, message: credits ? `今日已签到（积分 ${credits}）` : "今日已签到" };
     }
     const claim = await traeCheckinPost("/trae/api/v2/ug/checkin_credits/claim", token, cred.deviceId);
     const code = Number(claim?.code ?? 0);
-    // 上游业务码：9074 设备限流（勿立刻重试）、9095 当日已领（设备域）、0 成功
+    // 上游业务码：0 成功；9004/9095 本设备今日已签；9074 排队限流（勿立刻重试）
     if (code === 0) {
-      const reward = typeof claim?.data?.credits === "number" ? claim.data.credits : undefined;
+      const reward = traeClaimPointsOf(claim);
       return { ok: true, reward, message: reward != null ? `签到成功，+${reward} 积分` : "签到成功" };
     }
-    if (code === 9095) return { ok: true, already: true, message: "今日已签到（上游确认）" };
-    if (code === 9074) return { ok: false, message: "签到被上游限流（9074），请稍后再试" };
+    if (code === 9004 || code === 9095) return { ok: true, already: true, message: "今日已签到（上游确认）" };
+    if (code === 9074) {
+      return {
+        ok: false,
+        message:
+          "签到被上游限流（9074）：多为主授权设备号未注册或参与人数排队，签到窗口稍后由定时任务自动重试；若长期 9074 需重新授权以带上客户端真实设备号",
+      };
+    }
     const msg = String(claim?.message || "").slice(0, 120);
     return { ok: false, message: `签到未成功：${msg || "code " + code}` };
   } catch (err) {
     return { ok: false, message: (err as Error).message || "签到异常" };
   }
+}
+
+/** status 返回的积分：credits 优先，缺省取 extra_credits（对照客户端字段） */
+function traeCheckinCreditsOf(status: any): number | undefined {
+  const credits = Number(status?.credits);
+  if (Number.isFinite(credits) && credits > 0) return credits;
+  const extra = Number(status?.extra_credits);
+  return Number.isFinite(extra) && extra > 0 ? extra : undefined;
+}
+
+/** claim 返回的积分：data.points（客户端同款），兼容 data.credits */
+function traeClaimPointsOf(claim: any): number | undefined {
+  const points = Number(claim?.data?.points);
+  if (Number.isFinite(points) && points > 0) return points;
+  const credits = Number(claim?.data?.credits);
+  return Number.isFinite(credits) && credits > 0 ? credits : undefined;
 }
 
 export async function testTrae(
