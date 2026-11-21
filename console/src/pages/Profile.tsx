@@ -6,6 +6,8 @@ import { Button, Card, Field, Input, useToast } from "../components/ui";
 
 export default function Profile({ me, onRefresh }: { me: Me; onRefresh: () => void }) {
   const [tab, setTab] = useState<"profile" | "password" | "providers">("profile");
+  // 超级管理员的审核入口在「供应商 → 用户提交」选项卡，无需「我的供应商」
+  const isSuperadmin = me.user.role === "superadmin";
   const [nickname, setNickname] = useState(me.nickname ?? "");
   const [bio, setBio] = useState(me.bio ?? "");
   const [avatarUrl, setAvatarUrl] = useState(me.avatarUrl ?? "");
@@ -67,7 +69,7 @@ export default function Profile({ me, onRefresh }: { me: Me; onRefresh: () => vo
     <div className="flex flex-col gap-4">
       {/* 选项卡栏（与网站设置同款形态） */}
       <div className="flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit" role="tablist">
-        {([["profile", "个人资料"], ["password", "修改密码"], ["providers", "我的供应商"]] as const).map(([k, l]) => (
+        {([["profile", "个人资料"], ["password", "修改密码"], ...(!isSuperadmin ? ([["providers", "我的供应商"]] as const) : [])] as const).map(([k, l]) => (
           <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
             className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{l}</button>
         ))}
@@ -105,7 +107,7 @@ export default function Profile({ me, onRefresh }: { me: Me; onRefresh: () => vo
       </Card>
       )}
 
-      {tab === "providers" && <MyProviders meEmail={me.user.email} />}
+      {tab === "providers" && !isSuperadmin && <MyProviders meEmail={me.user.email} />}
 
       {tab === "password" && (
       <Card className="p-5">
