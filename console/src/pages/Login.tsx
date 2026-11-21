@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Github, Mail } from "lucide-react";
 import { api, type SiteInfo } from "../lib/api";
 import { Button, Card, Dialog, Field, Input, useToast } from "../components/ui";
@@ -80,10 +80,14 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
   return (
     <div className="flex min-h-screen items-center justify-center bg-bg p-6">
       <div className="w-full max-w-[400px]">
-        <div className="mb-6 flex items-center justify-center gap-2.5">
+        <Link
+          to="/"
+          title={`返回官网 (${site?.siteName ?? "Relay"})`}
+          className="mb-6 flex items-center justify-center gap-2.5 rounded-xl2 transition-opacity hover:opacity-80"
+        >
           {site?.siteLogoUrl ? <img src={site.siteLogoUrl} alt="logo" className="h-10 w-10 rounded-xl2 object-contain shadow-card" /> : <div className="flex h-10 w-10 items-center justify-center rounded-xl2 bg-brand text-lg font-bold text-white shadow-card">E</div>}
           <div><div className="text-lg font-bold">{site?.siteName ?? "Relay"}</div><div className="max-w-[260px] text-xs text-muted">{site?.siteDescription ?? "部署在 EdgeOne 边缘的 AI API 网关"}</div></div>
-        </div>
+        </Link>
         <Card className="p-6">
           <h1 className="text-base font-semibold">{mode === "login" ? "登录控制台" : "注册账号"}</h1>
           <p className="mt-1 text-xs text-muted">{mode === "login" ? "使用平台账号登录" : "注册即表示已阅读并同意服务条款与隐私政策"}</p>
