@@ -123,6 +123,13 @@ export default function ChatRoom({ me }: { me: Me }) {
   const displayEmail = (m: ChatMessage) => (m.role === "bot" ? m.nickname || botName : m.role === "system" ? "系统" : m.nickname || m.email);
   const isMine = (m: ChatMessage) => m.role === "user" && m.userId === me.user.id;
 
+  /** 机器人回复等待中：最后一条是 @ 机器人的用户消息，但 bot 回复尚未经轮询落库 */
+  const botTyping = !!msgs && msgs.length > 0 && (() => {
+    const last = msgs[msgs.length - 1];
+    if (last.role !== "user") return false;
+    return new RegExp(`@(relay助手|机器人|小r|bot|assistant|${botName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "i").test(last.content);
+  })();
+
   /** 房间参与者：出现过的用户去重（附机器人）；@ 提及候选来源 */
   const participants = useMemo(() => {
     const map = new Map<string, string>();
@@ -225,6 +232,27 @@ export default function ChatRoom({ me }: { me: Me }) {
               )
             )
           )}
+          {botTyping && (
+            <div className="flex gap-2">
+              <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-500">
+                <Bot size={14} />
+              </div>
+              <div className="max-w-[75%] space-y-0.5">
+                <div className="flex items-center gap-1.5 text-[10px] text-muted">
+                  <span className="font-medium text-ink">{botName}</span>
+                  <span className="rounded bg-emerald-500/10 px-1 text-[9px] text-emerald-500">机器人</span>
+                </div>
+                <div
+                  className="inline-flex items-center gap-1 rounded-xl2 px-3 py-3"
+                  style={{ borderRadius: "14px 14px 14px 4px" }}
+                >
+                  <span className="typing-dot" aria-hidden="true" />
+                  <span className="typing-dot" aria-hidden="true" />
+                  <span className="typing-dot" aria-hidden="true" />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="relative border-t border-line p-3">
@@ -275,7 +303,7 @@ export default function ChatRoom({ me }: { me: Me }) {
                 }
               }}
               rows={2}
-              placeholder={`输入消息，Enter 发送（${CHARS_LIMIT} 字以内）…`}
+              placeholder={botTyping ? "机器人正在回复…" : `输入消息，Enter 发送（${CHARS_LIMIT} 字以内）…`}
               className="max-h-32 min-h-[46px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink outline-none focus:border-brand/60"
             />
             <Button className="h-11" disabled={busy || !input.trim()} onClick={() => void send()}>

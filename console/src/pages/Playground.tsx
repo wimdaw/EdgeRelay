@@ -757,7 +757,15 @@ export default function Playground({ me }: { me: Me }) {
                       {m.mediaMime === "audio" && m.mediaUrl && (
                         <audio src={m.mediaUrl} controls className="w-72" />
                       )}
-                      {m.content && <span>{m.content || (busy ? "…" : "")}</span>}
+                      {m.content ? (
+                        <span>{m.content}</span>
+                      ) : busy && m.role === "assistant" && !m.error ? (
+                        <span className="inline-flex items-center gap-1 py-1">
+                          <span className="typing-dot" aria-hidden="true" />
+                          <span className="typing-dot" aria-hidden="true" />
+                          <span className="typing-dot" aria-hidden="true" />
+                        </span>
+                      ) : null}
                       {m.taskId && (
                         <span className="mt-1 flex items-center gap-2 text-[11px] text-muted">
                           任务 {m.taskId.slice(0, 14)}…
