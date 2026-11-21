@@ -203,9 +203,9 @@ export default function ChatRoom({ me }: { me: Me }) {
             <MessagesSquare size={18} />
           </div>
           <div>
-            <h1 className="text-base font-bold text-ink">聊天室</h1>
+            <h1 className="text-base font-bold text-ink">{translate("chatroom.title")}</h1>
             <p className="mt-0.5 text-xs text-muted">
-              全站用户畅聊区，所有人可见；消息保留 30 天自动清理。「Relay 助手」机器人在线答疑，需要人工处理的问题可通过它邮件转达管理员。
+              {translate("chatroom.desc", { bot: botName })}
             </p>
           </div>
         </div>
