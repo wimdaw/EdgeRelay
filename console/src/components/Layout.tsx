@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useLocaleSync, t as translate, LOCALE_OPTIONS, setLocale, type Locale } from "../lib/i18n";
+import { useLocaleSync, t as translate, LOCALE_OPTIONS, setLocale, applyLocaleDom, type Locale } from "../lib/i18n";
 import { Globe, Bell, Boxes, CalendarClock, CircleUser, DatabaseBackup, FlaskConical, MessagesSquare, Gauge, KeyRound, Layers, LogOut, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, Sun, Users, Wallet, X } from "lucide-react";
 import { api, type Me, type SiteInfo } from "../lib/api";
 import { getSeenAnnouncementIds, markAnnouncementsSeen } from "../lib/announcements";
@@ -238,7 +238,9 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
             onClick={() => {
               const order: Locale[] = ["zh-CN", "zh-TW", "en-US"];
               const idx = order.indexOf(locale);
-              setLocale(order[(idx + 1) % order.length] as Locale);
+              const next = order[(idx + 1) % order.length] as Locale;
+              setLocale(next);
+              applyLocaleDom(next);
             }}
             title={`${LOCALE_OPTIONS.map((o) => o.label).join(" / ")}（点击切换）`}
             aria-label="切换语言"
