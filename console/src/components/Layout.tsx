@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useLocaleSync, t as translate, LOCALE_OPTIONS, setLocale, applyLocaleDom, type Locale } from "../lib/i18n";
-import { Globe, Bell, Boxes, CalendarClock, CircleUser, DatabaseBackup, FlaskConical, MessagesSquare, Gauge, KeyRound, Layers, LogOut, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, Sun, Users, Wallet, X } from "lucide-react";
+import { useLocaleSync, t as translate } from "../lib/i18n";
+import { Bell, Boxes, CalendarClock, CircleUser, DatabaseBackup, FlaskConical, MessagesSquare, Gauge, KeyRound, Layers, LogOut, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, Sun, Users, Wallet, X } from "lucide-react";
 import { api, type Me, type SiteInfo } from "../lib/api";
 import { getSeenAnnouncementIds, markAnnouncementsSeen } from "../lib/announcements";
 import { cn, fmtMoney } from "../lib/utils";
 import { Button, useToast } from "./ui";
+import LocaleMenu from "./LocaleMenu";
 
 const ALL_ROLES = ["user", "vip", "admin", "superadmin", "finance", "auditor"];
 
@@ -66,8 +67,8 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
   const toast = useToast();
   useEffect(() => setDrawer(false), [loc.pathname]);
 
-  // 顶栏标题按最长路径匹配，避免 /dashboard 前缀把子页面全显示成"仪表盘"
-  const locale = useLocaleSync();
+  // 订阅语言变化：切换语言时触发重渲染，顶栏标题与导航文案随字典更新
+  useLocaleSync();
   const activeLabel = translate(
     NAV.filter((n) => n.roles.includes(me.user.role))
       .filter((n) => loc.pathname === n.to || loc.pathname.startsWith(`${n.to}/`))
@@ -213,9 +214,9 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* 顶部栏 */}
-        <header className="flex h-14 items-center gap-2.5 border-b border-line bg-surface px-4 lg:px-6">
-          <button className="rounded-lg p-1.5 text-muted hover:bg-surface2 lg:hidden" onClick={() => setDrawer(true)} aria-label="打开菜单"><Menu size={18} /></button>
+        {/* 顶部栏：移动端紧凑间距（gap/padding 缩小 + 标题可截断 + 角色徽章隐藏），避免语言切换等按钮加入后溢出错位 */}
+        <header className="flex h-14 items-center gap-1.5 border-b border-line bg-surface px-3 sm:gap-2.5 sm:px-4 lg:px-6">
+          <button className="rounded-lg p-1.5 text-muted hover:bg-surface2 sm:p-2 lg:hidden" onClick={() => setDrawer(true)} aria-label="打开菜单"><Menu size={18} /></button>
           <button
             type="button"
             onClick={toggleCollapsed}
@@ -225,36 +226,22 @@ export default function Layout({ me, site, onLogout }: { me: Me; site: SiteInfo 
           >
             {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
           </button>
-          <div className="text-sm font-medium">{activeLabel}</div>
+          <div className="min-w-0 truncate text-sm font-medium">{activeLabel}</div>
           <div className="flex-1" />
           <span className="hidden text-xs text-muted sm:block">
             {me.unlimited
               ? "∞ 无限额度（铸币方）"
               : `${fmtMoney(me.balance.available, me.balance.currency)}（冻结 ${me.balance.frozen.toFixed(4)}）`}
           </span>
-          <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-medium text-brand">{me.user.role}</span>
-          <button
-            className="inline-flex items-center gap-1 rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink"
-            onClick={() => {
-              const order: Locale[] = ["zh-CN", "zh-TW", "en-US"];
-              const idx = order.indexOf(locale);
-              const next = order[(idx + 1) % order.length] as Locale;
-              setLocale(next);
-              applyLocaleDom(next);
-            }}
-            title={`${LOCALE_OPTIONS.map((o) => o.label).join(" / ")}（点击切换）`}
-            aria-label="切换语言"
-          >
-            <Globe size={16} />
-            <span className="hidden md:inline text-[11px] font-medium">{locale}</span>
-          </button>
-          <button className="rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink" onClick={toggle} aria-label={theme === "dark" ? "切换浅色模式" : "切换深色模式"}>
+          <span className="hidden rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-medium text-brand sm:inline">{me.user.role}</span>
+          <LocaleMenu compact />
+          <button className="rounded-lg p-1.5 text-muted hover:bg-surface2 hover:text-ink sm:p-2" onClick={toggle} aria-label={theme === "dark" ? "切换浅色模式" : "切换深色模式"}>
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-          <button className="hidden rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink sm:block" onClick={followSystem} aria-label="跟随系统主题">
+          <button className="hidden rounded-lg p-1.5 text-muted hover:bg-surface2 hover:text-ink sm:block sm:p-2" onClick={followSystem} aria-label="跟随系统主题">
             <Monitor size={16} />
           </button>
-          <button className="relative rounded-lg p-2 text-muted hover:bg-surface2 hover:text-ink" onClick={toggleBell} aria-label="站内通知">
+          <button className="relative rounded-lg p-1.5 text-muted hover:bg-surface2 hover:text-ink sm:p-2" onClick={toggleBell} aria-label="站内通知">
             <Bell size={16} />
             {bellCount > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-err px-1 text-[10px] font-medium text-white">{bellCount}</span>}
           </button>

@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import type { Me, SiteInfo } from "../lib/api";
 import { cn } from "../lib/utils";
+import LocaleMenu from "../components/LocaleMenu";
 
 const PROVIDERS = ["OpenAI", "Anthropic", "Google", "DeepSeek", "OpenCode", "Duck.ai", "Meta", "Mistral"];
 const MODEL_FAMILIES = [
@@ -162,6 +163,7 @@ res = client.chat.completions.create(
             ))}
           </nav>
           <div className="ml-auto hidden items-center gap-2 md:flex">
+            <LocaleMenu />
             <ThemeToggle />
             {me ? (
               <Link to="/dashboard"><button className="rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover">进入控制台</button></Link>
@@ -180,6 +182,7 @@ res = client.chat.completions.create(
               <a key={label} href={href} onClick={(e) => { setMenu(false); handleNavClick(e, href); }} className="block rounded-lg px-3 py-2.5 text-sm text-ink hover:bg-surface2">{label}</a>
             ))}
             <div className="mt-2 flex items-center gap-2 border-t border-line pt-3">
+              <LocaleMenu />
               <ThemeToggle />
               {me ? (
                 <Link to="/dashboard" className="flex-1"><button className="w-full rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white">进入控制台</button></Link>

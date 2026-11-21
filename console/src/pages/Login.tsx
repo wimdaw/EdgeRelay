@@ -4,6 +4,7 @@ import { ArrowRight, Github, Mail } from "lucide-react";
 import { api, type SiteInfo } from "../lib/api";
 import { Button, Card, Dialog, Field, Input, useToast } from "../components/ui";
 import { t as translate } from "../lib/i18n";
+import LocaleMenu from "../components/LocaleMenu";
 
 export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogin: () => void }) {
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -79,7 +80,11 @@ export default function Login({ site, onLogin }: { site: SiteInfo | null; onLogi
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg p-6">
+    <div className="relative flex min-h-screen items-center justify-center bg-bg p-6">
+      {/* 语言切换：右上角悬浮，登录前也能切换全站语言 */}
+      <div className="absolute right-3 top-3 sm:right-5 sm:top-5">
+        <LocaleMenu />
+      </div>
       <div className="w-full max-w-[400px]">
         <Link
           to="/"
