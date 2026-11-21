@@ -1327,29 +1327,47 @@ export async function fetchTraeModels(
   if (!cred) return { models: fallback, message: "凭据格式无效，已回退内置目录" };
 
   try {
+    // 上游可能变更参数要求：依次探测 GET(原样) / GET+查询参数 / POST / account 域，取第一个成功形态
     const accessToken = await getAccessToken(env, cred);
     const headers = traeHeaders(ep, cred, accessToken, false);
-    const res = await fetch(`${ep.core}/api/ide/v1/model_list`, {
-      method: "GET",
-      headers,
-      signal: AbortSignal.timeout(30000),
-    });
-    const text = await res.text();
-    if (!res.ok) {
-      // 国际版固定 403（no schema found），这属于预期行为，不当成错误刷屏
-      // 带上上游响应体片段，便于定位 400/403 的具体原因
-      const snippet = text.slice(0, 180).replace(/\s+/g, " ");
-      return {
-        models: fallback,
-        message:
-          region === "global"
-            ? "国际版不开放 model_list（403），已使用内置目录；如需新模型请手动添加"
-            : `model_list 拉取失败 HTTP ${res.status}，已回退内置目录（${snippet}）`,
-      };
+    const diag: string[] = [];
+    const probeUrl = `${ep.core}/api/ide/v1/model_list`;
+    const query = `?ide_version=${encodeURIComponent(ep.ideVersion)}&version_code=${encodeURIComponent(ep.ideVersionCode)}&plugin_channel=${encodeURIComponent(PLUGIN_CHANNEL)}`;
+    const attempts: Array<{ label: string; url: string; method: "GET" | "POST"; body?: string }> = [
+      { label: "GET", url: probeUrl, method: "GET" },
+      { label: "GET+query", url: probeUrl + query, method: "GET" },
+      { label: "POST", url: probeUrl, method: "POST", body: JSON.stringify({ ide_version: ep.ideVersion, version_code: ep.ideVersionCode, plugin_channel: PLUGIN_CHANNEL }) },
+      { label: "GET@account", url: `${ep.account}/api/ide/v1/model_list`, method: "GET" },
+    ];
+    let text2 = "";
+    let lastStatus = 0;
+    let lastLabel = "";
+    for (const a of attempts) {
+      const res2 = await fetch(a.url, {
+        method: a.method,
+        headers,
+        ...(a.body ? { body: a.body } : {}),
+        signal: AbortSignal.timeout(30000),
+      });
+      text2 = await res2.text();
+      lastStatus = res2.status;
+      lastLabel = a.label;
+      diag.push(`${a.label}:${res2.status}`);
+      if (res2.ok) {
+        const models = parseTraeModelList(JSON.parse(text2));
+        if (models.length) return { models, message: `model_list OK（${a.label}，${models.length} 个）` };
+        diag.push(`${a.label}:200 但解析为空`);
+      }
     }
-    const models = parseTraeModelList(JSON.parse(text));
-    if (!models.length) return { models: fallback, message: "model_list 为空，已回退内置目录" };
-    return { models };
+    if (region === "global") {
+      return { models: fallback, message: "国际版不开放 model_list（403），已使用内置目录；如需新模型请手动添加" };
+    }
+    const uidState = cred.uid ? "有" : "无";
+    const snippet = text2.slice(0, 140).replace(/\s+/g, " ");
+    return {
+      models: fallback,
+      message: `model_list 拉取失败（探测 ${diag.join(" / ")}；uid=${uidState}；HTTP ${lastStatus} @${lastLabel}：${snippet}）`,
+    };
   } catch (err) {
     return { models: fallback, message: `model_list 拉取异常：${(err as Error).message}` };
   }
