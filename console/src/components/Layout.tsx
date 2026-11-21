@@ -15,10 +15,10 @@ const NAV = [
   { to: "/dashboard/accounts", label: "账号池", icon: Wallet, roles: ["superadmin"] },
   { to: "/dashboard/models", label: "模型与定价", icon: Layers, roles: ALL_ROLES },
   { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ALL_ROLES },
-  { to: "/dashboard/tasks", label: "定时任务", icon: CalendarClock, roles: ALL_ROLES },
   { to: "/dashboard/playground", label: "操练场", icon: FlaskConical, roles: ALL_ROLES },
   { to: "/dashboard/logs", label: "运行日志", icon: ScrollText, roles: ["superadmin", "admin", "auditor"] },
   { to: "/dashboard/profile", label: "个人主页", icon: CircleUser, roles: ALL_ROLES },
+  { to: "/dashboard/tasks", label: "定时任务", icon: CalendarClock, roles: ALL_ROLES },
   { to: "/dashboard/backup", label: "数据备份", icon: DatabaseBackup, roles: ["superadmin"] },
   { to: "/dashboard/settings", label: "网站设置", icon: SettingsIcon, roles: ["superadmin"] },
 ];

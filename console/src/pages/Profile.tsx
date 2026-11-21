@@ -4,6 +4,7 @@ import { api, type Me } from "../lib/api";
 import { Button, Card, Field, Input, useToast } from "../components/ui";
 
 export default function Profile({ me, onRefresh }: { me: Me; onRefresh: () => void }) {
+  const [tab, setTab] = useState<"profile" | "password">("profile");
   const [nickname, setNickname] = useState(me.nickname ?? "");
   const [bio, setBio] = useState(me.bio ?? "");
   const [avatarUrl, setAvatarUrl] = useState(me.avatarUrl ?? "");
@@ -62,8 +63,16 @@ export default function Profile({ me, onRefresh }: { me: Me; onRefresh: () => vo
   };
 
   return (
-    <div className="grid max-w-3xl gap-5">
-      {/* 资料卡 */}
+    <div className="flex flex-col gap-4">
+      {/* 选项卡栏（与网站设置同款形态） */}
+      <div className="flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit" role="tablist">
+        {([["profile", "个人资料"], ["password", "修改密码"]] as const).map(([k, l]) => (
+          <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
+            className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{l}</button>
+        ))}
+      </div>
+
+      {tab === "profile" && (
       <Card className="p-5">
         <h2 className="mb-1 text-sm font-semibold">个人资料</h2>
         <p className="mb-5 text-xs text-muted">昵称与介绍会展示在你的账号信息中。</p>
@@ -93,8 +102,9 @@ export default function Profile({ me, onRefresh }: { me: Me; onRefresh: () => vo
         </div>
         <div className="mt-4"><Button disabled={savingProfile} onClick={saveProfile}>{savingProfile ? "保存中…" : "保存资料"}</Button></div>
       </Card>
+      )}
 
-      {/* 密码卡 */}
+      {tab === "password" && (
       <Card className="p-5">
         <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold"><KeyRound size={15} />修改密码</h2>
         <p className="mb-5 text-xs text-muted">修改成功后其他设备将退出登录，当前会话保持。</p>
@@ -105,6 +115,7 @@ export default function Profile({ me, onRefresh }: { me: Me; onRefresh: () => vo
         </div>
         <div className="mt-4"><Button disabled={savingPw} onClick={changePw}>{savingPw ? "提交中…" : "修改密码"}</Button></div>
       </Card>
+      )}
     </div>
   );
 }

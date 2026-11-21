@@ -1,0 +1,11 @@
+{
+  "name": "edgeone-function-runtime",
+  "version": "1.0.0",
+  "description": "Runtime dependencies for EdgeOne function",
+  "main": "index.mjs",
+  "dependencies": {
+    "@edgeone/pages-blob": "^0.0.17",
+    "wreq-js": "^3.2.0",
+    "@wreq-js/binding-linux-x64-gnu": "^3.2.0"
+  }
+}
