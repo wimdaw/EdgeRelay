@@ -41,6 +41,8 @@ type PoolProvider = {
   status: "active" | "disabled";
   checkin?: { supported: boolean; enabled: boolean; label?: string; action?: string };
   accounts: PoolAccount[];
+  /** 快载模式只给数量，账号明细点「刷新」后返回 */
+  accountCount?: number;
 };
 
 const kindLabel = (kind: string) => (kind.startsWith("oauth:") ? "OAuth 授权" : kind.startsWith("web:") ? "Web 反代" : kind);
@@ -279,7 +281,7 @@ export default function AccountPool() {
     }
   };
 
-  const totalAccounts = (rows || []).reduce((n, p) => n + p.accounts.length, 0);
+  const totalAccounts = (rows || []).reduce((n, p) => n + (p.accountCount ?? p.accounts.length), 0);
   const visibleRows = (rows || []).filter((p) => tab === "all" || p.id === tab);
   const [checkinBusy, setCheckinBusy] = useState<string>("");
   const [refreshing, setRefreshing] = useState<string>("");
@@ -416,13 +418,19 @@ export default function AccountPool() {
                     <RefreshCw size={12} className={cn(refreshing === p.id && "animate-spin")} />
                     {refreshing === p.id ? "查询中…" : "刷新"}
                   </Button>
-                  <span className="inline-flex items-center gap-1 text-[11px] text-muted"><Users size={11} />{p.accounts.length} 个账号</span>
+                  <span className="inline-flex items-center gap-1 text-[11px] text-muted"><Users size={11} />{p.accountCount ?? p.accounts.length} 个账号</span>
                 </div>
               </div>
 
               <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-2 items-start">
                 {p.accounts.length === 0 ? (
-                  <p className="py-4 text-center text-xs text-muted">该渠道暂无账号凭据</p>
+                  (p.accountCount ?? 0) > 0 ? (
+                    <p className="py-4 text-center text-xs text-muted">
+                      共 {p.accountCount} 个账号（未加载详情）· 点「刷新」加载账号与额度
+                    </p>
+                  ) : (
+                    <p className="py-4 text-center text-xs text-muted">该渠道暂无账号凭据</p>
+                  )
                 ) : p.accounts.map((a) => (
                   <div key={a.id} className="rounded-lg border border-line/70 bg-surface2/30 p-2.5">
                     <div className="flex flex-wrap items-center gap-1.5">

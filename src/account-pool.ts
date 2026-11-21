@@ -55,6 +55,8 @@ export type AccountPoolProvider = {
   kind: string;
   status: "active" | "disabled";
   accounts: AccountPoolAccount[];
+  /** 快载模式（skipQuota）只给数量不给明细：进页总览用，点渠道「刷新」后才返回 accounts */
+  accountCount?: number;
   /** 该渠道是否支持自动签到，以及当前是否开启（未注册签到的渠道为 undefined） */
   checkin?: { supported: boolean; enabled: boolean; label?: string; action?: string };
 };
@@ -230,18 +232,21 @@ export async function buildAccountPool(
     }
     }
 
-    const accounts: AccountPoolAccount[] = keys.map((k, i) => {
-      const h = health[k.id] || health[k.keyFingerprint];
-      return {
-        id: k.id,
-        label: k.label,
-        fingerprint: k.keyFingerprint || "—",
-        status: k.status,
-        health: h?.demotedAt ? "demoted" : h?.failures ? "unhealthy" : "healthy",
-        failures: h?.failures || 0,
-        quota: quotas[i] ?? null,
-      };
-    });
+    // 快载模式：只报数量，账号明细与额度等点渠道「刷新」时一并返回
+    const accounts: AccountPoolAccount[] = opts.skipQuota
+      ? []
+      : keys.map((k, i) => {
+          const h = health[k.id] || health[k.keyFingerprint];
+          return {
+            id: k.id,
+            label: k.label,
+            fingerprint: k.keyFingerprint || "—",
+            status: k.status,
+            health: h?.demotedAt ? "demoted" : h?.failures ? "unhealthy" : "healthy",
+            failures: h?.failures || 0,
+            quota: quotas[i] ?? null,
+          };
+        });
 
     out.push({
       id: provider.id,
@@ -250,6 +255,7 @@ export async function buildAccountPool(
       kind: provider.kind,
       status: provider.status,
       accounts,
+      ...(opts.skipQuota ? { accountCount: keys.length } : {}),
       checkin: checkinState(info.scope === "oauth" ? info.type : ""),
     });
   }
