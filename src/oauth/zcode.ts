@@ -473,6 +473,9 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     messages: demoteSystem(inbound.messages, String(inbound.system || "")),
     thinking: ZCODE_DEFAULTS.thinking ?? { type: "enabled" },
     output_config: ZCODE_DEFAULTS.output_config ?? { effort: "low" },
+    // 工具定义必须进上游体：官方客户端就是 agent harness，tools 是一等公民。
+    // 丢了它模型只能纯文本回复，agent 客户端就会"说一句就断、不执行任何工具"。
+    ...(Array.isArray(inbound.tools) && inbound.tools.length ? { tools: inbound.tools } : {}),
     ...(inbound.temperature !== undefined ? { temperature: inbound.temperature } : {}),
     ...(inbound.top_p !== undefined ? { top_p: inbound.top_p } : {}),
     ...(inbound.stop_sequences ? { stop_sequences: inbound.stop_sequences } : {}),
