@@ -1431,6 +1431,86 @@ export async function fetchTraeModels(
   }
 }
 
+
+
+// =====================================================================
+// 每日签到领积分（api.trae.cn /trae/api/v2/ug/checkin_credits/*）
+// 契约对齐 TRAE2API：Cloud-IDE-JWT + x-device-id（token 派生稳定设备号）
+// =====================================================================
+
+/** 签到用的稳定设备号（token 哈希派生，同一账号不漂移） */
+function traeCheckinDeviceId(token: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < token.length; i++) {
+    h ^= token.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  const hex = (h >>> 0).toString(16).padStart(8, "0") + ((h ^ 0x9e3779b9) >>> 0).toString(16).padStart(8, "0") + ((h ^ 0x85ebca6b) >>> 0).toString(16).padStart(12, "0");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-8${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+}
+
+async function traeCheckinPost(path: string, token: string, deviceId?: string): Promise<any> {
+  const headers: Record<string, string> = {
+    Authorization: `Cloud-IDE-JWT ${token}`,
+    "Content-Type": "application/json",
+    "x-device-id": deviceId || traeCheckinDeviceId(token),
+  };
+  const res = await fetch(`https://api.trae.cn${path}`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({}),
+    signal: AbortSignal.timeout(30000),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Trae 签到接口 HTTP ${res.status}: ${text.slice(0, 120)}`);
+  return JSON.parse(text);
+}
+
+export type TraeCheckinResult = {
+  ok: boolean;
+  already?: boolean;
+  reward?: number;
+  message: string;
+};
+
+/** Trae 每日签到领积分：status 查询 → 未签则 claim（Cloud-IDE-JWT 鉴权，api.trae.cn） */
+export async function checkinTrae(env: Env, refreshToken: string): Promise<TraeCheckinResult> {
+  const cred = parseTraeCredential(refreshToken);
+  if (!cred) return { ok: false, message: "凭据格式无效" };
+  // 签到鉴权用 Cloud-IDE-JWT：与 x-ide-token 同源（cred.accessToken），缺失时换票
+  let token = cred.accessToken || "";
+  if (!token) {
+    try {
+      token = await getAccessToken(env, cred);
+    } catch (e) {
+      return { ok: false, message: `获取访问令牌失败：${(e as Error).message}` };
+    }
+  }
+  try {
+    const status = await traeCheckinPost("/trae/api/v2/ug/checkin_credits/status", token, cred.deviceId);
+    if (status?.enable === false) {
+      return { ok: false, message: "当前账号签到活动未开启（enable=false）" };
+    }
+    if (status?.checked_in === true) {
+      const credits = typeof status?.credits === "number" ? status.credits : undefined;
+      return { ok: true, already: true, reward: credits, message: credits != null ? `今日已签到（积分 ${credits}）` : "今日已签到" };
+    }
+    const claim = await traeCheckinPost("/trae/api/v2/ug/checkin_credits/claim", token, cred.deviceId);
+    const code = Number(claim?.code ?? 0);
+    // 上游业务码：9074 设备限流（勿立刻重试）、9095 当日已领（设备域）、0 成功
+    if (code === 0) {
+      const reward = typeof claim?.data?.credits === "number" ? claim.data.credits : undefined;
+      return { ok: true, reward, message: reward != null ? `签到成功，+${reward} 积分` : "签到成功" };
+    }
+    if (code === 9095) return { ok: true, already: true, message: "今日已签到（上游确认）" };
+    if (code === 9074) return { ok: false, message: "签到被上游限流（9074），请稍后再试" };
+    const msg = String(claim?.message || "").slice(0, 120);
+    return { ok: false, message: `签到未成功：${msg || "code " + code}` };
+  } catch (err) {
+    return { ok: false, message: (err as Error).message || "签到异常" };
+  }
+}
+
 export async function testTrae(
   env: Env,
   refreshToken: string,

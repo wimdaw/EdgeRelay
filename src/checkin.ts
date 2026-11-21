@@ -69,7 +69,12 @@ function cstHour(): number {
 }
 
 /** 签到最早触发时间（北京时间）：早于该时刻的心跳不签到，避免零点刚过就撞上游刷新窗口 */
-const CHECKIN_START_HOUR = 9;
+const CHECKIN_START_HOUR = 0;
+/** 触发窗口：北京时间 00:30 后（避开上游 0 点刷新窗口） */
+const CHECKIN_START_MINUTE = 30;
+function cstMinute(): number {
+  return new Date(Date.now() + 8 * 3600_000).getUTCMinutes();
+}
 
 // =====================================================================
 // 渠道注册表
@@ -135,10 +140,28 @@ async function runQoderProvider(env: Env, provider: ProviderRecord): Promise<Che
   });
 }
 
+/** Trae（字节跳动）：每日签到领积分 */
+async function runTraeProvider(env: Env, provider: ProviderRecord): Promise<CheckinAccountResult[]> {
+  const keys = (await getProviderKeysAll(env, provider.id)).filter((k) => k.status === "active");
+  if (!keys.length) return [];
+  const { checkinTrae } = await import("./oauth/trae");
+  return mapLimit(keys, 2, async (k): Promise<CheckinAccountResult> => {
+    const base = { keyId: k.id, email: k.email, fingerprint: k.keyFingerprint || k.id.slice(0, 8) };
+    try {
+      const token = await decryptSecret(env, k.encryptedKey);
+      const r = await checkinTrae(env, token);
+      return { ...base, ok: r.ok, already: r.already, reward: r.reward, message: r.message };
+    } catch (err) {
+      return { ...base, ok: false, message: (err as Error).message || "签到异常" };
+    }
+  });
+}
+
 const CHANNELS: Record<string, ChannelRunner> = {
   codebuddy: { label: "CodeBuddy / WorkBuddy", action: "签到", oauthType: "codebuddy", run: runCodebuddyProvider },
   zcode: { label: "ZCode (智谱)", action: "领额度", oauthType: "zcode", run: runZcodeProvider },
   qoder: { label: "Qoder", action: "签到", oauthType: "qoder", run: runQoderProvider },
+  trae: { label: "Trae (字节跳动)", action: "签到", oauthType: "trae", run: runTraeProvider },
 };
 
 /** 支持签到的渠道清单（供控制台渲染开关） */
@@ -261,7 +284,9 @@ export async function maybeRunDailyCheckin(env: Env): Promise<{
   success?: number;
   channels?: number;
 }> {
-  if (cstHour() < CHECKIN_START_HOUR) return { ran: false, skipped: "未到签到时间（北京时间 09:00 后）" };
+  if (cstHour() < CHECKIN_START_HOUR || (cstHour() === 0 && cstMinute() < CHECKIN_START_MINUTE)) {
+    return { ran: false, skipped: "未到签到时间（北京时间 00:30 后）" };
+  }
   const r = await runCheckins(env);
   return { ran: r.ran, skipped: r.skipped, total: r.total, success: r.success, channels: r.channels.length };
 }

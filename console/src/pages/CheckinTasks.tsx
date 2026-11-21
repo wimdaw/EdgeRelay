@@ -93,7 +93,7 @@ export default function CheckinTasks() {
             <div>
               <h2 className="text-base font-bold text-ink">签到任务</h2>
               <p className="mt-0.5 text-xs text-muted">
-                每日 09:00 后全站首次访问时自动执行一次（当日去重）；也可在此手动立即执行。开关按渠道类型全局生效。
+                每日 00:30 后全站首次访问时自动执行一次（当日去重）；也可在此手动立即执行。开关按渠道类型全局生效。
               </p>
             </div>
           </div>
