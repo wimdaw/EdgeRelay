@@ -11,5 +11,13 @@ export default defineConfig({
     // EdgeOne 构建容器 fd 上限较低，降低 Rollup 并发读文件数，避免 EMFILE: too many open files
     rollupOptions: { maxParallelFileOps: 4, output: { manualChunks: { vendor: ["react", "react-dom", "react-router-dom"], charts: ["recharts"] } } },
   },
-  server: { proxy: { "/api": "http://localhost:8787", "/v1": "http://localhost:8787" } },
+  server: {
+    proxy: {
+      // 本地开发：前端 HMR + API 代理。默认代理到线上生产（登录会话经代理透传，
+      // 同源无跨域问题）；可用 EO_LOCAL_API=http://localhost:8787 指向本地函数运行时。
+      // 注意：这是真实生产数据，破坏性操作（删除渠道/账号）会直接生效。
+      "/api": { target: process.env.EO_LOCAL_API || "https://relay.own.cloudns.nz", changeOrigin: true },
+      "/v1": { target: process.env.EO_LOCAL_API || "https://relay.own.cloudns.nz", changeOrigin: true },
+    },
+  },
 });
