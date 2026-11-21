@@ -2046,7 +2046,6 @@ const enPhrases: Record<string, string> = {
   "无": "None",
   "为": "For",
   "旧": "Old",
-  "中": "Medium",
   "走": "Walk",
   "张": "Zhang",
   "后": "After",

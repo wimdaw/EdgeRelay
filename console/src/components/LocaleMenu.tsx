@@ -57,6 +57,9 @@ export default function LocaleMenu({ compact = false }: { compact?: boolean }) {
       {open && (
         <div
           role="menu"
+          /* 语言名永远显示原生写法（简体中文/繁體中文/English），打上免疫标记避免 zh-TW/en-US DOM 转换层改写 */
+          data-s2t-done="1"
+          data-i18n-done="1"
           className="absolute right-0 top-full z-50 mt-1.5 w-36 overflow-hidden rounded-xl2 border border-line bg-surface py-1 shadow-pop"
         >
           {LOCALE_OPTIONS.map((o) => (

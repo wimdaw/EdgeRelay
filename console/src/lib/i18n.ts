@@ -131,22 +131,35 @@ function startS2TDom() {
   observer.observe(document.body, { childList: true, subtree: true, characterData: true });
 }
 
-/** en-US 短语替换（按长度降序最长匹配，单遍扫描文本节点） */
+/** en-US 短语替换：多字键按长度降序最长匹配；单字键仅整节点精确匹配（保留首尾空白），
+ *  避免单字替换污染复合词（如「中文」被拆成「Medium文」） */
 let enPhraseRes: RegExp | null = null;
 let enPhraseMap: Record<string, string> | null = null;
 
 function enPhraseRe(): RegExp | null {
   if (!enPhraseMap) return null;
   if (enPhraseRes) return enPhraseRes;
-  const keys = Object.keys(enPhraseMap).sort((a, b) => b.length - a.length).map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const keys = Object.keys(enPhraseMap)
+    .filter((k) => [...k].length > 1)
+    .sort((a, b) => b.length - a.length)
+    .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   enPhraseRes = keys.length ? new RegExp(keys.join("|"), "g") : null;
   return enPhraseRes;
 }
 
 function enPhraseReplace(text: string): string {
   const re = enPhraseRe();
-  if (!re) return text;
-  return text.replace(re, (m) => enPhraseMap![m] || m);
+  let out = re ? text.replace(re, (m) => enPhraseMap![m] || m) : text;
+  // 单字键：仅当整个文本节点就是这一个字（如分隔符「与」「或」）时替换，保留首尾空白
+  const trimmed = out.trim();
+  if (enPhraseMap && [...trimmed].length === 1) {
+    const single = enPhraseMap[trimmed];
+    if (single) {
+      const m = out.match(/^(\s*)([\s\S]+?)(\s*)$/);
+      if (m) out = `${m[1]}${single}${m[3]}`;
+    }
+  }
+  return out;
 }
 
 function translateElementEn(root: Element) {
