@@ -1336,6 +1336,9 @@ export async function fetchTraeModels(
   const fallback = defaultModelsFor(region);
   if (!cred) return { models: fallback, message: "凭据格式无效，已回退内置目录" };
 
+  const diag: string[] = [];
+  let webStatus = 0;
+  let webSnippet = "";
   try {
     // 首选：Web/Remote 平面的 /models（对齐 TRAE2API 的 web 客户端契约——
     // IDE 的 model_list 已失效 4001）。token 与 IDE 链路同为 Cloud-IDE-JWT。
@@ -1383,7 +1386,6 @@ export async function fetchTraeModels(
     // 上游可能变更参数要求：依次探测 GET(原样) / GET+查询参数 / POST / account 域，取第一个成功形态
     const accessToken = await getAccessToken(env, cred);
     const headers = traeHeaders(ep, cred, accessToken, false);
-    const diag: string[] = [];
     const probeUrl = `${ep.core}/api/ide/v1/model_list`;
     const query = `?ide_version=${encodeURIComponent(ep.ideVersion)}&version_code=${encodeURIComponent(ep.ideVersionCode)}&plugin_channel=${encodeURIComponent(PLUGIN_CHANNEL)}`;
     const attempts: Array<{ label: string; url: string; method: "GET" | "POST"; body?: string }> = [
@@ -1392,8 +1394,6 @@ export async function fetchTraeModels(
       { label: "POST", url: probeUrl, method: "POST", body: JSON.stringify({ ide_version: ep.ideVersion, version_code: ep.ideVersionCode, plugin_channel: PLUGIN_CHANNEL }) },
       { label: "GET@account", url: `${ep.account}/api/ide/v1/model_list`, method: "GET" },
     ];
-    let webStatus = 0;
-    let webSnippet = "";
     let text2 = "";
     let lastStatus = 0;
     let lastLabel = "";
