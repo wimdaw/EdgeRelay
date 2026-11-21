@@ -76,3 +76,25 @@ body { @apply bg-bg text-ink antialiased; }
     opacity: 0.6;
   }
 }
+
+
+/* 打字机显现光标（移植自 edgechat message-stream-caret）：常驻占位避免气泡高度抖动 */
+.msg-stream-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 1px;
+  background: currentColor;
+  vertical-align: text-bottom;
+  animation: msg-caret-blink 1100ms steps(1, end) infinite;
+}
+
+.msg-stream-caret--idle {
+  visibility: hidden;
+  animation: none;
+}
+
+@keyframes msg-caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}

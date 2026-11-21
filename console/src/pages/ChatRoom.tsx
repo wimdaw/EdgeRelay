@@ -31,6 +31,11 @@ export default function ChatRoom({ me }: { me: Me }) {
   const lastTapRef = useRef<{ time: number } | null>(null);
   const patBusyRef = useRef(false);
   const [mentionIdx, setMentionIdx] = useState(0);
+  /** 打字机显现：revealed[id] = 已显示字符数；仅对「新到达」的 bot 消息生效（历史消息直接完整显示） */
+  const revealedRef = useRef<Record<string, number>>({});
+  const twTimersRef = useRef<Map<string, number>>(new Map());
+  const seenBotIdsRef = useRef<Set<string>>(new Set());
+  const [, setTwTick] = useState(0);
   /** @ 提及候选：输入 @ 后弹出房间内所有用户 */
   const [mention, setMention] = useState<{ query: string } | null>(null);
   /** 机器人名字：后台「网站设置 → 站点信息 → 聊天室机器人名字」可配 */
@@ -38,10 +43,43 @@ export default function ChatRoom({ me }: { me: Me }) {
   const listRef = useRef<HTMLDivElement | null>(null);
   const toast = useToast();
 
+  /** 消息入状态的统一入口：新到达的 bot 消息启动打字机显现，历史消息直接完整 */
+  const applyMsgs = (list: ChatMessage[], isInitial = false) => {
+    for (const m of list) {
+      if (m.role !== "bot") continue;
+      if (seenBotIdsRef.current.has(m.id)) continue;
+      seenBotIdsRef.current.add(m.id);
+      if (isInitial) {
+        revealedRef.current[m.id] = m.content.length;
+      } else {
+        // 打字机：1800ms 内匀速显现完整个内容
+        const total = m.content.length;
+        revealedRef.current[m.id] = 0;
+        if (total > 0) {
+          const perTick = Math.max(1, Math.ceil(total / 60)); // 1800ms / 30ms ≈ 60 帧
+          const timer = window.setInterval(() => {
+            const next = (revealedRef.current[m.id] || 0) + perTick;
+            if (next >= total) {
+              window.clearInterval(timer);
+              twTimersRef.current.delete(m.id);
+              revealedRef.current[m.id] = total;
+            } else {
+              revealedRef.current[m.id] = next;
+            }
+            setTwTick((t) => t + 1);
+          }, 30);
+          twTimersRef.current.set(m.id, timer);
+        }
+      }
+    }
+    setMsgs(list);
+    setTwTick((t) => t + 1);
+  };
+
   const poll = async () => {
     try {
       const r = await api<{ messages: ChatMessage[]; botName?: string }>("/api/chatroom/messages");
-      setMsgs(r.messages || []);
+      applyMsgs(r.messages || []);
       if (r.botName) setBotName(r.botName);
     } catch {
       // 轮询失败静默，下个周期重试
@@ -56,6 +94,8 @@ export default function ChatRoom({ me }: { me: Me }) {
     return () => {
       window.clearInterval(tick);
       document.removeEventListener("visibilitychange", onVisible);
+      for (const timer of twTimersRef.current.values()) window.clearInterval(timer);
+      twTimersRef.current.clear();
     };
   }, []);
 
@@ -70,7 +110,7 @@ export default function ChatRoom({ me }: { me: Me }) {
     setMenu(null);
     try {
       const r = await api<{ messages: ChatMessage[]; botName?: string }>("/api/chatroom/pat", "POST", {});
-      setMsgs(r.messages || []);
+      applyMsgs(r.messages || []);
       if (r.botName) setBotName(r.botName);
     } catch (e) {
       toast((e as Error).message, "err");
@@ -111,7 +151,7 @@ export default function ChatRoom({ me }: { me: Me }) {
     try {
       // 发送响应即含最新消息（含机器人回复），随后轮询兜底
       const r = await api<{ messages: ChatMessage[]; botName?: string }>("/api/chatroom/messages", "POST", { content: text });
-      setMsgs(r.messages || []);
+      applyMsgs(r.messages || []);
       if (r.botName) setBotName(r.botName);
     } catch (e) {
       toast((e as Error).message, "err");
@@ -225,7 +265,20 @@ export default function ChatRoom({ me }: { me: Me }) {
                         isMine(m) ? "bg-brand text-white" : m.role === "bot" ? "bg-emerald-500/10 text-ink" : "bg-surface2 text-ink"
                       )}
                     >
-                      {m.content}
+                      {(() => {
+                        const rv = revealedRef.current[m.id];
+                        const streaming = m.role === "bot" && rv !== undefined && rv < m.content.length;
+                        const shown = streaming ? m.content.slice(0, rv) : m.content;
+                        return (
+                          <>
+                            {shown}
+                            <span
+                              className={cn("msg-stream-caret", m.role === "bot" && !streaming && "msg-stream-caret--idle")}
+                              aria-hidden="true"
+                            />
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>

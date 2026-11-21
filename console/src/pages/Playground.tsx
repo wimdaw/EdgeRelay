@@ -758,7 +758,15 @@ export default function Playground({ me }: { me: Me }) {
                         <audio src={m.mediaUrl} controls className="w-72" />
                       )}
                       {m.content ? (
-                        <span>{m.content}</span>
+                        <span>
+                          {m.content}
+                          {m.role === "assistant" && (
+                            <span
+                              className={cn("msg-stream-caret", !(busy && !m.error) && "msg-stream-caret--idle")}
+                              aria-hidden="true"
+                            />
+                          )}
+                        </span>
                       ) : busy && m.role === "assistant" && !m.error ? (
                         <span className="inline-flex items-center gap-1 py-1">
                           <span className="typing-dot" aria-hidden="true" />
