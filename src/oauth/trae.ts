@@ -1367,7 +1367,8 @@ export async function fetchTraeModels(
       const webText = await webRes.text().catch(() => "");
       webSnippet = webText.slice(0, 120).replace(/\s+/g, " ");
       if (webRes.ok) {
-        const j: any = await webRes.json().catch(() => null);
+        // 注意：body 已被 text() 消费，从这里解析而不是再次调用 json()
+        const j: any = JSON.parse(webText);
         const out: string[] = [];
         // 实测形态：{code:0, data:{list:[{function, models:[{name, ...}]}]}}
         const lists: any[] = (j?.data?.list ?? j?.data?.groups ?? j?.list ?? []) as any[];
