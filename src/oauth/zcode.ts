@@ -501,8 +501,13 @@ export function anthropicSseToOpenAIStream(body: ReadableStream<Uint8Array>, req
               if (evName === "content_block_delta") {
                 const idx = Number(ev?.index) || 0;
                 const d = ev?.delta || {};
-                if (d?.type === "thinking_delta" && typeof d.thinking === "string" && d.thinking) {
-                  chunk({ reasoning_content: d.thinking });
+                // 思考增量两种命名都认：Anthropic 原生 thinking_delta.thinking，
+                // Z.ai/GLM 变体 reasoning_delta.reasoning/content
+                const think = d?.type === "thinking_delta" ? d.thinking
+                  : d?.type === "reasoning_delta" ? (d.reasoning ?? d.content)
+                  : undefined;
+                if (typeof think === "string" && think) {
+                  chunk({ reasoning_content: think });
                 } else if (d?.type === "text_delta" && typeof d.text === "string" && d.text) {
                   chunk({ content: d.text });
                 } else if (d?.type === "input_json_delta" && typeof d.partial_json === "string" && d.partial_json) {
@@ -629,7 +634,10 @@ export async function handleZcodeRequest(p: ZcodeCallParams): Promise<Response> 
     system: ZCODE_SYSTEM,
     messages: demoteSystem(inbound.messages, String(inbound.system || "")),
     thinking: ZCODE_DEFAULTS.thinking ?? { type: "enabled" },
-    output_config: ZCODE_DEFAULTS.output_config ?? { effort: "low" },
+    // effort=high：官方抓包样本是 low（非 agent 场景），低档会把思考压没、
+    // agent 任务也敷衍（说一句就收尾）。这里对齐 agent 场景用高档，
+    // 上游指纹只校验 system，output_config 不在指纹内。
+    output_config: { effort: "high" },
     // 工具定义必须进上游体：官方客户端就是 agent harness，tools 是一等公民。
     // 丢了它模型只能纯文本回复，agent 客户端就会"说一句就断、不执行任何工具"。
     ...(Array.isArray(inbound.tools) && inbound.tools.length ? { tools: inbound.tools } : {}),
