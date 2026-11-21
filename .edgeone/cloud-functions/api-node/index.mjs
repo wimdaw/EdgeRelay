@@ -6054,7 +6054,7 @@ try {
 } catch (error) {
   console.error("Uncaught Exception:", error);
 }
-var port = 9005;
+var port = 9006;
 var EdgeoneBodyParser = class {
   /**
    * Parse request body according to Content-Type, strictly following Edgeone rules
@@ -6572,7 +6572,7 @@ var server = http.createServer(async (req, res) => {
         const params = {};
         params["default"] = cleanPath.split("/");
         context.params = params;
-        const mod_16 = (() => {
+        const mod_18 = (() => {
           var __defProp = Object.defineProperty;
           var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
           var __publicField = (obj, key, value) => {
@@ -6738,7 +6738,7 @@ var server = http.createServer(async (req, res) => {
           var zm;
           var qm;
           var Ww;
-          var Yn = H(() => {
+          var Jn = H(() => {
             xl = (e) => {
               let t = e.split("/");
               return t[0] === "" && t.shift(), t;
@@ -6858,7 +6858,7 @@ var server = http.createServer(async (req, res) => {
             Cm();
             Om();
             Lm();
-            Yn();
+            Jn();
             Km = (_a2 = class {
               constructor(e, t = "/", n = [[]]) {
                 __privateAdd(this, _n2);
@@ -7126,7 +7126,7 @@ var server = http.createServer(async (req, res) => {
             }, _a2);
           });
           var Tl;
-          var Ym = H(() => {
+          var Jm = H(() => {
             Tl = (e, t, n) => (r, a) => {
               let s = -1;
               return i(0);
@@ -7150,28 +7150,28 @@ var server = http.createServer(async (req, res) => {
               }
             };
           });
-          var Jm;
+          var Ym;
           var Si;
           var Ai;
-          var Jn = H(() => {
-            Jm = ["get", "post", "put", "delete", "options", "patch", "query"], Si = "Can not add a route since the matcher is already built.", Ai = class extends Error {
+          var Yn = H(() => {
+            Ym = ["get", "post", "put", "delete", "options", "patch", "query"], Si = "Can not add a route since the matcher is already built.", Ai = class extends Error {
             };
           });
-          var Xm;
-          var Qm = H(() => {
-            Xm = "__COMPOSED_HANDLER";
+          var Qm;
+          var Xm = H(() => {
+            Qm = "__COMPOSED_HANDLER";
           });
-          var Yw;
+          var Jw;
           var Zm;
           var eh;
           var nh = H(() => {
             var _t2, _e, e_fn, _n2, _s2, s_fn, _r2, r_fn, _a, a_fn, _a2;
-            Ym();
-            Yn();
-            El();
+            Jm();
             Jn();
-            Qm();
-            Yw = (e) => e.text("404 Not Found", 404), Zm = (e, t) => {
+            El();
+            Yn();
+            Xm();
+            Jw = (e) => e.text("404 Not Found", 404), Zm = (e, t) => {
               if ("getResponse" in e) {
                 let n = e.getResponse();
                 return t.newResponse(n.body, n);
@@ -7198,7 +7198,7 @@ var server = http.createServer(async (req, res) => {
                 __publicField(this, "_basePath", "/");
                 __privateAdd(this, _t2, "/");
                 __publicField(this, "routes", []);
-                __privateAdd(this, _n2, Yw);
+                __privateAdd(this, _n2, Jw);
                 __publicField(this, "errorHandler", Zm);
                 __publicField(this, "onError", (t3) => (this.errorHandler = t3, this));
                 __publicField(this, "notFound", (t3) => (__privateSet(this, _n2, t3), this));
@@ -7209,7 +7209,7 @@ var server = http.createServer(async (req, res) => {
                     t3.respondWith(__privateMethod(this, _a, a_fn).call(this, t3.request, t3, void 0, t3.request.method));
                   });
                 });
-                [...Jm, "all"].forEach((a) => {
+                [...Ym, "all"].forEach((a) => {
                   this[a] = (s, ...i) => {
                     let o = a.toUpperCase();
                     return typeof s == "string" ? __privateSet(this, _t2, s) : __privateMethod(this, _s2, s_fn).call(this, o, __privateGet(this, _t2), s), i.forEach((c) => {
@@ -7240,7 +7240,7 @@ var server = http.createServer(async (req, res) => {
                 return n.routes.map((a) => {
                   var _a3;
                   let s;
-                  n.errorHandler === Zm ? s = a.handler : (s = async (i, o) => (await Tl([], n.errorHandler)(i, () => a.handler(i, o))).res, s[Xm] = a.handler), __privateMethod(_a3 = r, _s2, s_fn).call(_a3, a.method, a.path, s, a.basePath);
+                  n.errorHandler === Zm ? s = a.handler : (s = async (i, o) => (await Tl([], n.errorHandler)(i, () => a.handler(i, o))).res, s[Qm] = a.handler), __privateMethod(_a3 = r, _s2, s_fn).call(_a3, a.method, a.path, s, a.basePath);
                 }), this;
               }
               basePath(t) {
@@ -7350,10 +7350,10 @@ var server = http.createServer(async (req, res) => {
           }
           var Ci;
           var Al = H(() => {
-            Jn();
+            Yn();
             Ci = [];
           });
-          function Jw(e, t) {
+          function Yw(e, t) {
             return e.length === 1 ? t.length === 1 ? e < t ? -1 : 1 : -1 : t.length === 1 ? 1 : e === ".*" || e === "(?:|/.*)" ? t === "(?:|/.*)" ? -1 : 1 : t === ".*" || t === "(?:|/.*)" ? -1 : e === "[^/]+" ? 1 : t === "[^/]+" ? -1 : e.length === t.length ? e < t ? -1 : 1 : t.length - e.length;
           }
           var Nl;
@@ -7401,7 +7401,7 @@ var server = http.createServer(async (req, res) => {
                 __privateSet(i, _t2, s ? -1 : n);
               }
               buildRegExpStr() {
-                let t = Object.keys(__privateGet(this, _n2)).sort(Jw).map((n) => {
+                let t = Object.keys(__privateGet(this, _n2)).sort(Yw).map((n) => {
                   let r = __privateGet(this, _n2)[n], a = r.buildRegExpStr();
                   return a === "" ? "" : (typeof __privateGet(r, _e) == "number" ? `(${n})@${__privateGet(r, _e)}` : rh.has(n) ? `\\${n}` : n) + a;
                 }).filter(Boolean);
@@ -7469,8 +7469,8 @@ var server = http.createServer(async (req, res) => {
           var Oi;
           var Ii = H(() => {
             var _t2, _e, _n2, _s2, s_fn, _r2, r_fn, _a;
-            Yn();
             Jn();
+            Yn();
             Na();
             Al();
             Il();
@@ -7549,7 +7549,7 @@ var server = http.createServer(async (req, res) => {
             }, _a);
           });
           var ch = H(() => {
-            Jn();
+            Yn();
             Al();
             Ii();
           });
@@ -7560,7 +7560,7 @@ var server = http.createServer(async (req, res) => {
           var uh;
           var dh = H(() => {
             var _t2, _e, _a;
-            Jn();
+            Yn();
             uh = (_a = class {
               constructor(e) {
                 __publicField(this, "name", "SmartRouter");
@@ -7603,14 +7603,14 @@ var server = http.createServer(async (req, res) => {
             }, _t2 = /* @__PURE__ */ new WeakMap(), _e = /* @__PURE__ */ new WeakMap(), _a);
           });
           var Pl;
-          var Xw;
+          var Qw;
           var fh;
           var mh = H(() => {
             var _t2, _e, _n2, _s2, _r2, _a, a_fn, _a2;
-            Yn();
             Jn();
+            Yn();
             Na();
-            Pl = ft(), Xw = 0, fh = (_a2 = class {
+            Pl = ft(), Qw = 0, fh = (_a2 = class {
               constructor() {
                 __privateAdd(this, _a);
                 __privateAdd(this, _t2, []);
@@ -7630,7 +7630,7 @@ var server = http.createServer(async (req, res) => {
                   [t]: {
                     handler: r,
                     possibleKeys: [...i],
-                    score: ++Xw
+                    score: ++Qw
                   }
                 });
               }
@@ -7701,7 +7701,7 @@ var server = http.createServer(async (req, res) => {
           var Rl;
           var Ml = H(() => {
             var _t2, _a;
-            Yn();
+            Jn();
             mh();
             Rl = (_a = class {
               constructor() {
@@ -7826,9 +7826,9 @@ var server = http.createServer(async (req, res) => {
             });
           }
           function yt(e) {
-            return crypto.subtle.digest("SHA-256", _n.encode(e)).then((t) => Qn(t));
+            return crypto.subtle.digest("SHA-256", _n.encode(e)).then((t) => Xn(t));
           }
-          function Qn(e) {
+          function Xn(e) {
             return [...new Uint8Array(e)].map((t) => t.toString(16).padStart(2, "0")).join("");
           }
           async function Zw(e) {
@@ -7839,7 +7839,7 @@ var server = http.createServer(async (req, res) => {
           }
           async function Pi(e, t) {
             let n = await Zw(e);
-            return Qn(await crypto.subtle.sign("HMAC", n, _n.encode(t)));
+            return Xn(await crypto.subtle.sign("HMAC", n, _n.encode(t)));
           }
           async function Ri(e, t) {
             if (e.length !== t.length)
@@ -7851,14 +7851,14 @@ var server = http.createServer(async (req, res) => {
           }
           async function jr(e) {
             let t = crypto.getRandomValues(new Uint8Array(16)), n = 1e5, r = await bh(e, t, n);
-            return `pbkdf2$${n}$${Qn(t.buffer)}$${Qn(r)}`;
+            return `pbkdf2$${n}$${Xn(t.buffer)}$${Xn(r)}`;
           }
           async function En(e, t) {
             let [n, r, a, s] = t.split("$");
             if (n !== "pbkdf2" || !r || !a || !s)
               return false;
             let i = Ll(a), o = await bh(e, i, parseInt(r, 10));
-            return Ri(Qn(o), s);
+            return Ri(Xn(o), s);
           }
           async function bh(e, t, n) {
             let r = await crypto.subtle.importKey("raw", _n.encode(e), "PBKDF2", false, ["deriveBits"]);
@@ -7877,14 +7877,14 @@ var server = http.createServer(async (req, res) => {
           }
           async function xh(e) {
             let t = String(e.ENCRYPTION_KEY || "edgerelay-default-encryption-secret-32b");
-            if (Xn && Xn.secret === t)
-              return Xn.key;
+            if (Qn && Qn.secret === t)
+              return Qn.key;
             let n = crypto.subtle.digest("SHA-256", _n.encode(t)).then((r) => crypto.subtle.importKey("raw", r, {
               name: "AES-GCM"
             }, false, ["encrypt", "decrypt"])).catch((r) => {
-              throw Xn && Xn.secret === t && (Xn = null), r;
+              throw Qn && Qn.secret === t && (Qn = null), r;
             });
-            return Xn = {
+            return Qn = {
               secret: t,
               key: n
             }, n;
@@ -7894,7 +7894,7 @@ var server = http.createServer(async (req, res) => {
               name: "AES-GCM",
               iv: n
             }, r, _n.encode(t));
-            return `v1:${Qn(n.buffer)}:${Qn(a)}`;
+            return `v1:${Xn(n.buffer)}:${Xn(a)}`;
           }
           async function ge(e, t) {
             let n = ji.get(t);
@@ -7906,7 +7906,7 @@ var server = http.createServer(async (req, res) => {
             let i = await xh(e), o = await crypto.subtle.decrypt({
               name: "AES-GCM",
               iv: Ll(a)
-            }, i, Ll(s)), c = Qw.decode(o);
+            }, i, Ll(s)), c = Xw.decode(o);
             return ji.size >= ek && ji.clear(), ji.set(t, c), c;
           }
           function Mi() {
@@ -7924,14 +7924,14 @@ var server = http.createServer(async (req, res) => {
             return btoa(t).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
           }
           var _n;
-          var Qw;
-          var Xn;
+          var Xw;
+          var Qn;
           var ji;
           var ek;
-          var Xe = H(() => {
+          var Qe = H(() => {
             "use strict";
-            _n = new TextEncoder(), Qw = new TextDecoder();
-            Xn = null;
+            _n = new TextEncoder(), Xw = new TextDecoder();
+            Qn = null;
             ji = /* @__PURE__ */ new Map(), ek = 4096;
           });
           function Ul() {
@@ -8040,7 +8040,7 @@ var server = http.createServer(async (req, res) => {
             };
           }
           var an;
-          var Je = H(() => {
+          var Ye = H(() => {
             "use strict";
             an = null;
           });
@@ -8177,7 +8177,7 @@ var server = http.createServer(async (req, res) => {
             commitApiKeyUsage: () => ar,
             createApiKey: () => Wi,
             createSession: () => Dr,
-            createUser: () => Jl,
+            createUser: () => Yl,
             deleteAuditLog: () => uu,
             deleteModel: () => Vl,
             deletePricing: () => qi,
@@ -8192,10 +8192,10 @@ var server = http.createServer(async (req, res) => {
             getApiKeyByHash: () => Gt,
             getApiKeyById: () => Ha,
             getAppeals: () => Ka,
-            getAuditLogs: () => Ji,
+            getAuditLogs: () => Yi,
             getBlobStore: () => K,
             getContentFlags: () => hu,
-            getDailyUsage: () => Yi,
+            getDailyUsage: () => Ji,
             getLedgerEntries: () => su,
             getModels: () => Rt,
             getOrCreateBalance: () => Dt,
@@ -8212,7 +8212,7 @@ var server = http.createServer(async (req, res) => {
             getUserByEmail: () => Sn,
             getUserById: () => $e,
             getUserUsageRecords: () => qa,
-            hasAnyUser: () => Yl,
+            hasAnyUser: () => Jl,
             invalidateStorageCaches: () => $i,
             listAllApiKeys: () => za,
             listAllUsers: () => An,
@@ -8422,14 +8422,14 @@ var server = http.createServer(async (req, res) => {
               consistency: "strong"
             }));
           }
-          async function Yl(e) {
+          async function Jl(e) {
             let n = await K(e).get("idx:users:all", {
               type: "json",
               consistency: "strong"
             }) || [];
             return Array.isArray(n) && n.length > 0;
           }
-          async function Jl(e, t) {
+          async function Yl(e, t) {
             let n = K(e), r = t.email.trim().toLowerCase(), a = await n.get("idx:users:all", {
               type: "json",
               consistency: "strong"
@@ -8580,17 +8580,17 @@ var server = http.createServer(async (req, res) => {
               });
             }));
           }
-          function Xl(e) {
+          function Ql(e) {
             return `provider_keys:${e}`;
           }
           function Eh(e) {
             return `provider_keys:${e}:m`;
           }
-          function Ql(e, t) {
+          function Xl(e, t) {
             return `provider_keys:${e}:s${t}`;
           }
           async function Gi(e, t) {
-            return await K(e).get(Xl(t), {
+            return await K(e).get(Ql(t), {
               type: "json",
               consistency: "strong"
             }) || [];
@@ -8608,13 +8608,13 @@ var server = http.createServer(async (req, res) => {
             });
           }
           async function Zl(e, t, n) {
-            return Bi.get(`${t}:${n}`, async () => await K(e).get(Ql(t, n), {
+            return Bi.get(`${t}:${n}`, async () => await K(e).get(Xl(t, n), {
               type: "json",
               consistency: "strong"
             }) || []);
           }
           async function Th(e, t, n, r) {
-            await K(e).setJSON(Ql(t, n), r), Bi.set(`${t}:${n}`, r);
+            await K(e).setJSON(Xl(t, n), r), Bi.set(`${t}:${n}`, r);
           }
           async function Sh(e, t, n) {
             await K(e).setJSON(Eh(t), n), Fl.set(t, n);
@@ -8640,7 +8640,7 @@ var server = http.createServer(async (req, res) => {
             return (await it(r, 8, (s) => Zl(e, t, s))).flat();
           }
           async function eu(e, t, n) {
-            await K(e).setJSON(Xl(t), n), Ui.set(t, n);
+            await K(e).setJSON(Ql(t), n), Ui.set(t, n);
           }
           async function tu(e, t, n) {
             let r = [];
@@ -8650,7 +8650,7 @@ var server = http.createServer(async (req, res) => {
             if (await Promise.all(r.map((s, i) => Th(e, t, i, s))), a && a.shards > r.length) {
               let s = K(e);
               for (let i = r.length; i < a.shards; i++)
-                await s.delete(Ql(t, i)).catch(() => {
+                await s.delete(Xl(t, i)).catch(() => {
                 }), Bi.delete(`${t}:${i}`);
             }
             await Sh(e, t, {
@@ -8667,7 +8667,7 @@ var server = http.createServer(async (req, res) => {
                 count: n.count
               };
             let r = await Gi(e, t);
-            return r.length ? (await tu(e, t, r), await K(e).delete(Xl(t)).catch(() => {
+            return r.length ? (await tu(e, t, r), await K(e).delete(Ql(t)).catch(() => {
             }), Ui.delete(t), {
               migrated: true,
               shards: Math.ceil(r.length / Li),
@@ -8871,7 +8871,7 @@ var server = http.createServer(async (req, res) => {
             }) || [], o = (new Set(s.map((c) => c.requestId)).has(n.requestId) ? s.slice() : [n].concat(s)).slice(0, 200);
             await t.setJSON(a, o);
           }
-          async function Yi(e, t) {
+          async function Ji(e, t) {
             return await K(e).get(`usage:daily:${t}`, {
               type: "json",
               consistency: "strong"
@@ -8947,12 +8947,12 @@ var server = http.createServer(async (req, res) => {
             let m = await Ch(e, a);
             return m.length > 1e3 && (m.length = 1e3), await n.setJSON("audit:chain", m), Tn = m, y;
           }
-          async function Ji(e, t = 100) {
+          async function Yi(e, t = 100) {
             let n = K(e), r = await lu(e), a = await Ch(e, r);
             return a !== r && (await n.setJSON("audit:chain", a), Tn = a), a.slice(0, t);
           }
           async function pu(e) {
-            let t = await Ji(e, 1e3);
+            let t = await Yi(e, 1e3);
             if (t.length <= 1)
               return {
                 valid: true,
@@ -9235,10 +9235,10 @@ var server = http.createServer(async (req, res) => {
           var Di;
           var Ne = H(() => {
             "use strict";
-            Je();
+            Ye();
             Oa();
             Bl();
-            Xe();
+            Qe();
             qe();
             er = new Kt(3e4, 5e3), Pr = new Kt(3e4, 2e3), Ra = new Kt(3e4, 2e3), Ui = new Kt(3e4, 200), Fl = new Kt(6e4, 300), Bi = new Kt(12e4, 4e3), Hl = new Kt(3e4, 2), zl = new Kt(3e4, 2), Zn = /* @__PURE__ */ new Map();
             _h = "provider_submissions", Kl = (e) => `provider_sub_msg:${e}`;
@@ -9352,7 +9352,7 @@ var server = http.createServer(async (req, res) => {
             if (t) {
               let {
                 verifyPassword: i
-              } = await Promise.resolve().then(() => (Xe(), vh));
+              } = await Promise.resolve().then(() => (Qe(), vh));
               if (!await i(t, s.passwordHash))
                 throw new C(401, A.AUTH_INVALID, "\u7BA1\u7406\u5458\u5BC6\u7801\u9519\u8BEF\uFF0C\u9A8C\u8BC1\u5931\u8D25");
               let c = a + 600;
@@ -9429,17 +9429,17 @@ var server = http.createServer(async (req, res) => {
           var ut = H(() => {
             "use strict";
             qe();
-            Xe();
+            Qe();
             ot();
             Ne();
           });
           function Ph(e, t) {
             return `rl:${e}:${t}`;
           }
-          function Xi() {
+          function Qi() {
             return Math.floor(Date.now() / 6e4);
           }
-          async function Qi(e, t, n) {
+          async function Xi(e, t, n) {
             let r = xu.get(t);
             if (r && r.minute === n)
               return r;
@@ -9470,7 +9470,7 @@ var server = http.createServer(async (req, res) => {
               r.dirty = false;
           }
           async function Ur(e, t, n, r, a) {
-            let s = Xi(), i = await Qi(e, t, s), o = 60 - Math.floor(Date.now() % 6e4 / 1e3) + 1;
+            let s = Qi(), i = await Xi(e, t, s), o = 60 - Math.floor(Date.now() % 6e4 / 1e3) + 1;
             if (r !== 0) {
               if (typeof r == "number" && r > 0 && a) {
                 if (i.dirty = true, i.state.modelRpm[a] = (i.state.modelRpm[a] || 0) + 1, i.state.modelRpm[a] > r)
@@ -9499,24 +9499,24 @@ var server = http.createServer(async (req, res) => {
             };
           }
           async function Rh(e, t, n) {
-            let r = Xi(), a = await Qi(e, t, r);
+            let r = Qi(), a = await Xi(e, t, r);
             a.dirty = true, a.state.tpm += n;
           }
           async function Mh(e, t, n) {
             if (n.tpm <= 0)
               return true;
-            let r = Xi();
-            return (await Qi(e, t, r)).state.tpm <= n.tpm;
+            let r = Qi();
+            return (await Xi(e, t, r)).state.tpm <= n.tpm;
           }
           async function Vt(e, t) {
-            let n = Xi(), r = await Qi(e, t, n);
+            let n = Qi(), r = await Xi(e, t, n);
             r.dirty = true, r.state.conc = Math.max(0, r.state.conc - 1);
           }
           var xu;
           var Zi = H(() => {
             "use strict";
-            Je();
-            Xe();
+            Ye();
+            Qe();
             xu = /* @__PURE__ */ new Map();
           });
           function Uh(e) {
@@ -9615,7 +9615,7 @@ var server = http.createServer(async (req, res) => {
           var yk;
           var pr = H(() => {
             "use strict";
-            Je();
+            Ye();
             Bh = 3, $h = 6e4, eo = /* @__PURE__ */ new Map(), to = /* @__PURE__ */ new Map(), vu = /* @__PURE__ */ new Set(), yk = 3e4;
           });
           function bk(e, t, n) {
@@ -9640,7 +9640,7 @@ var server = http.createServer(async (req, res) => {
               headers: {}
             };
           }
-          function Ya(e, t, n) {
+          function Ja(e, t, n) {
             return (e === "google" || /generativelanguage\.googleapis\.com/i.test(t || "")) && /^models\//i.test(n) ? n.replace(/^models\//i, "") : n;
           }
           async function wu(e, t) {
@@ -9707,7 +9707,7 @@ var server = http.createServer(async (req, res) => {
           var qh;
           var ro = H(() => {
             "use strict";
-            Xe();
+            Qe();
             qh = /* @__PURE__ */ new Set([408, 409, 425, 429, 500, 502, 503, 504]);
           });
           function Vh(e) {
@@ -9748,12 +9748,12 @@ var server = http.createServer(async (req, res) => {
             return i;
           }
           function vk(e) {
-            return Jh(e) ? false : e.kind === "opencode" || e.slug === "opencode" || e.kind === "duckai" || e.slug === "duckai" || e.kind === "kilo" || e.slug === "kilo" || e.authScheme === "none";
+            return Yh(e) ? false : e.kind === "opencode" || e.slug === "opencode" || e.kind === "duckai" || e.slug === "duckai" || e.kind === "kilo" || e.slug === "kilo" || e.authScheme === "none";
           }
-          function Jh(e) {
+          function Yh(e) {
             return (e.kind || "").startsWith("web:");
           }
-          function Yh(e, t) {
+          function Jh(e, t) {
             return {
               modelId: e.id,
               providerId: t.id,
@@ -9761,10 +9761,10 @@ var server = http.createServer(async (req, res) => {
               providerKind: t.kind,
               baseUrl: t.baseUrl,
               authScheme: t.authScheme,
-              extraHeaders: Xh(t.extraHeaders),
+              extraHeaders: Qh(t.extraHeaders),
               providerKeyId: "keyless",
               encryptedKey: "",
-              upstreamModel: Ya(t.slug, t.baseUrl, e.upstreamModel),
+              upstreamModel: Ja(t.slug, t.baseUrl, e.upstreamModel),
               priority: e.priority,
               costWeight: e.costWeight
             };
@@ -9772,11 +9772,11 @@ var server = http.createServer(async (req, res) => {
           function $r(e, t, n, r) {
             let a = t.model, s = t.provider;
             if (vk(s))
-              return [Yh(a, s)];
+              return [Jh(a, s)];
             let i = n.filter((l) => l.status === "active");
             if (!i.length)
-              return Jh(s) ? [Yh(a, s)] : [];
-            let o = i.length > Gh ? xk(i, Gh) : i, c = Hh(o, r), u = Xh(s.extraHeaders);
+              return Yh(s) ? [Jh(a, s)] : [];
+            let o = i.length > Gh ? xk(i, Gh) : i, c = Hh(o, r), u = Qh(s.extraHeaders);
             return c.map((l) => ({
               modelId: a.id,
               providerId: s.id,
@@ -9787,12 +9787,12 @@ var server = http.createServer(async (req, res) => {
               extraHeaders: u,
               providerKeyId: l.id,
               encryptedKey: l.encryptedKey,
-              upstreamModel: Ya(s.slug, s.baseUrl, a.upstreamModel),
+              upstreamModel: Ja(s.slug, s.baseUrl, a.upstreamModel),
               priority: a.priority,
               costWeight: a.costWeight
             }));
           }
-          function Xh(e) {
+          function Qh(e) {
             if (!e)
               return {};
             try {
@@ -9801,7 +9801,7 @@ var server = http.createServer(async (req, res) => {
               return {};
             }
           }
-          async function Qh(e) {
+          async function Xh(e) {
             let t = await Rt(e), n = await Ge(e), r = new Set(n.filter((c) => c.status === "active").map((c) => c.id)), a = new Map(n.map((c) => [c.id, c])), s = t.filter((c) => c.enabled === 1 && r.has(c.providerId)), i = /* @__PURE__ */ new Set();
             for (let c of s) {
               let u = a.get(c.providerId);
@@ -9819,7 +9819,7 @@ var server = http.createServer(async (req, res) => {
             }));
           }
           var Gh;
-          var Ja = H(() => {
+          var Ya = H(() => {
             "use strict";
             qe();
             Ne();
@@ -9951,10 +9951,10 @@ var server = http.createServer(async (req, res) => {
               createdAt: a
             }]);
           }
-          var Yt = H(() => {
+          var Jt = H(() => {
             "use strict";
             qe();
-            Xe();
+            Qe();
             Ne();
           });
           async function jt(e) {
@@ -9971,20 +9971,20 @@ var server = http.createServer(async (req, res) => {
           function dt(e) {
             return [...crypto.getRandomValues(new Uint8Array(e))].map((n) => n.toString(16).padStart(2, "0")).join("");
           }
-          function Xa(e) {
+          function Qa(e) {
             let t = "";
             for (let n of e)
               t += String.fromCharCode(n);
             return btoa(t).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
           }
           async function zr() {
-            let e = Xa(crypto.getRandomValues(new Uint8Array(32))), t = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(e));
+            let e = Qa(crypto.getRandomValues(new Uint8Array(32))), t = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(e));
             return {
               verifier: e,
-              challenge: Xa(new Uint8Array(t))
+              challenge: Qa(new Uint8Array(t))
             };
           }
-          function J(e, t, n = "oauth_error") {
+          function Y(e, t, n = "oauth_error") {
             return new Response(JSON.stringify({
               error: {
                 message: e,
@@ -10062,7 +10062,7 @@ var server = http.createServer(async (req, res) => {
           var Zh;
           var bt = H(() => {
             "use strict";
-            Je();
+            Ye();
             mr = /* @__PURE__ */ new Map(), Zh = 500;
           });
           function Tk(e, t, n = 1) {
@@ -10099,7 +10099,7 @@ var server = http.createServer(async (req, res) => {
             }
           }
           function eg(e, t, n, r, a) {
-            for (let s = 0; s < Qa / 8; s++) {
+            for (let s = 0; s < Xa / 8; s++) {
               let i = r + s * 8;
               e[s] ^= n[i] | n[i + 1] << 8 | n[i + 2] << 16 | n[i + 3] << 24, t[s] ^= n[i + 4] | n[i + 5] << 8 | n[i + 6] << 16 | n[i + 7] << 24;
             }
@@ -10118,9 +10118,9 @@ var server = http.createServer(async (req, res) => {
             for (let b = 0; b < 8; b++)
               s[b] = a[b * 4] | a[b * 4 + 1] << 8 | a[b * 4 + 2] << 16 | a[b * 4 + 3] << 24;
             let i = new TextEncoder().encode(e), o = new Uint32Array(25), c = new Uint32Array(25), u = 0;
-            for (; u + Qa <= i.length; )
-              eg(o, c, i, u, 1), u += Qa;
-            let l = i.length - u, p = i.subarray(u), y = new Uint8Array(20), m = new Uint8Array(Qa), d = new Uint32Array(25), g = new Uint32Array(25), h = Date.now();
+            for (; u + Xa <= i.length; )
+              eg(o, c, i, u, 1), u += Xa;
+            let l = i.length - u, p = i.subarray(u), y = new Uint8Array(20), m = new Uint8Array(Xa), d = new Uint32Array(25), g = new Uint32Array(25), h = Date.now();
             for (let b = 0; b < n; b++) {
               if ((b & 1023) === 0 && Date.now() - h > r)
                 return null;
@@ -10133,7 +10133,7 @@ var server = http.createServer(async (req, res) => {
               let k = 20 - v;
               d.set(o), g.set(c), m.fill(0), m.set(p, 0), m.set(y.subarray(v, 20), l);
               let w = l + k;
-              if (m[w] = 6, m[Qa - 1] |= 128, eg(d, g, m, 0, 1), d[0] === s[0] && g[0] === s[1] && d[1] === s[2] && g[1] === s[3] && d[2] === s[4] && g[2] === s[5] && d[3] === s[6] && g[3] === s[7])
+              if (m[w] = 6, m[Xa - 1] |= 128, eg(d, g, m, 0, 1), d[0] === s[0] && g[0] === s[1] && d[1] === s[2] && g[1] === s[3] && d[2] === s[4] && g[2] === s[5] && d[3] === s[6] && g[3] === s[7])
                 return b;
             }
             return null;
@@ -10160,10 +10160,10 @@ var server = http.createServer(async (req, res) => {
           var kk;
           var _k;
           var Ek;
-          var Qa;
+          var Xa;
           var ng = H(() => {
             "use strict";
-            kk = new Uint32Array([1, 32898, 32906, 2147516416, 32907, 2147483649, 2147516545, 32777, 138, 136, 2147516425, 2147483658, 2147516555, 139, 32905, 32771, 32770, 128, 32778, 2147483658, 2147516545, 32896, 2147483649, 2147516424]), _k = new Uint32Array([0, 0, 2147483648, 2147483648, 0, 0, 2147483648, 2147483648, 0, 0, 0, 0, 0, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 0, 2147483648, 2147483648, 2147483648, 0, 2147483648]), Ek = new Uint8Array([0, 1, 62, 28, 27, 36, 44, 6, 55, 20, 3, 10, 43, 25, 39, 41, 45, 15, 21, 8, 18, 2, 61, 56, 14]), Qa = 136;
+            kk = new Uint32Array([1, 32898, 32906, 2147516416, 32907, 2147483649, 2147516545, 32777, 138, 136, 2147516425, 2147483658, 2147516555, 139, 32905, 32771, 32770, 128, 32778, 2147483658, 2147516545, 32896, 2147483649, 2147516424]), _k = new Uint32Array([0, 0, 2147483648, 2147483648, 0, 0, 2147483648, 2147483648, 0, 0, 0, 0, 0, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 0, 2147483648, 2147483648, 2147483648, 0, 2147483648]), Ek = new Uint8Array([0, 1, 62, 28, 27, 36, 44, 6, 55, 20, 3, 10, 43, 25, 39, 41, 45, 15, 21, 8, 18, 2, 61, 56, 14]), Xa = 136;
           });
           function rg(e) {
             return e === "\uFF5C" ? "|" : e === "\u2581" ? "_" : e;
@@ -10892,12 +10892,12 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
               throw new Error(`\u83B7\u53D6 PoW challenge \u5931\u8D25: ${JSON.stringify(r).slice(0, 200)}`);
             return a;
           }
-          function Yk(e) {
+          function Jk(e) {
             return /^sk-[A-Za-z0-9]/.test(e.trim());
           }
-          async function Xk(e, t) {
+          async function Qk(e, t) {
             var _a, _b2, _c2;
-            let n = ((_a = e.body) == null ? void 0 : _a.stream) === true, r = await fetch(`${Jk}/chat/completions`, {
+            let n = ((_a = e.body) == null ? void 0 : _a.stream) === true, r = await fetch(`${Yk}/chat/completions`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -10912,7 +10912,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             });
             if (!r.ok) {
               let i = (await r.text().catch(() => "")).slice(0, 300);
-              return J(`HTTP ${r.status}: ${i}`, r.status, "upstream_error");
+              return Y(`HTTP ${r.status}: ${i}`, r.status, "upstream_error");
             }
             if (n && r.body) {
               let [i, o] = r.body.tee();
@@ -10955,7 +10955,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             try {
               s = JSON.parse(a);
             } catch {
-              return J(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${a.slice(0, 200)}`, 502, "upstream_error");
+              return Y(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${a.slice(0, 200)}`, 502, "upstream_error");
             }
             return xe(e, Te(e, {
               promptTokens: Number((_b2 = s == null ? void 0 : s.usage) == null ? void 0 : _b2.prompt_tokens) || 0,
@@ -10972,13 +10972,13 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             var _a, _b2, _c2;
             let n = (e.refreshTokens || []).filter((h) => h && h.trim());
             if (n.length === 0)
-              return J("\u8BE5 deepseek \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u53EF\u586B DeepSeek \u5B98\u65B9 API Key\uFF08sk- \u5F00\u5934\uFF0C\u8D70\u5B98\u65B9 API\uFF0C\u514D\u8D39\u7248\u53EF\u7528\uFF09\u6216 chat.deepseek.com \u7684 userToken\uFF08\u7F51\u9875\u53CD\u4EE3\uFF0C\u9700 Workers Paid\uFF09", 400, "configuration_error");
-            let r = n.find(Yk);
+              return Y("\u8BE5 deepseek \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u53EF\u586B DeepSeek \u5B98\u65B9 API Key\uFF08sk- \u5F00\u5934\uFF0C\u8D70\u5B98\u65B9 API\uFF0C\u514D\u8D39\u7248\u53EF\u7528\uFF09\u6216 chat.deepseek.com \u7684 userToken\uFF08\u7F51\u9875\u53CD\u4EE3\uFF0C\u9700 Workers Paid\uFF09", 400, "configuration_error");
+            let r = n.find(Jk);
             if (r)
-              return Xk(e, r.trim());
+              return Qk(e, r.trim());
             let a = ug(e.body || {}), s = dg(a, lg((_a = e.body) == null ? void 0 : _a.response_format)), i = !!(a.defsText || a.formatBlock), o = Hk((_b2 = e.body) == null ? void 0 : _b2.messages, s);
             if (!o)
-              return J("\u8BF7\u6C42\u7F3A\u5C11\u53EF\u7528\u5185\u5BB9\uFF08messages \u4E3A\u7A7A\uFF09", 400, "invalid_request_error");
+              return Y("\u8BF7\u6C42\u7F3A\u5C11\u53EF\u7528\u5185\u5BB9\uFF08messages \u4E3A\u7A7A\uFF09", 400, "invalid_request_error");
             let c = ((_c2 = e.body) == null ? void 0 : _c2.stream) === true, {
               modelType: u,
               thinking: l,
@@ -11009,7 +11009,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                 if (!v.ok && (v.status === 400 || v.status === 404) && (b = await pg(e.env, h, true), v = await x(b)), !v.ok) {
                   if (g = v.status, d = `HTTP ${v.status}: ${(await v.text().catch(() => "")).slice(0, 300)}`, [401, 403, 429].includes(v.status) || v.status >= 500)
                     continue;
-                  return J(d, v.status, "upstream_error");
+                  return Y(d, v.status, "upstream_error");
                 }
                 if (c && v.body) {
                   let T = Wk(v.body, e.requestedModel, (O) => {
@@ -11026,7 +11026,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                 }
                 let k = await v.text();
                 if (/value="captcha"|__cf_chl|CloudFront|Request blocked/i.test(k.slice(0, 500)))
-                  return J("\u4E0A\u6E38\u8FD4\u56DE\u62E6\u622A\u9875\u9762\uFF08WAF/\u98CE\u63A7\uFF09\uFF1A\u5F53\u524D Worker \u51FA\u53E3 IP \u53EF\u80FD\u88AB DeepSeek \u62E6\u622A", 502, "waf_blocked");
+                  return Y("\u4E0A\u6E38\u8FD4\u56DE\u62E6\u622A\u9875\u9762\uFF08WAF/\u98CE\u63A7\uFF09\uFF1A\u5F53\u524D Worker \u51FA\u53E3 IP \u53EF\u80FD\u88AB DeepSeek \u62E6\u622A", 502, "waf_blocked");
                 let {
                   body: w,
                   usage: _
@@ -11042,7 +11042,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                 d = b.message || "\u672A\u77E5\u9519\u8BEF", g = 502;
                 continue;
               }
-            return J(`\u6240\u6709 DeepSeek \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${d || "\u672A\u77E5"}`, g, "key_exhausted");
+            return Y(`\u6240\u6709 DeepSeek \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${d || "\u672A\u77E5"}`, g, "key_exhausted");
           }
           function gg() {
             return {
@@ -11055,10 +11055,10 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
           var Fk;
           var Ou;
           var io;
-          var Jk;
+          var Yk;
           var yg = H(() => {
             "use strict";
-            Je();
+            Ye();
             bt();
             ng();
             fg();
@@ -11143,14 +11143,14 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                 return /^response\/fragments\/-?\d+\/content$/.test(r) ? this.appendContent(r, n.v) : {};
               }
             };
-            Jk = "https://api.deepseek.com";
+            Yk = "https://api.deepseek.com";
           });
           function vg(e, t) {
             return String(Math.floor(Math.random() * (t - e)) + e);
           }
           function kg(e) {
             return {
-              baseUrl: (e || Qk).replace(/\/+$/, ""),
+              baseUrl: (e || Xk).replace(/\/+$/, ""),
               userAgent: bg[Math.floor(Math.random() * bg.length)],
               acceptLanguage: xg[Math.floor(Math.random() * xg.length)],
               deviceId: vg(7e18, 8e18),
@@ -11568,7 +11568,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
               for (let l of r.feed(u)) {
                 let p = Sg(l);
                 if (p.reasoning && (s += p.reasoning), p.content && (a += p.content), p.error)
-                  return J(`Kimi Web \u4E0A\u6E38\u9519\u8BEF: ${p.error}`, 502, "upstream_error");
+                  return Y(`Kimi Web \u4E0A\u6E38\u9519\u8BEF: ${p.error}`, 502, "upstream_error");
                 p.done && (i = "stop");
               }
             }
@@ -11599,10 +11599,10 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             var _a, _b2, _c2, _d2, _e, _f2;
             let n = (e.refreshTokens || []).map((y) => (y || "").trim()).filter(Boolean);
             if (n.length === 0)
-              return J("\u8BE5 kimiweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u767B\u5F55 https://www.kimi.ai \u540E\uFF0C\u5728\u6D4F\u89C8\u5668 Local Storage \u91CC\u53D6 access_token \u6216 refresh_token\uFF0C\u6BCF\u884C\u4E00\u4E2A\u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
+              return Y("\u8BE5 kimiweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u767B\u5F55 https://www.kimi.ai \u540E\uFF0C\u5728\u6D4F\u89C8\u5668 Local Storage \u91CC\u53D6 access_token \u6216 refresh_token\uFF0C\u6BCF\u884C\u4E00\u4E2A\u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
             let r = f_(e.requestedModel || e.modelId), a = Array.isArray((_a = e.body) == null ? void 0 : _a.messages) ? e.body.messages : [], s = l_(a);
             if (!s)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let i = ((_b2 = e.body) == null ? void 0 : _b2.stream) === true, o = !!(((_c2 = e.body) == null ? void 0 : _c2.web_search) || ((_d2 = e.body) == null ? void 0 : _d2.enable_web_search)), c = u_(r, s, o), u = a_(c), l = "", p = 502;
             for (let y of n) {
               let m = kg(t);
@@ -11618,10 +11618,10 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                 if (!g.ok) {
                   if (p = g.status, l = `HTTP ${g.status}: ${(await je(g)).slice(0, 300)}`, [401, 403, 429].includes(g.status) || g.status >= 500)
                     continue;
-                  return J(l, g.status, "upstream_error");
+                  return Y(l, g.status, "upstream_error");
                 }
                 if (!g.body)
-                  return J("Kimi Web \u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
+                  return Y("Kimi Web \u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
                 if (i && g.body) {
                   let [b, x] = g.body.tee(), v = x.getReader();
                   xe(e, (async () => {
@@ -11670,9 +11670,9 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                 continue;
               }
             }
-            return J(`\u6240\u6709 Kimi \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${l || "\u672A\u77E5"}`, p, "key_exhausted");
+            return Y(`\u6240\u6709 Kimi \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${l || "\u672A\u77E5"}`, p, "key_exhausted");
           }
-          var Qk;
+          var Xk;
           var Zk;
           var e_;
           var t_;
@@ -11684,7 +11684,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
           var Cg = H(() => {
             "use strict";
             bt();
-            Qk = "https://www.kimi.ai", Zk = "kimiweb:at:", e_ = "/apiv2/kimi.gateway.chat.v1.ChatService/Chat", t_ = "/apiv2/kimi.gateway.config.v1.ConfigService/GetAvailableModels", n_ = "/api/auth/token/refresh", r_ = 6e5, bg = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"], xg = ["zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7", "zh-CN,zh;q=0.9,en;q=0.8", "en-US,en;q=0.9"];
+            Xk = "https://www.kimi.ai", Zk = "kimiweb:at:", e_ = "/apiv2/kimi.gateway.chat.v1.ChatService/Chat", t_ = "/apiv2/kimi.gateway.config.v1.ConfigService/GetAvailableModels", n_ = "/api/auth/token/refresh", r_ = 6e5, bg = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"], xg = ["zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7", "zh-CN,zh;q=0.9,en;q=0.8", "en-US,en;q=0.9"];
             Tg = ["k3", "k3-agent-ultra", "k2d6", "k2d6-search"];
           });
           async function g_() {
@@ -11791,13 +11791,13 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
               "Accept-Encoding": "identity",
               Connection: "close"
             };
-            for (let [U, Q] of Object.entries(a))
-              /^(host|connection|accept-encoding|content-length)$/i.test(U) || (d[U] = Q);
+            for (let [U, X] of Object.entries(a))
+              /^(host|connection|accept-encoding|content-length)$/i.test(U) || (d[U] = X);
             m && (d["Content-Length"] = String(m.length));
             let g = `${r} ${o.pathname}${o.search} HTTP/1.1\r
 `;
-            for (let [U, Q] of Object.entries(d))
-              g += `${U}: ${Q}\r
+            for (let [U, X] of Object.entries(d))
+              g += `${U}: ${X}\r
 `;
             g += `\r
 `;
@@ -11811,65 +11811,65 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             for (; v < 0; ) {
               let {
                 done: U,
-                value: Q
+                value: X
               } = await b.read();
               if (U)
                 break;
-              x = Ru(x, Q), v = b_(x);
+              x = Ru(x, X), v = b_(x);
             }
             if (v < 0)
               throw p && clearTimeout(p), new Error("socket: HTTP \u54CD\u5E94\u5934\u4E0D\u5B8C\u6574");
             let k = new TextDecoder().decode(x.slice(0, v)), w = x.slice(v + 4), _ = k.split(`\r
 `), T = parseInt((_[0] || "").split(" ")[1], 10) || 0, O = new Headers();
             for (let U = 1; U < _.length; U++) {
-              let Q = _[U].indexOf(":");
-              if (Q > 0)
+              let X = _[U].indexOf(":");
+              if (X > 0)
                 try {
-                  O.append(_[U].slice(0, Q).trim(), _[U].slice(Q + 1).trim());
+                  O.append(_[U].slice(0, X).trim(), _[U].slice(X + 1).trim());
                 } catch {
                 }
             }
             let I = /chunked/i.test(O.get("transfer-encoding") || ""), j = O.has("content-length") ? parseInt(O.get("content-length"), 10) : null, R = new ReadableStream({
               async start(U) {
-                let Q = async () => {
+                let X = async () => {
                   let {
                     done: V,
-                    value: Y
+                    value: J
                   } = await b.read();
-                  return V ? false : (w = Ru(w, Y), true);
+                  return V ? false : (w = Ru(w, J), true);
                 };
                 try {
                   if (I)
                     for (; ; ) {
                       let V = Ng(w, 0);
                       for (; V < 0; ) {
-                        if (!await Q()) {
+                        if (!await X()) {
                           U.close();
                           return;
                         }
                         V = Ng(w, 0);
                       }
-                      let Y = parseInt(new TextDecoder().decode(w.slice(0, V)).trim().split(";")[0], 16);
-                      if (w = w.slice(V + 2), !Y || Number.isNaN(Y)) {
+                      let J = parseInt(new TextDecoder().decode(w.slice(0, V)).trim().split(";")[0], 16);
+                      if (w = w.slice(V + 2), !J || Number.isNaN(J)) {
                         U.close();
                         return;
                       }
-                      for (; w.length < Y + 2 && await Q(); )
+                      for (; w.length < J + 2 && await X(); )
                         ;
-                      U.enqueue(w.slice(0, Y)), w = w.slice(Y + 2);
+                      U.enqueue(w.slice(0, J)), w = w.slice(J + 2);
                     }
                   else if (j != null) {
                     let V = 0;
                     if (w.length) {
-                      let Y = w.slice(0, j);
-                      U.enqueue(Y), V += Y.length, w = w.slice(Y.length);
+                      let J = w.slice(0, j);
+                      U.enqueue(J), V += J.length, w = w.slice(J.length);
                     }
                     for (; V < j; ) {
                       let {
-                        done: Y,
+                        done: J,
                         value: oe
                       } = await b.read();
-                      if (Y)
+                      if (J)
                         break;
                       let pe = j - V, me = oe.length > pe ? oe.slice(0, pe) : oe;
                       U.enqueue(me), V += me.length;
@@ -11879,11 +11879,11 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                     for (w.length && U.enqueue(w); ; ) {
                       let {
                         done: V,
-                        value: Y
+                        value: J
                       } = await b.read();
                       if (V)
                         break;
-                      U.enqueue(Y);
+                      U.enqueue(J);
                     }
                     U.close();
                   }
@@ -11915,17 +11915,17 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
               headers: O,
               body: R,
               text: async () => {
-                let U = R.getReader(), Q = new Uint8Array(0);
+                let U = R.getReader(), X = new Uint8Array(0);
                 for (; ; ) {
                   let {
                     done: V,
-                    value: Y
+                    value: J
                   } = await U.read();
                   if (V)
                     break;
-                  Q = Ru(Q, Y);
+                  X = Ru(X, J);
                 }
-                return new TextDecoder().decode(Q);
+                return new TextDecoder().decode(X);
               }
             };
           }
@@ -12469,10 +12469,10 @@ ${s}` : a : s;
               sapisid: ""
             }], a = T_(e.requestedModel || e.modelId);
             if (a.error)
-              return J(a.error, 400, "invalid_request_error");
+              return Y(a.error, 400, "invalid_request_error");
             let s = Array.isArray((_a = e.body) == null ? void 0 : _a.messages) ? e.body.messages : [], i = D_((_b2 = e.body) == null ? void 0 : _b2.tools), o = $_(s, i, (_c2 = e.body) == null ? void 0 : _c2.tool_choice);
             if (!o)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let c = ((_d2 = e.body) == null ? void 0 : _d2.stream) === true, u = "\u672A\u77E5\u9519\u8BEF", l = 502;
             for (let y of r) {
               let m;
@@ -12487,7 +12487,7 @@ ${s}` : a : s;
                 let w = Dg(m.text);
                 if (w && (u = w), [401, 403, 429].includes(m.status) || m.status >= 500)
                   continue;
-                return J(u, m.status, "upstream_error");
+                return Y(u, m.status, "upstream_error");
               }
               if (c) {
                 let w = await R_(m.body);
@@ -12580,7 +12580,7 @@ ${s}` : a : s;
                 }
               });
             }
-            return r.length === 1 && !r[0].cookie && !r[0].sapisid && l === 429 ? J(`Gemini \u7F51\u9875\u7248\u5F53\u524D\u4E3A\u533F\u540D\u6A21\u5F0F\uFF0C\u89E6\u53D1\u4E86 Google \u51FA\u53E3 IP \u9891\u6B21\u9650\u5236\uFF08\u4E0A\u6E38\u751F\u6210\u5931\u8D25\uFF09\u3002\u5EFA\u8BAE\u5728\u300C\u4F9B\u5E94\u5546\u300D\u9875\u4E3A\u8BE5\u6E20\u9053\u914D\u7F6E Google \u8D26\u53F7 Cookie \u51ED\u636E\u89E3\u9664\u9650\u5236\u3002\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${u}`, 429, "rate_limit_exceeded") : J(`\u6240\u6709 Gemini \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${u}`, l, "key_exhausted");
+            return r.length === 1 && !r[0].cookie && !r[0].sapisid && l === 429 ? Y(`Gemini \u7F51\u9875\u7248\u5F53\u524D\u4E3A\u533F\u540D\u6A21\u5F0F\uFF0C\u89E6\u53D1\u4E86 Google \u51FA\u53E3 IP \u9891\u6B21\u9650\u5236\uFF08\u4E0A\u6E38\u751F\u6210\u5931\u8D25\uFF09\u3002\u5EFA\u8BAE\u5728\u300C\u4F9B\u5E94\u5546\u300D\u9875\u4E3A\u8BE5\u6E20\u9053\u914D\u7F6E Google \u8D26\u53F7 Cookie \u51ED\u636E\u89E3\u9664\u9650\u5236\u3002\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${u}`, 429, "rate_limit_exceeded") : Y(`\u6240\u6709 Gemini \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${u}`, l, "key_exhausted");
           }
           function Hg() {
             return {
@@ -12603,7 +12603,7 @@ ${s}` : a : s;
           var P_;
           var zg = H(() => {
             "use strict";
-            Je();
+            Ye();
             Og();
             bt();
             es = "https://gemini.google.com", v_ = `${es}/app`, w_ = "/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate", Ig = "boq_gemini-web-uiserver_20261007.01_p0", k_ = 3600 * 1e3, jg = 12e4, Pg = "geminiweb:bl", oo = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"], co = ["en-US,en;q=0.9", "en", "en-GB,en;q=0.9"], __ = /boq_assistant-bard-web-server_\d{8}\.\d+(_p\d+)?/, E_ = /"cfb2h"\s*:\s*"(boq_[a-z0-9\-]+_\d{8}\.\d+(_p\d+)?)"/, Kr = {
@@ -12650,7 +12650,7 @@ ${s}` : a : s;
             };
             P_ = ["I encountered an error doing what you asked", "I seem to be encountering an error", "I'm having a hard time fulfilling your request", "\u8BF7\u6055\u6211\u7231\u83AB\u80FD\u52A9\uFF0C\u6211\u53EA\u662F\u4E00\u4E2A\u8BED\u8A00\u6A21\u578B", "\u7531\u4E8E\u7A0B\u5E8F\u4EE3\u7801\u7684\u5C40\u9650\uFF0C\u6211\u6CA1\u6CD5\u529E\u5230", "\u6211\u53EA\u662F\u4E00\u4E2A\u8BED\u8A00\u6A21\u578B\uFF0C\u4E0D\u5177\u5907\u8FD9\u65B9\u9762\u7684\u4FE1\u606F\u6216\u80FD\u529B", "\u6211\u662F\u4E00\u4E2A\u8BED\u8A00\u6A21\u578B\uFF0C\u8FD9\u8D85\u51FA\u4E86\u6211\u7684\u8BBE\u8BA1\u7528\u9014", "\u8EAB\u4E3A\u4E00\u4E2A\u8BED\u8A00\u6A21\u578B\uFF0C\u6211\u6CA1\u529E\u6CD5\u63D0\u4F9B\u8FD9\u65B9\u9762\u7684\u5E2E\u52A9", "\u6211\u53EA\u662F\u4E00\u4E2A\u6587\u672C AI\uFF0C\u5728\u8FD9\u65B9\u9762\u6CA1\u6CD5\u5E2E\u5230\u4F60"];
           });
-          function Jt(e) {
+          function Yt(e) {
             let t = new TextEncoder().encode(e), n = t.length * 8, r = new Uint8Array(((t.length + 8 >> 6) + 1) * 64);
             r.set(t), r[t.length] = 128;
             let a = new DataView(r.buffer);
@@ -12704,11 +12704,11 @@ ${s}` : a : s;
             return [...crypto.getRandomValues(new Uint8Array(e))].map((n) => n.toString(16).padStart(2, "0")).join("");
           }
           function W_(e, t) {
-            return Jt(`${e}${z_}${t || ""}`);
+            return Yt(`${e}${z_}${t || ""}`);
           }
           function G_(e, t, n) {
-            let r = `${q_(e)}_${t}${Jt(String(n))}ooui`;
-            return Jt(r);
+            let r = `${q_(e)}_${t}${Yt(String(n))}ooui`;
+            return Yt(r);
           }
           function V_(e, t) {
             let n = -(/* @__PURE__ */ new Date()).getTimezoneOffset() / 60;
@@ -12743,7 +12743,7 @@ ${s}` : a : s;
             return typeof e == "string" ? e : Array.isArray(e) ? e.map((t) => typeof t == "string" ? t : (t == null ? void 0 : t.type) === "text" ? String(t.text || "") : "").filter(Boolean).join(`
 `) : e == null ? "" : String(e);
           }
-          function Y_(e, t) {
+          function J_(e, t) {
             let n = [];
             for (let i of e.slice(0, -1)) {
               let o = Vg(i.content).trim();
@@ -12761,7 +12761,7 @@ ${s}` : a : s;
               worktreeMode: false
             });
           }
-          function Yg() {
+          function Jg() {
             let e = "";
             return {
               feed(t) {
@@ -12790,7 +12790,7 @@ ${s}` : a : s;
               }
             };
           }
-          function Jg(e) {
+          function Yg(e) {
             if (!e || typeof e != "object")
               return {};
             if (e.base_resp && e.base_resp.status_code && e.base_resp.status_code !== 0)
@@ -12816,8 +12816,8 @@ ${s}` : a : s;
             }
             return {};
           }
-          function J_(e, t, n) {
-            let r = Yg(), a = new TextEncoder(), s = new TextDecoder(), i = {
+          function Y_(e, t, n) {
+            let r = Jg(), a = new TextEncoder(), s = new TextDecoder(), i = {
               id: `chatcmpl-minimaxweb-${Ee()}`,
               model: t
             }, o = false, c = false, u = 0, l, p = (m, d = null) => {
@@ -12871,7 +12871,7 @@ ${s}` : a : s;
                     }))) {
                       if (c)
                         return;
-                      let v = Jg(x);
+                      let v = Yg(x);
                       if (v.content && (o || (o = true, p({
                         role: "assistant",
                         content: ""
@@ -12910,7 +12910,7 @@ ${s}` : a : s;
               }
             });
           }
-          async function X_(e, t, n) {
+          async function Q_(e, t, n) {
             var _a;
             if (!e.agentId)
               return {
@@ -12961,7 +12961,7 @@ ${s}` : a : s;
                 body: null,
                 text: `\u4F1A\u8BDD\u54CD\u5E94\u7F3A\u5C11 session_id: ${JSON.stringify(i).slice(0, 200)}`
               };
-            let c = Y_(n, t), u = Gg(`/archon/api/v1/session/${o}/message`, c, e, true), l = await fetch(u.url, {
+            let c = J_(n, t), u = Gg(`/archon/api/v1/session/${o}/message`, c, e, true), l = await fetch(u.url, {
               method: "POST",
               headers: u.headers,
               body: c,
@@ -12979,19 +12979,19 @@ ${s}` : a : s;
               text: await l.text().catch(() => "")
             };
           }
-          async function Xg(e, t) {
+          async function Qg(e, t) {
             var _a, _b2;
             let n = (e.refreshTokens || []).map((u) => (u || "").trim()).filter(Boolean), r = K_(n, t);
             if (r.length === 0)
-              return J("\u8BE5 minimaxweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u767B\u5F55 https://agent.minimaxi.com \u540E\u4ECE\u6D4F\u89C8\u5668 Network \u91CC\u53D6 token\uFF08JWT\uFF09\uFF0C\u6309 `token|agentId` \u683C\u5F0F\u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
+              return Y("\u8BE5 minimaxweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u767B\u5F55 https://agent.minimaxi.com \u540E\u4ECE\u6D4F\u89C8\u5668 Network \u91CC\u53D6 token\uFF08JWT\uFF09\uFF0C\u6309 `token|agentId` \u683C\u5F0F\u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
             let a = Array.isArray((_a = e.body) == null ? void 0 : _a.messages) ? e.body.messages : [];
             if (a.length === 0)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let s = e.requestedModel || e.modelId, i = ((_b2 = e.body) == null ? void 0 : _b2.stream) === true, o = "\u672A\u77E5\u9519\u8BEF", c = 502;
             for (let u of r) {
               let l;
               try {
-                l = await X_(u, s, a);
+                l = await Q_(u, s, a);
               } catch (h) {
                 o = h.message || "\u4E0A\u6E38\u8BF7\u6C42\u5931\u8D25", c = 502;
                 continue;
@@ -12999,7 +12999,7 @@ ${s}` : a : s;
               if (!l.ok || !l.body) {
                 if (c = l.status, o = `HTTP ${l.status}: ${(l.text || "").slice(0, 300)}`, [401, 403, 409, 429].includes(l.status) || l.status >= 500)
                   continue;
-                return J(o, l.status, "upstream_error");
+                return Y(o, l.status, "upstream_error");
               }
               if (i) {
                 let [h, b] = l.body.tee(), x = b.getReader();
@@ -13019,7 +13019,7 @@ ${s}` : a : s;
                     completionTokens: Math.ceil(v / 4)
                   }, true, 200);
                 })().catch(() => {
-                })), new Response(J_(h, e.requestedModel), {
+                })), new Response(Y_(h, e.requestedModel), {
                   status: 200,
                   headers: {
                     "Content-Type": "text/event-stream; charset=utf-8",
@@ -13028,11 +13028,11 @@ ${s}` : a : s;
                   }
                 });
               }
-              let p = await new Response(l.body).text(), y = Yg(), m = "";
+              let p = await new Response(l.body).text(), y = Jg(), m = "";
               for (let h of y.feed(p)) {
-                let b = Jg(h);
+                let b = Yg(h);
                 if (b.content && (m += b.content), b.error)
-                  return J(`MiniMax \u4E0A\u6E38\u9519\u8BEF: ${b.error}`, 502, "upstream_error");
+                  return Y(`MiniMax \u4E0A\u6E38\u9519\u8BEF: ${b.error}`, 502, "upstream_error");
               }
               let d = Math.ceil(m.length / 4), g = {
                 id: `chatcmpl-minimaxweb-${Ee()}`,
@@ -13064,9 +13064,9 @@ ${s}` : a : s;
                 }
               });
             }
-            return J(`\u6240\u6709 MiniMax \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${o}`, c, "key_exhausted");
+            return Y(`\u6240\u6709 MiniMax \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${o}`, c, "key_exhausted");
           }
-          function Qg() {
+          function Xg() {
             return {
               success: true,
               models: Uu
@@ -13337,7 +13337,7 @@ ${s}` : a : s;
             });
           }
           async function lE(e, t, n) {
-            let r = JSON.stringify(iE(t, e, n)), a = await fetch(`${Q_}${Z_}`, {
+            let r = JSON.stringify(iE(t, e, n)), a = await fetch(`${X_}${Z_}`, {
               method: "POST",
               headers: oE(e),
               body: r,
@@ -13364,13 +13364,13 @@ ${s}` : a : s;
             var _a, _b2, _c2, _d2;
             let n = (e.refreshTokens || []).map((l) => (l || "").trim()).filter(Boolean), r = nE(n, t);
             if (r.length === 0)
-              return J("\u8BE5 lingxi \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u767B\u5F55\u4E2D\u56FD\u79FB\u52A8\u90AE\u7BB1\u7F51\u9875\u7248\u540E\uFF0C\u4ECE\u6D4F\u89C8\u5668\u8BF7\u6C42\u5934\u91CC\u53D6 Authorization(Basic ...) \u4E0E user_id\uFF0C\u6309 `authorization|userId` \u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
+              return Y("\u8BE5 lingxi \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u767B\u5F55\u4E2D\u56FD\u79FB\u52A8\u90AE\u7BB1\u7F51\u9875\u7248\u540E\uFF0C\u4ECE\u6D4F\u89C8\u5668\u8BF7\u6C42\u5934\u91CC\u53D6 Authorization(Basic ...) \u4E0E user_id\uFF0C\u6309 `authorization|userId` \u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
             let a = Array.isArray((_a = e.body) == null ? void 0 : _a.messages) ? e.body.messages : [];
             if (a.length === 0)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let s = aE(a);
             if (!s)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let i = ((_b2 = e.body) == null ? void 0 : _b2.stream) === true, o = !!(((_c2 = e.body) == null ? void 0 : _c2.web_search) || ((_d2 = e.body) == null ? void 0 : _d2.enable_web_search)), c = "\u672A\u77E5\u9519\u8BEF", u = 502;
             for (let l of r) {
               let p;
@@ -13383,7 +13383,7 @@ ${s}` : a : s;
               if (!p.ok || !p.body) {
                 if (u = p.status, c = `HTTP ${p.status}: ${(p.text || "").slice(0, 300)}`, [401, 403, 429].includes(p.status) || p.status >= 500)
                   continue;
-                return J(c, p.status, "upstream_error");
+                return Y(c, p.status, "upstream_error");
               }
               if (i) {
                 let [b, x] = p.body.tee(), v = x.getReader();
@@ -13416,7 +13416,7 @@ ${s}` : a : s;
               for (let b of m.feed(y)) {
                 let x = n0(b);
                 if (x.content && (d += x.content), x.error)
-                  return J(`\u7075\u7280\u4E0A\u6E38\u9519\u8BEF: ${x.error}`, 502, "upstream_error");
+                  return Y(`\u7075\u7280\u4E0A\u6E38\u9519\u8BEF: ${x.error}`, 502, "upstream_error");
               }
               let g = Math.ceil(d.length / 4), h = {
                 id: `chatcmpl-lingxi-${Ee()}`,
@@ -13448,7 +13448,7 @@ ${s}` : a : s;
                 }
               });
             }
-            return J(`\u6240\u6709\u7075\u7280\u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c}`, u, "key_exhausted");
+            return Y(`\u6240\u6709\u7075\u7280\u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c}`, u, "key_exhausted");
           }
           function a0() {
             return {
@@ -13456,7 +13456,7 @@ ${s}` : a : s;
               models: Bu
             };
           }
-          var Q_;
+          var X_;
           var e0;
           var Z_;
           var eE;
@@ -13465,7 +13465,7 @@ ${s}` : a : s;
           var s0 = H(() => {
             "use strict";
             bt();
-            Q_ = "https://ai.yun.139.com", e0 = "https://appmail.mail.10086.cn", Z_ = "/api/outer/assistant/chat/v2/add", eE = 12e4, Bu = ["lingxi-default", "qwen-3.7-plus", "deepseek-4.0-pro"], tE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36";
+            X_ = "https://ai.yun.139.com", e0 = "https://appmail.mail.10086.cn", Z_ = "/api/outer/assistant/chat/v2/add", eE = 12e4, Bu = ["lingxi-default", "qwen-3.7-plus", "deepseek-4.0-pro"], tE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36";
           });
           function dE(e) {
             if (!e || typeof e != "object")
@@ -13532,11 +13532,11 @@ ${s}` : a : s;
           });
           var cs = {};
           nt(cs, {
-            fetchChatgptWebAccountInfo: () => YE,
+            fetchChatgptWebAccountInfo: () => JE,
             fetchChatgptWebModels: () => uT,
             generateChatgptWebImage: () => pT,
             generateChatgptWebImageWithAccessToken: () => fT,
-            handleChatgptWebRequest: () => Qu,
+            handleChatgptWebRequest: () => Xu,
             isWebImageGenerationRequest: () => Vu,
             listChatgptWebModels: () => Zu,
             testChatgptWeb: () => dT
@@ -13875,7 +13875,7 @@ ${s}` : a : s;
               accountId: a
             };
           }
-          async function YE(e, t) {
+          async function JE(e, t) {
             try {
               let n = os(t);
               if (!n)
@@ -13924,7 +13924,7 @@ ${s}` : a : s;
               };
             }
           }
-          function JE(e) {
+          function YE(e) {
             return {
               "User-Agent": e.ua,
               Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -13964,7 +13964,7 @@ ${s}` : a : s;
               ...n
             };
           }
-          function XE(e) {
+          function QE(e) {
             let t = [];
             for (let r of e.matchAll(/<script[^>]+src="([^"]+)"/g)) {
               let a = r[1];
@@ -13992,12 +13992,12 @@ ${s}` : a : s;
             }
             try {
               let n = await fetch(wt + "/", {
-                headers: JE(t),
+                headers: YE(t),
                 signal: AbortSignal.timeout(_E)
               });
               if (n.ok) {
                 let r = await n.text(), s = {
-                  ...XE(r),
+                  ...QE(r),
                   at: Date.now()
                 };
                 return await G(e).put(i0, JSON.stringify(s), {
@@ -14106,7 +14106,7 @@ ${s}` : a : s;
             }
             return "";
           }
-          function QE(e) {
+          function XE(e) {
             if (!Array.isArray(e))
               return "";
             let t = [];
@@ -14128,7 +14128,7 @@ ${s}` : a : s;
 `);
           }
           function g0(e) {
-            let t = is(e == null ? void 0 : e.content), n = QE(e == null ? void 0 : e.tool_calls), r = String((e == null ? void 0 : e.role) || "").toLowerCase(), a = e == null ? void 0 : e.tool_call_id;
+            let t = is(e == null ? void 0 : e.content), n = XE(e == null ? void 0 : e.tool_calls), r = String((e == null ? void 0 : e.role) || "").toLowerCase(), a = e == null ? void 0 : e.tool_call_id;
             return [r === "tool" && a ? `[tool_result ${a}]` : "", t, n].filter(Boolean).join(`
 `);
           }
@@ -14265,7 +14265,7 @@ ${i}`);
             let n = String((e == null ? void 0 : e.o) || ""), r = typeof (e == null ? void 0 : e.v) == "string" ? e.v : "";
             return n === "append" ? t + r : n === "replace" ? r : t;
           }
-          function Yu(e, t) {
+          function Ju(e, t) {
             let n = rT(e);
             if (n !== null)
               return n;
@@ -14274,7 +14274,7 @@ ${i}`);
             if ((e == null ? void 0 : e.o) === "patch" && Array.isArray(e.v)) {
               let r = t;
               for (let a of e.v)
-                a && typeof a == "object" && (r = Yu(a, r));
+                a && typeof a == "object" && (r = Ju(a, r));
               return r;
             }
             return typeof (e == null ? void 0 : e.v) == "string" && !(e == null ? void 0 : e.p) && !(e == null ? void 0 : e.o) && t ? t + e.v : t;
@@ -14358,7 +14358,7 @@ ${i}`);
             }
             return t;
           }
-          async function Ju(e, t, n, r, a) {
+          async function Yu(e, t, n, r, a) {
             let s = "";
             if (r.startsWith("file-service://")) {
               let c = r.slice(15);
@@ -14397,7 +14397,7 @@ ${i}`);
             }
             return "";
           }
-          async function Xu(e, t, n, r) {
+          async function Qu(e, t, n, r) {
             if (!e)
               return null;
             let a = e.startsWith(wt), s = {
@@ -14454,14 +14454,14 @@ ${i}`);
             }
             return [];
           }
-          async function Qu(e) {
+          async function Xu(e) {
             var _a, _b2;
             let t = [...new Set((e.refreshTokens || []).map(os).filter(Boolean))];
             if (!t.length)
-              return J("\u8BE5 chatgptweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u4E00\u884C\u4E00\u4E2A\u8D26\u53F7\uFF0C\u76F4\u63A5\u7C98\u8D34\u53D1\u8D27\u6574\u884C\u300C\u8D26\u53F7----GPT\u5BC6\u7801----\u90AE\u7BB1\u5BC6\u7801----rt.1.xxx\u300D\uFF0C\u6216\u53EA\u586B rt.1.xxx / rt_xxx", 400, "configuration_error");
+              return Y("\u8BE5 chatgptweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u4E00\u884C\u4E00\u4E2A\u8D26\u53F7\uFF0C\u76F4\u63A5\u7C98\u8D34\u53D1\u8D27\u6574\u884C\u300C\u8D26\u53F7----GPT\u5BC6\u7801----\u90AE\u7BB1\u5BC6\u7801----rt.1.xxx\u300D\uFF0C\u6216\u53EA\u586B rt.1.xxx / rt_xxx", 400, "configuration_error");
             let n = Array.isArray((_a = e.body) == null ? void 0 : _a.messages) ? e.body.messages : [];
             if (!n.length)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let r = ((_b2 = e.body) == null ? void 0 : _b2.stream) === true, a = "", s = 502, i = await Promise.all(t.map(async (h, b) => ({
               raw: h,
               index: b + 1,
@@ -14505,24 +14505,24 @@ ${i}`);
                   } : {}
                 }), T = go(e.modelId, n, e.body || {});
                 if (!Array.isArray(T.messages) || T.messages.length === 0)
-                  return J("\u5BA2\u6237\u7AEF\u8BF7\u6C42\u4E2D\u6CA1\u6709\u53EF\u8F6C\u6362\u7684\u6587\u672C\u5185\u5BB9\uFF08\u53EF\u80FD\u662F\u7EAF tool_calls / \u56FE\u7247\u6D88\u606F\uFF09\uFF1B\u5F53\u524D chatgptweb \u6E20\u9053\u53EA\u652F\u6301\u6587\u672C", 400, "invalid_request_error");
-                let O = async (Q) => fetch(wt + w, {
+                  return Y("\u5BA2\u6237\u7AEF\u8BF7\u6C42\u4E2D\u6CA1\u6709\u53EF\u8F6C\u6362\u7684\u6587\u672C\u5185\u5BB9\uFF08\u53EF\u80FD\u662F\u7EAF tool_calls / \u56FE\u7247\u6D88\u606F\uFF09\uFF1B\u5F53\u524D chatgptweb \u6E20\u9053\u53EA\u652F\u6301\u6587\u672C", 400, "invalid_request_error");
+                let O = async (X) => fetch(wt + w, {
                   method: "POST",
                   headers: _,
-                  body: JSON.stringify(Q),
+                  body: JSON.stringify(X),
                   signal: AbortSignal.timeout(TE)
                 }), I = await O(T);
                 if (!I.ok) {
-                  let Q = await je(I);
-                  if (I.status === 422 && /invalid conversation body/i.test(Q)) {
+                  let X = await je(I);
+                  if (I.status === 422 && /invalid conversation body/i.test(X)) {
                     let V = eT(e.modelId, n, e.body || {});
-                    V && (I = await O(V), I.ok || (Q = await je(I)));
+                    V && (I = await O(V), I.ok || (X = await je(I)));
                   }
                   if (!I.ok) {
-                    s = I.status, a = `HTTP ${I.status}: ${Q.slice(0, 300)}`;
+                    s = I.status, a = `HTTP ${I.status}: ${X.slice(0, 300)}`;
                     let V = /cf_chl_opt|challenge-platform|<!DOCTYPE html/i.test(a);
                     if (I.status === 429) {
-                      let Y = Number(I.headers.get("retry-after")), oe = (Y > 0 ? Y * 1e3 : 0) || 0;
+                      let J = Number(I.headers.get("retry-after")), oe = (J > 0 ? J * 1e3 : 0) || 0;
                       p(h.hash, `429 ${a.slice(0, 120)}`, oe > 0 ? oe + 6e4 : SE);
                       continue;
                     }
@@ -14534,7 +14534,7 @@ ${i}`);
                       p(h.hash, a.slice(0, 120), po);
                       continue;
                     }
-                    return await m(), J(a, I.status, "upstream_error");
+                    return await m(), Y(a, I.status, "upstream_error");
                   }
                 }
                 y(h.hash), xe(e, m());
@@ -14543,7 +14543,7 @@ ${i}`);
                   "x-chatgptweb-cooldown": String(l)
                 };
                 if (!I.body)
-                  return J("\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
+                  return Y("\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
                 let R = Vu(e.body || {}, e.modelId), B = {
                   fp: b,
                   token: x,
@@ -14551,8 +14551,8 @@ ${i}`);
                   isImageMode: R
                 };
                 if (r) {
-                  let Q = cT(I.body, e.requestedModel, e, n, B);
-                  return new Response(Q, {
+                  let X = cT(I.body, e.requestedModel, e, n, B);
+                  return new Response(X, {
                     status: 200,
                     headers: {
                       "Content-Type": "text/event-stream; charset=utf-8",
@@ -14582,7 +14582,7 @@ ${i}`);
                 continue;
               }
             }
-            return await m(), J(`\u6240\u6709 ChatGPT \u7F51\u9875\u7248\u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${a || "\u672A\u77E5"}`, s === 401 ? 401 : s, s === 401 ? "authentication_error" : "key_exhausted");
+            return await m(), Y(`\u6240\u6709 ChatGPT \u7F51\u9875\u7248\u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${a || "\u672A\u77E5"}`, s === 401 ? 401 : s, s === 401 ? "authentication_error" : "key_exhausted");
           }
           function mn(e, t, n, r, a = null, s) {
             let i = {
@@ -14662,7 +14662,7 @@ ${i}`);
                     }), v("content_filter");
                     return;
                   }
-                  let I = y0(b0(Yu(T, y), l));
+                  let I = y0(b0(Ju(T, y), l));
                   if (I === y)
                     return;
                   let j = I.startsWith(y) ? I.slice(y.length) : I;
@@ -14682,9 +14682,9 @@ ${i}`);
                         if ((a == null ? void 0 : a.token) && (a == null ? void 0 : a.fp) && h.length > 0) {
                           let j = [];
                           for (let R of h.slice(0, 4)) {
-                            let B = await Ju(a.fp, a.token, a.accountId || "", R, b);
+                            let B = await Yu(a.fp, a.token, a.accountId || "", R, b);
                             if (B) {
-                              let U = await Xu(B, a.fp, a.token, a.accountId || "");
+                              let U = await Qu(B, a.fp, a.token, a.accountId || "");
                               U && j.push({
                                 type: "image_url",
                                 image_url: {
@@ -14757,7 +14757,7 @@ ${i}`);
               for (let T of w)
                 y.includes(T[0]) || y.push(T[0]);
               k.type === "moderation" && ((_b2 = k.moderation_response) == null ? void 0 : _b2.blocked) === true && (l = true);
-              let _ = y0(b0(Yu(k, u), o));
+              let _ = y0(b0(Ju(k, u), o));
               _ && (u = _);
             };
             for (; !p; ) {
@@ -14797,9 +14797,9 @@ ${i}`);
                   y.includes(k.pointer) || y.push(k.pointer);
               }
               for (let v of y.slice(0, 4)) {
-                let k = await Ju(r.fp, r.token, r.accountId || "", v, m);
+                let k = await Yu(r.fp, r.token, r.accountId || "", v, m);
                 if (k) {
-                  let w = await Xu(k, r.fp, r.token, r.accountId || "");
+                  let w = await Qu(k, r.fp, r.token, r.accountId || "");
                   w && g.push({
                     type: "image_url",
                     image_url: {
@@ -15017,9 +15017,9 @@ ${i}`);
                 };
               let x = Math.max(1, Math.min(4, Number(a.n) || 1)), v = b.slice(0, x), k = [];
               for (let w of v) {
-                let _ = await Ju(o, t, n, w.pointer, g);
+                let _ = await Yu(o, t, n, w.pointer, g);
                 if (_) {
-                  let T = await Xu(_, o, t, n);
+                  let T = await Qu(_, o, t, n);
                   if (T) {
                     let O = {
                       b64_json: T.b64
@@ -15094,10 +15094,10 @@ ${i}`);
           var BE;
           var $E;
           var qu;
-          var Yr = H(() => {
+          var Jr = H(() => {
             "use strict";
             bt();
-            Je();
+            Ye();
             ts();
             wt = "https://chatgpt.com", Ku = "https://chatgpt.com/backend-api/sentinel/sdk.js", yE = "app_2SKx67EdpoN0G6j64rFvigXD", bE = "pdlLIX2Y72MIl2rhLhTE9VV9bN905kBh", xE = "com.openai.chat://auth0.openai.com/ios/com.openai.chat/callback", vE = "prod-a194cd50d4416d3c0b47c740f206b12ce60f5887", wE = "6708908", kE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36", d0 = '"Chromium";v="145", "Google Chrome";v="145", "Not/A)Brand";v="99"', f0 = "chatgptweb:at:", Fu = "chatgptweb:health:", i0 = "chatgptweb:pow", o0 = 3600, _E = 15e3, Hu = 3e4, EE = 2e4, TE = 11e4, SE = 1800 * 1e3, c0 = 3600 * 1e3, po = 300 * 1e3, AE = 360 * 60 * 1e3, CE = ["gpt-5-5", "gpt-5-5-thinking", "gpt-5-4", "gpt-4o", "auto"], rs = class extends Error {
             }, On = class extends Error {
@@ -15126,7 +15126,7 @@ ${i}`);
           var td = {};
           nt(td, {
             WEB_KIND_PREFIX: () => ed,
-            WEB_PROVIDERS: () => Jr,
+            WEB_PROVIDERS: () => Yr,
             fetchWebModels: () => yT,
             handleWebChat: () => gT,
             isWebType: () => hT,
@@ -15136,10 +15136,10 @@ ${i}`);
             if (!e || !e.startsWith(ed))
               return null;
             let t = e.slice(ed.length);
-            return Jr[t] ? t : null;
+            return Yr[t] ? t : null;
           }
           function hT(e) {
-            return !!Jr[e];
+            return !!Yr[e];
           }
           async function gT(e) {
             let t = {
@@ -15163,11 +15163,11 @@ ${i}`);
               case "geminiweb":
                 return Fg(t);
               case "minimaxweb":
-                return Xg(t);
+                return Qg(t);
               case "lingxi":
                 return r0(t);
               case "chatgptweb":
-                return Qu(t);
+                return Xu(t);
               default:
                 return new Response(JSON.stringify({
                   error: {
@@ -15182,7 +15182,7 @@ ${i}`);
             }
           }
           async function yT(e, t, n, r) {
-            let a = Jr[t].defaultModels;
+            let a = Yr[t].defaultModels;
             try {
               if (t === "deepseek") {
                 let s = gg();
@@ -15207,14 +15207,14 @@ ${i}`);
                 };
               if (t === "minimaxweb")
                 return {
-                  models: Qg().models
+                  models: Xg().models
                 };
               if (t === "lingxi")
                 return {
                   models: a0().models
                 };
               if (t === "chatgptweb") {
-                let s = await Promise.resolve().then(() => (Yr(), cs)).then((i) => i.fetchChatgptWebModels(e, n));
+                let s = await Promise.resolve().then(() => (Jr(), cs)).then((i) => i.fetchChatgptWebModels(e, n));
                 return s.success && s.models.length ? {
                   models: s.models
                 } : {
@@ -15232,7 +15232,7 @@ ${i}`);
               models: a
             };
           }
-          var Jr;
+          var Yr;
           var ed;
           var yo = H(() => {
             "use strict";
@@ -15241,8 +15241,8 @@ ${i}`);
             zg();
             Zg();
             s0();
-            Yr();
-            Jr = {
+            Jr();
+            Yr = {
               deepseek: {
                 type: "deepseek",
                 name: "DeepSeek \u7F51\u9875\u7248",
@@ -15306,7 +15306,7 @@ ${i}`);
             createOpenAIStreamFromAnthropic: () => rd,
             openAIToAnthropicRequest: () => xo
           });
-          function Xr() {
+          function Qr() {
             try {
               return crypto.randomUUID();
             } catch {
@@ -15435,7 +15435,7 @@ ${i}`);
                     }
                   c.push({
                     type: "tool_use",
-                    id: u.id || `toolu_${Xr().replace(/-/g, "").slice(0, 20)}`,
+                    id: u.id || `toolu_${Qr().replace(/-/g, "").slice(0, 20)}`,
                     name: l.name,
                     input: p
                   });
@@ -15447,7 +15447,7 @@ ${i}`);
                 continue;
               }
               if (o === "tool") {
-                let c = i.tool_call_id || `toolu_${Xr().replace(/-/g, "").slice(0, 20)}`, u = bo(i.content), l = u.length > 0 ? u : [{
+                let c = i.tool_call_id || `toolu_${Qr().replace(/-/g, "").slice(0, 20)}`, u = bo(i.content), l = u.length > 0 ? u : [{
                   type: "text",
                   text: ""
                 }];
@@ -15498,7 +15498,7 @@ ${i}`);
             let n = Array.isArray(e == null ? void 0 : e.content) ? e.content : [], r = "", a = [];
             for (let o of n)
               (o == null ? void 0 : o.type) === "text" && typeof o.text == "string" ? r += o.text : (o == null ? void 0 : o.type) === "tool_use" && a.push({
-                id: o.id || `call_${Xr().replace(/-/g, "").slice(0, 24)}`,
+                id: o.id || `call_${Qr().replace(/-/g, "").slice(0, 24)}`,
                 type: "function",
                 function: {
                   name: o.name,
@@ -15513,7 +15513,7 @@ ${i}`);
             a.length > 0 && (s.tool_calls = a);
             let i = (e == null ? void 0 : e.usage) || {};
             return {
-              id: (e == null ? void 0 : e.id) || `chatcmpl-${Xr()}`,
+              id: (e == null ? void 0 : e.id) || `chatcmpl-${Qr()}`,
               object: "chat.completion",
               created: Math.floor(Date.now() / 1e3),
               model: t,
@@ -15554,7 +15554,7 @@ ${i}`);
           function rd(e, t, n) {
             let r = new TextDecoder(), a = new TextEncoder(), s = vT(), i = false, o = -1, c = null, u = 0, l = 0, p = (m, d, g = null, h = false) => {
               let b = {
-                id: `chatcmpl-anthropic-${Xr()}`,
+                id: `chatcmpl-anthropic-${Qr()}`,
                 object: "chat.completion.chunk",
                 created: Math.floor(Date.now() / 1e3),
                 model: t,
@@ -15592,7 +15592,7 @@ ${i}`);
                   b.type === "tool_use" && (o += 1, p(m, {
                     tool_calls: [{
                       index: o,
-                      id: b.id || `call_${Xr().replace(/-/g, "").slice(0, 24)}`,
+                      id: b.id || `call_${Qr().replace(/-/g, "").slice(0, 24)}`,
                       type: "function",
                       function: {
                         name: b.name || "",
@@ -15821,7 +15821,7 @@ ${i}`);
             var _a;
             let n = (e.refreshTokens || []).filter((o) => o && o.trim());
             if (n.length === 0)
-              return J("\u8BE5 claude \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Anthropic OAuth refresh_token\uFF08\u53EF\u70B9\u300C\u7528 Claude \u8D26\u53F7\u6388\u6743\u300D\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 claude \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Anthropic OAuth refresh_token\uFF08\u53EF\u70B9\u300C\u7528 Claude \u8D26\u53F7\u6388\u6743\u300D\u83B7\u53D6\uFF09", 400, "configuration_error");
             let r = ((_a = e.body) == null ? void 0 : _a.stream) === true;
             if (t === "messages-passthrough")
               return NT(e, n[0].trim(), r);
@@ -15842,7 +15842,7 @@ ${i}`);
                 if (!u.ok) {
                   if (i = u.status, s = `HTTP ${u.status}: ${(await je(u)).slice(0, 300)}`, [401, 403, 429].includes(u.status) || u.status >= 500)
                     continue;
-                  return J(s, u.status, "upstream_error");
+                  return Y(s, u.status, "upstream_error");
                 }
                 if (r && u.body) {
                   let m = rd(u.body, e.requestedModel, (d) => {
@@ -15861,7 +15861,7 @@ ${i}`);
                 try {
                   p = JSON.parse(l);
                 } catch {
-                  return J(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
+                  return Y(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
                 }
                 let y = nd(p, e.requestedModel);
                 return xe(e, Te(e, CT(p), true, 200)), new Response(JSON.stringify(y), {
@@ -15875,7 +15875,7 @@ ${i}`);
                 s = c.message || "\u672A\u77E5\u9519\u8BEF", i = 502;
                 continue;
               }
-            return J(`\u6240\u6709 Claude \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
+            return Y(`\u6240\u6709 Claude \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
           }
           async function NT(e, t, n) {
             try {
@@ -15886,7 +15886,7 @@ ${i}`);
                 signal: AbortSignal.timeout(6e5)
               });
               if (!a.ok)
-                return J(`HTTP ${a.status}: ${(await je(a)).slice(0, 300)}`, a.status, "upstream_error");
+                return Y(`HTTP ${a.status}: ${(await je(a)).slice(0, 300)}`, a.status, "upstream_error");
               let s = {
                 "Content-Type": a.headers.get("Content-Type") || (n ? "text/event-stream" : "application/json"),
                 "Cache-Control": "no-store"
@@ -15896,7 +15896,7 @@ ${i}`);
                 headers: s
               });
             } catch (r) {
-              return J(r.message || "\u900F\u4F20\u5931\u8D25", 502, "proxy_error");
+              return Y(r.message || "\u900F\u4F20\u5931\u8D25", 502, "proxy_error");
             }
           }
           async function O0(e, t, n) {
@@ -15987,7 +15987,7 @@ ${i}`);
           var sd;
           var j0 = H(() => {
             "use strict";
-            Je();
+            Ye();
             bt();
             vo();
             id = "9d1c250a-e61b-44d9-88ed-5944d1962f5e", wT = "https://claude.ai/oauth/authorize", _0 = "https://platform.claude.com/v1/oauth/token", E0 = "http://localhost:54545/callback", T0 = "user:profile user:inference user:sessions:claude_code user:mcp_servers user:file_upload", kT = "axios/1.15.2", _T = "claude-cli/2.1.258 (external, cli)", wo = "https://api.anthropic.com", ET = "claude-code-20250219,oauth-2025-04-20", TT = "claude:at:", sd = "claude:oauth:";
@@ -16055,7 +16055,7 @@ ${i}`);
               });
             return r;
           }
-          function Qr(e, t) {
+          function Xr(e, t) {
             var _a, _b2;
             let n = [], r = [];
             for (let m of Array.isArray(e.messages) ? e.messages : []) {
@@ -16918,20 +16918,20 @@ ${i}`);
             };
             return i(r), i(a), i(s), [...r, ...a, ...s];
           }
-          function YT(e) {
+          function JT(e) {
             return /^iVBORw0KGgo/.test(e) ? "image/png" : /^\/9j\//.test(e) ? "image/jpeg" : /^UklGR/.test(e) ? "image/webp" : "image/png";
           }
-          function JT(e) {
+          function YT(e) {
             if (e.url)
               return e.url;
             let t = String(e.b64 || "").replace(/^data:image\/[a-z0-9.+-]+;base64,/i, "");
-            return `data:${YT(t)};base64,${t}`;
+            return `data:${JT(t)};base64,${t}`;
           }
-          function XT(e) {
+          function QT(e) {
             return e.map((t) => ({
               type: "image_url",
               image_url: {
-                url: JT(t)
+                url: YT(t)
               }
             }));
           }
@@ -16984,7 +16984,7 @@ ${i}`);
             }
           }
           function B0(e, t, n, r) {
-            let a = `chatcmpl-codex-img-${Ee()}`, s = Math.floor(Date.now() / 1e3), i = XT(e);
+            let a = `chatcmpl-codex-img-${Ee()}`, s = Math.floor(Date.now() / 1e3), i = QT(e);
             if (!r) {
               let u = {
                 id: a,
@@ -17064,20 +17064,20 @@ ${i}`);
             var _a, _b2, _c2, _d2, _e, _f2, _g2;
             let n = await To(e.env), r = [...new Set((e.refreshTokens || []).map(Pn).filter(Boolean))];
             if (r.length === 0 && !n)
-              return J("\u8BE5 codex \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A OpenAI OAuth refresh_token\u3001\u56DB\u6BB5\u53D1\u8D27\u884C\u6216 CPA JSON\uFF08\u53EF\u70B9\u300C\u6388\u6743\u65B0\u8D26\u53F7\u300D\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 codex \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A OpenAI OAuth refresh_token\u3001\u56DB\u6BB5\u53D1\u8D27\u884C\u6216 CPA JSON\uFF08\u53EF\u70B9\u300C\u6388\u6743\u65B0\u8D26\u53F7\u300D\u83B7\u53D6\uFF09", 400, "configuration_error");
             let a = ((_a = e.body) == null ? void 0 : _a.stream) === true, s = ld(e.body || {}), i = s && r.length > 0 ? null : n;
             if (s && i) {
               let x = fo((_b2 = e.body) == null ? void 0 : _b2.messages);
               if (x) {
                 let v = await bd(i, fd(e), x, e.body || {});
-                return v.ok && ((_c2 = v.images) == null ? void 0 : _c2.length) ? B0(v.images, e.requestedModel, Math.max(1, Math.ceil(x.length / 4)), a) : J(v.error || "\u4E2D\u7EE7\u751F\u56FE\u5931\u8D25", v.status || 502, "upstream_error");
+                return v.ok && ((_c2 = v.images) == null ? void 0 : _c2.length) ? B0(v.images, e.requestedModel, Math.max(1, Math.ceil(x.length / 4)), a) : Y(v.error || "\u4E2D\u7EE7\u751F\u56FE\u5931\u8D25", v.status || 502, "upstream_error");
               }
             }
             if (t === "responses-passthrough")
-              return QT(e, ((_d2 = r[0]) == null ? void 0 : _d2.trim()) || "", a, n);
+              return XT(e, ((_d2 = r[0]) == null ? void 0 : _d2.trim()) || "", a, n);
             let {
               request: o
-            } = Qr({
+            } = Xr({
               ...e.body,
               model: i ? fd(e) : e.modelId
             });
@@ -17122,13 +17122,13 @@ ${i}`);
                     try {
                       let {
                         generateChatgptWebImageWithAccessToken: B
-                      } = await Promise.resolve().then(() => (Yr(), cs)), U = await B(e.env, j, R, e.body || {}, 3e4);
+                      } = await Promise.resolve().then(() => (Jr(), cs)), U = await B(e.env, j, R, e.body || {}, 3e4);
                       if (U.ok && U.body) {
-                        let Q = JSON.parse(U.body), V = (Array.isArray(Q == null ? void 0 : Q.data) ? Q.data : []).map((Y) => ({
-                          b64: typeof (Y == null ? void 0 : Y.b64_json) == "string" ? Y.b64_json : void 0,
-                          url: typeof (Y == null ? void 0 : Y.url) == "string" ? Y.url : void 0,
-                          revised_prompt: typeof (Y == null ? void 0 : Y.revised_prompt) == "string" ? Y.revised_prompt : void 0
-                        })).filter((Y) => Y.b64 || Y.url);
+                        let X = JSON.parse(U.body), V = (Array.isArray(X == null ? void 0 : X.data) ? X.data : []).map((J) => ({
+                          b64: typeof (J == null ? void 0 : J.b64_json) == "string" ? J.b64_json : void 0,
+                          url: typeof (J == null ? void 0 : J.url) == "string" ? J.url : void 0,
+                          revised_prompt: typeof (J == null ? void 0 : J.revised_prompt) == "string" ? J.revised_prompt : void 0
+                        })).filter((J) => J.b64 || J.url);
                         if (V.length)
                           return B0(V, e.requestedModel, Math.max(1, Math.ceil(fo((_e = e.body) == null ? void 0 : _e.messages).length / 4)), a);
                       }
@@ -17161,7 +17161,7 @@ ${i}`);
                     d(k, c.slice(0, 120), U0);
                     continue;
                   }
-                  return await h(), J(c, T.status, "upstream_error");
+                  return await h(), Y(c, T.status, "upstream_error");
                 }
                 g(k), xe(e, h());
                 let O = i ? {} : {
@@ -17183,12 +17183,12 @@ ${i}`);
                   });
                 }
                 if (!T.body)
-                  return J("\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
+                  return Y("\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
                 let I;
                 try {
                   I = await R0(T.body, e.requestedModel);
                 } catch (j) {
-                  return J(j.message || "\u4E0A\u6E38\u6D41\u89E3\u6790\u5931\u8D25", 502, "upstream_error");
+                  return Y(j.message || "\u4E0A\u6E38\u6D41\u89E3\u6790\u5931\u8D25", 502, "upstream_error");
                 }
                 return xe(e, Te(e, {
                   promptTokens: Number((_f2 = I.usage) == null ? void 0 : _f2.prompt_tokens) || 0,
@@ -17205,9 +17205,9 @@ ${i}`);
                 c = w.message || "\u672A\u77E5\u9519\u8BEF", u = w instanceof hr ? 401 : 502, d(k, `exception ${c.slice(0, 120)}`, w instanceof hr ? L0 : U0);
                 continue;
               }
-            return await h(), J(`\u6240\u6709 Codex \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c || "\u672A\u77E5"}`, u, u === 401 ? "authentication_error" : "key_exhausted");
+            return await h(), Y(`\u6240\u6709 Codex \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c || "\u672A\u77E5"}`, u, u === 401 ? "authentication_error" : "key_exhausted");
           }
-          async function QT(e, t, n, r) {
+          async function XT(e, t, n, r) {
             try {
               let a = {
                 ...e.body
@@ -17230,7 +17230,7 @@ ${i}`);
                 signal: AbortSignal.timeout(6e5)
               });
               if (!o.ok)
-                return J(`HTTP ${o.status}: ${(await je(o)).slice(0, 300)}`, o.status, "upstream_error");
+                return Y(`HTTP ${o.status}: ${(await je(o)).slice(0, 300)}`, o.status, "upstream_error");
               let c = {
                 "Content-Type": o.headers.get("Content-Type") || (n ? "text/event-stream" : "application/json"),
                 "Cache-Control": "no-store"
@@ -17241,7 +17241,7 @@ ${i}`);
               });
             } catch (a) {
               let s = a instanceof hr;
-              return J(a.message || "\u900F\u4F20\u5931\u8D25", s ? 401 : 502, s ? "authentication_error" : "proxy_error");
+              return Y(a.message || "\u900F\u4F20\u5931\u8D25", s ? 401 : 502, s ? "authentication_error" : "proxy_error");
             }
           }
           async function vd(e, t, n, r) {
@@ -17307,7 +17307,7 @@ ${i}`);
                 accountId: o
               } = await ea(e, s), {
                 request: c
-              } = Qr({
+              } = Xr({
                 model: n,
                 messages: [{
                   role: "user",
@@ -17538,7 +17538,7 @@ ${i}`);
           var KT;
           var So = H(() => {
             "use strict";
-            Je();
+            Ye();
             bt();
             ud();
             ts();
@@ -17931,10 +17931,10 @@ ${i}`);
               nameMap: r
             };
           }
-          function Y0(e) {
+          function J0(e) {
             return e && typeof e == "object" && "response" in e ? e.response : e || {};
           }
-          function J0(e) {
+          function Y0(e) {
             let t = (n) => Number(n) || 0;
             return {
               promptTokens: t(e == null ? void 0 : e.promptTokenCount),
@@ -17944,7 +17944,7 @@ ${i}`);
               cachedTokens: t(e == null ? void 0 : e.cachedContentTokenCount)
             };
           }
-          function X0(e) {
+          function Q0(e) {
             let t = {
               prompt_tokens: e.promptTokens,
               completion_tokens: e.completionTokens,
@@ -17956,7 +17956,7 @@ ${i}`);
               cached_tokens: e.cachedTokens
             }), t;
           }
-          function Q0(e, t) {
+          function X0(e, t) {
             if (t)
               return "tool_calls";
             switch ((e || "").toUpperCase()) {
@@ -17989,7 +17989,7 @@ ${i}`);
           }
           function ty(e, t, n, r) {
             var _a;
-            let a = Y0(e), s = Array.isArray(a.candidates) ? a.candidates[0] : void 0, i = ((_a = s == null ? void 0 : s.content) == null ? void 0 : _a.parts) || [], o = "", c = "", u = [], l = false;
+            let a = J0(e), s = Array.isArray(a.candidates) ? a.candidates[0] : void 0, i = ((_a = s == null ? void 0 : s.content) == null ? void 0 : _a.parts) || [], o = "", c = "", u = [], l = false;
             for (let m of i)
               if (typeof m.text == "string")
                 m.thought ? c += m.text : o += m.text;
@@ -18011,7 +18011,7 @@ ${i}`);
                   }
                 });
               }
-            let p = J0(a.usageMetadata);
+            let p = Y0(a.usageMetadata);
             if (!o && !l && ey(s == null ? void 0 : s.finishReason))
               throw new fs((s == null ? void 0 : s.finishReason) || "");
             let y = {
@@ -18026,10 +18026,10 @@ ${i}`);
               choices: [{
                 index: (s == null ? void 0 : s.index) ?? 0,
                 message: y,
-                finish_reason: Q0(s == null ? void 0 : s.finishReason, l),
+                finish_reason: X0(s == null ? void 0 : s.finishReason, l),
                 native_finish_reason: ((s == null ? void 0 : s.finishReason) || "").toLowerCase() || null
               }],
-              usage: X0(p)
+              usage: Q0(p)
             };
           }
           function ny(e, t, n, r, a, s) {
@@ -18066,8 +18066,8 @@ ${i}`);
               } catch {
                 return;
               }
-              let O = Y0(T);
-              O.responseId && (g = O.responseId), O.modelVersion && (d = O.modelVersion), O.usageMetadata && (h = J0(O.usageMetadata), r(h));
+              let O = J0(T);
+              O.responseId && (g = O.responseId), O.modelVersion && (d = O.modelVersion), O.usageMetadata && (h = Y0(O.usageMetadata), r(h));
               let I = Array.isArray(O.candidates) ? O.candidates[0] : void 0;
               if (!I)
                 return;
@@ -18088,11 +18088,11 @@ ${i}`);
                   } catch {
                     U = "{}";
                   }
-                  let Q = R.thoughtSignature ? V0(R.thoughtSignature) : R.functionCall.id || `call_${Co().replace(/-/g, "").slice(0, 24)}`;
+                  let X = R.thoughtSignature ? V0(R.thoughtSignature) : R.functionCall.id || `call_${Co().replace(/-/g, "").slice(0, 24)}`;
                   x(w, {
                     tool_calls: [{
                       index: l++,
-                      id: Q,
+                      id: X,
                       type: "function",
                       function: {
                         name: B,
@@ -18140,7 +18140,7 @@ ${i}`);
                   choices: [{
                     index: 0,
                     delta: {},
-                    finish_reason: Q0(p, y)
+                    finish_reason: X0(p, y)
                   }]
                 }), b(w, {
                   id: g,
@@ -18148,7 +18148,7 @@ ${i}`);
                   created: Math.floor(Date.now() / 1e3),
                   model: d,
                   choices: [],
-                  usage: X0(h)
+                  usage: Q0(h)
                 }), w.enqueue(o.encode(`data: [DONE]
 
 `)), a && a(h);
@@ -18665,15 +18665,15 @@ ${i}`);
                     }
                   });
                 }
-                let U = await B.text(), Q;
+                let U = await B.text(), X;
                 try {
-                  Q = JSON.parse(U);
+                  X = JSON.parse(U);
                 } catch {
                   return No(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${U.slice(0, 200)}`, 502, "upstream_error");
                 }
                 let V;
                 try {
-                  V = ty(Q, e.requestedModel, m, p);
+                  V = ty(X, e.requestedModel, m, p);
                 } catch (oe) {
                   if (oe instanceof fs) {
                     d = oe.message, g = 502, o(_, `zero_output ${oe.finishReason}`, Sd);
@@ -18681,8 +18681,8 @@ ${i}`);
                   }
                   throw oe;
                 }
-                let Y = MS(Q);
-                return await sy(e, Y, true, 200), new Response(JSON.stringify(V), {
+                let J = MS(X);
+                return await sy(e, J, true, 200), new Response(JSON.stringify(V), {
                   status: 200,
                   headers: {
                     "Content-Type": "application/json",
@@ -18969,7 +18969,7 @@ ${i}`);
           var Sd;
           var Rd = H(() => {
             "use strict";
-            Je();
+            Ye();
             bt();
             ry();
             dS = "ag:health:";
@@ -19137,7 +19137,7 @@ ${i}`);
             var _a, _b2, _c2, _d2;
             let n = Po(t), r = (e.refreshTokens || []).filter((o) => o && o.trim());
             if (r.length === 0)
-              return J("\u8BE5 kimi \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Kimi OAuth refresh_token\uFF08\u53EF\u901A\u8FC7\u8BBE\u5907\u7801\u6388\u6743\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 kimi \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Kimi OAuth refresh_token\uFF08\u53EF\u901A\u8FC7\u8BBE\u5907\u7801\u6388\u6743\u83B7\u53D6\uFF09", 400, "configuration_error");
             let a = {
               ...e.body,
               model: _y(e.modelId)
@@ -19157,7 +19157,7 @@ ${i}`);
                 if (!u.ok) {
                   if (i = u.status, s = `HTTP ${u.status}: ${(await je(u)).slice(0, 300)}`, [401, 403, 429].includes(u.status) || u.status >= 500)
                     continue;
-                  return J(s, u.status, "upstream_error");
+                  return Y(s, u.status, "upstream_error");
                 }
                 if (((_b2 = e.body) == null ? void 0 : _b2.stream) === true && u.body) {
                   let [y, m] = u.body.tee();
@@ -19174,7 +19174,7 @@ ${i}`);
                 try {
                   p = JSON.parse(l);
                 } catch {
-                  return J(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
+                  return Y(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
                 }
                 return xe(e, Te(e, {
                   promptTokens: Number((_c2 = p == null ? void 0 : p.usage) == null ? void 0 : _c2.prompt_tokens) || 0,
@@ -19190,7 +19190,7 @@ ${i}`);
                 s = c.message || "\u672A\u77E5\u9519\u8BEF", i = 502;
                 continue;
               }
-            return J(`\u6240\u6709 Kimi \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
+            return Y(`\u6240\u6709 Kimi \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
           }
           async function KS(e, t) {
             try {
@@ -19313,7 +19313,7 @@ ${i}`);
           var qS;
           var Ay = H(() => {
             "use strict";
-            Je();
+            Ye();
             bt();
             Md = "17e5f671-d194-4dfb-9706-5516cb48c098", BS = {
               auth: "https://auth.kimi.ai",
@@ -19348,10 +19348,10 @@ ${i}`);
               "X-DashScope-UserAgent": bs
             };
           }
-          function QS(e) {
+          function XS(e) {
             let t = (e || "").trim();
             if (!t)
-              return YS;
+              return JS;
             let n = /^https?:\/\//i.test(t) ? t : `https://${t}`;
             return n.replace(/\/$/, "").endsWith("/v1") ? n.replace(/\/$/, "") : `${n.replace(/\/$/, "")}/v1`;
           }
@@ -19489,7 +19489,7 @@ ${i}`);
           }
           async function jy(e, t) {
             var _a;
-            let n = await st(e, XS, t, ZS), r = QS((_a = n.extra) == null ? void 0 : _a.resourceUrl);
+            let n = await st(e, QS, t, ZS), r = XS((_a = n.extra) == null ? void 0 : _a.resourceUrl);
             return {
               token: n.accessToken,
               base: r
@@ -19499,7 +19499,7 @@ ${i}`);
             var _a, _b2, _c2;
             let t = (e.refreshTokens || []).filter((s) => s && s.trim());
             if (t.length === 0)
-              return J("\u8BE5 qwen \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Qwen OAuth refresh_token\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u7528\u8BBE\u5907\u7801\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 qwen \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Qwen OAuth refresh_token\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u7528\u8BBE\u5907\u7801\u83B7\u53D6\uFF09", 400, "configuration_error");
             let n = ((_a = e.body) == null ? void 0 : _a.stream) === true, r = "", a = 502;
             for (let s of t)
               try {
@@ -19518,7 +19518,7 @@ ${i}`);
                 if (!c.ok) {
                   if (a = c.status, r = `HTTP ${c.status}: ${(await je(c)).slice(0, 300)}`, [401, 403, 429].includes(c.status) || c.status >= 500)
                     continue;
-                  return J(r, c.status, "upstream_error");
+                  return Y(r, c.status, "upstream_error");
                 }
                 if (n && c.body) {
                   let [p, y] = c.body.tee();
@@ -19535,7 +19535,7 @@ ${i}`);
                 try {
                   l = JSON.parse(u);
                 } catch {
-                  return J(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${u.slice(0, 200)}`, 502, "upstream_error");
+                  return Y(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${u.slice(0, 200)}`, 502, "upstream_error");
                 }
                 return xe(e, Te(e, {
                   promptTokens: Number((_b2 = l == null ? void 0 : l.usage) == null ? void 0 : _b2.prompt_tokens) || 0,
@@ -19551,7 +19551,7 @@ ${i}`);
                 r = i.message || "\u672A\u77E5\u9519\u8BEF", a = 502;
                 continue;
               }
-            return J(`\u6240\u6709 Qwen \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${r || "\u672A\u77E5"}`, a, "key_exhausted");
+            return Y(`\u6240\u6709 Qwen \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${r || "\u672A\u77E5"}`, a, "key_exhausted");
           }
           async function e2(e, t) {
             try {
@@ -19622,7 +19622,7 @@ ${i}`);
           function My() {
             return {
               success: true,
-              models: [...JS]
+              models: [...YS]
             };
           }
           var Ud;
@@ -19630,16 +19630,16 @@ ${i}`);
           var Cy;
           var GS;
           var VS;
-          var YS;
           var JS;
+          var YS;
           var bs;
-          var XS;
+          var QS;
           var ys;
           var Dy = H(() => {
             "use strict";
-            Je();
+            Ye();
             bt();
-            Ud = "f0304373b74a44d2b584a3fb70ca9e56", WS = "https://chat.qwen.ai/api/v1/oauth2/device/code", Cy = "https://chat.qwen.ai/api/v1/oauth2/token", GS = "openid profile email model.completion", VS = "urn:ietf:params:oauth:grant-type:device_code", YS = "https://portal.qwen.ai/v1", JS = ["coder-model", "qwen3-coder-plus", "qwen3-coder-flash", "vision-model"], bs = "QwenCode/0.9.1 (darwin; arm64)", XS = "qwen:at:", ys = "qwen:device:";
+            Ud = "f0304373b74a44d2b584a3fb70ca9e56", WS = "https://chat.qwen.ai/api/v1/oauth2/device/code", Cy = "https://chat.qwen.ai/api/v1/oauth2/token", GS = "openid profile email model.completion", VS = "urn:ietf:params:oauth:grant-type:device_code", JS = "https://portal.qwen.ai/v1", YS = ["coder-model", "qwen3-coder-plus", "qwen3-coder-flash", "vision-model"], bs = "QwenCode/0.9.1 (darwin; arm64)", QS = "qwen:at:", ys = "qwen:device:";
           });
           async function Fd(e) {
             let t = G(e), n = await t.get(Ly + "v1").catch(() => null);
@@ -19811,13 +19811,13 @@ ${i}`);
             var _a, _b2, _c2;
             let n = (e.refreshTokens || []).filter((o) => o && o.trim());
             if (n.length === 0)
-              return J("\u8BE5 grok \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A xAI OAuth refresh_token\uFF08\u53EF\u901A\u8FC7\u8BBE\u5907\u7801\u6388\u6743\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 grok \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A xAI OAuth refresh_token\uFF08\u53EF\u901A\u8FC7\u8BBE\u5907\u7801\u6388\u6743\u83B7\u53D6\uFF09", 400, "configuration_error");
             let r = ((_a = e.body) == null ? void 0 : _a.stream) === true;
             if (t === "responses-passthrough")
               return c2(e, n[0].trim(), r);
             let {
               request: a
-            } = Qr({
+            } = Xr({
               ...e.body,
               model: e.modelId
             }), s = "", i = 502;
@@ -19832,7 +19832,7 @@ ${i}`);
                 if (!u.ok) {
                   if (i = u.status, s = `HTTP ${u.status}: ${(await je(u)).slice(0, 300)}`, [401, 403, 429].includes(u.status) || u.status >= 500)
                     continue;
-                  return J(s, u.status, "upstream_error");
+                  return Y(s, u.status, "upstream_error");
                 }
                 if (r && u.body) {
                   let m = Eo(u.body, e.requestedModel, (d) => {
@@ -19851,7 +19851,7 @@ ${i}`);
                 try {
                   p = JSON.parse(l);
                 } catch {
-                  return J(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
+                  return Y(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
                 }
                 let y = P0(p, e.requestedModel);
                 return xe(e, Te(e, {
@@ -19868,7 +19868,7 @@ ${i}`);
                 s = c.message || "\u672A\u77E5\u9519\u8BEF", i = 502;
                 continue;
               }
-            return J(`\u6240\u6709 Grok \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
+            return Y(`\u6240\u6709 Grok \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
           }
           async function c2(e, t, n) {
             try {
@@ -19879,7 +19879,7 @@ ${i}`);
                 signal: AbortSignal.timeout(6e5)
               });
               if (!a.ok)
-                return J(`HTTP ${a.status}: ${(await je(a)).slice(0, 300)}`, a.status, "upstream_error");
+                return Y(`HTTP ${a.status}: ${(await je(a)).slice(0, 300)}`, a.status, "upstream_error");
               let s = {
                 "Content-Type": a.headers.get("Content-Type") || (n ? "text/event-stream" : "application/json"),
                 "Cache-Control": "no-store"
@@ -19889,7 +19889,7 @@ ${i}`);
                 headers: s
               });
             } catch (r) {
-              return J(r.message || "\u900F\u4F20\u5931\u8D25", 502, "proxy_error");
+              return Y(r.message || "\u900F\u4F20\u5931\u8D25", 502, "proxy_error");
             }
           }
           async function Fy(e, t, n) {
@@ -19902,7 +19902,7 @@ ${i}`);
             try {
               let r = await Hd(e, t), {
                 request: a
-              } = Qr({
+              } = Xr({
                 model: n,
                 messages: [{
                   role: "user",
@@ -19943,13 +19943,13 @@ ${i}`);
           var Ly;
           var Hy = H(() => {
             "use strict";
-            Je();
+            Ye();
             bt();
             ud();
             t2 = "https://auth.x.ai/.well-known/openid-configuration", Bd = "b1a00492-073a-47ea-816f-4c329264a828", n2 = "openid profile email offline_access grok-cli:access api:access", r2 = "urn:ietf:params:oauth:grant-type:device_code", $d = "https://cli-chat-proxy.grok.com/v1", a2 = "xai-grok-workspace/0.2.120", s2 = "0.2.120", i2 = "grok:at:", xs = "grok:device:", Ly = "grok:endpoints:";
           });
           var vs;
-          var Xt;
+          var Qt;
           var zy = H(() => {
             "use strict";
             vs = [{
@@ -20064,7 +20064,7 @@ Before running a command that changes system state \u2014 restarts, deletes, con
               cache_control: {
                 type: "ephemeral"
               }
-            }], Xt = {
+            }], Qt = {
               max_tokens: 128e3,
               thinking: {
                 type: "enabled"
@@ -20113,14 +20113,14 @@ Before running a command that changes system state \u2014 restarts, deletes, con
             deviceIdFor: () => ws,
             fetchZaiBusinessToken: () => Gy,
             fetchZcodeBalance: () => w2,
-            fetchZcodeModels: () => Xd,
-            handleZcodeRequest: () => Yd,
+            fetchZcodeModels: () => Qd,
+            handleZcodeRequest: () => Jd,
             parseZcodeCredential: () => aa,
             pollZcodeDeviceFlow: () => Vd,
             probeZcode: () => k2,
             sessionIdFor: () => Lo,
             startZcodeDeviceFlow: () => Gd,
-            testZcode: () => Jd,
+            testZcode: () => Yd,
             userIdFromJwt: () => Es,
             zcodeProviderFor: () => Ro
           });
@@ -20162,7 +20162,7 @@ Before running a command that changes system state \u2014 restarts, deletes, con
           async function ks(e, t = "access") {
             let n = aa(e), r = t === "jwt" ? n.jwt || n.accessToken : n.accessToken || n.jwt, a = Es(n.jwt), s = await ws(a), i = n.deviceId || s, o = await Lo(a);
             return {
-              ...Xt.headers,
+              ...Qt.headers,
               authorization: `Bearer ${r}`,
               "x-api-key": r,
               "content-type": "application/json",
@@ -20456,7 +20456,7 @@ data: [DONE]
               }
             });
           }
-          async function Yd(e) {
+          async function Jd(e) {
             var _a, _b2, _c2;
             if (!e.refreshToken)
               return Mn("\u8BE5 zcode \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u586B\u5165 ZCode \u8D26\u53F7\u7684 JWT\uFF08\u53EF\u70B9\u300C\u7528 ZCode \u8D26\u53F7\u6388\u6743\u300D\u83B7\u53D6\uFF09", 400, "configuration_error");
@@ -20465,17 +20465,17 @@ data: [DONE]
               model: e.modelId
             }), n = aa(e.refreshToken), r = Es(n.jwt), [a, s] = await Promise.all([ws(r), Lo(r)]), i = {
               model: e.modelId,
-              max_tokens: Math.min(Number(t.max_tokens) || 8192, Number(Xt.max_tokens) || 32e3),
+              max_tokens: Math.min(Number(t.max_tokens) || 8192, Number(Qt.max_tokens) || 32e3),
               stream: false,
               metadata: {
                 user_id: h2(r, n.deviceId || await ws(r), await Lo(r))
               },
               system: vs,
               messages: y2(t.messages, String(t.system || "")),
-              thinking: Xt.thinking ?? {
+              thinking: Qt.thinking ?? {
                 type: "enabled"
               },
-              output_config: Xt.output_config ?? {
+              output_config: Qt.output_config ?? {
                 effort: "low"
               },
               ...t.temperature !== void 0 ? {
@@ -20519,7 +20519,7 @@ data: [DONE]
             let d = x2(p, e.requestedModel);
             return ((_c2 = e.body) == null ? void 0 : _c2.stream) === true ? v2(d) : Vy(d);
           }
-          async function Jd(e, t, n, r) {
+          async function Yd(e, t, n, r) {
             var _a, _b2;
             try {
               let a = /bigmodel\.cn/i.test(r || ""), s = a ? `${(r || "").replace(/\/+$/, "")}/v1/messages` : `${kt}${Mo}`, i = await fetch(s, {
@@ -20534,8 +20534,8 @@ data: [DONE]
                     role: "user",
                     content: "hi"
                   }],
-                  thinking: Xt.thinking,
-                  output_config: Xt.output_config
+                  thinking: Qt.thinking,
+                  output_config: Qt.output_config
                 }),
                 signal: AbortSignal.timeout(6e4)
               }), o = await i.text().catch(() => "");
@@ -20576,7 +20576,7 @@ data: [DONE]
               };
             }
           }
-          async function Xd(e, t) {
+          async function Qd(e, t) {
             return {
               success: true,
               models: _s
@@ -20711,8 +20711,8 @@ data: [DONE]
                         role: "user",
                         content: "hi"
                       }],
-                      thinking: Xt.thinking,
-                      output_config: Xt.output_config
+                      thinking: Qt.thinking,
+                      output_config: Qt.output_config
                     }),
                     signal: AbortSignal.timeout(3e4)
                   }), v = await x.text().catch(() => "");
@@ -20756,8 +20756,8 @@ data: [DONE]
                       role: "user",
                       content: "hi"
                     }],
-                    thinking: Xt.thinking,
-                    output_config: Xt.output_config
+                    thinking: Qt.thinking,
+                    output_config: Qt.output_config
                   }),
                   signal: AbortSignal.timeout(3e4)
                 }), b = await h.text().catch(() => "");
@@ -20940,7 +20940,7 @@ data: [DONE]
           var p2;
           var br = H(() => {
             "use strict";
-            Je();
+            Ye();
             zy();
             Ky();
             kt = "https://zcode.z.ai", l2 = "https://api.z.ai", ra = "3.16.3", Mo = "/api/v1/zcode-plan/anthropic/v1/messages", u2 = "/api/v1/oauth/cli/init", d2 = (e) => `/api/v1/oauth/cli/poll/${encodeURIComponent(e)}`, Do = `/api/v1/zcode-plan/billing/balance?app_version=${ra}`, Kd = `/api/v1/zcode-plan/billing/preview?app_version=${ra}&platform=win32-x64`, f2 = "/api/v1/zcode-plan/billing/claim", qd = (e) => `zcode:flow:${e}`, _s = ["GLM-5.3", "GLM-5.3-Flash"], p2 = _s;
@@ -20993,7 +20993,7 @@ data: [DONE]
               "User-Agent": T2
             };
           }
-          async function Yy(e, t) {
+          async function Jy(e, t) {
             return (await jt(`wb2a:${t}:${e}`)).slice(0, 36);
           }
           async function F2(e, t, n) {
@@ -21031,7 +21031,7 @@ data: [DONE]
             c || (c = `${r.base}/login?state=${encodeURIComponent(o)}&platform=CLI`);
             let u = r.global ? "global" : "cn";
             try {
-              await G(e).put(Qd + o, JSON.stringify({
+              await G(e).put(Xd + o, JSON.stringify({
                 realm: u,
                 base: r.base,
                 origin: r.origin,
@@ -21049,7 +21049,7 @@ data: [DONE]
             };
           }
           async function ef(e, t) {
-            let n = await G(e).get(Qd + t).catch(() => null);
+            let n = await G(e).get(Xd + t).catch(() => null);
             if (!n)
               return {
                 status: "error",
@@ -21128,7 +21128,7 @@ data: [DONE]
               expiresAt: Date.now() + p * 1e3,
               currentRefreshToken: u
             }, p).catch(() => {
-            }), await G(e).put(Qd + t, JSON.stringify({
+            }), await G(e).put(Xd + t, JSON.stringify({
               ...r,
               done: true,
               refreshToken: u,
@@ -21192,7 +21192,7 @@ data: [DONE]
               "X-IDE-Version": $o,
               "X-Product": "WorkBuddy"
             };
-            t ? a.Authorization = "Bearer " + t : a["X-No-Authorization"] = "1", n.uid ? (a["X-User-Id"] = n.uid, a["X-Machine-ID"] = await Yy(n.uid, "machine"), a["X-Session-ID"] = await Yy(n.uid, "session")) : a["X-No-User-Id"] = "1", e.global ? (a["X-No-Enterprise-Id"] = "1", a["X-Domain"] = "www.workbuddy.ai") : (n.enterpriseId ? a["X-Enterprise-Id"] = n.enterpriseId : a["X-No-Enterprise-Id"] = "1", n.domain ? a["X-Domain"] = n.domain : a["X-No-Department-Info"] = "1");
+            t ? a.Authorization = "Bearer " + t : a["X-No-Authorization"] = "1", n.uid ? (a["X-User-Id"] = n.uid, a["X-Machine-ID"] = await Jy(n.uid, "machine"), a["X-Session-ID"] = await Jy(n.uid, "session")) : a["X-No-User-Id"] = "1", e.global ? (a["X-No-Enterprise-Id"] = "1", a["X-Domain"] = "www.workbuddy.ai") : (n.enterpriseId ? a["X-Enterprise-Id"] = n.enterpriseId : a["X-No-Enterprise-Id"] = "1", n.domain ? a["X-Domain"] = n.domain : a["X-No-Department-Info"] = "1");
             let s = dt(16), i = dt(16);
             return a["X-Conversation-Request-ID"] = s, a["X-Conversation-Message-ID"] = i, a["X-Request-ID"] = i, a["X-Root-Request-ID"] = s, a["X-Trace-ID"] = s, a["X-B3-TraceId"] = s, a["X-B3-SpanId"] = i.slice(0, 16), a["X-B3-Sampled"] = "1", a;
           }
@@ -21217,7 +21217,7 @@ data: [DONE]
             };
             return n.stream = true, K2(n), "stream_options" in n || (n.stream_options = {
               include_usage: true
-            }), W2(n), G2(n), V2(n), Array.isArray(n.messages) && (n.messages = J2(Y2(n.messages))), X2(n), Q2(n), n;
+            }), W2(n), G2(n), V2(n), Array.isArray(n.messages) && (n.messages = Y2(J2(n.messages))), Q2(n), X2(n), n;
           }
           function K2(e) {
             if (!("max_completion_tokens" in e))
@@ -21269,7 +21269,7 @@ data: [DONE]
                     });
             }
           }
-          function Y2(e) {
+          function J2(e) {
             if (!Array.isArray(e) || e.length < 3)
               return e;
             let t = [], n = false, r = 0;
@@ -21304,7 +21304,7 @@ data: [DONE]
             }
             return n ? t : e;
           }
-          function J2(e) {
+          function Y2(e) {
             if (!Array.isArray(e) || e.length === 0)
               return e;
             let t = /* @__PURE__ */ new Set(), n = /* @__PURE__ */ new Set(), r = false;
@@ -21341,10 +21341,10 @@ data: [DONE]
             }
             return s ? i : e;
           }
-          function Jy(e) {
+          function Yy(e) {
             "reasoning_effort" in e || "reasoningEffort" in e || (e.reasoning_effort = q2);
           }
-          function X2(e) {
+          function Q2(e) {
             if (!ib(e.model))
               return;
             let t = e.thinking, n = !!t && typeof t == "object" && !Array.isArray(t), r = n ? String(t.type || "").trim() : "";
@@ -21353,14 +21353,14 @@ data: [DONE]
                 delete e.reasoning_effort, delete e.reasoningEffort;
                 return;
               }
-              Jy(e);
+              Yy(e);
               return;
             }
             n ? t.type = "enabled" : e.thinking = {
               type: "enabled"
-            }, Jy(e);
+            }, Yy(e);
           }
-          function Q2(e) {
+          function X2(e) {
             if (!ib(e.model))
               return;
             let t = e.messages;
@@ -21599,7 +21599,7 @@ data: [DONE]
             var _a;
             let r = (e.refreshTokens || []).filter((u) => u && u.trim());
             if (r.length === 0)
-              return J("\u8BE5 codebuddy \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Keys\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A refresh_token\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u81EA\u52A8\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 codebuddy \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Keys\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A refresh_token\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u81EA\u52A8\u83B7\u53D6\uFF09", 400, "configuration_error");
             let a = xr(t, n), s = ((_a = e.body) == null ? void 0 : _a.stream) === true, i = nf(e.body, e.modelId), o = "", c = 502;
             for (let u of r)
               try {
@@ -21615,7 +21615,7 @@ data: [DONE]
                 if (!m.ok) {
                   if (c = m.status, o = `HTTP ${m.status}: ${(await je(m)).slice(0, 300)}`, [401, 403, 429].includes(m.status) || m.status >= 500)
                     continue;
-                  return J(o, m.status, "upstream_error");
+                  return Y(o, m.status, "upstream_error");
                 }
                 if (!m.body) {
                   o = "\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", c = 502;
@@ -21647,7 +21647,7 @@ data: [DONE]
                 o = l.message || "\u672A\u77E5\u9519\u8BEF", c = 502;
                 continue;
               }
-            return J(`\u6240\u6709 CodeBuddy \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${o || "\u672A\u77E5"}`, c, "key_exhausted");
+            return Y(`\u6240\u6709 CodeBuddy \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${o || "\u672A\u77E5"}`, c, "key_exhausted");
           }
           async function af(e, t, n, r, a) {
             if (!t)
@@ -21857,11 +21857,11 @@ data: [DONE]
               };
             }
           }
-          function Xy(e) {
+          function Qy(e) {
             let t = (e || "").toLowerCase();
             return ["\u5DF2\u7B7E\u5230", "\u7B7E\u5230\u8FC7", "\u91CD\u590D\u7B7E\u5230", "already", "code=10001"].some((n) => t.includes(n.toLowerCase()));
           }
-          async function Qy(e, t, n, r, a) {
+          async function Xy(e, t, n, r, a) {
             try {
               let s = await ob(e, t, n, r);
               s.ok && (typeof s.remain == "number" && (a.remain = s.remain), !a.nickname && s.nickname && (a.nickname = s.nickname), !a.uid && s.uid && (a.uid = s.uid));
@@ -21901,7 +21901,7 @@ data: [DONE]
                 }
                 let g = String((d == null ? void 0 : d.msg) || (d == null ? void 0 : d.message) || "");
                 if (!y.ok || d && d.code !== 0)
-                  return Xy(g) || Xy(m) ? Qy(e, t, n, r, {
+                  return Qy(g) || Qy(m) ? Xy(e, t, n, r, {
                     ok: true,
                     already: true,
                     message: "\u4ECA\u65E5\u5DF2\u7B7E\u5230",
@@ -21913,7 +21913,7 @@ data: [DONE]
                     message: `HTTP ${y.status} code=${d == null ? void 0 : d.code} msg=${g || m.slice(0, 160)}`
                   };
                 let h = ((_b2 = (_a = d == null ? void 0 : d.data) == null ? void 0 : _a.Response) == null ? void 0 : _b2.Data) || ((_c2 = d == null ? void 0 : d.data) == null ? void 0 : _c2.data) || (d == null ? void 0 : d.data) || {}, b = Number((h == null ? void 0 : h.Reward) ?? (h == null ? void 0 : h.Dosage) ?? (h == null ? void 0 : h.Credit) ?? ((_d2 = d == null ? void 0 : d.data) == null ? void 0 : _d2.reward) ?? 0) || 0;
-                return Qy(e, t, n, r, {
+                return Xy(e, t, n, r, {
                   ok: true,
                   message: b > 0 ? `\u7B7E\u5230\u6210\u529F\uFF0C\u83B7\u5F97 ${b} \u79EF\u5206` : "\u7B7E\u5230\u6210\u529F",
                   realm: s,
@@ -21966,14 +21966,14 @@ data: [DONE]
           var D2;
           var L2;
           var nb;
-          var Qd;
+          var Xd;
           var rb;
           var ab;
           var U2;
           var q2;
           var zo = H(() => {
             "use strict";
-            Je();
+            Ye();
             bt();
             Uo = {
               base: "https://copilot.tencent.com",
@@ -21986,7 +21986,7 @@ data: [DONE]
               origin: "https://www.workbuddy.ai",
               global: true
             }, $o = "5.5.4", E2 = "2.137.1", T2 = "CLI/2.63.2 CodeBuddy/2.63.2", S2 = "/v2/plugin/auth/state?platform=CLI", A2 = "/v2/plugin/auth/token", C2 = "/v2/plugin/login/account", N2 = "/v2/plugin/auth/token/refresh", Zy = "/v2/chat/completions", O2 = "/console/enterprises/personal/models", I2 = "/v2/enterprises/personal/models", j2 = "/v3/config";
-            eb = "/meter/get-user-resource", tb = "/meter/daily-checkin", P2 = Ho(Uo, eb), R2 = Ho(Bo, eb), M2 = Ho(Uo, tb), D2 = Ho(Bo, tb), L2 = "codebuddy-checkin-cron-v1", nb = "codebuddy:at:", Qd = "codebuddy:auth:", rb = "codebuddy:acct:", ab = 3600, U2 = 2160 * 3600;
+            eb = "/meter/get-user-resource", tb = "/meter/daily-checkin", P2 = Ho(Uo, eb), R2 = Ho(Bo, eb), M2 = Ho(Uo, tb), D2 = Ho(Bo, tb), L2 = "codebuddy-checkin-cron-v1", nb = "codebuddy:at:", Xd = "codebuddy:auth:", rb = "codebuddy:acct:", ab = 3600, U2 = 2160 * 3600;
             q2 = "high";
           });
           var yb = {};
@@ -22250,7 +22250,7 @@ data: [DONE]
             var _a;
             let t = (e.refreshTokens || []).filter((l) => l && l.trim());
             if (t.length === 0)
-              return J("\u8BE5 cline \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Keys\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Cline refreshToken\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u81EA\u52A8\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 cline \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Keys\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Cline refreshToken\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u81EA\u52A8\u83B7\u53D6\uFF09", 400, "configuration_error");
             let n = ((_a = e.body) == null ? void 0 : _a.stream) === true, r = gA(e.body, e.modelId, n), a = /* @__PURE__ */ new Map();
             for (let l of t)
               a.set(l, await mb(l));
@@ -22287,7 +22287,7 @@ data: [DONE]
                     oa.set(y, w), lb(e.env, p, e.modelId, w);
                     continue;
                   }
-                  return J(c, d.status, "upstream_error");
+                  return Y(c, d.status, "upstream_error");
                 }
                 if (!d.body) {
                   c = "\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", u = 502;
@@ -22338,7 +22338,7 @@ data: [DONE]
                 continue;
               }
             }
-            return J(`\u6240\u6709 Cline \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c || "\u672A\u77E5"}`, u, "key_exhausted");
+            return Y(`\u6240\u6709 Cline \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c || "\u672A\u77E5"}`, u, "key_exhausted");
           }
           async function gb(e, t) {
             var _a, _b2;
@@ -22719,7 +22719,7 @@ data: [DONE]
           var yA;
           var gf = H(() => {
             "use strict";
-            Je();
+            Ye();
             bt();
             vr = "https://api.cline.bot/api/v1", lA = "https://api.workos.com/user_management/authorize/device", uA = "https://api.workos.com/user_management/authenticate", db = "client_01K3A541FN8TA3EPPHTD2325AR", fb = {
               "User-Agent": "Cline/3.0.47",
@@ -22813,17 +22813,17 @@ data: [DONE]
             return `${t.slice(0, 8)}-${t.slice(8, 12)}-${t.slice(12, 16)}-${t.slice(16, 20)}-${t.slice(20, 32)}`;
           }
           function yf(e) {
-            return vb(Jt(`machine:${e || "anonymous"}`));
+            return vb(Yt(`machine:${e || "anonymous"}`));
           }
           function bf(e) {
-            return vb(Jt(`machinetype:${e || "anonymous"}`)).replace(/-/g, "").slice(0, 18);
+            return vb(Yt(`machinetype:${e || "anonymous"}`)).replace(/-/g, "").slice(0, 18);
           }
           async function xf(e) {
             let t = await crypto.subtle.digest("SHA-512", ca(`machinetoken:${e || "anonymous"}`));
             return PA(new Uint8Array(t)).slice(0, 43);
           }
           function vf(e) {
-            return "DESKTOP-" + Jt(`hostname:${e || "anonymous"}`).slice(0, 7).toUpperCase();
+            return "DESKTOP-" + Yt(`hostname:${e || "anonymous"}`).slice(0, 7).toUpperCase();
           }
           async function wb(e, t) {
             let n = yf(t), r = await xf(t), a = bf(t), s = vf(t), i = [...crypto.getRandomValues(new Uint8Array(8))].map((l) => l.toString(16).padStart(2, "0")).join(""), o = As(UA(ca(i))), c = xb({
@@ -22858,7 +22858,7 @@ data: [DONE]
               info: e.info,
               requestId: crypto.randomUUID(),
               version: "v1"
-            }))), s = String(Math.floor(Date.now() / 1e3)), i = Jt([a, e.cosyKey, s, t, $A(n)].join(`
+            }))), s = String(Math.floor(Date.now() / 1e3)), i = Yt([a, e.cosyKey, s, t, $A(n)].join(`
 `)), o = {
               "cosy-data-policy": "agree",
               "content-type": "application/json",
@@ -22919,7 +22919,7 @@ data: [DONE]
           var Zo = {};
           nt(Zo, {
             QODER_CN_MODELS: () => Ab,
-            QODER_MODELS: () => Qo,
+            QODER_MODELS: () => Xo,
             checkinQoder: () => uC,
             fetchQoderModels: () => Af,
             handleQoderRequest: () => Tf,
@@ -22936,7 +22936,7 @@ data: [DONE]
             return /qoder\.com\.cn/i.test(e || "") ? "cn" : "global";
           }
           function Cb(e) {
-            return Dn(e) === "cn" ? Ab : Qo;
+            return Dn(e) === "cn" ? Ab : Xo;
           }
           function Ns(e) {
             let t = (e || "").trim();
@@ -22995,7 +22995,7 @@ data: [DONE]
             });
             n === "cn" && l.set("redirect_uri", zA);
             let p = `${r.website}/device/selectAccounts?${l.toString()}`, y = `qd-${Date.now().toString(36)}-${dt(6)}`;
-            return await K(e).setJSON(Xo(y), {
+            return await K(e).setJSON(Qo(y), {
               verifier: s,
               nonce: c,
               region: n,
@@ -23026,7 +23026,7 @@ data: [DONE]
             }
           }
           async function Ef(e, t) {
-            let n = K(e), r = await n.get(Xo(t), {
+            let n = K(e), r = await n.get(Qo(t), {
               type: "json",
               consistency: "strong"
             });
@@ -23036,7 +23036,7 @@ data: [DONE]
                 message: "\u6388\u6743\u6D41\u7A0B\u4E0D\u5B58\u5728\u6216\u5DF2\u8FC7\u671F\uFF0C\u8BF7\u91CD\u65B0\u53D1\u8D77"
               };
             if (Date.now() - (r.at || 0) > qA)
-              return await n.delete(Xo(t)).catch(() => {
+              return await n.delete(Qo(t)).catch(() => {
               }), {
                 status: "error",
                 message: "\u6388\u6743\u5DF2\u8D85\u65F6\uFF0C\u8BF7\u91CD\u65B0\u53D1\u8D77"
@@ -23087,7 +23087,7 @@ data: [DONE]
               region: a,
               issuedAt: Date.now()
             };
-            return await n.delete(Xo(t)).catch(() => {
+            return await n.delete(Qo(t)).catch(() => {
             }), {
               status: "ok",
               refreshToken: Nb(d),
@@ -23100,7 +23100,7 @@ data: [DONE]
             };
           }
           async function VA(e) {
-            let t = `${e.region}|${e.uid || e.deviceToken.slice(0, 24)}|${e.deviceToken.slice(-8)}`, n = Yo.get(t);
+            let t = `${e.region}|${e.uid || e.deviceToken.slice(0, 24)}|${e.deviceToken.slice(-8)}`, n = Jo.get(t);
             if (n)
               return n;
             let r = e.uid || `cred:${e.deviceToken}`, a = await wb({
@@ -23113,13 +23113,13 @@ data: [DONE]
               securityOauthToken: e.deviceToken,
               refreshToken: e.refreshToken
             }, r);
-            return Yo.size >= GA && Yo.clear(), Yo.set(t, a), a;
+            return Jo.size >= GA && Jo.clear(), Jo.set(t, a), a;
           }
           function Cs(e) {
             return typeof e == "string" ? e : Array.isArray(e) ? e.map((t) => (t == null ? void 0 : t.type) === "text" ? String(t.text ?? "") : "").filter(Boolean).join(`
 `) : "";
           }
-          function YA(e) {
+          function JA(e) {
             var _a;
             if (!Array.isArray(e))
               return [];
@@ -23133,7 +23133,7 @@ data: [DONE]
                   n.type === "image" && n.source && (n.source.type === "base64" && n.source.data ? t.push(`data:${n.source.media_type || "image/png"};base64,${n.source.data}`) : n.source.type === "url" && n.source.url && t.push(String(n.source.url)));
             return t;
           }
-          function Jo() {
+          function Yo() {
             return _b();
           }
           function Ob(e) {
@@ -23149,7 +23149,7 @@ data: [DONE]
                 continue;
               }
               if (a === "user") {
-                let s = Cs(r.content), o = YA(r.content).map((c) => ({
+                let s = Cs(r.content), o = JA(r.content).map((c) => ({
                   type: "image_url",
                   image_url: {
                     url: c
@@ -23162,7 +23162,7 @@ data: [DONE]
                   role: "user",
                   content: "",
                   contents: o,
-                  response_meta: Jo(),
+                  response_meta: Yo(),
                   reasoning_content_signature: ""
                 });
                 continue;
@@ -23171,7 +23171,7 @@ data: [DONE]
                 let s = {
                   role: "assistant",
                   content: Cs(r.content),
-                  response_meta: Jo(),
+                  response_meta: Yo(),
                   reasoning_content_signature: ""
                 };
                 Array.isArray(r.tool_calls) && r.tool_calls.length && (s.tool_calls = r.tool_calls), t.push(s);
@@ -23181,7 +23181,7 @@ data: [DONE]
                 let s = {
                   role: "tool",
                   content: Cs(r.content),
-                  response_meta: Jo(),
+                  response_meta: Yo(),
                   reasoning_content_signature: ""
                 };
                 r.tool_call_id && (s.tool_call_id = String(r.tool_call_id)), r.name && (s.name = String(r.name)), t.push(s);
@@ -23197,11 +23197,11 @@ data: [DONE]
                 type: "text",
                 text: "hi"
               }],
-              response_meta: Jo(),
+              response_meta: Yo(),
               reasoning_content_signature: ""
             }), t;
           }
-          function JA(e) {
+          function YA(e) {
             for (let t = e.length - 1; t >= 0; t--) {
               let n = e[t];
               if ((n == null ? void 0 : n.role) !== "user")
@@ -23218,7 +23218,7 @@ data: [DONE]
             }
             return "";
           }
-          function XA(e) {
+          function QA(e) {
             return Array.isArray(e) ? e.map((t) => {
               var _a, _b2;
               if (!t || typeof t != "object")
@@ -23240,7 +23240,7 @@ data: [DONE]
             }).filter(Boolean) : [];
           }
           function ZA(e) {
-            return QA[e] || {
+            return XA[e] || {
               display: e,
               ctx: 18e4,
               vl: true,
@@ -23253,7 +23253,7 @@ data: [DONE]
             return n ? ["low", "minimal"].includes(n) ? "low" : ["high", "xhigh", "max"].includes(n) ? "high" : n === "medium" ? "medium" : "" : "";
           }
           function tC(e, t, n, r) {
-            let a = JA(r), s = crypto.randomUUID(), i = ZA(t), o = eC(n), c = !!o, u = {
+            let a = YA(r), s = crypto.randomUUID(), i = ZA(t), o = eC(n), c = !!o, u = {
               key: t,
               display_name: i.display,
               model: "",
@@ -23307,7 +23307,7 @@ data: [DONE]
               task_id: "common",
               model_config: u,
               messages: r,
-              tools: XA(n == null ? void 0 : n.tools),
+              tools: QA(n == null ? void 0 : n.tools),
               business: {
                 product: "cli",
                 version: Vo,
@@ -23830,23 +23830,23 @@ data: [DONE]
           var FA;
           var HA;
           var zA;
-          var Xo;
+          var Qo;
           var qA;
           var wf;
           var la;
           var KA;
           var Ab;
-          var Qo;
-          var Yo;
+          var Xo;
+          var Jo;
           var GA;
-          var QA;
+          var XA;
           var oC;
           var Os = H(() => {
             "use strict";
-            Je();
+            Ye();
             bt();
             Eb();
-            FA = "1c5e33e1-364d-4ce6-b02c-acaa81274a5c", HA = "e883ade2-e6e3-4d6d-adf7-f92ceff5fdcb", zA = "qoder-work-cn://", Xo = (e) => `qoder:flow:${e}`, qA = 600 * 1e3, wf = "/algo/api/v2/service/pro/sse/agent_chat_generation?FetchKeys=llm_model_result&AgentId=agent_common&Encode=1", la = {
+            FA = "1c5e33e1-364d-4ce6-b02c-acaa81274a5c", HA = "e883ade2-e6e3-4d6d-adf7-f92ceff5fdcb", zA = "qoder-work-cn://", Qo = (e) => `qoder:flow:${e}`, qA = 600 * 1e3, wf = "/algo/api/v2/service/pro/sse/agent_chat_generation?FetchKeys=llm_model_result&AgentId=agent_common&Encode=1", la = {
               cn: {
                 website: "https://qoder.com.cn",
                 openapi: "https://openapi.qoder.com.cn",
@@ -23859,9 +23859,9 @@ data: [DONE]
                 userAgent: "Qoder/1.1.75",
                 chatUrl: "https://api3.qoder.sh" + wf
               }
-            }, KA = ["https://api3.qoder.sh", "https://api2.qoder.sh", "https://api1.qoder.sh"].map((e) => e + wf), Ab = ["auto", "qmodel_38max", "qfmodel", "qmodel_latest", "qmodel", "q37fmodel", "dmodel", "dfmodel", "gmodel", "gfmodel", "gm51model", "kmodel_latest", "kmodel", "mmodel", "lmodel"], Qo = ["auto", "qmodel_38max", "qfmodel", "qmodel_latest", "qmodel", "dmodel", "dfmodel", "gmodel", "gfmodel", "kmodel_latest", "kmodel", "mmodel", "lmodel", "ultimate", "performance", "efficient", "fast", "smodel", "cmodel"];
-            Yo = /* @__PURE__ */ new Map(), GA = 50;
-            QA = {
+            }, KA = ["https://api3.qoder.sh", "https://api2.qoder.sh", "https://api1.qoder.sh"].map((e) => e + wf), Ab = ["auto", "qmodel_38max", "qfmodel", "qmodel_latest", "qmodel", "q37fmodel", "dmodel", "dfmodel", "gmodel", "gfmodel", "gm51model", "kmodel_latest", "kmodel", "mmodel", "lmodel"], Xo = ["auto", "qmodel_38max", "qfmodel", "qmodel_latest", "qmodel", "dmodel", "dfmodel", "gmodel", "gfmodel", "kmodel_latest", "kmodel", "mmodel", "lmodel", "ultimate", "performance", "efficient", "fast", "smodel", "cmodel"];
+            Jo = /* @__PURE__ */ new Map(), GA = 50;
+            XA = {
               auto: {
                 display: "Auto",
                 ctx: 2e5,
@@ -24007,7 +24007,7 @@ data: [DONE]
             normalizeTraeModel: () => Of,
             parseTraeCallback: () => Fb,
             parseTraeCredential: () => Rs,
-            parseTraeModelList: () => Yb,
+            parseTraeModelList: () => Jb,
             probeTrae: () => kC,
             regionFromBaseUrl: () => Ps,
             serializeTraeCredential: () => Bb,
@@ -24117,10 +24117,10 @@ data: [DONE]
             return `http://127.0.0.1:${18080 + Math.floor(Math.random() * 120)}${$b}`;
           }
           async function mC() {
-            let e = Xa(crypto.getRandomValues(new Uint8Array(48))), t = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(e));
+            let e = Qa(crypto.getRandomValues(new Uint8Array(48))), t = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(e));
             return {
               verifier: e,
-              challenge: Xa(new Uint8Array(t))
+              challenge: Qa(new Uint8Array(t))
             };
           }
           async function If(e, t) {
@@ -24811,15 +24811,15 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
             var _a, _b2;
             let n = Rs(((_a = e.refreshTokens) == null ? void 0 : _a[0]) || "", t);
             if (!n)
-              return J("\u8BE5 Trae \u6E20\u9053\u672A\u914D\u7F6E\u6709\u6548\u51ED\u636E\uFF1A\u8BF7\u70B9\u300C\u7528 Trae \u8D26\u53F7\u6388\u6743\u300D\u5B8C\u6210\u6388\u6743\uFF0C\u6216\u7C98\u8D34\u542B refreshToken \u7684\u56DE\u8C03 URL", 400, "configuration_error");
+              return Y("\u8BE5 Trae \u6E20\u9053\u672A\u914D\u7F6E\u6709\u6548\u51ED\u636E\uFF1A\u8BF7\u70B9\u300C\u7528 Trae \u8D26\u53F7\u6388\u6743\u300D\u5B8C\u6210\u6388\u6743\uFF0C\u6216\u7C98\u8D34\u542B refreshToken \u7684\u56DE\u8C03 URL", 400, "configuration_error");
             let r = ec(t, n), a = Un(e.env, r), s = Of(e.modelId || "");
             if (s.forcedRegion && s.forcedRegion !== r)
-              return J(`\u6A21\u578B\u524D\u7F00\u4E0E\u672C\u6E20\u9053\u533A\u57DF\u4E0D\u4E00\u81F4\uFF1A\u8BE5\u6E20\u9053\u662F${a.label}\uFF0C\u6A21\u578B ${e.modelId} \u6307\u5411${s.forcedRegion === "cn" ? "\u56FD\u5185\u7248" : "\u56FD\u9645\u7248"}\u3002\u8BF7\u6539\u8D70\u5BF9\u5E94\u533A\u57DF\u7684\u6E20\u9053`, 400, "invalid_request_error");
+              return Y(`\u6A21\u578B\u524D\u7F00\u4E0E\u672C\u6E20\u9053\u533A\u57DF\u4E0D\u4E00\u81F4\uFF1A\u8BE5\u6E20\u9053\u662F${a.label}\uFF0C\u6A21\u578B ${e.modelId} \u6307\u5411${s.forcedRegion === "cn" ? "\u56FD\u5185\u7248" : "\u56FD\u9645\u7248"}\u3002\u8BF7\u6539\u8D70\u5BF9\u5E94\u533A\u57DF\u7684\u6E20\u9053`, 400, "invalid_request_error");
             let i = s.model || e.modelId, o = ((_b2 = e.body) == null ? void 0 : _b2.stream) === true, c = "";
             try {
               c = await nc(e.env, n);
             } catch (m) {
-              return J(m.message || "Trae \u51ED\u636E\u5237\u65B0\u5931\u8D25", 401, "authentication_error");
+              return Y(m.message || "Trae \u51ED\u636E\u5237\u65B0\u5931\u8D25", 401, "authentication_error");
             }
             let u = rc(a, n, c, true), l = e.requestedModel, p = "", y = 502;
             for (let m of ["raw", "utils"]) {
@@ -24837,7 +24837,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
                 } = await Gb(g), w = js(v, k, g.status);
                 if (y = w.status, p = w.message, (g.status === 404 || g.status === 405) && m === "raw" || m === "raw" && v === "4001")
                   continue;
-                return J(w.message, w.status, w.type);
+                return Y(w.message, w.status, w.type);
               }
               if (!g.body) {
                 p = "\u4E0A\u6E38\u65E0\u54CD\u5E94\u4F53";
@@ -24857,7 +24857,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
               });
               if (h.error && !h.content) {
                 let v = js(h.error.code, h.error.message);
-                return J(v.message, v.status, v.type);
+                return Y(v.message, v.status, v.type);
               }
               let b = h.usage || {
                 prompt_tokens: 0,
@@ -24898,9 +24898,9 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
                 }
               });
             }
-            return J(`Trae \u6240\u6709\u901A\u9053\u5747\u5931\u8D25\uFF1A${p || "\u672A\u77E5\u9519\u8BEF"}`, y, "upstream_error");
+            return Y(`Trae \u6240\u6709\u901A\u9053\u5747\u5931\u8D25\uFF1A${p || "\u672A\u77E5\u9519\u8BEF"}`, y, "upstream_error");
           }
-          function Yb(e) {
+          function Jb(e) {
             var _a, _b2, _c2;
             let t = [(_a = e == null ? void 0 : e.Result) == null ? void 0 : _a.ModelList, (_b2 = e == null ? void 0 : e.Result) == null ? void 0 : _b2.modelList, (_c2 = e == null ? void 0 : e.Result) == null ? void 0 : _c2.Models, e == null ? void 0 : e.model_list, e == null ? void 0 : e.modelList, e == null ? void 0 : e.Data, e == null ? void 0 : e.data, e == null ? void 0 : e.Models, e == null ? void 0 : e.models], n = [];
             for (let a of t) {
@@ -24945,7 +24945,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
                   models: i,
                   message: a === "global" ? "\u56FD\u9645\u7248\u4E0D\u5F00\u653E model_list\uFF08403\uFF09\uFF0C\u5DF2\u4F7F\u7528\u5185\u7F6E\u76EE\u5F55\uFF1B\u5982\u9700\u65B0\u6A21\u578B\u8BF7\u624B\u52A8\u6DFB\u52A0" : `model_list \u62C9\u53D6\u5931\u8D25 HTTP ${u.status}\uFF0C\u5DF2\u56DE\u9000\u5185\u7F6E\u76EE\u5F55`
                 };
-              let p = Yb(JSON.parse(l));
+              let p = Jb(JSON.parse(l));
               return p.length ? {
                 models: p
               } : {
@@ -25065,7 +25065,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
           var _C;
           var sc = H(() => {
             "use strict";
-            Je();
+            Ye();
             bt();
             Mb = {
               cn: {
@@ -25320,7 +25320,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
                 };
               }
               if (t === "zcode") {
-                let s = await Xd(e, n);
+                let s = await Qd(e, n);
                 return {
                   models: s.models.length ? s.models : a,
                   message: s.message
@@ -25361,7 +25361,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
             };
           }
           async function OC(e, t, n, r, a) {
-            return t === "claude" ? O0(e, n, r) : t === "codex" ? vd(e, n, r) : t === "antigravity" ? jo(e, n, r) : t === "kimi" ? Ty(e, n, r, a) : t === "qwen" ? Ry(e, n, r) : t === "codebuddy" ? af(e, n, r, a) : t === "zcode" ? Jd(e, n, r, a) : t === "qoder" ? Sf(e, n, r, a) : t === "trae" ? Lf(e, n, r, a) : t === "cline" ? ff(e, n, r) : Fy(e, n, r);
+            return t === "claude" ? O0(e, n, r) : t === "codex" ? vd(e, n, r) : t === "antigravity" ? jo(e, n, r) : t === "kimi" ? Ty(e, n, r, a) : t === "qwen" ? Ry(e, n, r) : t === "codebuddy" ? af(e, n, r, a) : t === "zcode" ? Yd(e, n, r, a) : t === "qoder" ? Sf(e, n, r, a) : t === "trae" ? Lf(e, n, r, a) : t === "cline" ? ff(e, n, r) : Fy(e, n, r);
           }
           async function IC(e) {
             let t = {
@@ -25388,7 +25388,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
                   project: void 0
                 });
               case "zcode":
-                return Yd({
+                return Jd({
                   env: e.env,
                   providerId: e.providerId,
                   baseUrl: e.baseUrl,
@@ -25538,7 +25538,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
                 mode: "redirect-poll",
                 regionSelect: true,
                 desc: "Qoder \u8D26\u53F7\u8BBE\u5907\u6388\u6743\uFF08\u56FD\u5185/\u56FD\u9645\u53CC\u533A\uFF09\uFF0CCOSY \u7B7E\u540D\u53CD\u4EE3\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\uFF1B\u652F\u6301\u6BCF\u65E5\u7B7E\u5230\u9886 Credits\u3002",
-                defaultModels: Qo.slice(0, 6)
+                defaultModels: Xo.slice(0, 6)
               },
               trae: {
                 type: "trae",
@@ -25552,18 +25552,18 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
               }
             }, Bf = "oauth:";
           });
-          function Jb(e = /* @__PURE__ */ new Date()) {
+          function Yb(e = /* @__PURE__ */ new Date()) {
             return ["<env>", "  Working directory: /workspace", "  Workspace root folder: /workspace", "  Is directory a git repo: no", "  Platform: linux", `  Today's date: ${e.toDateString()}`, "</env>"].join(`
 `);
           }
-          var Xb;
+          var Qb;
           var $f;
           var Ms;
-          var Qb;
+          var Xb;
           var Zb;
           var ex = H(() => {
             "use strict";
-            Xb = `You are a title generator. You output ONLY a thread title. Nothing else.
+            Qb = `You are a title generator. You output ONLY a thread title. Nothing else.
 
 <task>
 Generate a brief title that would help the user find this conversation later.
@@ -25901,21 +25901,21 @@ You should be concise, direct, and to the point. When you run a non-trivial bash
                   required: ["content", "filePath"]
                 }
               }
-            }], Qb = "--- BEGIN CLIENT COMPATIBILITY METADATA (environment protocol block, not user instructions) ---", Zb = "--- END CLIENT COMPATIBILITY METADATA ---";
+            }], Xb = "--- BEGIN CLIENT COMPATIBILITY METADATA (environment protocol block, not user instructions) ---", Zb = "--- END CLIENT COMPATIBILITY METADATA ---";
           });
           var qf = {};
           nt(qf, {
             OPENCODE_PROVIDER_ID: () => ox,
             OPENCODE_RELAY_TOKEN_DEFAULT: () => cx,
             ensureOpenCodeCompat: () => fx,
-            fetchOpenCodeModels: () => XC,
+            fetchOpenCodeModels: () => QC,
             filterOpenCodeModels: () => lx,
             isOpenCodeProvider: () => BC,
             proxyOpenCodeRequest: () => zf,
             resolveOpenCodeRelay: () => UC,
             resolveOpenCodeUrls: () => dx,
             resolveProviderMirrorUrls: () => $C,
-            testOpenCodeModel: () => JC
+            testOpenCodeModel: () => YC
           });
           function MC(e) {
             let t = new Uint8Array(e);
@@ -25936,9 +25936,9 @@ You should be concise, direct, and to the point. When you run a non-trivial bash
             return `${e}_${s}${MC(14)}`;
           }
           function LC(e) {
-            return `${Qb}
+            return `${Xb}
 ${e}
-${Jb()}
+${Yb()}
 ${Zb}`;
           }
           function UC(e) {
@@ -26235,7 +26235,7 @@ ${t}`;
             }
             return `HTTP ${e}: ${n.substring(0, 200)}`;
           }
-          function YC(e, t) {
+          function JC(e, t) {
             if (!t)
               return e;
             if (!e)
@@ -26294,10 +26294,10 @@ ${t}`;
               } catch (g) {
                 i = g;
               }
-            let m = YC(a, s);
+            let m = JC(a, s);
             return m ? ix(m) : sx(i);
           }
-          async function JC(e, t, n, r, a, s) {
+          async function YC(e, t, n, r, a, s) {
             let i = await zf({
               baseUrl: e,
               apiKeys: t,
@@ -26328,7 +26328,7 @@ ${t}`;
               statusCode: i.status
             };
           }
-          async function XC(e, t, n, r, a) {
+          async function QC(e, t, n, r, a) {
             let s = await zf({
               baseUrl: e,
               apiKeys: t,
@@ -26385,7 +26385,7 @@ ${t}`;
             ox = "opencode", jC = "2.1.4", PC = "prod", tx = 3e5, RC = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
             nx = 0, Ff = 0;
             cx = "oc_relay_2f4c8a1d6b9e3f70c5a2d84b1e6f9073";
-            PM = Xb.slice(0, 80), HC = $f.slice(0, 80);
+            PM = Qb.slice(0, 80), HC = $f.slice(0, 80);
             qC = ["getworkflowrun", "fillworkflowhole"];
             GC = ["TLS_AES_128_GCM_SHA256", "TLS_AES_256_GCM_SHA384", "TLS_CHACHA20_POLY1305_SHA256", "ECDHE-ECDSA-AES128-GCM-SHA256", "ECDHE-RSA-AES128-GCM-SHA256", "ECDHE-ECDSA-AES256-GCM-SHA384", "ECDHE-RSA-AES256-GCM-SHA384", "ECDHE-ECDSA-CHACHA20-POLY1305", "ECDHE-RSA-CHACHA20-POLY1305", "ECDHE-ECDSA-AES128-SHA", "ECDHE-RSA-AES128-SHA", "ECDHE-ECDSA-AES256-SHA", "ECDHE-RSA-AES256-SHA", "AES128-GCM-SHA256", "AES256-GCM-SHA384", "AES128-SHA", "AES256-SHA"].join(":"), Ds = null, px = null;
           });
@@ -26402,14 +26402,14 @@ ${t}`;
             return e !== 32 && e !== 10 && e !== 13 && e !== 9 && e !== 12 && e >= 1 && e <= 31 || e >= 127 && e <= 159;
           }
           function fc(e) {
-            return e >= 64976 && e <= 65007 || QC.has(e);
+            return e >= 64976 && e <= 65007 || XC.has(e);
           }
-          var QC;
-          var Qe;
+          var XC;
+          var Xe;
           var E;
           var At;
           var pc = H(() => {
-            QC = /* @__PURE__ */ new Set([65534, 65535, 131070, 131071, 196606, 196607, 262142, 262143, 327678, 327679, 393214, 393215, 458750, 458751, 524286, 524287, 589822, 589823, 655358, 655359, 720894, 720895, 786430, 786431, 851966, 851967, 917502, 917503, 983038, 983039, 1048574, 1048575, 1114110, 1114111]), Qe = "\uFFFD";
+            XC = /* @__PURE__ */ new Set([65534, 65535, 131070, 131071, 196606, 196607, 262142, 262143, 327678, 327679, 393214, 393215, 458750, 458751, 524286, 524287, 589822, 589823, 655358, 655359, 720894, 720895, 786430, 786431, 851966, 851967, 917502, 917503, 983038, 983039, 1048574, 1048575, 1114110, 1114111]), Xe = "\uFFFD";
             (function(e) {
               e[e.EOF = -1] = "EOF", e[e.NULL = 0] = "NULL", e[e.TABULATION = 9] = "TABULATION", e[e.CARRIAGE_RETURN = 13] = "CARRIAGE_RETURN", e[e.LINE_FEED = 10] = "LINE_FEED", e[e.FORM_FEED = 12] = "FORM_FEED", e[e.SPACE = 32] = "SPACE", e[e.EXCLAMATION_MARK = 33] = "EXCLAMATION_MARK", e[e.QUOTATION_MARK = 34] = "QUOTATION_MARK", e[e.AMPERSAND = 38] = "AMPERSAND", e[e.APOSTROPHE = 39] = "APOSTROPHE", e[e.HYPHEN_MINUS = 45] = "HYPHEN_MINUS", e[e.SOLIDUS = 47] = "SOLIDUS", e[e.DIGIT_0 = 48] = "DIGIT_0", e[e.DIGIT_9 = 57] = "DIGIT_9", e[e.SEMICOLON = 59] = "SEMICOLON", e[e.LESS_THAN_SIGN = 60] = "LESS_THAN_SIGN", e[e.EQUALS_SIGN = 61] = "EQUALS_SIGN", e[e.GREATER_THAN_SIGN = 62] = "GREATER_THAN_SIGN", e[e.QUESTION_MARK = 63] = "QUESTION_MARK", e[e.LATIN_CAPITAL_A = 65] = "LATIN_CAPITAL_A", e[e.LATIN_CAPITAL_Z = 90] = "LATIN_CAPITAL_Z", e[e.RIGHT_SQUARE_BRACKET = 93] = "RIGHT_SQUARE_BRACKET", e[e.GRAVE_ACCENT = 96] = "GRAVE_ACCENT", e[e.LATIN_SMALL_A = 97] = "LATIN_SMALL_A", e[e.LATIN_SMALL_Z = 122] = "LATIN_SMALL_Z";
             })(E || (E = {}));
@@ -26537,27 +26537,27 @@ ${t}`;
           });
           var Gf = H(() => {
           });
-          function Yf(e) {
+          function Jf(e) {
             var t;
             return e >= 55296 && e <= 57343 || e > 1114111 ? 65533 : (t = nN.get(e)) !== null && t !== void 0 ? t : e;
           }
           var Vf;
           var nN;
           var bx;
-          var Jf = H(() => {
+          var Yf = H(() => {
             nN = /* @__PURE__ */ new Map([[0, 65533], [128, 8364], [130, 8218], [131, 402], [132, 8222], [133, 8230], [134, 8224], [135, 8225], [136, 710], [137, 8240], [138, 352], [139, 8249], [140, 338], [142, 381], [145, 8216], [146, 8217], [147, 8220], [148, 8221], [149, 8226], [150, 8211], [151, 8212], [152, 732], [153, 8482], [154, 353], [155, 8250], [156, 339], [158, 382], [159, 376]]), bx = (Vf = String.fromCodePoint) !== null && Vf !== void 0 ? Vf : function(e) {
               let t = "";
               return e > 65535 && (e -= 65536, t += String.fromCharCode(e >>> 10 & 1023 | 55296), e = 56320 | e & 1023), t += String.fromCharCode(e), t;
             };
           });
-          function Xf(e) {
+          function Qf(e) {
             return e >= gt.ZERO && e <= gt.NINE;
           }
           function sN(e) {
             return e >= gt.UPPER_A && e <= gt.UPPER_F || e >= gt.LOWER_A && e <= gt.LOWER_F;
           }
           function iN(e) {
-            return e >= gt.UPPER_A && e <= gt.UPPER_Z || e >= gt.LOWER_A && e <= gt.LOWER_Z || Xf(e);
+            return e >= gt.UPPER_A && e <= gt.UPPER_Z || e >= gt.LOWER_A && e <= gt.LOWER_Z || Qf(e);
           }
           function oN(e) {
             return e === gt.EQUALS || iN(e);
@@ -26591,10 +26591,10 @@ ${t}`;
           var xx = H(() => {
             Wf();
             Gf();
-            Jf();
+            Yf();
             Wf();
             Gf();
-            Jf();
+            Yf();
             (function(e) {
               e[e.NUM = 35] = "NUM", e[e.SEMI = 59] = "SEMI", e[e.EQUALS = 61] = "EQUALS", e[e.ZERO = 48] = "ZERO", e[e.NINE = 57] = "NINE", e[e.LOWER_A = 97] = "LOWER_A", e[e.LOWER_F = 102] = "LOWER_F", e[e.LOWER_X = 120] = "LOWER_X", e[e.LOWER_Z = 122] = "LOWER_Z", e[e.UPPER_A = 65] = "UPPER_A", e[e.UPPER_F = 70] = "UPPER_F", e[e.UPPER_Z = 90] = "UPPER_Z";
             })(gt || (gt = {}));
@@ -26642,7 +26642,7 @@ ${t}`;
                 let r = n;
                 for (; n < t.length; ) {
                   let a = t.charCodeAt(n);
-                  if (Xf(a) || sN(a))
+                  if (Qf(a) || sN(a))
                     n += 1;
                   else
                     return this.addToNumericResult(t, r, n, 16), this.emitNumericEntity(a, 3);
@@ -26653,7 +26653,7 @@ ${t}`;
                 let r = n;
                 for (; n < t.length; ) {
                   let a = t.charCodeAt(n);
-                  if (Xf(a))
+                  if (Qf(a))
                     n += 1;
                   else
                     return this.addToNumericResult(t, r, n, 10), this.emitNumericEntity(a, 2);
@@ -26668,7 +26668,7 @@ ${t}`;
                   this.consumed += 1;
                 else if (this.decodeMode === sn.Strict)
                   return 0;
-                return this.emitCodePoint(Yf(this.result), this.consumed), this.errors && (t !== gt.SEMI && this.errors.missingSemicolonAfterCharacterReference(), this.errors.validateNumericCharacterReference(this.result)), this.consumed;
+                return this.emitCodePoint(Jf(this.result), this.consumed), this.errors && (t !== gt.SEMI && this.errors.missingSemicolonAfterCharacterReference(), this.errors.validateNumericCharacterReference(this.result)), this.consumed;
               }
               stateNamedEntity(t, n) {
                 let {
@@ -26790,7 +26790,7 @@ ${t}`;
           var S;
           var _t;
           var $s;
-          var Qf = H(() => {
+          var Xf = H(() => {
             yx();
             pc();
             gc();
@@ -27341,7 +27341,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this._emitChars(Qe);
+                    this._err(M.unexpectedNullCharacter), this._emitChars(Xe);
                     break;
                   }
                   case E.EOF: {
@@ -27359,7 +27359,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this._emitChars(Qe);
+                    this._err(M.unexpectedNullCharacter), this._emitChars(Xe);
                     break;
                   }
                   case E.EOF: {
@@ -27377,7 +27377,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this._emitChars(Qe);
+                    this._err(M.unexpectedNullCharacter), this._emitChars(Xe);
                     break;
                   }
                   case E.EOF: {
@@ -27391,7 +27391,7 @@ ${t}`;
               _statePlaintext(t) {
                 switch (t) {
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this._emitChars(Qe);
+                    this._err(M.unexpectedNullCharacter), this._emitChars(Xe);
                     break;
                   }
                   case E.EOF: {
@@ -27463,7 +27463,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), n.tagName += Qe;
+                    this._err(M.unexpectedNullCharacter), n.tagName += Xe;
                     break;
                   }
                   case E.EOF: {
@@ -27548,7 +27548,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this._emitChars(Qe);
+                    this._err(M.unexpectedNullCharacter), this._emitChars(Xe);
                     break;
                   }
                   case E.EOF: {
@@ -27570,7 +27570,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this.state = S.SCRIPT_DATA_ESCAPED, this._emitChars(Qe);
+                    this._err(M.unexpectedNullCharacter), this.state = S.SCRIPT_DATA_ESCAPED, this._emitChars(Xe);
                     break;
                   }
                   case E.EOF: {
@@ -27596,7 +27596,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this.state = S.SCRIPT_DATA_ESCAPED, this._emitChars(Qe);
+                    this._err(M.unexpectedNullCharacter), this.state = S.SCRIPT_DATA_ESCAPED, this._emitChars(Xe);
                     break;
                   }
                   case E.EOF: {
@@ -27636,7 +27636,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this._emitChars(Qe);
+                    this._err(M.unexpectedNullCharacter), this._emitChars(Xe);
                     break;
                   }
                   case E.EOF: {
@@ -27658,7 +27658,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this.state = S.SCRIPT_DATA_DOUBLE_ESCAPED, this._emitChars(Qe);
+                    this._err(M.unexpectedNullCharacter), this.state = S.SCRIPT_DATA_DOUBLE_ESCAPED, this._emitChars(Xe);
                     break;
                   }
                   case E.EOF: {
@@ -27684,7 +27684,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this.state = S.SCRIPT_DATA_DOUBLE_ESCAPED, this._emitChars(Qe);
+                    this._err(M.unexpectedNullCharacter), this.state = S.SCRIPT_DATA_DOUBLE_ESCAPED, this._emitChars(Xe);
                     break;
                   }
                   case E.EOF: {
@@ -27751,7 +27751,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this.currentAttr.name += Qe;
+                    this._err(M.unexpectedNullCharacter), this.currentAttr.name += Xe;
                     break;
                   }
                   default:
@@ -27819,7 +27819,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this.currentAttr.value += Qe;
+                    this._err(M.unexpectedNullCharacter), this.currentAttr.value += Xe;
                     break;
                   }
                   case E.EOF: {
@@ -27841,7 +27841,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this.currentAttr.value += Qe;
+                    this._err(M.unexpectedNullCharacter), this.currentAttr.value += Xe;
                     break;
                   }
                   case E.EOF: {
@@ -27870,7 +27870,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), this.currentAttr.value += Qe;
+                    this._err(M.unexpectedNullCharacter), this.currentAttr.value += Xe;
                     break;
                   }
                   case E.QUOTATION_MARK:
@@ -27941,7 +27941,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), n.data += Qe;
+                    this._err(M.unexpectedNullCharacter), n.data += Xe;
                     break;
                   }
                   default:
@@ -27998,7 +27998,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), n.data += Qe;
+                    this._err(M.unexpectedNullCharacter), n.data += Xe;
                     break;
                   }
                   case E.EOF: {
@@ -28124,7 +28124,7 @@ ${t}`;
                     case E.FORM_FEED:
                       break;
                     case E.NULL: {
-                      this._err(M.unexpectedNullCharacter), this._createDoctypeToken(Qe), this.state = S.DOCTYPE_NAME;
+                      this._err(M.unexpectedNullCharacter), this._createDoctypeToken(Xe), this.state = S.DOCTYPE_NAME;
                       break;
                     }
                     case E.GREATER_THAN_SIGN: {
@@ -28158,7 +28158,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), n.name += Qe;
+                    this._err(M.unexpectedNullCharacter), n.name += Xe;
                     break;
                   }
                   case E.EOF: {
@@ -28255,7 +28255,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), n.publicId += Qe;
+                    this._err(M.unexpectedNullCharacter), n.publicId += Xe;
                     break;
                   }
                   case E.GREATER_THAN_SIGN: {
@@ -28278,7 +28278,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), n.publicId += Qe;
+                    this._err(M.unexpectedNullCharacter), n.publicId += Xe;
                     break;
                   }
                   case E.GREATER_THAN_SIGN: {
@@ -28417,7 +28417,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), n.systemId += Qe;
+                    this._err(M.unexpectedNullCharacter), n.systemId += Xe;
                     break;
                   }
                   case E.GREATER_THAN_SIGN: {
@@ -28440,7 +28440,7 @@ ${t}`;
                     break;
                   }
                   case E.NULL: {
-                    this._err(M.unexpectedNullCharacter), n.systemId += Qe;
+                    this._err(M.unexpectedNullCharacter), n.systemId += Xe;
                     break;
                   }
                   case E.GREATER_THAN_SIGN: {
@@ -28764,15 +28764,15 @@ ${t}`;
               }
             };
           });
-          var Qt;
+          var Xt;
           var Ox;
           var kc;
           var Ix = H(() => {
             (function(e) {
               e[e.Marker = 0] = "Marker", e[e.Element = 1] = "Element";
-            })(Qt || (Qt = {}));
+            })(Xt || (Xt = {}));
             Ox = {
-              type: Qt.Marker
+              type: Xt.Marker
             }, kc = class {
               constructor(t) {
                 this.treeAdapter = t, this.entries = [], this.bookmark = null;
@@ -28781,7 +28781,7 @@ ${t}`;
                 let r = [], a = n.length, s = this.treeAdapter.getTagName(t), i = this.treeAdapter.getNamespaceURI(t);
                 for (let o = 0; o < this.entries.length; o++) {
                   let c = this.entries[o];
-                  if (c.type === Qt.Marker)
+                  if (c.type === Xt.Marker)
                     break;
                   let {
                     element: u
@@ -28813,7 +28813,7 @@ ${t}`;
               }
               pushElement(t, n) {
                 this._ensureNoahArkCondition(t), this.entries.unshift({
-                  type: Qt.Element,
+                  type: Xt.Element,
                   element: t,
                   token: n
                 });
@@ -28821,7 +28821,7 @@ ${t}`;
               insertElementAfterBookmark(t, n) {
                 let r = this.entries.indexOf(this.bookmark);
                 this.entries.splice(r, 0, {
-                  type: Qt.Element,
+                  type: Xt.Element,
                   element: t,
                   token: n
                 });
@@ -28835,11 +28835,11 @@ ${t}`;
                 t === -1 ? this.entries.length = 0 : this.entries.splice(0, t + 1);
               }
               getElementEntryInScopeWithTagName(t) {
-                let n = this.entries.find((r) => r.type === Qt.Marker || this.treeAdapter.getTagName(r.element) === t);
-                return n && n.type === Qt.Element ? n : null;
+                let n = this.entries.find((r) => r.type === Xt.Marker || this.treeAdapter.getTagName(r.element) === t);
+                return n && n.type === Xt.Element ? n : null;
               }
               getElementEntry(t) {
-                return this.entries.find((n) => n.type === Qt.Element && n.element === t);
+                return this.entries.find((n) => n.type === Xt.Element && n.element === t);
               }
             };
           });
@@ -29147,7 +29147,7 @@ ${t}`;
           });
           function BN(e, t) {
             let n = e.activeFormattingElements.getElementEntryInScopeWithTagName(t.tagName);
-            return n ? e.openElements.contains(n.element) ? e.openElements.hasInScope(t.tagID) || (n = null) : (e.activeFormattingElements.removeEntry(n), n = null) : Qx(e, t), n;
+            return n ? e.openElements.contains(n.element) ? e.openElements.hasInScope(t.tagID) || (n = null) : (e.activeFormattingElements.removeEntry(n), n = null) : Xx(e, t), n;
           }
           function $N(e, t) {
             let n = null, r = e.openElements.stackTop;
@@ -29234,14 +29234,14 @@ ${t}`;
           function VN(e, t) {
             t.tagID === f.HTML ? (e._insertElement(t, $.HTML), e.insertionMode = N.BEFORE_HEAD) : zs(e, t);
           }
-          function YN(e, t) {
+          function JN(e, t) {
             let n = t.tagID;
             (n === f.HTML || n === f.HEAD || n === f.BODY || n === f.BR) && zs(e, t);
           }
           function zs(e, t) {
             e._insertFakeRootElement(), e.insertionMode = N.BEFORE_HEAD, e._processToken(t);
           }
-          function JN(e, t) {
+          function YN(e, t) {
             switch (t.tagID) {
               case f.HTML: {
                 Et(e, t);
@@ -29255,7 +29255,7 @@ ${t}`;
                 qs(e, t);
             }
           }
-          function XN(e, t) {
+          function QN(e, t) {
             let n = t.tagID;
             n === f.HEAD || n === f.BODY || n === f.HTML || n === f.BR ? qs(e, t) : e._err(t, M.endTagWithoutMatchingOpenElement);
           }
@@ -29305,7 +29305,7 @@ ${t}`;
                 Ks(e, t);
             }
           }
-          function QN(e, t) {
+          function XN(e, t) {
             switch (t.tagID) {
               case f.HEAD: {
                 e.openElements.pop(), e.insertionMode = N.AFTER_HEAD;
@@ -29430,7 +29430,7 @@ ${t}`;
           function Cc(e, t) {
             switch (t.type) {
               case Fe.CHARACTER: {
-                Yx(e, t);
+                Jx(e, t);
                 break;
               }
               case Fe.WHITESPACE_CHARACTER: {
@@ -29459,7 +29459,7 @@ ${t}`;
           function Vx(e, t) {
             e._reconstructActiveFormattingElements(), e._insertCharacters(t);
           }
-          function Yx(e, t) {
+          function Jx(e, t) {
             e._reconstructActiveFormattingElements(), e._insertCharacters(t), e.framesetOk = false;
           }
           function rO(e, t) {
@@ -29522,15 +29522,15 @@ ${t}`;
           function yO(e, t) {
             e.treeAdapter.getDocumentMode(e.document) !== Ct.QUIRKS && e.openElements.hasInButtonScope(f.P) && e._closePElement(), e._insertElement(t, $.HTML), e.framesetOk = false, e.insertionMode = N.IN_TABLE;
           }
-          function Jx(e, t) {
+          function Yx(e, t) {
             e._reconstructActiveFormattingElements(), e._appendElement(t, $.HTML), e.framesetOk = false, t.ackSelfClosing = true;
           }
-          function Xx(e) {
+          function Qx(e) {
             let t = hc(e, hn.TYPE);
             return t != null && t.toLowerCase() === MN;
           }
           function bO(e, t) {
-            e._reconstructActiveFormattingElements(), e._appendElement(t, $.HTML), Xx(t) || (e.framesetOk = false), t.ackSelfClosing = true;
+            e._reconstructActiveFormattingElements(), e._appendElement(t, $.HTML), Qx(t) || (e.framesetOk = false), t.ackSelfClosing = true;
           }
           function xO(e, t) {
             e._appendElement(t, $.HTML), t.ackSelfClosing = true;
@@ -29539,7 +29539,7 @@ ${t}`;
             e.openElements.hasInButtonScope(f.P) && e._closePElement(), e._appendElement(t, $.HTML), e.framesetOk = false, t.ackSelfClosing = true;
           }
           function wO(e, t) {
-            t.tagName = P.IMG, t.tagID = f.IMG, Jx(e, t);
+            t.tagName = P.IMG, t.tagID = f.IMG, Yx(e, t);
           }
           function kO(e, t) {
             e._insertElement(t, $.HTML), e.skipNextNewLine = true, e.tokenizer.state = _t.RCDATA, e.originalInsertionMode = e.insertionMode, e.framesetOk = false, e.insertionMode = N.TEXT;
@@ -29644,7 +29644,7 @@ ${t}`;
               case f.AREA:
               case f.EMBED:
               case f.KEYGEN: {
-                Jx(e, t);
+                Yx(e, t);
                 break;
               }
               case f.HR: {
@@ -29823,7 +29823,7 @@ ${t}`;
           function $O(e) {
             e._reconstructActiveFormattingElements(), e._insertFakeElement(P.BR, f.BR), e.openElements.pop(), e.framesetOk = false;
           }
-          function Qx(e, t) {
+          function Xx(e, t) {
             let n = t.tagName, r = t.tagID;
             for (let a = e.openElements.stackTop; a > 0; a--) {
               let s = e.openElements.items[a], i = e.openElements.tagIDs[a];
@@ -29933,7 +29933,7 @@ ${t}`;
                 break;
               }
               default:
-                Qx(e, t);
+                Xx(e, t);
             }
           }
           function Zx(e, t) {
@@ -29959,7 +29959,7 @@ ${t}`;
                 }
               }
             else
-              Js(e, t);
+              Ys(e, t);
           }
           function zO(e, t) {
             e.openElements.clearBackToTableContext(), e.activeFormattingElements.insertMarker(), e._insertElement(t, $.HTML), e.insertionMode = N.IN_CAPTION;
@@ -29979,10 +29979,10 @@ ${t}`;
           function VO(e, t) {
             e.openElements.hasInTableScope(f.TABLE) && (e.openElements.popUntilTagNamePopped(f.TABLE), e._resetInsertionMode(), e._processStartTag(t));
           }
-          function YO(e, t) {
-            Xx(t) ? e._appendElement(t, $.HTML) : Js(e, t), t.ackSelfClosing = true;
-          }
           function JO(e, t) {
+            Qx(t) ? e._appendElement(t, $.HTML) : Ys(e, t), t.ackSelfClosing = true;
+          }
+          function YO(e, t) {
             !e.formElement && e.openElements.tmplCount === 0 && (e._insertElement(t, $.HTML), e.formElement = e.openElements.current, e.openElements.pop());
           }
           function ua(e, t) {
@@ -30004,7 +30004,7 @@ ${t}`;
                 break;
               }
               case f.FORM: {
-                JO(e, t);
+                YO(e, t);
                 break;
               }
               case f.TABLE: {
@@ -30018,7 +30018,7 @@ ${t}`;
                 break;
               }
               case f.INPUT: {
-                YO(e, t);
+                JO(e, t);
                 break;
               }
               case f.CAPTION: {
@@ -30030,10 +30030,10 @@ ${t}`;
                 break;
               }
               default:
-                Js(e, t);
+                Ys(e, t);
             }
           }
-          function Ys(e, t) {
+          function Js(e, t) {
             switch (t.tagID) {
               case f.TABLE: {
                 e.openElements.hasInTableScope(f.TABLE) && (e.openElements.popUntilTagNamePopped(f.TABLE), e._resetInsertionMode());
@@ -30056,10 +30056,10 @@ ${t}`;
               case f.TR:
                 break;
               default:
-                Js(e, t);
+                Ys(e, t);
             }
           }
-          function Js(e, t) {
+          function Ys(e, t) {
             let n = e.fosterParentingEnabled;
             e.fosterParentingEnabled = true, Cc(e, t), e.fosterParentingEnabled = n;
           }
@@ -30073,22 +30073,22 @@ ${t}`;
             let n = 0;
             if (e.hasNonWhitespacePendingCharacterToken)
               for (; n < e.pendingCharacterTokens.length; n++)
-                Js(e, e.pendingCharacterTokens[n]);
+                Ys(e, e.pendingCharacterTokens[n]);
             else
               for (; n < e.pendingCharacterTokens.length; n++)
                 e._insertCharacters(e.pendingCharacterTokens[n]);
             e.insertionMode = e.originalInsertionMode, e._processToken(t);
           }
-          function XO(e, t) {
+          function QO(e, t) {
             let n = t.tagID;
             n1.has(n) ? e.openElements.hasInTableScope(f.CAPTION) && (e.openElements.generateImpliedEndTags(), e.openElements.popUntilTagNamePopped(f.CAPTION), e.activeFormattingElements.clearToLastMarker(), e.insertionMode = N.IN_TABLE, ua(e, t)) : Et(e, t);
           }
-          function QO(e, t) {
+          function XO(e, t) {
             let n = t.tagID;
             switch (n) {
               case f.CAPTION:
               case f.TABLE: {
-                e.openElements.hasInTableScope(f.CAPTION) && (e.openElements.generateImpliedEndTags(), e.openElements.popUntilTagNamePopped(f.CAPTION), e.activeFormattingElements.clearToLastMarker(), e.insertionMode = N.IN_TABLE, n === f.TABLE && Ys(e, t));
+                e.openElements.hasInTableScope(f.CAPTION) && (e.openElements.generateImpliedEndTags(), e.openElements.popUntilTagNamePopped(f.CAPTION), e.activeFormattingElements.clearToLastMarker(), e.insertionMode = N.IN_TABLE, n === f.TABLE && Js(e, t));
                 break;
               }
               case f.BODY:
@@ -30177,7 +30177,7 @@ ${t}`;
                 break;
               }
               case f.TABLE: {
-                e.openElements.hasTableBodyContextInTableScope() && (e.openElements.clearBackToTableBodyContext(), e.openElements.pop(), e.insertionMode = N.IN_TABLE, Ys(e, t));
+                e.openElements.hasTableBodyContextInTableScope() && (e.openElements.clearBackToTableBodyContext(), e.openElements.pop(), e.insertionMode = N.IN_TABLE, Js(e, t));
                 break;
               }
               case f.BODY:
@@ -30190,7 +30190,7 @@ ${t}`;
               case f.TR:
                 break;
               default:
-                Ys(e, t);
+                Js(e, t);
             }
           }
           function Ic(e, t) {
@@ -30239,7 +30239,7 @@ ${t}`;
               case f.TH:
                 break;
               default:
-                Ys(e, t);
+                Js(e, t);
             }
           }
           function eI(e, t) {
@@ -30457,7 +30457,7 @@ ${t}`;
             }
           }
           function pI(e, t) {
-            t.chars = Qe, e._insertCharacters(t);
+            t.chars = Xe, e._insertCharacters(t);
           }
           function mI(e, t) {
             e._insertCharacters(t), e.framesetOk = false;
@@ -30502,7 +30502,7 @@ ${t}`;
           var Vs;
           var n1;
           var cp = H(() => {
-            Qf();
+            Xf();
             Nx();
             Ix();
             _c();
@@ -30773,7 +30773,7 @@ ${t}`;
               _reconstructActiveFormattingElements() {
                 let t = this.activeFormattingElements.entries.length;
                 if (t) {
-                  let n = this.activeFormattingElements.entries.findIndex((a) => a.type === Qt.Marker || this.openElements.contains(a.element)), r = n === -1 ? t - 1 : n - 1;
+                  let n = this.activeFormattingElements.entries.findIndex((a) => a.type === Xt.Marker || this.openElements.contains(a.element)), r = n === -1 ? t - 1 : n - 1;
                   for (let a = r; a >= 0; a--) {
                     let s = this.activeFormattingElements.entries[a];
                     this._insertElement(s.token, this.treeAdapter.getNamespaceURI(s.element)), s.element = this.openElements.current;
@@ -30940,7 +30940,7 @@ ${t}`;
                   case N.IN_CAPTION:
                   case N.IN_CELL:
                   case N.IN_TEMPLATE: {
-                    Yx(this, t);
+                    Jx(this, t);
                     break;
                   }
                   case N.TEXT:
@@ -31109,7 +31109,7 @@ ${t}`;
                     break;
                   }
                   case N.BEFORE_HEAD: {
-                    JN(this, t);
+                    YN(this, t);
                     break;
                   }
                   case N.IN_HEAD: {
@@ -31137,7 +31137,7 @@ ${t}`;
                     break;
                   }
                   case N.IN_CAPTION: {
-                    XO(this, t);
+                    QO(this, t);
                     break;
                   }
                   case N.IN_COLUMN_GROUP: {
@@ -31201,15 +31201,15 @@ ${t}`;
                     break;
                   }
                   case N.BEFORE_HTML: {
-                    YN(this, t);
+                    JN(this, t);
                     break;
                   }
                   case N.BEFORE_HEAD: {
-                    XN(this, t);
+                    QN(this, t);
                     break;
                   }
                   case N.IN_HEAD: {
-                    QN(this, t);
+                    XN(this, t);
                     break;
                   }
                   case N.IN_HEAD_NO_SCRIPT: {
@@ -31229,7 +31229,7 @@ ${t}`;
                     break;
                   }
                   case N.IN_TABLE: {
-                    Ys(this, t);
+                    Js(this, t);
                     break;
                   }
                   case N.IN_TABLE_TEXT: {
@@ -31237,7 +31237,7 @@ ${t}`;
                     break;
                   }
                   case N.IN_CAPTION: {
-                    QO(this, t);
+                    XO(this, t);
                     break;
                   }
                   case N.IN_COLUMN_GROUP: {
@@ -31506,7 +31506,7 @@ ${t}`;
             tp();
             gn();
             gc();
-            Qf();
+            Xf();
           });
           var v1 = yl((I5, jc) => {
             "use strict";
@@ -31514,7 +31514,7 @@ ${t}`;
               return Buffer.from(e).toString("base64");
             };
             function TI(e) {
-              var t = this, n = Math.round, r = Math.floor, a = new Array(64), s = new Array(64), i = new Array(64), o = new Array(64), c, u, l, p, y = new Array(65535), m = new Array(65535), d = new Array(64), g = new Array(64), h = [], b = 0, x = 7, v = new Array(64), k = new Array(64), w = new Array(64), _ = new Array(256), T = new Array(2048), O, I = [0, 1, 5, 6, 14, 15, 27, 28, 2, 4, 7, 13, 16, 26, 29, 42, 3, 8, 12, 17, 25, 30, 41, 43, 9, 11, 18, 24, 31, 40, 44, 53, 10, 19, 23, 32, 39, 45, 52, 54, 20, 22, 33, 38, 46, 51, 55, 60, 21, 34, 37, 47, 50, 56, 59, 61, 35, 36, 48, 49, 57, 58, 62, 63], j = [0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], R = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], B = [0, 0, 2, 1, 3, 3, 2, 4, 3, 5, 5, 4, 4, 0, 0, 1, 125], U = [1, 2, 3, 0, 4, 17, 5, 18, 33, 49, 65, 6, 19, 81, 97, 7, 34, 113, 20, 50, 129, 145, 161, 8, 35, 66, 177, 193, 21, 82, 209, 240, 36, 51, 98, 114, 130, 9, 10, 22, 23, 24, 25, 26, 37, 38, 39, 40, 41, 42, 52, 53, 54, 55, 56, 57, 58, 67, 68, 69, 70, 71, 72, 73, 74, 83, 84, 85, 86, 87, 88, 89, 90, 99, 100, 101, 102, 103, 104, 105, 106, 115, 116, 117, 118, 119, 120, 121, 122, 131, 132, 133, 134, 135, 136, 137, 138, 146, 147, 148, 149, 150, 151, 152, 153, 154, 162, 163, 164, 165, 166, 167, 168, 169, 170, 178, 179, 180, 181, 182, 183, 184, 185, 186, 194, 195, 196, 197, 198, 199, 200, 201, 202, 210, 211, 212, 213, 214, 215, 216, 217, 218, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250], Q = [0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], V = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], Y = [0, 0, 2, 1, 2, 4, 4, 3, 4, 7, 5, 4, 4, 0, 1, 2, 119], oe = [0, 1, 2, 3, 17, 4, 5, 33, 49, 6, 18, 65, 81, 7, 97, 113, 19, 34, 50, 129, 8, 20, 66, 145, 161, 177, 193, 9, 35, 51, 82, 240, 21, 98, 114, 209, 10, 22, 36, 52, 225, 37, 241, 23, 24, 25, 26, 38, 39, 40, 41, 42, 53, 54, 55, 56, 57, 58, 67, 68, 69, 70, 71, 72, 73, 74, 83, 84, 85, 86, 87, 88, 89, 90, 99, 100, 101, 102, 103, 104, 105, 106, 115, 116, 117, 118, 119, 120, 121, 122, 130, 131, 132, 133, 134, 135, 136, 137, 138, 146, 147, 148, 149, 150, 151, 152, 153, 154, 162, 163, 164, 165, 166, 167, 168, 169, 170, 178, 179, 180, 181, 182, 183, 184, 185, 186, 194, 195, 196, 197, 198, 199, 200, 201, 202, 210, 211, 212, 213, 214, 215, 216, 217, 218, 226, 227, 228, 229, 230, 231, 232, 233, 234, 242, 243, 244, 245, 246, 247, 248, 249, 250];
+              var t = this, n = Math.round, r = Math.floor, a = new Array(64), s = new Array(64), i = new Array(64), o = new Array(64), c, u, l, p, y = new Array(65535), m = new Array(65535), d = new Array(64), g = new Array(64), h = [], b = 0, x = 7, v = new Array(64), k = new Array(64), w = new Array(64), _ = new Array(256), T = new Array(2048), O, I = [0, 1, 5, 6, 14, 15, 27, 28, 2, 4, 7, 13, 16, 26, 29, 42, 3, 8, 12, 17, 25, 30, 41, 43, 9, 11, 18, 24, 31, 40, 44, 53, 10, 19, 23, 32, 39, 45, 52, 54, 20, 22, 33, 38, 46, 51, 55, 60, 21, 34, 37, 47, 50, 56, 59, 61, 35, 36, 48, 49, 57, 58, 62, 63], j = [0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], R = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], B = [0, 0, 2, 1, 3, 3, 2, 4, 3, 5, 5, 4, 4, 0, 0, 1, 125], U = [1, 2, 3, 0, 4, 17, 5, 18, 33, 49, 65, 6, 19, 81, 97, 7, 34, 113, 20, 50, 129, 145, 161, 8, 35, 66, 177, 193, 21, 82, 209, 240, 36, 51, 98, 114, 130, 9, 10, 22, 23, 24, 25, 26, 37, 38, 39, 40, 41, 42, 52, 53, 54, 55, 56, 57, 58, 67, 68, 69, 70, 71, 72, 73, 74, 83, 84, 85, 86, 87, 88, 89, 90, 99, 100, 101, 102, 103, 104, 105, 106, 115, 116, 117, 118, 119, 120, 121, 122, 131, 132, 133, 134, 135, 136, 137, 138, 146, 147, 148, 149, 150, 151, 152, 153, 154, 162, 163, 164, 165, 166, 167, 168, 169, 170, 178, 179, 180, 181, 182, 183, 184, 185, 186, 194, 195, 196, 197, 198, 199, 200, 201, 202, 210, 211, 212, 213, 214, 215, 216, 217, 218, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250], X = [0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], V = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], J = [0, 0, 2, 1, 2, 4, 4, 3, 4, 7, 5, 4, 4, 0, 1, 2, 119], oe = [0, 1, 2, 3, 17, 4, 5, 33, 49, 6, 18, 65, 81, 7, 97, 113, 19, 34, 50, 129, 8, 20, 66, 145, 161, 177, 193, 9, 35, 51, 82, 240, 21, 98, 114, 209, 10, 22, 36, 52, 225, 37, 241, 23, 24, 25, 26, 38, 39, 40, 41, 42, 53, 54, 55, 56, 57, 58, 67, 68, 69, 70, 71, 72, 73, 74, 83, 84, 85, 86, 87, 88, 89, 90, 99, 100, 101, 102, 103, 104, 105, 106, 115, 116, 117, 118, 119, 120, 121, 122, 130, 131, 132, 133, 134, 135, 136, 137, 138, 146, 147, 148, 149, 150, 151, 152, 153, 154, 162, 163, 164, 165, 166, 167, 168, 169, 170, 178, 179, 180, 181, 182, 183, 184, 185, 186, 194, 195, 196, 197, 198, 199, 200, 201, 202, 210, 211, 212, 213, 214, 215, 216, 217, 218, 226, 227, 228, 229, 230, 231, 232, 233, 234, 242, 243, 244, 245, 246, 247, 248, 249, 250];
               function pe(D) {
                 for (var le = [16, 11, 10, 16, 24, 40, 51, 61, 12, 12, 14, 19, 26, 58, 60, 55, 14, 13, 16, 24, 40, 57, 69, 56, 14, 17, 22, 29, 51, 87, 80, 62, 18, 22, 37, 56, 68, 109, 103, 77, 24, 35, 55, 64, 81, 104, 113, 92, 49, 64, 78, 87, 103, 121, 120, 101, 72, 92, 95, 98, 112, 100, 103, 99], fe = 0; fe < 64; fe++) {
                   var ue = r((le[fe] * D + 50) / 100);
@@ -31537,7 +31537,7 @@ ${t}`;
                 return ke;
               }
               function et() {
-                c = me(j, R), u = me(Q, V), l = me(B, U), p = me(Y, oe);
+                c = me(j, R), u = me(X, V), l = me(B, U), p = me(J, oe);
               }
               function Oe() {
                 for (var D = 1, le = 2, fe = 1; fe <= 15; fe++) {
@@ -31621,12 +31621,12 @@ ${t}`;
                   L(U[ue]);
                 L(1);
                 for (var ke = 0; ke < 16; ke++)
-                  L(Q[ke + 1]);
+                  L(X[ke + 1]);
                 for (var ae = 0; ae <= 11; ae++)
                   L(V[ae]);
                 L(17);
                 for (var Pe = 0; Pe < 16; Pe++)
-                  L(Y[Pe + 1]);
+                  L(J[Pe + 1]);
                 for (var Be = 0; Be <= 161; Be++)
                   L(oe[Be]);
               }
@@ -31668,7 +31668,7 @@ ${t}`;
                 }
                 return _e != de && we(ae), fe;
               }
-              function X() {
+              function Q() {
                 for (var D = String.fromCharCode, le = 0; le < 256; le++)
                   _[le] = D(le);
               }
@@ -31700,12 +31700,12 @@ ${t}`;
                   D < 50 ? le = Math.floor(5e3 / D) : le = Math.floor(200 - D * 2), pe(le), O = D;
                 }
               }
-              function Ye() {
+              function Je() {
                 var D = (/* @__PURE__ */ new Date()).getTime();
-                e || (e = 50), X(), et(), Oe(), Ie(), re(e);
+                e || (e = 50), Q(), et(), Oe(), Ie(), re(e);
                 var le = (/* @__PURE__ */ new Date()).getTime() - D;
               }
-              Ye();
+              Je();
             }
             typeof jc < "u" ? jc.exports = b1 : typeof window < "u" && (window["jpeg-js"] = window["jpeg-js"] || {}, window["jpeg-js"].encode = b1);
             function b1(e, t) {
@@ -31755,7 +31755,7 @@ ${t}`;
                 return w[0].children;
               }
               function y(x, v, k, w, _, T, O, I, j, R) {
-                var B = k.precision, U = k.samplesPerLine, Q = k.scanLines, V = k.mcusPerLine, Y = k.progressive, oe = k.maxH, pe = k.maxV, me = v, et = 0, Oe = 0;
+                var B = k.precision, U = k.samplesPerLine, X = k.scanLines, V = k.mcusPerLine, J = k.progressive, oe = k.maxH, pe = k.maxV, me = v, et = 0, Oe = 0;
                 function Ie() {
                   if (Oe > 0)
                     return Oe--, et >> Oe & 1;
@@ -31866,26 +31866,26 @@ ${t}`;
                   var ve = ie / V | 0, Me = ie % V, he = ve * z.v + Re, ze = Me * z.h + _e;
                   z.blocks[he] === void 0 && R.tolerantDecoding || ee(z, z.blocks[he][ze]);
                 }
-                function X(z, ee, ie) {
+                function Q(z, ee, ie) {
                   var Re = ie / z.blocksPerLine | 0, _e = ie % z.blocksPerLine;
                   z.blocks[Re] === void 0 && R.tolerantDecoding || ee(z, z.blocks[Re][_e]);
                 }
-                var re = w.length, Ye, D, le, fe, ue, ke;
-                Y ? T === 0 ? ke = I === 0 ? He : Se : ke = I === 0 ? Ce : We : ke = Ue;
+                var re = w.length, Je, D, le, fe, ue, ke;
+                J ? T === 0 ? ke = I === 0 ? He : Se : ke = I === 0 ? Ce : We : ke = Ue;
                 var ae = 0, Pe, Be;
                 re == 1 ? Be = w[0].blocksPerLine * w[0].blocksPerColumn : Be = V * k.mcusPerColumn, _ || (_ = Be);
                 for (var tt, de; ae < Be; ) {
                   for (D = 0; D < re; D++)
                     w[D].pred = 0;
                   if (Ae = 0, re == 1)
-                    for (Ye = w[0], ue = 0; ue < _; ue++)
-                      X(Ye, ke, ae), ae++;
+                    for (Je = w[0], ue = 0; ue < _; ue++)
+                      Q(Je, ke, ae), ae++;
                   else
                     for (ue = 0; ue < _; ue++) {
                       for (D = 0; D < re; D++)
-                        for (Ye = w[D], tt = Ye.h, de = Ye.v, le = 0; le < de; le++)
+                        for (Je = w[D], tt = Je.h, de = Je.v, le = 0; le < de; le++)
                           for (fe = 0; fe < tt; fe++)
-                            ye(Ye, ke, ae, le, fe);
+                            ye(Je, ke, ae, le, fe);
                       if (ae++, ae === Be)
                         break;
                     }
@@ -31919,12 +31919,12 @@ ${t}`;
                     we = c * Z[0 + ye] + 128 >> 8, L = c * Z[4 + ye] + 128 >> 8, ce = Z[2 + ye], Ue = Z[6 + ye], He = u * (Z[1 + ye] - Z[7 + ye]) + 128 >> 8, Ce = u * (Z[1 + ye] + Z[7 + ye]) + 128 >> 8, Se = Z[3 + ye] << 4, Ae = Z[5 + ye] << 4, ne = we - L + 1 >> 1, we = we + L + 1 >> 1, L = ne, ne = ce * o + Ue * i + 128 >> 8, ce = ce * i - Ue * o + 128 >> 8, Ue = ne, ne = He - Ae + 1 >> 1, He = He + Ae + 1 >> 1, Ae = ne, ne = Ce + Se + 1 >> 1, Se = Ce - Se + 1 >> 1, Ce = ne, ne = we - Ue + 1 >> 1, we = we + Ue + 1 >> 1, Ue = ne, ne = L - ce + 1 >> 1, L = L + ce + 1 >> 1, ce = ne, ne = He * s + Ce * a + 2048 >> 12, He = He * a - Ce * s + 2048 >> 12, Ce = ne, ne = Se * r + Ae * n + 2048 >> 12, Se = Se * n - Ae * r + 2048 >> 12, Ae = ne, Z[0 + ye] = we + Ce, Z[7 + ye] = we - Ce, Z[1 + ye] = L + Ae, Z[6 + ye] = L - Ae, Z[2 + ye] = ce + Se, Z[5 + ye] = ce - Se, Z[3 + ye] = Ue + He, Z[4 + ye] = Ue - He;
                   }
                   for (We = 0; We < 8; ++We) {
-                    var X = We;
-                    if (Z[8 + X] == 0 && Z[16 + X] == 0 && Z[24 + X] == 0 && Z[32 + X] == 0 && Z[40 + X] == 0 && Z[48 + X] == 0 && Z[56 + X] == 0) {
-                      ne = c * Oe[We + 0] + 8192 >> 14, Z[0 + X] = ne, Z[8 + X] = ne, Z[16 + X] = ne, Z[24 + X] = ne, Z[32 + X] = ne, Z[40 + X] = ne, Z[48 + X] = ne, Z[56 + X] = ne;
+                    var Q = We;
+                    if (Z[8 + Q] == 0 && Z[16 + Q] == 0 && Z[24 + Q] == 0 && Z[32 + Q] == 0 && Z[40 + Q] == 0 && Z[48 + Q] == 0 && Z[56 + Q] == 0) {
+                      ne = c * Oe[We + 0] + 8192 >> 14, Z[0 + Q] = ne, Z[8 + Q] = ne, Z[16 + Q] = ne, Z[24 + Q] = ne, Z[32 + Q] = ne, Z[40 + Q] = ne, Z[48 + Q] = ne, Z[56 + Q] = ne;
                       continue;
                     }
-                    we = c * Z[0 + X] + 2048 >> 12, L = c * Z[32 + X] + 2048 >> 12, ce = Z[16 + X], Ue = Z[48 + X], He = u * (Z[8 + X] - Z[56 + X]) + 2048 >> 12, Ce = u * (Z[8 + X] + Z[56 + X]) + 2048 >> 12, Se = Z[24 + X], Ae = Z[40 + X], ne = we - L + 1 >> 1, we = we + L + 1 >> 1, L = ne, ne = ce * o + Ue * i + 2048 >> 12, ce = ce * i - Ue * o + 2048 >> 12, Ue = ne, ne = He - Ae + 1 >> 1, He = He + Ae + 1 >> 1, Ae = ne, ne = Ce + Se + 1 >> 1, Se = Ce - Se + 1 >> 1, Ce = ne, ne = we - Ue + 1 >> 1, we = we + Ue + 1 >> 1, Ue = ne, ne = L - ce + 1 >> 1, L = L + ce + 1 >> 1, ce = ne, ne = He * s + Ce * a + 2048 >> 12, He = He * a - Ce * s + 2048 >> 12, Ce = ne, ne = Se * r + Ae * n + 2048 >> 12, Se = Se * n - Ae * r + 2048 >> 12, Ae = ne, Z[0 + X] = we + Ce, Z[56 + X] = we - Ce, Z[8 + X] = L + Ae, Z[48 + X] = L - Ae, Z[16 + X] = ce + Se, Z[40 + X] = ce - Se, Z[24 + X] = Ue + He, Z[32 + X] = Ue - He;
+                    we = c * Z[0 + Q] + 2048 >> 12, L = c * Z[32 + Q] + 2048 >> 12, ce = Z[16 + Q], Ue = Z[48 + Q], He = u * (Z[8 + Q] - Z[56 + Q]) + 2048 >> 12, Ce = u * (Z[8 + Q] + Z[56 + Q]) + 2048 >> 12, Se = Z[24 + Q], Ae = Z[40 + Q], ne = we - L + 1 >> 1, we = we + L + 1 >> 1, L = ne, ne = ce * o + Ue * i + 2048 >> 12, ce = ce * i - Ue * o + 2048 >> 12, Ue = ne, ne = He - Ae + 1 >> 1, He = He + Ae + 1 >> 1, Ae = ne, ne = Ce + Se + 1 >> 1, Se = Ce - Se + 1 >> 1, Ce = ne, ne = we - Ue + 1 >> 1, we = we + Ue + 1 >> 1, Ue = ne, ne = L - ce + 1 >> 1, L = L + ce + 1 >> 1, ce = ne, ne = He * s + Ce * a + 2048 >> 12, He = He * a - Ce * s + 2048 >> 12, Ce = ne, ne = Se * r + Ae * n + 2048 >> 12, Se = Se * n - Ae * r + 2048 >> 12, Ae = ne, Z[0 + Q] = we + Ce, Z[56 + Q] = we - Ce, Z[8 + Q] = L + Ae, Z[48 + Q] = L - Ae, Z[16 + Q] = ce + Se, Z[40 + Q] = ce - Se, Z[24 + Q] = Ue + He, Z[32 + Q] = Ue - He;
                   }
                   for (We = 0; We < 64; ++We) {
                     var re = 128 + (Z[We] + 8 >> 4);
@@ -31933,16 +31933,16 @@ ${t}`;
                 }
                 b(T * _ * 8);
                 for (var R, B, U = 0; U < _; U++) {
-                  var Q = U << 3;
+                  var X = U << 3;
                   for (R = 0; R < 8; R++)
                     k.push(new Uint8Array(T));
                   for (var V = 0; V < w; V++) {
                     j(v.blocks[U][V], I, O);
-                    var Y = 0, oe = V << 3;
+                    var J = 0, oe = V << 3;
                     for (B = 0; B < 8; B++) {
-                      var pe = k[Q + B];
+                      var pe = k[X + B];
                       for (R = 0; R < 8; R++)
-                        pe[oe + R] = I[Y++];
+                        pe[oe + R] = I[J++];
                     }
                   }
                 }
@@ -31988,7 +31988,7 @@ ${t}`;
                       }
                     he.maxH = ze, he.maxV = ct, he.mcusPerLine = Tt, he.mcusPerColumn = un;
                   }
-                  var j = null, R = null, B = null, U, Q, V = [], Y = [], oe = [], pe = [], me = T(), et = -1;
+                  var j = null, R = null, B = null, U, X, V = [], J = [], oe = [], pe = [], me = T(), et = -1;
                   if (this.comments = [], me != 65496)
                     throw new Error("SOI not found");
                   for (me = T(); me != 65497; ) {
@@ -32065,19 +32065,19 @@ ${t}`;
                           var Z = Math.ceil((ne - k) / 1e6);
                           throw new Error(`maxResolutionInMP limit exceeded by ${Z}MP`);
                         }
-                        var We = v[w++], ye, X = 0, re = 0;
+                        var We = v[w++], ye, Q = 0, re = 0;
                         for (Oe = 0; Oe < We; Oe++) {
                           ye = v[w];
-                          var Ye = v[w + 1] >> 4, D = v[w + 1] & 15, le = v[w + 2];
-                          if (Ye <= 0 || D <= 0)
+                          var Je = v[w + 1] >> 4, D = v[w + 1] & 15, le = v[w + 2];
+                          if (Je <= 0 || D <= 0)
                             throw new Error("Invalid sampling factor, expected values above 0");
                           U.componentsOrder.push(ye), U.components[ye] = {
-                            h: Ye,
+                            h: Je,
                             v: D,
                             quantizationIdx: le
                           }, w += 3;
                         }
-                        I(U), Y.push(U);
+                        I(U), J.push(U);
                         break;
                       case 65476:
                         var fe = T();
@@ -32093,7 +32093,7 @@ ${t}`;
                         }
                         break;
                       case 65501:
-                        T(), Q = T();
+                        T(), X = T();
                         break;
                       case 65500:
                         T(), T();
@@ -32105,7 +32105,7 @@ ${t}`;
                           var ee = v[w++];
                           z.huffmanTableDC = pe[ee >> 4], z.huffmanTableAC = oe[ee & 15], de.push(z);
                         }
-                        var ie = v[w++], Re = v[w++], _e = v[w++], ve = y(v, w, U, de, Q, ie, Re, _e >> 4, _e & 15, this.opts);
+                        var ie = v[w++], Re = v[w++], _e = v[w++], ve = y(v, w, U, de, X, ie, Re, _e >> 4, _e & 15, this.opts);
                         w += ve;
                         break;
                       case 65535:
@@ -32129,10 +32129,10 @@ ${t}`;
                     }
                     me = T();
                   }
-                  if (Y.length != 1)
+                  if (J.length != 1)
                     throw new Error("only single frame JPEGs supported");
-                  for (var Oe = 0; Oe < Y.length; Oe++) {
-                    var Me = Y[Oe].components;
+                  for (var Oe = 0; Oe < J.length; Oe++) {
+                    var Me = J[Oe].components;
                     for (var Ie in Me)
                       Me[Ie].quantizationTable = V[Me[Ie].quantizationIdx], delete Me[Ie].quantizationIdx;
                   }
@@ -32147,31 +32147,31 @@ ${t}`;
                   }
                 },
                 getData: function(v, k) {
-                  var w = this.width / v, _ = this.height / k, T, O, I, j, R, B, U, Q, V, Y, oe = 0, pe, me, et, Oe, Ie, we, L, ce, Ue, He, Se, Ae = v * k * this.components.length;
+                  var w = this.width / v, _ = this.height / k, T, O, I, j, R, B, U, X, V, J, oe = 0, pe, me, et, Oe, Ie, we, L, ce, Ue, He, Se, Ae = v * k * this.components.length;
                   b(Ae);
                   var Ce = new Uint8Array(Ae);
                   switch (this.components.length) {
                     case 1:
-                      for (T = this.components[0], Y = 0; Y < k; Y++)
-                        for (R = T.lines[0 | Y * T.scaleY * _], V = 0; V < v; V++)
+                      for (T = this.components[0], J = 0; J < k; J++)
+                        for (R = T.lines[0 | J * T.scaleY * _], V = 0; V < v; V++)
                           pe = R[0 | V * T.scaleX * w], Ce[oe++] = pe;
                       break;
                     case 2:
-                      for (T = this.components[0], O = this.components[1], Y = 0; Y < k; Y++)
-                        for (R = T.lines[0 | Y * T.scaleY * _], B = O.lines[0 | Y * O.scaleY * _], V = 0; V < v; V++)
+                      for (T = this.components[0], O = this.components[1], J = 0; J < k; J++)
+                        for (R = T.lines[0 | J * T.scaleY * _], B = O.lines[0 | J * O.scaleY * _], V = 0; V < v; V++)
                           pe = R[0 | V * T.scaleX * w], Ce[oe++] = pe, pe = B[0 | V * O.scaleX * w], Ce[oe++] = pe;
                       break;
                     case 3:
-                      for (Se = true, this.adobe && this.adobe.transformCode ? Se = true : typeof this.opts.colorTransform < "u" && (Se = !!this.opts.colorTransform), T = this.components[0], O = this.components[1], I = this.components[2], Y = 0; Y < k; Y++)
-                        for (R = T.lines[0 | Y * T.scaleY * _], B = O.lines[0 | Y * O.scaleY * _], U = I.lines[0 | Y * I.scaleY * _], V = 0; V < v; V++)
+                      for (Se = true, this.adobe && this.adobe.transformCode ? Se = true : typeof this.opts.colorTransform < "u" && (Se = !!this.opts.colorTransform), T = this.components[0], O = this.components[1], I = this.components[2], J = 0; J < k; J++)
+                        for (R = T.lines[0 | J * T.scaleY * _], B = O.lines[0 | J * O.scaleY * _], U = I.lines[0 | J * I.scaleY * _], V = 0; V < v; V++)
                           Se ? (pe = R[0 | V * T.scaleX * w], me = B[0 | V * O.scaleX * w], et = U[0 | V * I.scaleX * w], ce = d(pe + 1.402 * (et - 128)), Ue = d(pe - 0.3441363 * (me - 128) - 0.71413636 * (et - 128)), He = d(pe + 1.772 * (me - 128))) : (ce = R[0 | V * T.scaleX * w], Ue = B[0 | V * O.scaleX * w], He = U[0 | V * I.scaleX * w]), Ce[oe++] = ce, Ce[oe++] = Ue, Ce[oe++] = He;
                       break;
                     case 4:
                       if (!this.adobe)
                         throw new Error("Unsupported color mode (4 components)");
-                      for (Se = false, this.adobe && this.adobe.transformCode ? Se = true : typeof this.opts.colorTransform < "u" && (Se = !!this.opts.colorTransform), T = this.components[0], O = this.components[1], I = this.components[2], j = this.components[3], Y = 0; Y < k; Y++)
-                        for (R = T.lines[0 | Y * T.scaleY * _], B = O.lines[0 | Y * O.scaleY * _], U = I.lines[0 | Y * I.scaleY * _], Q = j.lines[0 | Y * j.scaleY * _], V = 0; V < v; V++)
-                          Se ? (pe = R[0 | V * T.scaleX * w], me = B[0 | V * O.scaleX * w], et = U[0 | V * I.scaleX * w], Oe = Q[0 | V * j.scaleX * w], Ie = 255 - d(pe + 1.402 * (et - 128)), we = 255 - d(pe - 0.3441363 * (me - 128) - 0.71413636 * (et - 128)), L = 255 - d(pe + 1.772 * (me - 128))) : (Ie = R[0 | V * T.scaleX * w], we = B[0 | V * O.scaleX * w], L = U[0 | V * I.scaleX * w], Oe = Q[0 | V * j.scaleX * w]), Ce[oe++] = 255 - Ie, Ce[oe++] = 255 - we, Ce[oe++] = 255 - L, Ce[oe++] = 255 - Oe;
+                      for (Se = false, this.adobe && this.adobe.transformCode ? Se = true : typeof this.opts.colorTransform < "u" && (Se = !!this.opts.colorTransform), T = this.components[0], O = this.components[1], I = this.components[2], j = this.components[3], J = 0; J < k; J++)
+                        for (R = T.lines[0 | J * T.scaleY * _], B = O.lines[0 | J * O.scaleY * _], U = I.lines[0 | J * I.scaleY * _], X = j.lines[0 | J * j.scaleY * _], V = 0; V < v; V++)
+                          Se ? (pe = R[0 | V * T.scaleX * w], me = B[0 | V * O.scaleX * w], et = U[0 | V * I.scaleX * w], Oe = X[0 | V * j.scaleX * w], Ie = 255 - d(pe + 1.402 * (et - 128)), we = 255 - d(pe - 0.3441363 * (me - 128) - 0.71413636 * (et - 128)), L = 255 - d(pe + 1.772 * (me - 128))) : (Ie = R[0 | V * T.scaleX * w], we = B[0 | V * O.scaleX * w], L = U[0 | V * I.scaleX * w], Oe = X[0 | V * j.scaleX * w]), Ce[oe++] = 255 - Ie, Ce[oe++] = 255 - we, Ce[oe++] = 255 - L, Ce[oe++] = 255 - Oe;
                       break;
                     default:
                       throw new Error("Unsupported color mode");
@@ -32179,7 +32179,7 @@ ${t}`;
                   return Ce;
                 },
                 copyToImageData: function(v, k) {
-                  var w = v.width, _ = v.height, T = v.data, O = this.getData(w, _), I = 0, j = 0, R, B, U, Q, V, Y, oe, pe, me;
+                  var w = v.width, _ = v.height, T = v.data, O = this.getData(w, _), I = 0, j = 0, R, B, U, X, V, J, oe, pe, me;
                   switch (this.components.length) {
                     case 1:
                       for (B = 0; B < _; B++)
@@ -32194,7 +32194,7 @@ ${t}`;
                     case 4:
                       for (B = 0; B < _; B++)
                         for (R = 0; R < w; R++)
-                          V = O[I++], Y = O[I++], U = O[I++], Q = O[I++], oe = 255 - d(V * (1 - Q / 255) + Q), pe = 255 - d(Y * (1 - Q / 255) + Q), me = 255 - d(U * (1 - Q / 255) + Q), T[j++] = oe, T[j++] = pe, T[j++] = me, k && (T[j++] = 255);
+                          V = O[I++], J = O[I++], U = O[I++], X = O[I++], oe = 255 - d(V * (1 - X / 255) + X), pe = 255 - d(J * (1 - X / 255) + X), me = 255 - d(U * (1 - X / 255) + X), T[j++] = oe, T[j++] = pe, T[j++] = me, k && (T[j++] = 255);
                       break;
                     default:
                       throw new Error("Unsupported color mode");
@@ -32410,7 +32410,7 @@ ${t}`;
             T1 = Uw(E1(), 1), NI = 512, OI = 8, II = 6 * 1024 * 1024, jI = /^data:(image\/[a-z0-9.+-]+);base64,([a-z0-9+/=]+)$/i;
             Pc = null;
           });
-          function Xs(e) {
+          function Qs(e) {
             return e && typeof e == "object" && !Array.isArray(e) ? e : null;
           }
           function HI(e) {
@@ -32419,7 +32419,7 @@ ${t}`;
                 url: e,
                 title: e
               } : null;
-            let t = Xs(e);
+            let t = Qs(e);
             if (!t)
               return null;
             let n = typeof t.url == "string" && t.url ? t.url : typeof t.href == "string" && t.href ? t.href : typeof t.link == "string" ? t.link : "";
@@ -32445,14 +32445,14 @@ ${t}`;
             var _a, _b2, _c2;
             let t = /* @__PURE__ */ new Map();
             for (let n of e) {
-              let r = Array.isArray(n) ? n : ((_a = Xs(n)) == null ? void 0 : _a.citations) ?? ((_b2 = Xs(n)) == null ? void 0 : _b2.urls) ?? ((_c2 = Xs(n)) == null ? void 0 : _c2.results) ?? [];
+              let r = Array.isArray(n) ? n : ((_a = Qs(n)) == null ? void 0 : _a.citations) ?? ((_b2 = Qs(n)) == null ? void 0 : _b2.urls) ?? ((_c2 = Qs(n)) == null ? void 0 : _c2.results) ?? [];
               for (let a of Rc(r))
                 t.has(a.url) || t.set(a.url, a);
             }
             return [...t.values()].slice(0, 50);
           }
           function C1(e) {
-            let t = Xs(e);
+            let t = Qs(e);
             return t ? Array.isArray(t.citations) ? Rc(t.citations) : Array.isArray(t.urls) ? Rc(t.urls) : Array.isArray(t.results) ? Rc(t.results) : [] : [];
           }
           function Mc(e) {
@@ -32539,7 +32539,7 @@ ${t}`;
             }
             return null;
           }
-          function Qs(e) {
+          function Xs(e) {
             let t = String(e || "").toLowerCase();
             return t === "jpg" || t === "jpeg" ? "image/jpeg" : t === "png" || t === "webp" || t === "gif" ? `image/${t}` : `image/${t || "png"}`;
           }
@@ -32563,7 +32563,7 @@ ${t}`;
             return {
               type: "image_url",
               image_url: {
-                url: `data:${Qs(t)};base64,${e.b64}`
+                url: `data:${Xs(t)};base64,${e.b64}`
               }
             };
           }
@@ -32874,13 +32874,13 @@ ${t}`
               t += String((n == null ? void 0 : n.content) || "").length;
             return t;
           }
-          function YI(e) {
+          function JI(e) {
             return /[^\x00-\x7F]/.test(e);
           }
-          function JI(e) {
+          function YI(e) {
             return e.charCodeAt(0) < 128 ? 5 * 0.5 : 5;
           }
-          function XI(e, t) {
+          function QI(e, t) {
             let n = [];
             for (let r of String(e || "").replace(/\r\n/g, `
 `).split(`
@@ -32891,14 +32891,14 @@ ${t}`
               }
               let a = "", s = 0;
               for (let i of r) {
-                let o = JI(i);
+                let o = YI(i);
                 s + o > t && a && (n.push(a.replace(/\s+$/, "")), a = "", s = 0), a += i, s += o;
               }
               a && n.push(a.replace(/\s+$/, ""));
             }
             return n;
           }
-          function QI(e) {
+          function XI(e) {
             let t = ["=== CONVERSATION CONTEXT (archived) ===", "This PDF contains the earlier conversation. Use it as context; the current question follows in the chat text.", ""];
             for (let n of e) {
               let r = (n == null ? void 0 : n.role) ? String(n.role).toUpperCase() : "USER", a = String((n == null ? void 0 : n.content) || "").trim();
@@ -32914,16 +32914,16 @@ ${t}`
             return typeof btoa == "function" ? btoa(e) : Buffer.from(e, "binary").toString("base64");
           }
           function tj(e, t = {}) {
-            let n = Math.max(1, Math.trunc(t.maxPages || 15)), r = QI(e), a = r.join(`
+            let n = Math.max(1, Math.trunc(t.maxPages || 15)), r = XI(e), a = r.join(`
 `);
-            if (YI(a))
+            if (JI(a))
               throw new Bc("context PDF requires a CJK font (not available in edge runtime)", {
                 reason: "font_missing",
                 textChars: a.length
               });
             let s = 595.28 - 64, i = [];
             for (let h of r)
-              i.push(...XI(h, s));
+              i.push(...QI(h, s));
             let o = [], c = [];
             for (let h of i)
               c.length >= 250 && (o.push(c), c = []), c.push(h);
@@ -33091,14 +33091,14 @@ ${g}
             handleDuckAiRequest: () => Ej,
             solveDuckDuckGoChallenge: () => Sp
           });
-          async function Q1() {
-            Hc < uj || await new Promise((t) => X1.push(t)), Hc++;
+          async function X1() {
+            Hc < uj || await new Promise((t) => Q1.push(t)), Hc++;
             let e = V1 + dj - Date.now();
             e > 0 && await ev(e), V1 = Date.now();
           }
           function Z1() {
             Hc--;
-            let e = X1.shift();
+            let e = Q1.shift();
             e && e();
           }
           async function ni(e, t, n) {
@@ -33426,34 +33426,34 @@ at async ${l}${p}:2:1519117`,
                     }
                     if (U.includes("[DONE]")) {
                       _r(x, ei(U));
-                      let Q = gp(U);
-                      Q.limit ? g = Q.limit : d = yp(Q.stopReason), _(I);
+                      let X = gp(U);
+                      X.limit ? g = X.limit : d = yp(X.stopReason), _(I);
                       continue;
                     }
                     try {
-                      let Q = JSON.parse(U);
-                      _r(x, _p(Q));
-                      let V = Lc(Q);
+                      let X = JSON.parse(U);
+                      _r(x, _p(X));
+                      let V = Lc(X);
                       if (V) {
                         V.partial ? h = V : (h = null, b = true, k(I, {
                           images: [Zs(V)]
                         }));
                         continue;
                       }
-                      if (xp(Q)) {
+                      if (xp(X)) {
                         y = true;
                         continue;
                       }
-                      let Y = bp(Q);
-                      if (Y.text ? (m = true, k(I, {
-                        reasoning_content: Y.text
-                      })) : Y.fallback && !m && (m = true, k(I, {
-                        reasoning_content: Y.fallback
+                      let J = bp(X);
+                      if (J.text ? (m = true, k(I, {
+                        reasoning_content: J.text
+                      })) : J.fallback && !m && (m = true, k(I, {
+                        reasoning_content: J.fallback
                       })), n) {
-                        let pe = lv(Q, l);
+                        let pe = lv(X, l);
                         pe !== l && (l = pe, w(I));
                       }
-                      let oe = cv(Q);
+                      let oe = cv(X);
                       if (oe) {
                         let pe = v ? v.process(oe) : oe;
                         pe && k(I, {
@@ -33667,9 +33667,9 @@ at async ${l}${p}:2:1519117`,
             }
             t.length > 0 && (n = $1(n, L1(t)));
             let r = bj(e.tools, e.webSearch), a = xj(e);
-            await Q1();
+            await X1();
             try {
-              let s = ov(e.model), i = await ni(Y1, {
+              let s = ov(e.model), i = await ni(J1, {
                 headers: {
                   ...zc,
                   "x-vqd-accept": "1",
@@ -33716,7 +33716,7 @@ at async ${l}${p}:2:1519117`,
                   conversationId: Lt.randomUUID(),
                   publicKey: l
                 }
-              }, y = await ni(J1, {
+              }, y = await ni(Y1, {
                 method: "POST",
                 headers: {
                   ...zc,
@@ -33755,7 +33755,7 @@ at async ${l}${p}:2:1519117`,
             return !Number.isInteger(t) || t < 1 || t > 4 ? null : t;
           }
           async function Sj(e, t) {
-            let n = await ni(Y1, {
+            let n = await ni(J1, {
               headers: {
                 ...zc,
                 "x-vqd-accept": "1",
@@ -33794,7 +33794,7 @@ at async ${l}${p}:2:1519117`,
                 conversationId: Lt.randomUUID(),
                 publicKey: i
               }
-            }, c = await ni(J1, {
+            }, c = await ni(Y1, {
               method: "POST",
               headers: {
                 ...zc,
@@ -33875,7 +33875,7 @@ at async ${l}${p}:2:1519117`,
                 };
             }
             let i = ov(t || "gpt-5.4-mini"), o = [];
-            await Q1();
+            await X1();
             try {
               for (let u = 0; u < a; u++) {
                 let l = await Sj(i, r);
@@ -33903,15 +33903,15 @@ at async ${l}${p}:2:1519117`,
             let c = o.slice(0, a).map((u) => {
               let l = hp(u.b64, u.format || "png");
               return s === "url" ? {
-                url: `data:${Qs(l)};base64,${u.b64}`,
+                url: `data:${Xs(l)};base64,${u.b64}`,
                 revised_prompt: r,
                 format: l,
-                mime_type: Qs(l)
+                mime_type: Xs(l)
               } : {
                 b64_json: u.b64,
                 revised_prompt: r,
                 format: l,
-                mime_type: Qs(l)
+                mime_type: Xs(l)
               };
             });
             return {
@@ -33927,8 +33927,8 @@ at async ${l}${p}:2:1519117`,
             };
           }
           var da;
-          var Y1;
           var J1;
+          var Y1;
           var Z5;
           var cj;
           var lj;
@@ -33939,7 +33939,7 @@ at async ${l}${p}:2:1519117`,
           var Ep;
           var Hc;
           var V1;
-          var X1;
+          var Q1;
           var ev;
           var fj;
           var tv;
@@ -33958,7 +33958,7 @@ at async ${l}${p}:2:1519117`,
             q1();
             W1();
             ts();
-            da = "https://duck.ai", Y1 = `${da}/duckchat/v1/status`, J1 = `${da}/duckchat/v1/chat`, Z5 = `${da}/duckchat/v1/models`, cj = /serp_\d{8}_\d{6}_[A-Z]{2}-[0-9a-f]{20,40}/, lj = "serp_20260424_180649_ET-0bdc33b2a02ebf8f235def65d887787f694720a1", zn = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36", zc = {
+            da = "https://duck.ai", J1 = `${da}/duckchat/v1/status`, Y1 = `${da}/duckchat/v1/chat`, Z5 = `${da}/duckchat/v1/models`, cj = /serp_\d{8}_\d{6}_[A-Z]{2}-[0-9a-f]{20,40}/, lj = "serp_20260424_180649_ET-0bdc33b2a02ebf8f235def65d887787f694720a1", zn = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36", zc = {
               Accept: "*/*",
               "Accept-Language": "en-US,en;q=0.9",
               "Cache-Control": "no-cache",
@@ -33970,7 +33970,7 @@ at async ${l}${p}:2:1519117`,
               "Sec-Ch-Ua-Platform": '"Linux"',
               "Sec-Fetch-Dest": "empty",
               "Sec-Fetch-Mode": "cors"
-            }, uj = 1, dj = 1500, Ep = [2e3, 4e3], Hc = 0, V1 = 0, X1 = [];
+            }, uj = 1, dj = 1500, Ep = [2e3, 4e3], Hc = 0, V1 = 0, Q1 = [];
             ev = (e) => new Promise((t) => setTimeout(t, e));
             fj = [{
               id: "gpt-6-luna",
@@ -34163,7 +34163,7 @@ var getComputedStyle = __getComputedStyle;
             VIDEO_KEY_COOLDOWN_SECONDS: () => _v,
             buildAgnesVideoBody: () => kv,
             deleteVideoTask: () => Fp,
-            extractVideoUrl: () => Qc,
+            extractVideoUrl: () => Xc,
             getKeyCooldown: () => Bp,
             isAgnesVideoRoute: () => Zc,
             isQueueFullError: () => ma,
@@ -34192,7 +34192,7 @@ var getComputedStyle = __getComputedStyle;
             let t = (e || "").toLowerCase();
             return ["completed", "complete", "succeeded", "success", "saved", "done", "finished"].includes(t) ? "completed" : ["failed", "failure", "error", "cancelled", "canceled"].includes(t) ? t.startsWith("cancel") ? "cancelled" : "failed" : ["processing", "running", "in_progress", "generating", "started"].includes(t) ? "in_progress" : "queued";
           }
-          function Qc(e) {
+          function Xc(e) {
             var _a, _b2, _c2, _d2, _e, _f2, _g2, _h2;
             if (!e)
               return "";
@@ -34274,7 +34274,7 @@ var getComputedStyle = __getComputedStyle;
                 };
               let o = (i == null ? void 0 : i.video_id) || ((_c2 = i == null ? void 0 : i.data) == null ? void 0 : _c2.video_id) || (i == null ? void 0 : i.task_id) || (i == null ? void 0 : i.id) || ((_d2 = i == null ? void 0 : i.data) == null ? void 0 : _d2.task_id) || ((_e = i == null ? void 0 : i.data) == null ? void 0 : _e.id) || "";
               if (!o) {
-                let c = Qc(i);
+                let c = Xc(i);
                 return c ? {
                   ok: true,
                   httpStatus: 200,
@@ -34294,7 +34294,7 @@ var getComputedStyle = __getComputedStyle;
                 httpStatus: 200,
                 taskId: String(o),
                 status: Dp(i == null ? void 0 : i.status),
-                url: Qc(i),
+                url: Xc(i),
                 raw: i
               };
             } catch (a) {
@@ -34338,7 +34338,7 @@ var getComputedStyle = __getComputedStyle;
                   httpStatus: 200,
                   status: m,
                   progress: g,
-                  url: Qc(y) || void 0,
+                  url: Xc(y) || void 0,
                   error: m === "failed" ? JSON.stringify((y == null ? void 0 : y.error) || (y == null ? void 0 : y.message) || "\u4E0A\u6E38\u751F\u6210\u5931\u8D25").slice(0, 500) : void 0,
                   raw: y
                 };
@@ -34562,8 +34562,8 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           var _v;
           var ln = H(() => {
             "use strict";
-            Je();
-            Xe();
+            Ye();
+            Qe();
             Ne();
             Rj = 3e4, Mj = 2e4, vv = 86400;
             bv = {
@@ -34638,7 +34638,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             ut();
             qe();
             ot();
-            Xe();
+            Qe();
             Ne();
           });
           var Hp = {};
@@ -34778,7 +34778,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 }
                 j.providerKeyId !== "keyless" && (await fr(e, j.providerId, j.providerKeyId).catch(() => {
                 }), await nl(e, j.providerId, j.providerKeyId));
-                let U = n.seconds ?? n.duration, Q = U === void 0 ? NaN : Number(U);
+                let U = n.seconds ?? n.duration, X = U === void 0 ? NaN : Number(U);
                 _ = {
                   id: `video_${te().replace(/-/g, "").slice(0, 20)}`,
                   providerId: j.providerId,
@@ -34791,7 +34791,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   status: B.status || "queued",
                   progress: B.status === "completed" ? 100 : 0,
                   url: B.url || void 0,
-                  seconds: Number.isFinite(Q) ? Q : void 0,
+                  seconds: Number.isFinite(X) ? X : void 0,
                   size: n.size,
                   userId: t.userId,
                   apiKeyId: t.keyId,
@@ -34815,7 +34815,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   attempts: b,
                   ip: t.ip
                 }), k) {
-                  let j = d[0], R = Math.floor(Date.now() / 1e3), B = n.seconds ?? n.duration, U = B === void 0 ? NaN : Number(B), Q = {
+                  let j = d[0], R = Math.floor(Date.now() / 1e3), B = n.seconds ?? n.duration, U = B === void 0 ? NaN : Number(B), X = {
                     id: `video_${te().replace(/-/g, "").slice(0, 20)}`,
                     providerId: (j == null ? void 0 : j.providerId) ?? "",
                     providerKeyId: (j == null ? void 0 : j.providerKeyId) ?? "",
@@ -34838,11 +34838,11 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                     nextRetryAt: R + oi,
                     retryCount: 0
                   };
-                  return await yn(e, Q), pt(503, A.UPSTREAM_ERROR, v, {
+                  return await yn(e, X), pt(503, A.UPSTREAM_ERROR, v, {
                     retry_after: oi,
                     code: "video_queue_full",
-                    task_id: Q.id,
-                    poll_url: `/v1/videos/${Q.id}`,
+                    task_id: X.id,
+                    poll_url: `/v1/videos/${X.id}`,
                     queue_waiting: true
                   });
                 }
@@ -35002,11 +35002,11 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             qe();
             ci();
             li();
-            Ja();
-            Yt();
+            Ya();
+            Jt();
             Zi();
             pr();
-            Xe();
+            Qe();
             Ne();
             ln();
             rn = new be(), Ov = 3, Iv = 1e5, Cv = 6e4, $j = 4e3;
@@ -35168,13 +35168,13 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           });
           var Wn = {};
           nt(Wn, {
-            isCheckinEnabled: () => Qj,
-            listCheckinChannels: () => Jj,
+            isCheckinEnabled: () => Xj,
+            listCheckinChannels: () => Yj,
             maybeRunDailyCheckin: () => eP,
             readCheckinConfig: () => qp,
             runCheckins: () => Kp,
             runCodebuddyCheckinAll: () => Zj,
-            writeCheckinConfig: () => Xj
+            writeCheckinConfig: () => Qj
           });
           function qj() {
             return new Date(Date.now() + 8 * 36e5).toISOString().slice(0, 10);
@@ -35246,7 +35246,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               }
             });
           }
-          async function Yj(e, t) {
+          async function Jj(e, t) {
             let n = (await Ke(e, t.id)).filter((a) => a.status === "active");
             if (!n.length)
               return [];
@@ -35277,7 +35277,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               }
             });
           }
-          function Jj() {
+          function Yj() {
             return Object.entries(il).map(([e, t]) => ({
               type: e,
               label: t.label,
@@ -35299,12 +35299,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               };
             }
           }
-          async function Xj(e, t) {
+          async function Qj(e, t) {
             await K(e).setJSON(Uv, {
               disabled: t.disabled
             });
           }
-          async function Qj(e, t) {
+          async function Xj(e, t) {
             return !(await qp(e)).disabled.includes(t);
           }
           async function Kp(e, t = {}) {
@@ -35390,9 +35390,9 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           var Gn = H(() => {
             "use strict";
             Ne();
-            Xe();
+            Qe();
             Oa();
-            Je();
+            Ye();
             Uv = "checkin:config", Lv = (e) => `checkin:day:${e}`;
             Wj = 9;
             il = {
@@ -35412,7 +35412,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 label: "Qoder",
                 action: "\u7B7E\u5230",
                 oauthType: "qoder",
-                run: Yj
+                run: Jj
               }
             };
           });
@@ -35560,7 +35560,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               if (!l)
                 continue;
               let p = await Ke(e, u.id);
-              if (l.scope === "web" && p.length === 0 && ((_a = Jr[l.type]) == null ? void 0 : _a.anonymous))
+              if (l.scope === "web" && p.length === 0 && ((_a = Yr[l.type]) == null ? void 0 : _a.anonymous))
                 continue;
               let y = await Ft(e, u.id), m = p.map(() => null), d = [];
               if (n.skipQuota)
@@ -35665,7 +35665,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   } else if (l.type === "chatgptweb") {
                     let {
                       fetchChatgptWebAccountInfo: h
-                    } = await Promise.resolve().then(() => (Yr(), cs)), b = p.map((k, w) => ({
+                    } = await Promise.resolve().then(() => (Jr(), cs)), b = p.map((k, w) => ({
                       key: k,
                       token: d[w]
                     })).filter((k) => k.token), x = await it(b, 5, async (k) => h(e, k.token)), v = new Map(b.map((k, w) => [k.key.id, x[w]]));
@@ -35739,7 +35739,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             "use strict";
             Ne();
             pr();
-            Xe();
+            Qe();
             Oa();
             yo();
           });
@@ -35853,7 +35853,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           ut();
           qe();
           Zi();
-          Xe();
+          Qe();
           Ne();
           async function Lh(e, t) {
             let n = t.settings;
@@ -35916,11 +35916,11 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             });
           }
           ot();
-          Ja();
-          Yt();
+          Ya();
+          Jt();
           ro();
           pr();
-          Xe();
+          Qe();
           Ne();
           var Np = new be();
           async function fv(e, t, n) {
@@ -36075,20 +36075,20 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               let d = n.model, g = !!n.stream, h = d.includes("/") ? d.slice(d.indexOf("/") + 1) : d;
               if (p.modelWhitelist)
                 try {
-                  let X = JSON.parse(p.modelWhitelist), re = Array.isArray(X) && X.some((Ye) => Ye === d || Ye === h || Ye.toLowerCase() === d.toLowerCase() || Ye.toLowerCase() === h.toLowerCase());
-                  if (Array.isArray(X) && X.length && !re)
+                  let Q = JSON.parse(p.modelWhitelist), re = Array.isArray(Q) && Q.some((Je) => Je === d || Je === h || Je.toLowerCase() === d.toLowerCase() || Je.toLowerCase() === h.toLowerCase());
+                  if (Array.isArray(Q) && Q.length && !re)
                     throw new C(403, A.MODEL_NOT_ALLOWED, `\u8BE5 Key \u65E0\u6743\u8C03\u7528\u6A21\u578B ${d}`);
-                } catch (X) {
-                  if (X instanceof C)
-                    throw X;
+                } catch (Q) {
+                  if (Q instanceof C)
+                    throw Q;
                 }
-              let b = n.messages.filter((X) => X.role === "user").map((X) => typeof X.content == "string" ? X.content : "").join(`
-`), x = await Nn(r, d), v = (_a = x[0]) == null ? void 0 : _a.model.publicName, k = (v ? await St(r, v) : null) || await St(r, d) || (h !== d ? await St(r, h) : null), w = k == null ? void 0 : k.rpmLimit, _ = !!k && (k.inputPerMillion > 0 || k.outputPerMillion > 0), T = bu(o, c), O = await Le(r), j = x.filter((X, re) => x.findIndex((Ye) => Ye.provider.id === X.provider.id) === re).map(async (X) => {
-                let [re, Ye] = await Promise.all([ir(r, X.provider.id), Ft(r, X.provider.id)]);
+              let b = n.messages.filter((Q) => Q.role === "user").map((Q) => typeof Q.content == "string" ? Q.content : "").join(`
+`), x = await Nn(r, d), v = (_a = x[0]) == null ? void 0 : _a.model.publicName, k = (v ? await St(r, v) : null) || await St(r, d) || (h !== d ? await St(r, h) : null), w = k == null ? void 0 : k.rpmLimit, _ = !!k && (k.inputPerMillion > 0 || k.outputPerMillion > 0), T = bu(o, c), O = await Le(r), j = x.filter((Q, re) => x.findIndex((Je) => Je.provider.id === Q.provider.id) === re).map(async (Q) => {
+                let [re, Je] = await Promise.all([ir(r, Q.provider.id), Ft(r, Q.provider.id)]);
                 return {
-                  plan: X,
+                  plan: Q,
                   keys: re,
-                  health: Ye
+                  health: Je
                 };
               }), R = Lh(m, {
                 settings: O,
@@ -36099,7 +36099,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 text: b
               }), B = (async () => await Mh(r, i, u) ? Ur(r, i, u, w, d) : {
                 tpmDenied: true
-              })(), U = _ ? $e(r, o) : Promise.resolve(null), Q = _ ? Dt(r, T) : Promise.resolve(null), [V, Y, oe] = await Promise.all([Promise.all(j), R, B]), pe = await U, me = await Q;
+              })(), U = _ ? $e(r, o) : Promise.resolve(null), X = _ ? Dt(r, T) : Promise.resolve(null), [V, J, oe] = await Promise.all([Promise.all(j), R, B]), pe = await U, me = await X;
               if (oe !== null && "tpmDenied" in oe)
                 return pt(429, A.RATE_LIMITED, "TPM \u8D85\u9650", {
                   retry_after: 60
@@ -36109,7 +36109,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 return pt(429, A.RATE_LIMITED, et.reason || `${(_b2 = et.kind) == null ? void 0 : _b2.toUpperCase()} \u8D85\u9650\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5`, {
                   retry_after: et.retryAfter
                 });
-              if (Y.flagged)
+              if (J.flagged)
                 throw await qc(r, {
                   id: te(),
                   requestId: a,
@@ -36128,7 +36128,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   ip: l,
                   createdAt: Math.floor(Date.now() / 1e3)
                 }, i), new C(400, A.CONTENT_BLOCKED, "\u8BF7\u6C42\u5185\u5BB9\u89E6\u53D1\u5B89\u5168\u7B56\u7565\uFF0C\u5DF2\u88AB\u62E6\u622A\u5E76\u8FDB\u5165\u4EBA\u5DE5\u590D\u6838", {
-                  rule: Y.rule,
+                  rule: J.rule,
                   request_id: a
                 });
               let Oe = "user";
@@ -36139,20 +36139,20 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 throw new C(403, A.MODEL_NOT_ALLOWED, `\u6A21\u578B\u300C${d}\u300D\u4E3A\u4ED8\u8D39\u9AD8\u7EA7\u6A21\u578B\uFF0C\u666E\u901A\u7528\u6237\u4EC5\u53EF\u8C03\u7528\u514D\u8D39\u6A21\u578B\u6C60\u3002\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458\u5347\u7EA7\u4E3A VIP \u8D26\u53F7\u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u6A21\u578B\uFF01`);
               let Ie = [];
               for (let {
-                plan: X,
+                plan: Q,
                 keys: re,
-                health: Ye
+                health: Je
               } of V)
-                Ie.push(...$r(r, X, re, Ye));
+                Ie.push(...$r(r, Q, re, Je));
               if (!Ie.length)
                 throw new C(404, A.MODEL_NOT_FOUND, `\u6A21\u578B ${d} \u4E0D\u5B58\u5728\u6216\u6682\u65E0\u53EF\u7528\u4E0A\u6E38`);
               let we = k || (x[0] ? await St(r, x[0].model.upstreamModel) : null), L = Kh(b), ce = n.max_tokens ?? 1024, Ue = we ? ao(we, L, ce) : 0, {
                 holdId: He
-              } = await ku(m, T, Ue, a, Oe), Se = async (X) => {
+              } = await ku(m, T, Ue, a, Oe), Se = async (Q) => {
                 if (y)
                   return;
                 y = true;
-                let re = we ? ao(we, X.promptTokens, X.completionTokens) : 0;
+                let re = we ? ao(we, Q.promptTokens, Q.completionTokens) : 0;
                 await Vt(r, i), await _u(m, {
                   scope: T,
                   holdId: He,
@@ -36162,40 +36162,40 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   userId: o,
                   apiKeyId: i,
                   unlimited: Oe === "superadmin"
-                }), await Rh(r, i, X.promptTokens + X.completionTokens), await qc(r, {
+                }), await Rh(r, i, Q.promptTokens + Q.completionTokens), await qc(r, {
                   id: te(),
                   requestId: a,
                   userId: o,
                   apiKeyId: i,
                   publicModel: d,
-                  providerId: X.route.providerId,
-                  upstreamModel: X.route.upstreamModel,
-                  status: X.status,
-                  httpStatus: X.httpStatus,
+                  providerId: Q.route.providerId,
+                  upstreamModel: Q.route.upstreamModel,
+                  status: Q.status,
+                  httpStatus: Q.httpStatus,
                   latencyMs: Date.now() - s,
-                  promptTokens: X.promptTokens,
-                  completionTokens: X.completionTokens,
+                  promptTokens: Q.promptTokens,
+                  completionTokens: Q.completionTokens,
                   costUsd: re,
                   currency: "CNY",
-                  stream: X.streamFlag,
+                  stream: Q.streamFlag,
                   attempts: Ae,
                   ip: l,
                   createdAt: Math.floor(Date.now() / 1e3)
                 }, i);
-              }, Ae = 0, Ce = "", ne = 0, Z = Ie.slice(0, 5), We = async (X, re) => {
-                if (X.providerKeyId && X.providerKeyId !== "keyless") {
-                  let Ye = re === 401 || re === 402;
-                  await Br(r, X.providerId, X.providerKeyId, Ye).catch(() => {
+              }, Ae = 0, Ce = "", ne = 0, Z = Ie.slice(0, 5), We = async (Q, re) => {
+                if (Q.providerKeyId && Q.providerKeyId !== "keyless") {
+                  let Je = re === 401 || re === 402;
+                  await Br(r, Q.providerId, Q.providerKeyId, Je).catch(() => {
                   });
                 }
-              }, ye = async (X) => {
-                X.providerKeyId && X.providerKeyId !== "keyless" && await fr(r, X.providerId, X.providerKeyId).catch(() => {
+              }, ye = async (Q) => {
+                Q.providerKeyId && Q.providerKeyId !== "keyless" && await fr(r, Q.providerId, Q.providerKeyId).catch(() => {
                 });
               };
-              for (let X = 0; X < Z.length; X++) {
-                let re = Z[X];
+              for (let Q = 0; Q < Z.length; Q++) {
+                let re = Z[Q];
                 Ae++;
-                let Ye = X + 1 < Z.length ? 1 : Cj;
+                let Je = Q + 1 < Z.length ? 1 : Cj;
                 try {
                   let D = re.providerKind === "opencode" || re.providerSlug === "opencode", le = re.providerKind === "duckai" || re.providerSlug === "duckai", fe = re.providerKind === "anthropic" || re.providerSlug === "anthropic", ue = ((_d2 = re.providerKind) == null ? void 0 : _d2.startsWith("oauth:")) ? re.providerKind.slice(6) : "", ke = ((_e = re.providerKind) == null ? void 0 : _e.startsWith("web:")) ? re.providerKind.slice(4) : "", ae = null;
                   if (ke) {
@@ -36272,7 +36272,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                       headers: Re,
                       body: JSON.stringify(z),
                       signal: AbortSignal.timeout(12e4)
-                    }), Ye);
+                    }), Je);
                   } else {
                     let {
                       url: de
@@ -36282,7 +36282,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                       headers: z,
                       body: JSON.stringify(ee),
                       signal: AbortSignal.timeout(12e4)
-                    }), Ye);
+                    }), Je);
                   }
                   if (!ae)
                     throw new Error("no response from upstream");
@@ -36483,14 +36483,14 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             }
           }
           at();
-          Ja();
+          Ya();
           ut();
           qe();
           ot();
           Ne();
           var Ip = new be();
           Ip.get("/", async (e) => {
-            let t = await Qh(e.env);
+            let t = await Xh(e.env);
             return e.json({
               object: "list",
               data: t
@@ -36539,12 +36539,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           });
           at();
           qe();
-          Xe();
+          Qe();
           ot();
           Er();
           ut();
           Ne();
-          Yt();
+          Jt();
           var fa = (e) => Buffer.from(e).toString("base64");
           async function pa(e, t) {
             let n = e.host.trim(), r = e.port || 465, a = e.username.includes("@") ? e.username : e.from || e.username, s = e.password, i = (e.from || a).trim(), o = i.match(/<([^>]+)>/) || i.match(/([^\s<]+@[^\s>]+)/), c = o ? o[1].trim() : i, u = i.match(/^([^<]+)</), l = (t.fromName || e.fromName || (u ? u[1].trim() : "") || "Relay AI").trim();
@@ -36609,10 +36609,10 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                       x = 8;
                       let O = `----=_EdgeRelay_${Date.now().toString(36)}`, I = `=?UTF-8?B?${fa(t.subject)}?=`, j = /^[\x20-\x7E]+$/.test(l), R = l ? j ? `"${l.replace(/"/g, '\\"')}" <${c}>` : `=?UTF-8?B?${fa(l)}?= <${c}>` : `<${c}>`, B = [`From: ${R}`, `Reply-To: ${R}`, `To: <${t.to}>`, `Subject: ${I}`, "MIME-Version: 1.0", `Content-Type: multipart/alternative; boundary="${O}"`, `Date: ${(/* @__PURE__ */ new Date()).toUTCString()}`, ""], U = [`--${O}`, "Content-Type: text/plain; charset=UTF-8", "Content-Transfer-Encoding: base64", "", fa(t.text), ""];
                       t.html && U.push(`--${O}`, "Content-Type: text/html; charset=UTF-8", "Content-Transfer-Encoding: base64", "", fa(t.html), ""), U.push(`--${O}--`, "", ".");
-                      let Q = B.concat(U).join(`\r
+                      let X = B.concat(U).join(`\r
 `) + `\r
 `;
-                      b.write(Q);
+                      b.write(X);
                     } else if (x === 8 && T === 250) {
                       x = 9, b.write(`QUIT\r
 `), g(), p();
@@ -36655,7 +36655,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
 </td></tr></table>
 </body></html>`;
           }
-          Je();
+          Ye();
           var Oj = {
             register: "reg"
           };
@@ -36695,12 +36695,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               ok: true
             };
           }
-          var Yc = {
+          var Jc = {
             absent: "\u9A8C\u8BC1\u7801\u5DF2\u8FC7\u671F\u6216\u672A\u83B7\u53D6\uFF0C\u8BF7\u70B9\u51FB\u91CD\u65B0\u83B7\u53D6",
             mismatch: "\u9A8C\u8BC1\u7801\u8F93\u5165\u9519\u8BEF\uFF0C\u8BF7\u4ED4\u7EC6\u6838\u5BF9\u90AE\u4EF6\u4E2D\u7684 6 \u4F4D\u6570\u5B57",
             locked: "\u9A8C\u8BC1\u7801\u9519\u8BEF\u6B21\u6570\u8FC7\u591A\uFF0C\u8BF7\u91CD\u65B0\u83B7\u53D6"
           };
-          function Jc(e) {
+          function Yc(e) {
             return (e == null ? void 0 : e.requireEmailVerification) !== false;
           }
           var qn = new be();
@@ -36761,12 +36761,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 throw new C(400, A.BAD_REQUEST, "\u5BC6\u7801\u81F3\u5C11 10 \u4F4D");
               if (Oh(a, r), await Sn(t, s))
                 throw new C(409, A.BAD_REQUEST, "\u90AE\u7BB1\u5DF2\u6CE8\u518C");
-              if (Jc(r) && !!await Yl(t)) {
+              if (Yc(r) && !!await Jl(t)) {
                 if (!o)
                   throw new C(503, A.INTERNAL, "\u5DF2\u5F00\u542F\u6CE8\u518C\u90AE\u7BB1\u9A8C\u8BC1\uFF0C\u4F46\u90AE\u4EF6\u670D\u52A1\u5F53\u524D\u4E0D\u53EF\u7528\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458");
                 let x = await Vc(i, "register", s, a.code);
                 if (!x.ok)
-                  throw new C(400, A.BAD_REQUEST, Yc[x.reason ?? "absent"]);
+                  throw new C(400, A.BAD_REQUEST, Jc[x.reason ?? "absent"]);
               }
               let u = Math.floor(Date.now() / 1e3), l = te(), p = {
                 id: l,
@@ -36779,7 +36779,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 createdAt: u,
                 updatedAt: u
               };
-              p.inviteCode = l.slice(0, 8).toUpperCase(), await Jl(t, p);
+              p.inviteCode = l.slice(0, 8).toUpperCase(), await Yl(t, p);
               let y = r.inviteRegisterReward ?? 0;
               y > 0 && await fn(n, `user:${l}`, y, "\u65B0\u4EBA\u6CE8\u518C\u5956\u52B1");
               let m = te(), d = r.persistentSession ? 31536e4 : 604800;
@@ -36865,7 +36865,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 let d = await Vc(i, "login", s, a.code);
                 if (!d.ok) {
                   let g = d.reason === "locked" ? 429 : 401, h = d.reason === "locked" ? A.RATE_LIMITED : A.AUTH_INVALID;
-                  throw new C(g, h, Yc[d.reason ?? "absent"]);
+                  throw new C(g, h, Jc[d.reason ?? "absent"]);
                 }
               } else if (a.password) {
                 if (!await En(a.password, c.passwordHash))
@@ -37016,7 +37016,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 throw new C(400, A.BAD_REQUEST, "\u65B0\u5BC6\u7801\u81F3\u5C11 10 \u4F4D");
               let c = await Vc(i, "reset", s, a.code);
               if (!c.ok)
-                throw new C(400, A.BAD_REQUEST, Yc[c.reason ?? "absent"]);
+                throw new C(400, A.BAD_REQUEST, Jc[c.reason ?? "absent"]);
               let u = await Sn(t, s);
               if (!u)
                 throw new C(404, A.NOT_FOUND, "\u7528\u6237\u4E0D\u5B58\u5728");
@@ -37041,7 +37041,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           at();
           ut();
           qe();
-          Xe();
+          Qe();
           Er();
           ot();
           Ne();
@@ -37197,7 +37197,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           ut();
           qe();
           ot();
-          Yt();
+          Jt();
           Ne();
           var si = new be();
           si.get("/balance", async (e) => {
@@ -37261,7 +37261,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 getUserById: o
               } = await Promise.resolve().then(() => (Ne(), vt)), {
                 topup: c
-              } = await Promise.resolve().then(() => (Yt(), Eu)), u = await s(e.env, a, n.id, n.email);
+              } = await Promise.resolve().then(() => (Jt(), Eu)), u = await s(e.env, a, n.id, n.email);
               await c(t, `user:${n.id}`, u.amount, `\u4F7F\u7528\u5361\u5BC6 [${a}] \u5151\u6362\u5145\u503C`);
               let l = await Fr(e.env, `user:${n.id}`), {
                 syncUserVipStatus: p
@@ -37300,12 +37300,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           ut();
           qe();
           ot();
-          Je();
-          Xe();
+          Ye();
+          Qe();
           uo();
-          Yt();
+          Jt();
           var ii = new be();
-          var Xc = "epay:order:";
+          var Qc = "epay:order:";
           var Ij = 48 * 3600;
           var jj = ["alipay", "wxpay", "qqpay"];
           function gv(e, t) {
@@ -37313,10 +37313,10 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               let a = e[r];
               return a != null && String(a) !== "";
             }).sort().map((r) => `${r}=${e[r]}`).join("&");
-            return Jt(n + t);
+            return Yt(n + t);
           }
           async function yv(e, t) {
-            let n = await G(e).get(Xc + t);
+            let n = await G(e).get(Qc + t);
             if (!n)
               return null;
             try {
@@ -37326,7 +37326,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             }
           }
           async function Rp(e, t) {
-            await G(e).put(Xc + t.outTradeNo, JSON.stringify(t), {
+            await G(e).put(Qc + t.outTradeNo, JSON.stringify(t), {
               expirationTtl: Ij
             });
           }
@@ -37397,11 +37397,11 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   throw new C(502, A.INTERNAL, `\u652F\u4ED8\u7F51\u5173\u8FD4\u56DE\u975E JSON\uFF1A${x.slice(0, 120)}`);
                 }
               } catch (b) {
-                throw await G(e.env).delete(Xc + m).catch(() => {
+                throw await G(e.env).delete(Qc + m).catch(() => {
                 }), b instanceof C ? b : new C(502, A.INTERNAL, `\u652F\u4ED8\u7F51\u5173\u4E0D\u53EF\u8FBE\uFF1A${b.message}`);
               }
               if (Number(h == null ? void 0 : h.code) !== 1)
-                throw await G(e.env).delete(Xc + m).catch(() => {
+                throw await G(e.env).delete(Qc + m).catch(() => {
                 }), new C(502, A.INTERNAL, (h == null ? void 0 : h.msg) ? `\u4E0B\u5355\u5931\u8D25\uFF1A${h.msg}` : "\u4E0B\u5355\u5931\u8D25");
               return F({
                 ok: true,
@@ -37495,10 +37495,10 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           Bl();
           ut();
           qe();
-          Xe();
+          Qe();
           ot();
           Er();
-          Yt();
+          Jt();
           ro();
           Ne();
           pr();
@@ -37519,7 +37519,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               r(), cl.get(e) === s && cl.delete(e);
             }
           }
-          async function Yp(e) {
+          async function Jp(e) {
             return it(e, 8, async (t) => (await yt(t)).slice(0, 16));
           }
           async function qv(e, t, n) {
@@ -37534,7 +37534,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               precomputed: l
             } = n;
             return Kv(t, async () => {
-              let p = await Ke(e, t), y = new Set(p.map((x) => x.keyFingerprint).filter(Boolean)), m = l && r.length === 1 ? [l.fingerprint] : await Yp(r);
+              let p = await Ke(e, t), y = new Set(p.map((x) => x.keyFingerprint).filter(Boolean)), m = l && r.length === 1 ? [l.fingerprint] : await Jp(r);
               if (s && r.length === 1) {
                 let v = (await Ge(e)).find((w) => w.id === t), k = null;
                 if ((v == null ? void 0 : v.kind) === "oauth:zcode") {
@@ -37660,7 +37660,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 case "list_users": {
                   let d = await An(t), {
                     getBalance: g
-                  } = await Promise.resolve().then(() => (Yt(), Eu)), h = await it(d, 8, async (b) => {
+                  } = await Promise.resolve().then(() => (Jt(), Eu)), h = await it(d, 8, async (b) => {
                     let x = await g(t, `user:${b.id}`);
                     return {
                       id: b.id,
@@ -37828,26 +37828,26 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }), i.key) {
                     let T = String(i.key).split(/[\r\n,]+/).map((O) => O.trim()).filter(Boolean);
                     await Kv(v, async () => {
-                      let O = await Ke(t, v), I = new Set(O.map((U) => U.keyFingerprint).filter(Boolean)), j = await Yp(T), R = [];
-                      T.forEach((U, Q) => {
-                        let V = j[Q];
+                      let O = await Ke(t, v), I = new Set(O.map((U) => U.keyFingerprint).filter(Boolean)), j = await Jp(T), R = [];
+                      T.forEach((U, X) => {
+                        let V = j[X];
                         I.has(V) || (I.add(V), R.push({
                           plaintext: U,
-                          index: Q,
+                          index: X,
                           fingerprint: V
                         }));
                       });
                       let B = await it(R, 8, async ({
                         plaintext: U,
-                        index: Q,
+                        index: X,
                         fingerprint: V
                       }) => {
-                        let Y = await xt(t, U);
+                        let J = await xt(t, U);
                         return {
                           id: te(),
                           providerId: v,
-                          label: T.length > 1 ? `key-${Q + 1}` : "default",
-                          encryptedKey: Y,
+                          label: T.length > 1 ? `key-${X + 1}` : "default",
+                          encryptedKey: J,
                           keyFingerprint: V,
                           status: "active",
                           createdAt: o
@@ -37917,7 +37917,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   let b = String(i.refreshToken ?? i.key ?? "").trim();
                   if (!b)
                     throw new C(400, A.BAD_REQUEST, "\u7F3A\u5C11 refreshToken");
-                  let x = h[d], v = String(i.slug || "").trim() || x.slug, k = String(i.name || "").trim() || x.name, w = String(i.baseUrl || "").trim() || x.baseUrl, _ = typeof i.email == "string" && i.email.trim() ? i.email.trim() : void 0, T = typeof i.identity == "string" ? i.identity.trim() : "", O = await Yp([b]), I = await xt(t, b), j = await Ge(t), R = j.find((Y) => Y.slug === v);
+                  let x = h[d], v = String(i.slug || "").trim() || x.slug, k = String(i.name || "").trim() || x.name, w = String(i.baseUrl || "").trim() || x.baseUrl, _ = typeof i.email == "string" && i.email.trim() ? i.email.trim() : void 0, T = typeof i.identity == "string" ? i.identity.trim() : "", O = await Jp([b]), I = await xt(t, b), j = await Ge(t), R = j.find((J) => J.slug === v);
                   if (R && R.kind !== `oauth:${d}`)
                     throw new C(400, A.BAD_REQUEST, `\u6E20\u9053 slug "${v}" \u5DF2\u88AB ${R.kind} \u6E20\u9053\u5360\u7528\uFF0C\u8BF7\u6362\u4E00\u4E2A slug`);
                   let B = R ? null : {
@@ -37935,7 +37935,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }, U = (R == null ? void 0 : R.id) ?? B.id, V = `account-${(R ? (await Ke(t, U)).length : 0) + 1}`;
                   try {
                     B && await Rr(t, [...j, B]);
-                    let Y = await qv(t, U, {
+                    let J = await qv(t, U, {
                       rawKeys: [b],
                       email: _,
                       identity: T,
@@ -37949,16 +37949,16 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                     return m({
                       providerId: U,
                       created: !!B,
-                      added: Y.added,
-                      count: Y.added.length,
-                      skipped: Y.skipped.length,
-                      replaced: Y.replaced ?? 0,
-                      duplicate: Y.skipped.length > 0,
-                      fingerprint: ((_b2 = Y.added[0]) == null ? void 0 : _b2.fingerprint) ?? Y.skipped[0]
+                      added: J.added,
+                      count: J.added.length,
+                      skipped: J.skipped.length,
+                      replaced: J.replaced ?? 0,
+                      duplicate: J.skipped.length > 0,
+                      fingerprint: ((_b2 = J.added[0]) == null ? void 0 : _b2.fingerprint) ?? J.skipped[0]
                     }, "provider", U);
-                  } catch (Y) {
+                  } catch (J) {
                     throw B && await Hi(t, U).catch(() => {
-                    }), Y;
+                    }), J;
                   }
                 }
                 case "video_monitor_link": {
@@ -38527,7 +38527,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                           signal: AbortSignal.timeout(15e3)
                         });
                         if (_.ok) {
-                          let O = ((await _.json()).data ?? []).map((I) => I.id).filter((I) => !!I).map((I) => Ya(h.slug, h.baseUrl, I));
+                          let O = ((await _.json()).data ?? []).map((I) => I.id).filter((I) => !!I).map((I) => Ja(h.slug, h.baseUrl, I));
                           if (O.length)
                             return F({
                               ok: true,
@@ -38910,7 +38910,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   return await Wa(t, g), m(null, "announcement", String(i.id));
                 }
                 case "list_audit": {
-                  let g = (await Ji(t, Number(i.limit) || 100)).map((h) => ({
+                  let g = (await Yi(t, Number(i.limit) || 100)).map((h) => ({
                     id: h.id,
                     actor_user_id: h.actorUserId ?? void 0,
                     actor_email: null,
@@ -38986,7 +38986,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             try {
               let n = await se(t);
               lt(n, ["admin", "auditor"]);
-              let r = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10), a = await Yi(e.env, r), s = (a == null ? void 0 : a.requests) || 0, i = (a == null ? void 0 : a.successRequests) || 0, o = s - i, c = [];
+              let r = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10), a = await Ji(e.env, r), s = (a == null ? void 0 : a.requests) || 0, i = (a == null ? void 0 : a.successRequests) || 0, o = s - i, c = [];
               if (a == null ? void 0 : a.byModel)
                 for (let [u, l] of Object.entries(a.byModel))
                   c.push({
@@ -39025,7 +39025,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               lt(n, ["admin", "auditor"]);
               let r = Math.min(Number(e.req.query("days")) || 7, 30), a = Date.now(), s = Array.from({
                 length: r
-              }, (c, u) => new Date(a - (r - 1 - u) * 86400 * 1e3).toISOString().slice(0, 10)), i = await Promise.all(s.map((c) => Yi(e.env, c))), o = s.map((c, u) => {
+              }, (c, u) => new Date(a - (r - 1 - u) * 86400 * 1e3).toISOString().slice(0, 10)), i = await Promise.all(s.map((c) => Ji(e.env, c))), o = s.map((c, u) => {
                 let l = i[u];
                 return {
                   date: c,
@@ -39095,19 +39095,19 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           qe();
           ot();
           Er();
-          Je();
+          Ye();
           Ne();
           qe();
           var Gv = "edgerelay-backup";
           var Vv = 1;
-          var Xp = "backup:index";
+          var Qp = "backup:index";
           var rP = "backup:snapshot:";
           var Wv = 10;
           var aP = ["session:", "backup:", "kv/"];
-          function Yv(e) {
+          function Jv(e) {
             return aP.some((t) => e.startsWith(t));
           }
-          async function Jp(e, t, n) {
+          async function Yp(e, t, n) {
             let r = new Array(e.length), a = 0, s = Array.from({
               length: Math.min(t, e.length)
             }, async () => {
@@ -39130,7 +39130,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               }
             throw n;
           }
-          async function Jv(e) {
+          async function Yv(e) {
             return ((await e.list({
               paginate: true,
               consistency: "strong"
@@ -39161,7 +39161,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               };
             }
           }
-          function Xv(e) {
+          function Qv(e) {
             let t = {}, n = (r) => {
               t[r] = (t[r] ?? 0) + 1;
             };
@@ -39172,24 +39172,24 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             return t;
           }
           async function pi(e) {
-            let t = K(e), n = (await Jv(t)).filter((a) => !Yv(a)), r = (await Jp(n, 10, (a) => sP(t, a))).filter(Boolean);
+            let t = K(e), n = (await Yv(t)).filter((a) => !Jv(a)), r = (await Yp(n, 10, (a) => sP(t, a))).filter(Boolean);
             return {
               format: Gv,
               version: Vv,
               exportedAt: (/* @__PURE__ */ new Date()).toISOString(),
-              counts: Xv(r),
+              counts: Qv(r),
               entries: r
             };
           }
-          async function Qp(e, t, n = {}) {
+          async function Xp(e, t, n = {}) {
             if (!t || t.format !== Gv || Number(t.version) !== Vv || !Array.isArray(t.entries))
               throw new C(400, A.BAD_REQUEST, "\u4E0D\u662F\u6709\u6548\u7684 EdgeRelay \u5907\u4EFD\u6587\u4EF6");
-            let r = t.entries.filter((c) => !!c && typeof c.key == "string" && c.key.length > 0 && !Yv(c.key));
+            let r = t.entries.filter((c) => !!c && typeof c.key == "string" && c.key.length > 0 && !Jv(c.key));
             if (r.length === 0)
               throw new C(400, A.BAD_REQUEST, "\u5907\u4EFD\u6587\u4EF6\u4E0D\u5305\u542B\u4EFB\u4F55\u6570\u636E");
-            let a = K(e), s = n.currentUserId ? await $e(e, n.currentUserId) : null, i = n.currentSessionId ? await $a(e, n.currentSessionId) : null, o = await Jv(a);
-            if (await Jp(o.filter((c) => !c.startsWith("backup:")), 10, (c) => fi(() => a.delete(c)).catch(() => {
-            })), await Jp(r, 10, (c) => fi(() => c.raw ? a.set(c.key, String(c.value)) : a.setJSON(c.key, c.value))), $i(), s) {
+            let a = K(e), s = n.currentUserId ? await $e(e, n.currentUserId) : null, i = n.currentSessionId ? await $a(e, n.currentSessionId) : null, o = await Yv(a);
+            if (await Yp(o.filter((c) => !c.startsWith("backup:")), 10, (c) => fi(() => a.delete(c)).catch(() => {
+            })), await Yp(r, 10, (c) => fi(() => c.raw ? a.set(c.key, String(c.value)) : a.setJSON(c.key, c.value))), $i(), s) {
               let c = await $e(e, s.id), u = c ? {
                 ...c,
                 role: "superadmin",
@@ -39212,17 +39212,17 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             }
             return i && await a.setJSON(`session:${i.id}`, i), $i(), {
               entries: r.length,
-              counts: Xv(r)
+              counts: Qv(r)
             };
           }
           async function mi(e) {
-            let n = await K(e).get(Xp, {
+            let n = await K(e).get(Qp, {
               type: "json",
               consistency: "strong"
             });
             return Array.isArray(n) ? n.filter((r) => !!r && typeof r.id == "string" && typeof r.key == "string" && typeof r.createdAt == "string") : [];
           }
-          async function Qv(e) {
+          async function Xv(e) {
             let t = K(e), n = await pi(e), r = JSON.stringify(n), a = n.exportedAt.replace(/[:.]/g, "-"), s = `${rP}${a}`;
             await fi(() => t.set(s, r));
             let i = {
@@ -39233,7 +39233,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               entries: n.entries.length,
               counts: n.counts
             }, o = await mi(e), c = [i, ...o.filter((l) => l.id !== i.id)], u = c.slice(Wv);
-            await t.setJSON(Xp, c.slice(0, Wv));
+            await t.setJSON(Qp, c.slice(0, Wv));
             for (let l of u)
               await fi(() => t.delete(l.key)).catch(() => {
               });
@@ -39254,7 +39254,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             });
             if (!a)
               throw new C(404, A.NOT_FOUND, "\u5FEB\u7167\u6587\u4EF6\u5DF2\u4E22\u5931");
-            return await Qp(e, a, n);
+            return await Xp(e, a, n);
           }
           async function ew(e, t) {
             if (!t)
@@ -39263,10 +39263,10 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             if (!a)
               throw new C(404, A.NOT_FOUND, "\u5FEB\u7167\u4E0D\u5B58\u5728\u6216\u5DF2\u88AB\u6E05\u7406");
             await fi(() => n.delete(a.key)).catch(() => {
-            }), await n.setJSON(Xp, r.filter((s) => s.id !== t));
+            }), await n.setJSON(Qp, r.filter((s) => s.id !== t));
           }
-          Je();
-          Xe();
+          Ye();
+          Qe();
           qe();
           var Zp = "backup:telegram";
           async function em(e) {
@@ -39456,7 +39456,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               let n = await xn(t), {
                 snapshot: r,
                 message: a
-              } = await Qv(e.env);
+              } = await Xv(e.env);
               return await Ze(t, {
                 actorUserId: n.id,
                 actorIp: De(t.req),
@@ -39482,7 +39482,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               req: e.req
             };
             try {
-              let n = await xn(t), r = await hi(e), a = await Qp(e.env, r, {
+              let n = await xn(t), r = await hi(e), a = await Xp(e.env, r, {
                 currentUserId: n.id,
                 currentSessionId: ow(t)
               });
@@ -39848,7 +39848,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           at();
           ut();
           qe();
-          Xe();
+          Qe();
           ot();
           Er();
           Ne();
@@ -39972,7 +39972,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             }
           });
           at();
-          Yn();
+          Jn();
           var oP = /^[\w!#$%&'*.^`|~+-]+$/;
           var cP = /^[!#-:<>-[\]-~]+$/;
           var lP = /^[ !#-:<-[\]-~]*$/;
@@ -40079,7 +40079,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           ot();
           ut();
           qe();
-          Xe();
+          Qe();
           Ne();
           var ba = new be();
           ba.get("/site", async (e) => {
@@ -40106,7 +40106,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 google: !!t.oauthGoogleEnabled
               },
               smtpEnabled: !!t.smtpEnabled,
-              emailVerificationRequired: Jc(t),
+              emailVerificationRequired: Yc(t),
               payment: {
                 epayEnabled: Mp(t),
                 channels: Array.isArray(t.epayChannels) && t.epayChannels.length ? t.epayChannels : ["alipay", "wxpay", "qqpay"],
@@ -40172,11 +40172,11 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           at();
           qe();
           ci();
-          Ja();
-          Yt();
+          Ya();
+          Jt();
           Zi();
           pr();
-          Xe();
+          Qe();
           Ne();
           ln();
           function fP(e) {
@@ -40277,7 +40277,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             if (a === "chatgptweb") {
               let {
                 generateChatgptWebImage: s
-              } = await Promise.resolve().then(() => (Yr(), cs));
+              } = await Promise.resolve().then(() => (Jr(), cs));
               return s(e, n, {
                 ...r,
                 model: t.upstreamModel || r.model
@@ -41078,9 +41078,9 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           Vp();
           qe();
           ot();
-          Xe();
+          Qe();
           Ne();
-          Xe();
+          Qe();
           var Cr = new be();
           var IP = /^[a-z0-9][a-z0-9-]{1,31}$/;
           function vw(e) {
@@ -41247,8 +41247,8 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           qe();
           ot();
           Ne();
-          Je();
-          Xe();
+          Ye();
+          Qe();
           var bi = new be();
           var cm = "chatroom:messages";
           var dl = 500;
@@ -41599,10 +41599,10 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           ci();
           qe();
           ot();
-          Yt();
+          Jt();
           Ne();
-          Je();
-          Xe();
+          Ye();
+          Qe();
           ui();
           ln();
           li();
@@ -41854,28 +41854,28 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           });
           at();
           var fm = {
-            "/assets/AccountPool-C5nNmUVp.js": {
-              content: 'import{u as G,j as e,d as b,W as C,U as W,B as z,m as p,E as D,v as Q,n as v,w as j}from"./index-C1Wgc1sf.js";import{r as u}from"./vendor-BbQ_LiY-.js";import{R as F}from"./refresh-cw-g67Iczt4.js";import{C as R}from"./circle-check-DY1J2Ix2.js";import{S as H,T as I}from"./triangle-alert-BVzhzJGL.js";import{C as $}from"./clock-Bek_ctNZ.js";const V=s=>s.startsWith("oauth:")?"OAuth \u6388\u6743":s.startsWith("web:")?"Web \u53CD\u4EE3":s;function J(s,m){if(m)return m;if(!s||s<=0)return"\u989D\u5EA6\u7A97\u53E3";if(s>=25920)return"\u6708\u7A97\u53E3";if(s>=1440){const a=Math.round(s/1440);return a===1?"\u65E5\u7A97\u53E3":a===7?"\u5468\u7A97\u53E3":`${a} \u5929\u7A97\u53E3`}return`${Math.max(1,Math.round(s/60))} \u5C0F\u65F6\u7A97\u53E3`}function K({a:s}){return s.status==="disabled"?e.jsx("span",{className:"rounded bg-zinc-500/10 px-1.5 py-0.5 text-[10px] text-zinc-400",children:"\u5DF2\u505C\u7528"}):s.health==="demoted"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-500",children:[e.jsx(H,{size:10}),"\u7194\u65AD\u51B7\u5374"]}):s.health==="unhealthy"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-500",children:[e.jsx(I,{size:10}),"\u5F02\u5E38(",s.failures,")"]}):e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500",children:[e.jsx(R,{size:10}),"\u5C31\u7EEA"]})}function y({value:s,label:m}){const a=s==null?null:Math.max(0,Math.min(100,Math.round(s*100)));return e.jsxs("div",{className:"min-w-[120px]",children:[e.jsxs("div",{className:"flex items-center justify-between gap-2 text-[10px] text-muted",children:[e.jsx("span",{className:"truncate",children:m}),e.jsx("span",{className:p("font-mono",a==null?"text-muted":a<=10?"text-red-500":a<=30?"text-amber-500":"text-emerald-500"),children:a==null?"\u2014":`${a}%`})]}),e.jsx("div",{className:"mt-1 h-1.5 w-full overflow-hidden rounded-full bg-line/70",children:e.jsx("div",{className:p("h-full rounded-full",a==null?"bg-muted/40":a<=10?"bg-red-500":a<=30?"bg-amber-500":"bg-emerald-500"),style:{width:`${a??0}%`}})})]})}function X({q:s,notQueried:m}){if(!s)return e.jsx("span",{className:"text-[11px] text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u989D\u5EA6\u67E5\u8BE2\u63A5\u53E3"});if(!s.ok)return e.jsx("span",{className:"text-[11px] text-err break-all",children:s.error||"\u989D\u5EA6\u67E5\u8BE2\u5931\u8D25"});if(s.type==="antigravity")return e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email&&e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.note&&e.jsx("span",{className:"text-[10px] text-amber-500",children:s.note})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-1.5 sm:grid-cols-2",children:[(s.models||[]).map(a=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:a.remaining,label:a.id}),a.resetTime&&e.jsxs("div",{className:"mt-1 flex items-center gap-1 text-[10px] text-muted",children:[e.jsx($,{size:10}),"\u91CD\u7F6E ",new Date(a.resetTime).toLocaleString("zh-CN",{hour12:!1})]})]},a.id)),(s.models||[]).length===0&&e.jsx("span",{className:"text-[11px] text-muted",children:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u6A21\u578B\u989D\u5EA6"})]})]});if(s.type==="cline")return e.jsxs("div",{className:"flex flex-wrap items-center gap-3 text-[11px] text-muted",children:[s.email&&e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}),e.jsxs("span",{className:"rounded bg-surface2 px-2 py-1",children:["Credit \u4F59\u989D ",e.jsx("b",{className:"font-mono text-ink",children:s.balance==null?"\u2014":s.balance.toLocaleString()})]}),e.jsxs("span",{className:"rounded bg-surface2 px-2 py-1",children:["\u4ECA\u65E5\u8BF7\u6C42 ",e.jsx("b",{className:"font-mono text-ink",children:s.requestsToday??0})]})]});if(s.type==="codebuddy"){const a=s.size??null,r=s.remain??null;return e.jsxs("div",{className:"space-y-1.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email&&e.jsx("span",{className:"inline-flex items-center gap-1 text-ink",children:s.email}),s.note&&e.jsx("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px]",children:s.note})]}),e.jsxs("div",{className:"flex items-center gap-3",children:[a!=null&&a>0&&r!=null?e.jsx("div",{className:"min-w-[160px] flex-1",children:e.jsx(y,{value:r/a,label:`\u5269\u4F59 ${r} / ${a}`})}):e.jsxs("span",{className:"text-[11px] text-muted",children:["\u5269\u4F59\u79EF\u5206 ",e.jsx("b",{className:"font-mono text-ink",children:r??"\u2014"})]}),s.used!=null&&e.jsxs("span",{className:"text-[10px] text-muted",children:["\u5DF2\u7528 ",e.jsx("b",{className:"font-mono text-ink",children:s.used})]})]})]})}if(s.type==="codex")return e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email?e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}):e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx(j,{size:11}),"\u672A\u8FD4\u56DE\u90AE\u7BB1"]}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.credits&&e.jsxs("span",{className:"rounded bg-surface2 px-2 py-0.5 text-[10px]",children:["Credits ",s.credits.unlimited?"\u4E0D\u9650":s.credits.hasCredits?s.credits.balance==null?"\u53EF\u7528":s.credits.balance.toLocaleString():"\u65E0"]})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-1.5 sm:grid-cols-2",children:[(s.windows||[]).map((a,r)=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:a.remainPercent/100,label:J(a.windowMinutes,a.label)}),e.jsxs("div",{className:"mt-1 flex items-center gap-1 text-[10px] text-muted",children:[e.jsx($,{size:10}),a.resetTime?`\u91CD\u7F6E ${new Date(a.resetTime).toLocaleString("zh-CN",{hour12:!1})}`:"\u672A\u8FD4\u56DE\u91CD\u7F6E\u65F6\u95F4"]})]},`${a.label}-${r}`)),(s.windows||[]).length===0&&e.jsx("span",{className:"text-[11px] text-muted",children:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u989D\u5EA6\u7A97\u53E3"})]})]});if(s.type==="chatgptweb")return e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email?e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}):e.jsx("span",{className:"text-ink",children:s.name||"\u7F51\u9875\u8D26\u53F7"}),s.name&&s.email&&e.jsx("span",{className:"text-[10px] text-muted",children:s.name}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.note&&e.jsx("span",{className:"text-[10px] text-amber-500",children:s.note}),!s.note&&e.jsx("span",{className:"text-[10px] text-muted",children:"\u7F51\u9875\u7248\u65E0\u989D\u5EA6\u63A5\u53E3"})]});if(s.type==="zcode"){const a=s.zcodeBalances||[],r=n=>n>=1e8?`${(n/1e8).toFixed(1).replace(/\\.0$/,"")}\u4EBF`:n>=1e4?`${(n/1e4).toFixed(1).replace(/\\.0$/,"")}\u4E07`:String(n);return e.jsxs("div",{className:"space-y-1.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx(C,{size:11}),"Start Plan \u989D\u5EA6"]}),(s.claimableCount??0)>0&&e.jsxs("span",{className:"rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-500",children:["\u6709 ",s.claimableCount," \u4E2A\u5305\u53EF\u9886"]}),a.length===0&&e.jsx("span",{className:"text-[10px] text-muted",children:"\u8BE5\u8EAB\u4EFD\u540D\u4E0B\u6682\u65E0\u751F\u6548\u989D\u5EA6\uFF08\u82E5\u5BA2\u6237\u7AEF\u6709\u989D\u5EA6\uFF0C\u8BF7\u5728\u7F51\u5173\u91CD\u65B0\u6388\u6743\u5BA2\u6237\u7AEF\u6B63\u5728\u4F7F\u7528\u7684\u8D26\u53F7\uFF09"})]}),a.map((n,f)=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:n.total>0?n.remaining/n.total:null,label:n.showName}),e.jsxs("div",{className:"mt-1 flex flex-wrap items-center gap-2 text-[10px] text-muted",children:[e.jsxs("span",{children:["\u5269 ",e.jsx("b",{className:"font-mono text-ink",children:r(n.remaining)}),n.total>0&&e.jsxs(e.Fragment,{children:[" / ",r(n.total)]}),n.unitType&&` ${n.unitType}`]}),n.used>0&&e.jsxs("span",{children:["\u5DF2\u7528 ",r(n.used)]}),n.expiresAt&&e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx($,{size:10}),"\u5230\u671F ",new Date(n.expiresAt*1e3).toLocaleString("zh-CN",{hour12:!1})]})]})]},`${n.showName}-${f}`))]})}return e.jsx("span",{className:"text-[11px] text-muted",children:"\u2014"})}function ae(){const[s,m]=u.useState(null),[a,r]=u.useState(!1),[n,f]=u.useState(null),[g,S]=u.useState("all"),o=G(),N=async t=>{r(!0);try{const i=await v("account_pool",t!=null&&t.skipQuota?{quota:0}:{});m(i.providers),t!=null&&t.skipQuota||M(!0),f(Date.now())}catch(i){o(i.message,"err"),f(Date.now())}finally{r(!1)}};u.useEffect(()=>{N({skipQuota:!0})},[]);const B=async t=>{var i;L(t.id);try{const c=(i=(await v("account_pool",{providerId:t.id})).providers)==null?void 0:i[0];c&&(m(x=>(x||[]).map(d=>d.id===c.id?c:d)),M(!0)),f(Date.now())}catch(l){o(l.message,"err")}finally{L("")}},E=(s||[]).reduce((t,i)=>t+(i.accountCount??i.accounts.length),0),O=(s||[]).filter(t=>g==="all"||t.id===g),[T,A]=u.useState(""),[k,L]=u.useState(""),[P,M]=u.useState(!1),U=async(t,i,l="\u7B7E\u5230")=>{A(t);try{const x=(await v("codebuddy_checkin",{type:t})).result,d=((x==null?void 0:x.channels)||[]).flatMap(w=>w.accounts),h=d.filter(w=>!w.ok);d.length?h.length?o(`${i} ${l}\uFF1A\u6210\u529F ${d.length-h.length}/${d.length}\uFF0C${h[0].message||"\u5B58\u5728\u5931\u8D25"}`,"err"):o(`${i} ${l}\u5B8C\u6210\uFF1A${d.length} \u4E2A\u8D26\u53F7\u6210\u529F`,"ok"):o((x==null?void 0:x.skipped)||`${i} \u6682\u65E0\u53EF${l}\u8D26\u53F7`,"err"),await N()}catch(c){o(c.message,"err")}finally{A("")}},_=async(t,i,l="\u7B7E\u5230")=>{try{await v("set_checkin",{type:t,enabled:i}),o(`${i?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"}\u81EA\u52A8${l}`,"ok"),await N()}catch(c){o(c.message,"err")}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs(b,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(C,{size:18})}),e.jsxs("div",{children:[e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u8D26\u53F7\u6C60"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"OAuth / Web \u53CD\u4EE3\u6E20\u9053\u7684\u8D26\u53F7\u4E0E\u989D\u5EA6\u603B\u89C8\u3002\u8FDB\u5165\u9875\u9762\u81EA\u52A8\u52A0\u8F7D\u8D26\u53F7\u5217\u8868\uFF08\u4E0D\u67E5\u4E0A\u6E38\u989D\u5EA6\uFF0C\u79D2\u5F00\uFF09\uFF1B\u989D\u5EA6\u6309\u9700\u67E5\u8BE2\u2014\u2014\u70B9\u6E20\u9053\u300C\u5237\u65B0\u300D\u53EA\u67E5\u8BE5\u6E20\u9053\uFF0C\u70B9\u300C\u5237\u65B0\u989D\u5EA6\u300D\u5168\u7AD9\u67E5\u8BE2\u3002"})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[n&&e.jsxs("span",{className:"text-xs text-muted",children:["\u4E0A\u6B21\u66F4\u65B0 ",new Date(n).toLocaleTimeString("zh-CN",{hour12:!1})]}),e.jsxs("span",{className:"text-xs text-muted",children:[e.jsx(W,{size:12,className:"mr-1 inline"}),s?`${s.length} \u4E2A\u6E20\u9053 / ${E} \u4E2A\u8D26\u53F7`:"\u672A\u67E5\u8BE2"]}),e.jsxs(z,{variant:"soft",onClick:()=>void N(),disabled:a,children:[e.jsx(F,{size:14,className:p(a&&"animate-spin")}),a?"\u67E5\u8BE2\u4E2D\u2026":"\u5237\u65B0\u989D\u5EA6"]})]})]}),e.jsx("p",{className:"mt-3 rounded-lg border border-line bg-surface2/40 px-3 py-2 text-[11px] text-muted",children:"\u8D26\u53F7\u5217\u8868\u8FDB\u9875\u5373\u8F7D\uFF1B\u4E0A\u6E38\u989D\u5EA6\u67E5\u8BE2\u6309\u6E20\u9053\u6309\u9700\u8FDB\u884C\uFF08ChatGPT \u7F51\u9875\u7248\u7B49\u6E20\u9053\u8F83\u6162\uFF0C\u5EFA\u8BAE\u7528\u5355\u6E20\u9053\u300C\u5237\u65B0\u300D\uFF09\u3002\u67E5\u8BE2\u5931\u8D25\u4E0D\u5F71\u54CD\u8D26\u53F7\u6B63\u5E38\u8C03\u7528\u3002"}),s&&s.length>0&&e.jsxs("div",{className:"mt-3 flex flex-wrap gap-1.5",children:[e.jsxs("button",{onClick:()=>S("all"),className:p("rounded-lg px-2.5 py-1 text-[11px] transition-colors",g==="all"?"bg-brand/15 text-brand":"bg-surface2/60 text-muted hover:text-ink"),children:["\u5168\u90E8 \xB7 ",s.length]}),s.map(t=>e.jsxs("button",{onClick:()=>S(t.id),className:p("rounded-lg px-2.5 py-1 text-[11px] transition-colors",g===t.id?"bg-brand/15 text-brand":"bg-surface2/60 text-muted hover:text-ink"),children:[t.name," \xB7 ",t.accounts.length]},t.id))]})]}),s===null?e.jsx(b,{children:e.jsx(D,{icon:e.jsx(Q,{size:32}),title:"\u70B9\u51FB\u5237\u65B0\u989D\u5EA6\u5F00\u59CB\u67E5\u8BE2",hint:"\u8FDB\u5165\u9875\u9762\u4E0D\u4F1A\u81EA\u52A8\u8BF7\u6C42\u4E0A\u6E38\u989D\u5EA6\uFF1B\u70B9\u51FB\u53F3\u4E0A\u89D2\u300C\u5237\u65B0\u989D\u5EA6\u300D\u83B7\u53D6\u5B9E\u65F6\u989D\u5EA6\u4E0E\u8D26\u53F7\u72B6\u6001\u3002"})}):s.length===0?e.jsx(b,{children:e.jsx(D,{icon:e.jsx(C,{size:32}),title:"\u6682\u65E0 OAuth / Web \u8D26\u53F7",hint:"\u5148\u5728\u300C\u4F9B\u5E94\u5546\u300D\u9875\u7684 OAuth \u6388\u6743\u6216 Web \u53CD\u4EE3\u9009\u9879\u5361\u63A5\u5165\u6E20\u9053\u8D26\u53F7\u3002"})}):e.jsx("div",{className:"flex flex-col gap-3.5",children:O.map(t=>{var i;return e.jsxs(b,{className:p("p-4",t.status==="disabled"&&"opacity-75 border-dashed"),children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2.5",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-xs font-bold text-brand",children:t.name[0]}),e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-1.5",children:[e.jsx("span",{className:"truncate text-sm font-semibold text-ink",children:t.name}),e.jsx("span",{className:"rounded bg-line/70 px-1.5 py-0.5 text-[10px] text-muted",children:V(t.kind)}),e.jsx("span",{className:p("rounded px-1.5 py-0.5 text-[10px] font-medium",t.status==="active"?"bg-emerald-500/10 text-emerald-500":"bg-zinc-500/10 text-zinc-400"),children:t.status==="active"?"\u542F\u7528":"\u505C\u7528"})]}),e.jsx("code",{className:"text-[10px] text-muted font-mono",children:t.slug})]})]}),e.jsxs("div",{className:"flex items-center gap-2.5",children:[((i=t.checkin)==null?void 0:i.supported)&&e.jsxs(e.Fragment,{children:[e.jsxs("label",{className:"inline-flex cursor-pointer items-center gap-1.5 text-[11px] text-muted",children:[e.jsx("input",{type:"checkbox",className:"h-3 w-3 cursor-pointer accent-[var(--brand)]",checked:t.checkin.enabled,onChange:l=>{var c;return void _(t.kind.replace(/^oauth:/,""),l.target.checked,(c=t.checkin)==null?void 0:c.action)}}),"\u81EA\u52A8",t.checkin.action||"\u7B7E\u5230"]}),e.jsxs(z,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:T===t.kind.replace(/^oauth:/,""),onClick:()=>{var l;return void U(t.kind.replace(/^oauth:/,""),t.name,(l=t.checkin)==null?void 0:l.action)},children:[e.jsx(R,{size:12}),T===t.kind.replace(/^oauth:/,"")?`${t.checkin.action||"\u7B7E\u5230"}\u4E2D\u2026`:`\u7ACB\u5373${t.checkin.action||"\u7B7E\u5230"}`]})]}),e.jsxs(z,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:k===t.id,onClick:()=>void B(t),title:"\u53EA\u5237\u65B0\u8BE5\u6E20\u9053\u7684\u989D\u5EA6\u4E0E\u72B6\u6001",children:[e.jsx(F,{size:12,className:p(k===t.id&&"animate-spin")}),k===t.id?"\u67E5\u8BE2\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-[11px] text-muted",children:[e.jsx(W,{size:11}),t.accountCount??t.accounts.length," \u4E2A\u8D26\u53F7"]})]})]}),e.jsx("div",{className:"mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-2 items-start",children:t.accounts.length===0?(t.accountCount??0)>0?e.jsxs("p",{className:"py-4 text-center text-xs text-muted",children:["\u5171 ",t.accountCount," \u4E2A\u8D26\u53F7\uFF08\u672A\u52A0\u8F7D\u8BE6\u60C5\uFF09\xB7 \u70B9\u300C\u5237\u65B0\u300D\u52A0\u8F7D\u8D26\u53F7\u4E0E\u989D\u5EA6"]}):e.jsx("p",{className:"py-4 text-center text-xs text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u8D26\u53F7\u51ED\u636E"}):t.accounts.map(l=>{var c,x,d,h;return e.jsxs("div",{className:"rounded-lg border border-line/70 bg-surface2/30 p-2.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-1.5",children:[e.jsx("code",{className:"text-[11px] font-mono font-medium text-ink",children:l.fingerprint}),e.jsx("span",{className:"rounded bg-line px-1 py-0.5 text-[10px] text-muted",children:l.label||"account"}),e.jsx(K,{a:l}),(((c=l.quota)==null?void 0:c.plan)||((x=l.quota)==null?void 0:x.email))&&e.jsxs("span",{className:"ml-auto inline-flex items-center gap-1 text-[10px] text-muted",children:[e.jsx(Q,{size:10}),((d=l.quota)==null?void 0:d.email)||((h=l.quota)==null?void 0:h.plan)]})]}),e.jsx("div",{className:"mt-2 pl-0.5",children:e.jsx(X,{q:l.quota,notQueried:!P})})]},l.id)})})]},t.id)})})]})}\n',
+            "/assets/AccountPool-BbeJM3Nl.js": {
+              content: 'import{u as G,j as e,d as b,W as C,U as W,B as z,m as p,E as D,v as Q,n as v,w as j}from"./index-KwMGOJkp.js";import{r as u}from"./vendor-BbQ_LiY-.js";import{R as F}from"./refresh-cw-BrzRfQC6.js";import{C as R}from"./circle-check-B2pLGJPh.js";import{S as H,T as I}from"./triangle-alert-CuVylkfm.js";import{C as $}from"./clock-BJH_AWv4.js";const V=s=>s.startsWith("oauth:")?"OAuth \u6388\u6743":s.startsWith("web:")?"Web \u53CD\u4EE3":s;function J(s,m){if(m)return m;if(!s||s<=0)return"\u989D\u5EA6\u7A97\u53E3";if(s>=25920)return"\u6708\u7A97\u53E3";if(s>=1440){const a=Math.round(s/1440);return a===1?"\u65E5\u7A97\u53E3":a===7?"\u5468\u7A97\u53E3":`${a} \u5929\u7A97\u53E3`}return`${Math.max(1,Math.round(s/60))} \u5C0F\u65F6\u7A97\u53E3`}function K({a:s}){return s.status==="disabled"?e.jsx("span",{className:"rounded bg-zinc-500/10 px-1.5 py-0.5 text-[10px] text-zinc-400",children:"\u5DF2\u505C\u7528"}):s.health==="demoted"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-500",children:[e.jsx(H,{size:10}),"\u7194\u65AD\u51B7\u5374"]}):s.health==="unhealthy"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-500",children:[e.jsx(I,{size:10}),"\u5F02\u5E38(",s.failures,")"]}):e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500",children:[e.jsx(R,{size:10}),"\u5C31\u7EEA"]})}function y({value:s,label:m}){const a=s==null?null:Math.max(0,Math.min(100,Math.round(s*100)));return e.jsxs("div",{className:"min-w-[120px]",children:[e.jsxs("div",{className:"flex items-center justify-between gap-2 text-[10px] text-muted",children:[e.jsx("span",{className:"truncate",children:m}),e.jsx("span",{className:p("font-mono",a==null?"text-muted":a<=10?"text-red-500":a<=30?"text-amber-500":"text-emerald-500"),children:a==null?"\u2014":`${a}%`})]}),e.jsx("div",{className:"mt-1 h-1.5 w-full overflow-hidden rounded-full bg-line/70",children:e.jsx("div",{className:p("h-full rounded-full",a==null?"bg-muted/40":a<=10?"bg-red-500":a<=30?"bg-amber-500":"bg-emerald-500"),style:{width:`${a??0}%`}})})]})}function X({q:s,notQueried:m}){if(!s)return e.jsx("span",{className:"text-[11px] text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u989D\u5EA6\u67E5\u8BE2\u63A5\u53E3"});if(!s.ok)return e.jsx("span",{className:"text-[11px] text-err break-all",children:s.error||"\u989D\u5EA6\u67E5\u8BE2\u5931\u8D25"});if(s.type==="antigravity")return e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email&&e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.note&&e.jsx("span",{className:"text-[10px] text-amber-500",children:s.note})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-1.5 sm:grid-cols-2",children:[(s.models||[]).map(a=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:a.remaining,label:a.id}),a.resetTime&&e.jsxs("div",{className:"mt-1 flex items-center gap-1 text-[10px] text-muted",children:[e.jsx($,{size:10}),"\u91CD\u7F6E ",new Date(a.resetTime).toLocaleString("zh-CN",{hour12:!1})]})]},a.id)),(s.models||[]).length===0&&e.jsx("span",{className:"text-[11px] text-muted",children:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u6A21\u578B\u989D\u5EA6"})]})]});if(s.type==="cline")return e.jsxs("div",{className:"flex flex-wrap items-center gap-3 text-[11px] text-muted",children:[s.email&&e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}),e.jsxs("span",{className:"rounded bg-surface2 px-2 py-1",children:["Credit \u4F59\u989D ",e.jsx("b",{className:"font-mono text-ink",children:s.balance==null?"\u2014":s.balance.toLocaleString()})]}),e.jsxs("span",{className:"rounded bg-surface2 px-2 py-1",children:["\u4ECA\u65E5\u8BF7\u6C42 ",e.jsx("b",{className:"font-mono text-ink",children:s.requestsToday??0})]})]});if(s.type==="codebuddy"){const a=s.size??null,r=s.remain??null;return e.jsxs("div",{className:"space-y-1.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email&&e.jsx("span",{className:"inline-flex items-center gap-1 text-ink",children:s.email}),s.note&&e.jsx("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px]",children:s.note})]}),e.jsxs("div",{className:"flex items-center gap-3",children:[a!=null&&a>0&&r!=null?e.jsx("div",{className:"min-w-[160px] flex-1",children:e.jsx(y,{value:r/a,label:`\u5269\u4F59 ${r} / ${a}`})}):e.jsxs("span",{className:"text-[11px] text-muted",children:["\u5269\u4F59\u79EF\u5206 ",e.jsx("b",{className:"font-mono text-ink",children:r??"\u2014"})]}),s.used!=null&&e.jsxs("span",{className:"text-[10px] text-muted",children:["\u5DF2\u7528 ",e.jsx("b",{className:"font-mono text-ink",children:s.used})]})]})]})}if(s.type==="codex")return e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email?e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}):e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx(j,{size:11}),"\u672A\u8FD4\u56DE\u90AE\u7BB1"]}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.credits&&e.jsxs("span",{className:"rounded bg-surface2 px-2 py-0.5 text-[10px]",children:["Credits ",s.credits.unlimited?"\u4E0D\u9650":s.credits.hasCredits?s.credits.balance==null?"\u53EF\u7528":s.credits.balance.toLocaleString():"\u65E0"]})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-1.5 sm:grid-cols-2",children:[(s.windows||[]).map((a,r)=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:a.remainPercent/100,label:J(a.windowMinutes,a.label)}),e.jsxs("div",{className:"mt-1 flex items-center gap-1 text-[10px] text-muted",children:[e.jsx($,{size:10}),a.resetTime?`\u91CD\u7F6E ${new Date(a.resetTime).toLocaleString("zh-CN",{hour12:!1})}`:"\u672A\u8FD4\u56DE\u91CD\u7F6E\u65F6\u95F4"]})]},`${a.label}-${r}`)),(s.windows||[]).length===0&&e.jsx("span",{className:"text-[11px] text-muted",children:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u989D\u5EA6\u7A97\u53E3"})]})]});if(s.type==="chatgptweb")return e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email?e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}):e.jsx("span",{className:"text-ink",children:s.name||"\u7F51\u9875\u8D26\u53F7"}),s.name&&s.email&&e.jsx("span",{className:"text-[10px] text-muted",children:s.name}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.note&&e.jsx("span",{className:"text-[10px] text-amber-500",children:s.note}),!s.note&&e.jsx("span",{className:"text-[10px] text-muted",children:"\u7F51\u9875\u7248\u65E0\u989D\u5EA6\u63A5\u53E3"})]});if(s.type==="zcode"){const a=s.zcodeBalances||[],r=n=>n>=1e8?`${(n/1e8).toFixed(1).replace(/\\.0$/,"")}\u4EBF`:n>=1e4?`${(n/1e4).toFixed(1).replace(/\\.0$/,"")}\u4E07`:String(n);return e.jsxs("div",{className:"space-y-1.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx(C,{size:11}),"Start Plan \u989D\u5EA6"]}),(s.claimableCount??0)>0&&e.jsxs("span",{className:"rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-500",children:["\u6709 ",s.claimableCount," \u4E2A\u5305\u53EF\u9886"]}),a.length===0&&e.jsx("span",{className:"text-[10px] text-muted",children:"\u8BE5\u8EAB\u4EFD\u540D\u4E0B\u6682\u65E0\u751F\u6548\u989D\u5EA6\uFF08\u82E5\u5BA2\u6237\u7AEF\u6709\u989D\u5EA6\uFF0C\u8BF7\u5728\u7F51\u5173\u91CD\u65B0\u6388\u6743\u5BA2\u6237\u7AEF\u6B63\u5728\u4F7F\u7528\u7684\u8D26\u53F7\uFF09"})]}),a.map((n,f)=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:n.total>0?n.remaining/n.total:null,label:n.showName}),e.jsxs("div",{className:"mt-1 flex flex-wrap items-center gap-2 text-[10px] text-muted",children:[e.jsxs("span",{children:["\u5269 ",e.jsx("b",{className:"font-mono text-ink",children:r(n.remaining)}),n.total>0&&e.jsxs(e.Fragment,{children:[" / ",r(n.total)]}),n.unitType&&` ${n.unitType}`]}),n.used>0&&e.jsxs("span",{children:["\u5DF2\u7528 ",r(n.used)]}),n.expiresAt&&e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx($,{size:10}),"\u5230\u671F ",new Date(n.expiresAt*1e3).toLocaleString("zh-CN",{hour12:!1})]})]})]},`${n.showName}-${f}`))]})}return e.jsx("span",{className:"text-[11px] text-muted",children:"\u2014"})}function ae(){const[s,m]=u.useState(null),[a,r]=u.useState(!1),[n,f]=u.useState(null),[g,S]=u.useState("all"),o=G(),N=async t=>{r(!0);try{const i=await v("account_pool",t!=null&&t.skipQuota?{quota:0}:{});m(i.providers),t!=null&&t.skipQuota||M(!0),f(Date.now())}catch(i){o(i.message,"err"),f(Date.now())}finally{r(!1)}};u.useEffect(()=>{N({skipQuota:!0})},[]);const B=async t=>{var i;L(t.id);try{const c=(i=(await v("account_pool",{providerId:t.id})).providers)==null?void 0:i[0];c&&(m(x=>(x||[]).map(d=>d.id===c.id?c:d)),M(!0)),f(Date.now())}catch(l){o(l.message,"err")}finally{L("")}},E=(s||[]).reduce((t,i)=>t+(i.accountCount??i.accounts.length),0),O=(s||[]).filter(t=>g==="all"||t.id===g),[T,A]=u.useState(""),[k,L]=u.useState(""),[P,M]=u.useState(!1),U=async(t,i,l="\u7B7E\u5230")=>{A(t);try{const x=(await v("codebuddy_checkin",{type:t})).result,d=((x==null?void 0:x.channels)||[]).flatMap(w=>w.accounts),h=d.filter(w=>!w.ok);d.length?h.length?o(`${i} ${l}\uFF1A\u6210\u529F ${d.length-h.length}/${d.length}\uFF0C${h[0].message||"\u5B58\u5728\u5931\u8D25"}`,"err"):o(`${i} ${l}\u5B8C\u6210\uFF1A${d.length} \u4E2A\u8D26\u53F7\u6210\u529F`,"ok"):o((x==null?void 0:x.skipped)||`${i} \u6682\u65E0\u53EF${l}\u8D26\u53F7`,"err"),await N()}catch(c){o(c.message,"err")}finally{A("")}},_=async(t,i,l="\u7B7E\u5230")=>{try{await v("set_checkin",{type:t,enabled:i}),o(`${i?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"}\u81EA\u52A8${l}`,"ok"),await N()}catch(c){o(c.message,"err")}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs(b,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(C,{size:18})}),e.jsxs("div",{children:[e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u8D26\u53F7\u6C60"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"OAuth / Web \u53CD\u4EE3\u6E20\u9053\u7684\u8D26\u53F7\u4E0E\u989D\u5EA6\u603B\u89C8\u3002\u8FDB\u5165\u9875\u9762\u81EA\u52A8\u52A0\u8F7D\u8D26\u53F7\u5217\u8868\uFF08\u4E0D\u67E5\u4E0A\u6E38\u989D\u5EA6\uFF0C\u79D2\u5F00\uFF09\uFF1B\u989D\u5EA6\u6309\u9700\u67E5\u8BE2\u2014\u2014\u70B9\u6E20\u9053\u300C\u5237\u65B0\u300D\u53EA\u67E5\u8BE5\u6E20\u9053\uFF0C\u70B9\u300C\u5237\u65B0\u989D\u5EA6\u300D\u5168\u7AD9\u67E5\u8BE2\u3002"})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[n&&e.jsxs("span",{className:"text-xs text-muted",children:["\u4E0A\u6B21\u66F4\u65B0 ",new Date(n).toLocaleTimeString("zh-CN",{hour12:!1})]}),e.jsxs("span",{className:"text-xs text-muted",children:[e.jsx(W,{size:12,className:"mr-1 inline"}),s?`${s.length} \u4E2A\u6E20\u9053 / ${E} \u4E2A\u8D26\u53F7`:"\u672A\u67E5\u8BE2"]}),e.jsxs(z,{variant:"soft",onClick:()=>void N(),disabled:a,children:[e.jsx(F,{size:14,className:p(a&&"animate-spin")}),a?"\u67E5\u8BE2\u4E2D\u2026":"\u5237\u65B0\u989D\u5EA6"]})]})]}),e.jsx("p",{className:"mt-3 rounded-lg border border-line bg-surface2/40 px-3 py-2 text-[11px] text-muted",children:"\u8D26\u53F7\u5217\u8868\u8FDB\u9875\u5373\u8F7D\uFF1B\u4E0A\u6E38\u989D\u5EA6\u67E5\u8BE2\u6309\u6E20\u9053\u6309\u9700\u8FDB\u884C\uFF08ChatGPT \u7F51\u9875\u7248\u7B49\u6E20\u9053\u8F83\u6162\uFF0C\u5EFA\u8BAE\u7528\u5355\u6E20\u9053\u300C\u5237\u65B0\u300D\uFF09\u3002\u67E5\u8BE2\u5931\u8D25\u4E0D\u5F71\u54CD\u8D26\u53F7\u6B63\u5E38\u8C03\u7528\u3002"}),s&&s.length>0&&e.jsxs("div",{className:"mt-3 flex flex-wrap gap-1.5",children:[e.jsxs("button",{onClick:()=>S("all"),className:p("rounded-lg px-2.5 py-1 text-[11px] transition-colors",g==="all"?"bg-brand/15 text-brand":"bg-surface2/60 text-muted hover:text-ink"),children:["\u5168\u90E8 \xB7 ",s.length]}),s.map(t=>e.jsxs("button",{onClick:()=>S(t.id),className:p("rounded-lg px-2.5 py-1 text-[11px] transition-colors",g===t.id?"bg-brand/15 text-brand":"bg-surface2/60 text-muted hover:text-ink"),children:[t.name," \xB7 ",t.accounts.length]},t.id))]})]}),s===null?e.jsx(b,{children:e.jsx(D,{icon:e.jsx(Q,{size:32}),title:"\u70B9\u51FB\u5237\u65B0\u989D\u5EA6\u5F00\u59CB\u67E5\u8BE2",hint:"\u8FDB\u5165\u9875\u9762\u4E0D\u4F1A\u81EA\u52A8\u8BF7\u6C42\u4E0A\u6E38\u989D\u5EA6\uFF1B\u70B9\u51FB\u53F3\u4E0A\u89D2\u300C\u5237\u65B0\u989D\u5EA6\u300D\u83B7\u53D6\u5B9E\u65F6\u989D\u5EA6\u4E0E\u8D26\u53F7\u72B6\u6001\u3002"})}):s.length===0?e.jsx(b,{children:e.jsx(D,{icon:e.jsx(C,{size:32}),title:"\u6682\u65E0 OAuth / Web \u8D26\u53F7",hint:"\u5148\u5728\u300C\u4F9B\u5E94\u5546\u300D\u9875\u7684 OAuth \u6388\u6743\u6216 Web \u53CD\u4EE3\u9009\u9879\u5361\u63A5\u5165\u6E20\u9053\u8D26\u53F7\u3002"})}):e.jsx("div",{className:"flex flex-col gap-3.5",children:O.map(t=>{var i;return e.jsxs(b,{className:p("p-4",t.status==="disabled"&&"opacity-75 border-dashed"),children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2.5",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-xs font-bold text-brand",children:t.name[0]}),e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-1.5",children:[e.jsx("span",{className:"truncate text-sm font-semibold text-ink",children:t.name}),e.jsx("span",{className:"rounded bg-line/70 px-1.5 py-0.5 text-[10px] text-muted",children:V(t.kind)}),e.jsx("span",{className:p("rounded px-1.5 py-0.5 text-[10px] font-medium",t.status==="active"?"bg-emerald-500/10 text-emerald-500":"bg-zinc-500/10 text-zinc-400"),children:t.status==="active"?"\u542F\u7528":"\u505C\u7528"})]}),e.jsx("code",{className:"text-[10px] text-muted font-mono",children:t.slug})]})]}),e.jsxs("div",{className:"flex items-center gap-2.5",children:[((i=t.checkin)==null?void 0:i.supported)&&e.jsxs(e.Fragment,{children:[e.jsxs("label",{className:"inline-flex cursor-pointer items-center gap-1.5 text-[11px] text-muted",children:[e.jsx("input",{type:"checkbox",className:"h-3 w-3 cursor-pointer accent-[var(--brand)]",checked:t.checkin.enabled,onChange:l=>{var c;return void _(t.kind.replace(/^oauth:/,""),l.target.checked,(c=t.checkin)==null?void 0:c.action)}}),"\u81EA\u52A8",t.checkin.action||"\u7B7E\u5230"]}),e.jsxs(z,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:T===t.kind.replace(/^oauth:/,""),onClick:()=>{var l;return void U(t.kind.replace(/^oauth:/,""),t.name,(l=t.checkin)==null?void 0:l.action)},children:[e.jsx(R,{size:12}),T===t.kind.replace(/^oauth:/,"")?`${t.checkin.action||"\u7B7E\u5230"}\u4E2D\u2026`:`\u7ACB\u5373${t.checkin.action||"\u7B7E\u5230"}`]})]}),e.jsxs(z,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:k===t.id,onClick:()=>void B(t),title:"\u53EA\u5237\u65B0\u8BE5\u6E20\u9053\u7684\u989D\u5EA6\u4E0E\u72B6\u6001",children:[e.jsx(F,{size:12,className:p(k===t.id&&"animate-spin")}),k===t.id?"\u67E5\u8BE2\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-[11px] text-muted",children:[e.jsx(W,{size:11}),t.accountCount??t.accounts.length," \u4E2A\u8D26\u53F7"]})]})]}),e.jsx("div",{className:"mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-2 items-start",children:t.accounts.length===0?(t.accountCount??0)>0?e.jsxs("p",{className:"py-4 text-center text-xs text-muted",children:["\u5171 ",t.accountCount," \u4E2A\u8D26\u53F7\uFF08\u672A\u52A0\u8F7D\u8BE6\u60C5\uFF09\xB7 \u70B9\u300C\u5237\u65B0\u300D\u52A0\u8F7D\u8D26\u53F7\u4E0E\u989D\u5EA6"]}):e.jsx("p",{className:"py-4 text-center text-xs text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u8D26\u53F7\u51ED\u636E"}):t.accounts.map(l=>{var c,x,d,h;return e.jsxs("div",{className:"rounded-lg border border-line/70 bg-surface2/30 p-2.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-1.5",children:[e.jsx("code",{className:"text-[11px] font-mono font-medium text-ink",children:l.fingerprint}),e.jsx("span",{className:"rounded bg-line px-1 py-0.5 text-[10px] text-muted",children:l.label||"account"}),e.jsx(K,{a:l}),(((c=l.quota)==null?void 0:c.plan)||((x=l.quota)==null?void 0:x.email))&&e.jsxs("span",{className:"ml-auto inline-flex items-center gap-1 text-[10px] text-muted",children:[e.jsx(Q,{size:10}),((d=l.quota)==null?void 0:d.email)||((h=l.quota)==null?void 0:h.plan)]})]}),e.jsx("div",{className:"mt-2 pl-0.5",children:e.jsx(X,{q:l.quota,notQueried:!P})})]},l.id)})})]},t.id)})})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Backup-HWJu0Gys.js": {
-              content: 'import{c as A,u as G,i as Q,j as e,d as C,z as W,B as l,A as X,F as S,I as z,m as Z,a as o}from"./index-C1Wgc1sf.js";import{r as h}from"./vendor-BbQ_LiY-.js";import{D as ee}from"./download-74qsMNMY.js";import{R as O}from"./refresh-cw-g67Iczt4.js";import{T as E}from"./trash-2-Hgm_5qDX.js";import{B as ae,S as se}from"./send-BlMsmIhB.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const R=A("Save",[["path",{d:"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z",key:"1c8476"}],["path",{d:"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7",key:"1ydtos"}],["path",{d:"M7 3v4a1 1 0 0 0 1 1h7",key:"t51u73"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const D=A("Upload",[["path",{d:"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",key:"ih7n3h"}],["polyline",{points:"17 8 12 3 7 8",key:"t8dd8p"}],["line",{x1:"12",x2:"12",y1:"3",y2:"15",key:"widbto"}]]);function oe(){const[g,I]=h.useState(null),[i,c]=h.useState(""),[s,y]=h.useState(null),[d,b]=h.useState({botToken:"",chatId:""}),[m,x]=h.useState(""),[j,P]=h.useState("local"),w=h.useRef(null),t=G(),{confirm:v,confirmEl:L}=Q(),u=async()=>{try{const a=await o("/api/admin/backup/list");I(a.snapshots??[])}catch{I([])}},$=async()=>{try{const a=await o("/api/admin/backup/telegram");y(a),b(r=>({...r,chatId:a.chatId??""}))}catch{y({configured:!1,chatId:"",botTokenMasked:""})}};h.useEffect(()=>{u(),$()},[]);const M=async()=>{var a,r;if(!i){c("export");try{const n=await fetch("/api/admin/backup/export",{credentials:"same-origin"});if(!n.ok){const f=await n.json().catch(()=>null);throw((a=f==null?void 0:f.error)==null?void 0:a.code)==="step_up_required"&&window.dispatchEvent(new CustomEvent("gw:stepup")),new Error(((r=f==null?void 0:f.error)==null?void 0:r.message)||"\u5BFC\u51FA\u5931\u8D25")}const p=await n.blob(),T=((n.headers.get("content-disposition")||"").match(/filename="?([^";]+)/)||[])[1]||`edgerelay-backup-${Date.now()}.json`,B=URL.createObjectURL(p),k=document.createElement("a");k.href=B,k.download=T,document.body.appendChild(k),k.click(),k.remove(),setTimeout(()=>URL.revokeObjectURL(B),1e3),t("\u5907\u4EFD\u6587\u4EF6\u5DF2\u5F00\u59CB\u4E0B\u8F7D")}catch(n){t(n.message,"err")}finally{c("")}}},U=async a=>{if(!(!a||i))try{const r=await a.text();let n;try{n=JSON.parse(r)}catch{throw new Error("\u5907\u4EFD\u6587\u4EF6\u4E0D\u662F\u5408\u6CD5 JSON")}const p=n;if((p==null?void 0:p.format)!=="edgerelay-backup"||p.version!==1||!Array.isArray(p.entries))throw new Error("\u4E0D\u662F\u6709\u6548\u7684 EdgeRelay \u5907\u4EFD\u6587\u4EF6");if(!await v(`\u786E\u8BA4\u7528\u300C${a.name}\u300D\u8986\u76D6\u5F53\u524D\u5168\u90E8\u6570\u636E\uFF1F\u5176\u4ED6\u8BBE\u5907\u4F1A\u88AB\u9000\u51FA\u767B\u5F55\u3002`))return;c("import");const T=await o("/api/admin/backup/import","POST",p);t(T.message),await u()}catch(r){t(r.message,"err")}finally{c(""),w.current&&(w.current.value="")}},F=async()=>{if(!i){c("snapshot");try{const a=await o("/api/admin/backup/snapshot","POST",{});t(a.message),await u()}catch(a){t(a.message,"err")}finally{c("")}}},J=async a=>{if(i)return;const r=new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1});if(await v(`\u786E\u8BA4\u6062\u590D\u5230 ${r} \u7684\u5FEB\u7167\uFF1F\u5F53\u524D\u6570\u636E\u5C06\u88AB\u8986\u76D6\uFF0C\u5176\u4ED6\u8BBE\u5907\u4F1A\u88AB\u9000\u51FA\u767B\u5F55\u3002`)){c("restore");try{const n=await o("/api/admin/backup/restore","POST",{id:a.id});t(n.message),await u()}catch(n){t(n.message,"err")}finally{c("")}}},H=async a=>{if(i)return;const r=new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1});if(await v(`\u786E\u8BA4\u5220\u9664 ${r} \u7684\u5FEB\u7167\uFF1F\u5220\u9664\u540E\u4E0D\u53EF\u6062\u590D\u3002`)){c("delete");try{await o("/api/admin/backup/delete","POST",{id:a.id}),t("\u5FEB\u7167\u5DF2\u5220\u9664"),await u()}catch(n){t(n.message,"err")}finally{c("")}}},_=async()=>{if(!m){x("save");try{const a=await o("/api/admin/backup/telegram","POST",{botToken:d.botToken.trim()||void 0,chatId:d.chatId.trim()});y(a.status),b({botToken:"",chatId:a.status.chatId}),t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},K=async()=>{if(!m){x("test");try{const a=await o("/api/admin/backup/telegram/test","POST",{botToken:d.botToken.trim()||void 0,chatId:d.chatId.trim()||void 0});t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},V=async()=>{if(!(m||!(s!=null&&s.configured))){x("push");try{const a=await o("/api/admin/backup/telegram/push","POST",{});t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},Y=async()=>{if(!m&&await v("\u786E\u8BA4\u6E05\u9664 Telegram \u673A\u5668\u4EBA\u914D\u7F6E\uFF1F\u6E05\u9664\u540E\u9700\u8981\u91CD\u65B0\u586B\u5199 Bot Token \u548C Chat ID\u3002")){x("clear");try{await o("/api/admin/backup/telegram/clear","POST",{}),y({configured:!1,chatId:"",botTokenMasked:""}),b({botToken:"",chatId:""}),t("Telegram \u914D\u7F6E\u5DF2\u6E05\u9664")}catch(a){t(a.message,"err")}finally{x("")}}},N=!!m;return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["local","\u672C\u5730\u5907\u4EFD"],["snapshots","\u7AD9\u5185\u5FEB\u7167"],["telegram","Telegram \u5907\u4EFD"]].map(([a,r])=>e.jsx("button",{role:"tab","aria-selected":j===a,onClick:()=>P(a),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${j===a?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:r},a))}),j==="local"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(W,{size:15}),"\u672C\u5730\u5907\u4EFD"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u5BFC\u51FA\u5168\u7AD9\u6570\u636E\u4E3A JSON \u6587\u4EF6\uFF0C\u6216\u7528\u5907\u4EFD\u6587\u4EF6\u8986\u76D6\u6062\u590D\u3002\u5907\u4EFD\u5305\u542B\u7528\u6237\u3001\u5BC6\u94A5\u3001\u6E20\u9053\u3001\u6A21\u578B\u3001\u8BA1\u8D39\u3001\u7528\u91CF\u4E0E\u5BA1\u8BA1\u65E5\u5FD7\uFF0C\u4E0D\u542B\u767B\u5F55\u4F1A\u8BDD\u3002"}),e.jsxs("div",{className:"flex flex-wrap gap-2",children:[e.jsxs(l,{onClick:M,disabled:!!i,children:[e.jsx(ee,{size:14}),i==="export"?"\u5BFC\u51FA\u4E2D\u2026":"\u5BFC\u51FA\u6570\u636E\u5E93"]}),e.jsxs(l,{variant:"ghost",onClick:()=>{var a;return(a=w.current)==null?void 0:a.click()},disabled:!!i,children:[e.jsx(D,{size:14}),"\u5BFC\u5165\u6570\u636E\u5E93\u6587\u4EF6"]}),e.jsx("input",{ref:w,type:"file",accept:".json,application/json",className:"hidden",onChange:a=>{var r;return U((r=a.target.files)==null?void 0:r[0])}})]}),e.jsxs("div",{className:"mt-4 rounded-lg border border-warn/30 bg-warn/5 px-3.5 py-2.5 text-[11px] leading-relaxed text-muted",children:["\u5BFC\u5165\u4F1A\u8986\u76D6\u73B0\u6709\u6570\u636E\uFF0C\u5176\u4ED6\u8BBE\u5907\u5C06\u88AB\u9000\u51FA\u767B\u5F55\uFF1B\u5F53\u524D\u767B\u5F55\u7684\u8D85\u7EA7\u7BA1\u7406\u5458\u8D26\u53F7\u4E0E\u5DF2\u4FDD\u5B58\u7684\u7AD9\u5185\u5FEB\u7167\u4F1A\u81EA\u52A8\u4FDD\u7559\u3002 \u5907\u4EFD\u5305\u542B\u5BC6\u7801\u54C8\u5E0C\u3001API Key \u54C8\u5E0C\u4E0E\u4F9B\u5E94\u5546\u5BC6\u94A5\u5BC6\u6587\uFF0C\u8BF7\u59A5\u5584\u4FDD\u7BA1\uFF1B\u8DE8\u73AF\u5883\u6062\u590D\u65F6\u9700\u4FDD\u6301\u76F8\u540C\u7684",e.jsx("code",{className:"mx-1 font-mono text-ink",children:"ENCRYPTION_KEY"}),"\u3002"]})]}),j==="snapshots"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(O,{size:15}),"\u7AD9\u5185\u5FEB\u7167"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u5FEB\u7167\u4FDD\u5B58\u5728 EdgeOne Blob \u5185\uFF0C\u6700\u591A\u4FDD\u7559 10 \u4EFD\uFF0C\u4E0D\u4F9D\u8D56 R2 \u7B49\u5916\u90E8\u5BF9\u8C61\u5B58\u50A8\u3002"}),e.jsxs("div",{className:"flex flex-wrap gap-2",children:[e.jsxs(l,{variant:"soft",onClick:F,disabled:!!i,children:[e.jsx(R,{size:14}),i==="snapshot"?"\u751F\u6210\u4E2D\u2026":"\u7ACB\u5373\u751F\u6210\u5FEB\u7167"]}),e.jsxs(l,{variant:"ghost",onClick:u,disabled:!!i,children:[e.jsx(O,{size:14}),"\u5237\u65B0\u5FEB\u7167"]})]}),e.jsxs("div",{className:"mt-5 border-t border-line pt-4",children:[e.jsxs("div",{className:"mb-2 flex items-center justify-between text-xs text-muted",children:[e.jsx("span",{children:"\u5FEB\u7167\u5217\u8868"}),e.jsx("span",{children:g===null?"\u52A0\u8F7D\u4E2D\u2026":`${g.length} / 10 \u4EFD`})]}),g===null?e.jsx("div",{className:"flex flex-col gap-2",children:[0,1].map(a=>e.jsx("div",{className:"skeleton h-12"},a))}):g.length===0?e.jsx("p",{className:"rounded-lg border border-dashed border-line px-3 py-4 text-center text-xs text-muted",children:"\u8FD8\u6CA1\u6709\u5FEB\u7167\uFF0C\u70B9\u51FB\u300C\u7ACB\u5373\u751F\u6210\u5FEB\u7167\u300D\u521B\u5EFA\u7B2C\u4E00\u4EFD\u3002"}):e.jsx("div",{className:"flex flex-col gap-2",children:g.map(a=>e.jsxs("div",{className:"flex flex-col gap-2 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-[12px] font-medium",children:new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1})}),e.jsxs("div",{className:"text-[11px] text-muted",children:[a.entries," \u9879 \xB7 ",X(a.size)]})]}),e.jsxs("div",{className:"flex shrink-0 gap-2",children:[e.jsx(l,{variant:"ghost",className:"!px-2.5 !py-1 !text-xs",onClick:()=>J(a),disabled:!!i,children:"\u6062\u590D"}),e.jsx(l,{variant:"danger",className:"!px-2.5 !py-1 !text-xs",onClick:()=>H(a),disabled:!!i,"aria-label":"\u5220\u9664\u5FEB\u7167",children:e.jsx(E,{size:12})})]})]},a.id))})]})]}),j==="telegram"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(ae,{size:15}),"Telegram \u673A\u5668\u4EBA\u5907\u4EFD"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u914D\u7F6E Telegram Bot \u540E\uFF0C\u53EF\u628A\u5B8C\u6574 JSON \u5907\u4EFD\u4F5C\u4E3A\u6587\u4EF6\u63A8\u9001\u5230\u6307\u5B9A\u4F1A\u8BDD\u3002Bot Token \u4F1A\u52A0\u5BC6\u4FDD\u5B58\uFF0C\u9875\u9762\u53EA\u663E\u793A\u63A9\u7801\u3002"}),e.jsxs("div",{className:"grid gap-3 sm:grid-cols-2",children:[e.jsx(S,{label:"Bot Token",hint:s!=null&&s.configured?`\u5DF2\u914D\u7F6E\uFF1A${s.botTokenMasked}`:"\u5411 @BotFather \u83B7\u53D6",children:e.jsx(z,{type:"password",value:d.botToken,onChange:a=>b({...d,botToken:a.target.value}),placeholder:s!=null&&s.configured?"\u7559\u7A7A\u5219\u4FDD\u6301\u73B0\u6709 Token":"123456789:AA...",autoComplete:"off",spellCheck:!1})}),e.jsx(S,{label:"Chat ID",hint:"\u79C1\u804A / \u7FA4\u7EC4 / \u9891\u9053\u7684\u6570\u5B57 ID",children:e.jsx(z,{value:d.chatId,onChange:a=>b({...d,chatId:a.target.value}),placeholder:"-1001234567890"})})]}),e.jsxs("div",{className:"mt-3 flex items-center gap-2 text-[11px] text-muted",children:[e.jsx("span",{className:Z("h-2 w-2 rounded-full",s!=null&&s.configured?"bg-ok":"bg-muted/40")}),s!=null&&s.configured?`\u5DF2\u914D\u7F6E\uFF08Chat ID\uFF1A${s.chatId}\uFF09`:"\u5C1A\u672A\u914D\u7F6E"]}),e.jsxs("div",{className:"mt-4 flex flex-wrap gap-2",children:[e.jsxs(l,{onClick:_,disabled:N,children:[e.jsx(R,{size:14}),m==="save"?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u914D\u7F6E"]}),e.jsxs(l,{variant:"ghost",onClick:K,disabled:N,children:[e.jsx(se,{size:14}),m==="test"?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001\u6D4B\u8BD5\u6D88\u606F"]}),e.jsxs(l,{variant:"soft",onClick:V,disabled:N||!(s!=null&&s.configured),children:[e.jsx(D,{size:14}),m==="push"?"\u63A8\u9001\u4E2D\u2026":"\u63A8\u9001\u5907\u4EFD\u5230 Telegram"]}),(s==null?void 0:s.configured)&&e.jsxs(l,{variant:"danger",onClick:Y,disabled:N,children:[e.jsx(E,{size:14}),"\u6E05\u9664\u914D\u7F6E"]})]}),e.jsx("p",{className:"mt-3 text-[11px] leading-relaxed text-muted",children:"\u63A8\u9001\u5185\u5BB9\u4E0E\u300C\u5BFC\u51FA\u6570\u636E\u5E93\u300D\u4E0B\u8F7D\u7684 JSON \u6587\u4EF6\u4E00\u81F4\u3002Telegram \u914D\u7F6E\u4FDD\u5B58\u5728\u7AD9\u5185\u4E14\u4E0D\u4F1A\u5199\u8FDB\u5907\u4EFD\u6587\u4EF6\uFF1B\u63A8\u9001\u524D\u8BF7\u5148\u4FDD\u5B58\u914D\u7F6E\u3002"})]}),L]})}\n',
+            "/assets/Backup-DHXahAPv.js": {
+              content: 'import{c as A,u as G,i as Q,j as e,d as C,z as W,B as l,A as X,F as S,I as z,m as Z,a as o}from"./index-KwMGOJkp.js";import{r as h}from"./vendor-BbQ_LiY-.js";import{D as ee}from"./download-vNmvYjVK.js";import{R as O}from"./refresh-cw-BrzRfQC6.js";import{T as E}from"./trash-2-BF158Quc.js";import{B as ae,S as se}from"./send-BqPM7u0p.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const R=A("Save",[["path",{d:"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z",key:"1c8476"}],["path",{d:"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7",key:"1ydtos"}],["path",{d:"M7 3v4a1 1 0 0 0 1 1h7",key:"t51u73"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const D=A("Upload",[["path",{d:"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",key:"ih7n3h"}],["polyline",{points:"17 8 12 3 7 8",key:"t8dd8p"}],["line",{x1:"12",x2:"12",y1:"3",y2:"15",key:"widbto"}]]);function oe(){const[g,I]=h.useState(null),[i,c]=h.useState(""),[s,y]=h.useState(null),[d,b]=h.useState({botToken:"",chatId:""}),[m,x]=h.useState(""),[j,P]=h.useState("local"),w=h.useRef(null),t=G(),{confirm:v,confirmEl:L}=Q(),u=async()=>{try{const a=await o("/api/admin/backup/list");I(a.snapshots??[])}catch{I([])}},$=async()=>{try{const a=await o("/api/admin/backup/telegram");y(a),b(r=>({...r,chatId:a.chatId??""}))}catch{y({configured:!1,chatId:"",botTokenMasked:""})}};h.useEffect(()=>{u(),$()},[]);const M=async()=>{var a,r;if(!i){c("export");try{const n=await fetch("/api/admin/backup/export",{credentials:"same-origin"});if(!n.ok){const f=await n.json().catch(()=>null);throw((a=f==null?void 0:f.error)==null?void 0:a.code)==="step_up_required"&&window.dispatchEvent(new CustomEvent("gw:stepup")),new Error(((r=f==null?void 0:f.error)==null?void 0:r.message)||"\u5BFC\u51FA\u5931\u8D25")}const p=await n.blob(),T=((n.headers.get("content-disposition")||"").match(/filename="?([^";]+)/)||[])[1]||`edgerelay-backup-${Date.now()}.json`,B=URL.createObjectURL(p),k=document.createElement("a");k.href=B,k.download=T,document.body.appendChild(k),k.click(),k.remove(),setTimeout(()=>URL.revokeObjectURL(B),1e3),t("\u5907\u4EFD\u6587\u4EF6\u5DF2\u5F00\u59CB\u4E0B\u8F7D")}catch(n){t(n.message,"err")}finally{c("")}}},U=async a=>{if(!(!a||i))try{const r=await a.text();let n;try{n=JSON.parse(r)}catch{throw new Error("\u5907\u4EFD\u6587\u4EF6\u4E0D\u662F\u5408\u6CD5 JSON")}const p=n;if((p==null?void 0:p.format)!=="edgerelay-backup"||p.version!==1||!Array.isArray(p.entries))throw new Error("\u4E0D\u662F\u6709\u6548\u7684 EdgeRelay \u5907\u4EFD\u6587\u4EF6");if(!await v(`\u786E\u8BA4\u7528\u300C${a.name}\u300D\u8986\u76D6\u5F53\u524D\u5168\u90E8\u6570\u636E\uFF1F\u5176\u4ED6\u8BBE\u5907\u4F1A\u88AB\u9000\u51FA\u767B\u5F55\u3002`))return;c("import");const T=await o("/api/admin/backup/import","POST",p);t(T.message),await u()}catch(r){t(r.message,"err")}finally{c(""),w.current&&(w.current.value="")}},F=async()=>{if(!i){c("snapshot");try{const a=await o("/api/admin/backup/snapshot","POST",{});t(a.message),await u()}catch(a){t(a.message,"err")}finally{c("")}}},J=async a=>{if(i)return;const r=new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1});if(await v(`\u786E\u8BA4\u6062\u590D\u5230 ${r} \u7684\u5FEB\u7167\uFF1F\u5F53\u524D\u6570\u636E\u5C06\u88AB\u8986\u76D6\uFF0C\u5176\u4ED6\u8BBE\u5907\u4F1A\u88AB\u9000\u51FA\u767B\u5F55\u3002`)){c("restore");try{const n=await o("/api/admin/backup/restore","POST",{id:a.id});t(n.message),await u()}catch(n){t(n.message,"err")}finally{c("")}}},H=async a=>{if(i)return;const r=new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1});if(await v(`\u786E\u8BA4\u5220\u9664 ${r} \u7684\u5FEB\u7167\uFF1F\u5220\u9664\u540E\u4E0D\u53EF\u6062\u590D\u3002`)){c("delete");try{await o("/api/admin/backup/delete","POST",{id:a.id}),t("\u5FEB\u7167\u5DF2\u5220\u9664"),await u()}catch(n){t(n.message,"err")}finally{c("")}}},_=async()=>{if(!m){x("save");try{const a=await o("/api/admin/backup/telegram","POST",{botToken:d.botToken.trim()||void 0,chatId:d.chatId.trim()});y(a.status),b({botToken:"",chatId:a.status.chatId}),t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},K=async()=>{if(!m){x("test");try{const a=await o("/api/admin/backup/telegram/test","POST",{botToken:d.botToken.trim()||void 0,chatId:d.chatId.trim()||void 0});t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},V=async()=>{if(!(m||!(s!=null&&s.configured))){x("push");try{const a=await o("/api/admin/backup/telegram/push","POST",{});t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},Y=async()=>{if(!m&&await v("\u786E\u8BA4\u6E05\u9664 Telegram \u673A\u5668\u4EBA\u914D\u7F6E\uFF1F\u6E05\u9664\u540E\u9700\u8981\u91CD\u65B0\u586B\u5199 Bot Token \u548C Chat ID\u3002")){x("clear");try{await o("/api/admin/backup/telegram/clear","POST",{}),y({configured:!1,chatId:"",botTokenMasked:""}),b({botToken:"",chatId:""}),t("Telegram \u914D\u7F6E\u5DF2\u6E05\u9664")}catch(a){t(a.message,"err")}finally{x("")}}},N=!!m;return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["local","\u672C\u5730\u5907\u4EFD"],["snapshots","\u7AD9\u5185\u5FEB\u7167"],["telegram","Telegram \u5907\u4EFD"]].map(([a,r])=>e.jsx("button",{role:"tab","aria-selected":j===a,onClick:()=>P(a),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${j===a?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:r},a))}),j==="local"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(W,{size:15}),"\u672C\u5730\u5907\u4EFD"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u5BFC\u51FA\u5168\u7AD9\u6570\u636E\u4E3A JSON \u6587\u4EF6\uFF0C\u6216\u7528\u5907\u4EFD\u6587\u4EF6\u8986\u76D6\u6062\u590D\u3002\u5907\u4EFD\u5305\u542B\u7528\u6237\u3001\u5BC6\u94A5\u3001\u6E20\u9053\u3001\u6A21\u578B\u3001\u8BA1\u8D39\u3001\u7528\u91CF\u4E0E\u5BA1\u8BA1\u65E5\u5FD7\uFF0C\u4E0D\u542B\u767B\u5F55\u4F1A\u8BDD\u3002"}),e.jsxs("div",{className:"flex flex-wrap gap-2",children:[e.jsxs(l,{onClick:M,disabled:!!i,children:[e.jsx(ee,{size:14}),i==="export"?"\u5BFC\u51FA\u4E2D\u2026":"\u5BFC\u51FA\u6570\u636E\u5E93"]}),e.jsxs(l,{variant:"ghost",onClick:()=>{var a;return(a=w.current)==null?void 0:a.click()},disabled:!!i,children:[e.jsx(D,{size:14}),"\u5BFC\u5165\u6570\u636E\u5E93\u6587\u4EF6"]}),e.jsx("input",{ref:w,type:"file",accept:".json,application/json",className:"hidden",onChange:a=>{var r;return U((r=a.target.files)==null?void 0:r[0])}})]}),e.jsxs("div",{className:"mt-4 rounded-lg border border-warn/30 bg-warn/5 px-3.5 py-2.5 text-[11px] leading-relaxed text-muted",children:["\u5BFC\u5165\u4F1A\u8986\u76D6\u73B0\u6709\u6570\u636E\uFF0C\u5176\u4ED6\u8BBE\u5907\u5C06\u88AB\u9000\u51FA\u767B\u5F55\uFF1B\u5F53\u524D\u767B\u5F55\u7684\u8D85\u7EA7\u7BA1\u7406\u5458\u8D26\u53F7\u4E0E\u5DF2\u4FDD\u5B58\u7684\u7AD9\u5185\u5FEB\u7167\u4F1A\u81EA\u52A8\u4FDD\u7559\u3002 \u5907\u4EFD\u5305\u542B\u5BC6\u7801\u54C8\u5E0C\u3001API Key \u54C8\u5E0C\u4E0E\u4F9B\u5E94\u5546\u5BC6\u94A5\u5BC6\u6587\uFF0C\u8BF7\u59A5\u5584\u4FDD\u7BA1\uFF1B\u8DE8\u73AF\u5883\u6062\u590D\u65F6\u9700\u4FDD\u6301\u76F8\u540C\u7684",e.jsx("code",{className:"mx-1 font-mono text-ink",children:"ENCRYPTION_KEY"}),"\u3002"]})]}),j==="snapshots"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(O,{size:15}),"\u7AD9\u5185\u5FEB\u7167"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u5FEB\u7167\u4FDD\u5B58\u5728 EdgeOne Blob \u5185\uFF0C\u6700\u591A\u4FDD\u7559 10 \u4EFD\uFF0C\u4E0D\u4F9D\u8D56 R2 \u7B49\u5916\u90E8\u5BF9\u8C61\u5B58\u50A8\u3002"}),e.jsxs("div",{className:"flex flex-wrap gap-2",children:[e.jsxs(l,{variant:"soft",onClick:F,disabled:!!i,children:[e.jsx(R,{size:14}),i==="snapshot"?"\u751F\u6210\u4E2D\u2026":"\u7ACB\u5373\u751F\u6210\u5FEB\u7167"]}),e.jsxs(l,{variant:"ghost",onClick:u,disabled:!!i,children:[e.jsx(O,{size:14}),"\u5237\u65B0\u5FEB\u7167"]})]}),e.jsxs("div",{className:"mt-5 border-t border-line pt-4",children:[e.jsxs("div",{className:"mb-2 flex items-center justify-between text-xs text-muted",children:[e.jsx("span",{children:"\u5FEB\u7167\u5217\u8868"}),e.jsx("span",{children:g===null?"\u52A0\u8F7D\u4E2D\u2026":`${g.length} / 10 \u4EFD`})]}),g===null?e.jsx("div",{className:"flex flex-col gap-2",children:[0,1].map(a=>e.jsx("div",{className:"skeleton h-12"},a))}):g.length===0?e.jsx("p",{className:"rounded-lg border border-dashed border-line px-3 py-4 text-center text-xs text-muted",children:"\u8FD8\u6CA1\u6709\u5FEB\u7167\uFF0C\u70B9\u51FB\u300C\u7ACB\u5373\u751F\u6210\u5FEB\u7167\u300D\u521B\u5EFA\u7B2C\u4E00\u4EFD\u3002"}):e.jsx("div",{className:"flex flex-col gap-2",children:g.map(a=>e.jsxs("div",{className:"flex flex-col gap-2 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-[12px] font-medium",children:new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1})}),e.jsxs("div",{className:"text-[11px] text-muted",children:[a.entries," \u9879 \xB7 ",X(a.size)]})]}),e.jsxs("div",{className:"flex shrink-0 gap-2",children:[e.jsx(l,{variant:"ghost",className:"!px-2.5 !py-1 !text-xs",onClick:()=>J(a),disabled:!!i,children:"\u6062\u590D"}),e.jsx(l,{variant:"danger",className:"!px-2.5 !py-1 !text-xs",onClick:()=>H(a),disabled:!!i,"aria-label":"\u5220\u9664\u5FEB\u7167",children:e.jsx(E,{size:12})})]})]},a.id))})]})]}),j==="telegram"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(ae,{size:15}),"Telegram \u673A\u5668\u4EBA\u5907\u4EFD"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u914D\u7F6E Telegram Bot \u540E\uFF0C\u53EF\u628A\u5B8C\u6574 JSON \u5907\u4EFD\u4F5C\u4E3A\u6587\u4EF6\u63A8\u9001\u5230\u6307\u5B9A\u4F1A\u8BDD\u3002Bot Token \u4F1A\u52A0\u5BC6\u4FDD\u5B58\uFF0C\u9875\u9762\u53EA\u663E\u793A\u63A9\u7801\u3002"}),e.jsxs("div",{className:"grid gap-3 sm:grid-cols-2",children:[e.jsx(S,{label:"Bot Token",hint:s!=null&&s.configured?`\u5DF2\u914D\u7F6E\uFF1A${s.botTokenMasked}`:"\u5411 @BotFather \u83B7\u53D6",children:e.jsx(z,{type:"password",value:d.botToken,onChange:a=>b({...d,botToken:a.target.value}),placeholder:s!=null&&s.configured?"\u7559\u7A7A\u5219\u4FDD\u6301\u73B0\u6709 Token":"123456789:AA...",autoComplete:"off",spellCheck:!1})}),e.jsx(S,{label:"Chat ID",hint:"\u79C1\u804A / \u7FA4\u7EC4 / \u9891\u9053\u7684\u6570\u5B57 ID",children:e.jsx(z,{value:d.chatId,onChange:a=>b({...d,chatId:a.target.value}),placeholder:"-1001234567890"})})]}),e.jsxs("div",{className:"mt-3 flex items-center gap-2 text-[11px] text-muted",children:[e.jsx("span",{className:Z("h-2 w-2 rounded-full",s!=null&&s.configured?"bg-ok":"bg-muted/40")}),s!=null&&s.configured?`\u5DF2\u914D\u7F6E\uFF08Chat ID\uFF1A${s.chatId}\uFF09`:"\u5C1A\u672A\u914D\u7F6E"]}),e.jsxs("div",{className:"mt-4 flex flex-wrap gap-2",children:[e.jsxs(l,{onClick:_,disabled:N,children:[e.jsx(R,{size:14}),m==="save"?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u914D\u7F6E"]}),e.jsxs(l,{variant:"ghost",onClick:K,disabled:N,children:[e.jsx(se,{size:14}),m==="test"?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001\u6D4B\u8BD5\u6D88\u606F"]}),e.jsxs(l,{variant:"soft",onClick:V,disabled:N||!(s!=null&&s.configured),children:[e.jsx(D,{size:14}),m==="push"?"\u63A8\u9001\u4E2D\u2026":"\u63A8\u9001\u5907\u4EFD\u5230 Telegram"]}),(s==null?void 0:s.configured)&&e.jsxs(l,{variant:"danger",onClick:Y,disabled:N,children:[e.jsx(E,{size:14}),"\u6E05\u9664\u914D\u7F6E"]})]}),e.jsx("p",{className:"mt-3 text-[11px] leading-relaxed text-muted",children:"\u63A8\u9001\u5185\u5BB9\u4E0E\u300C\u5BFC\u51FA\u6570\u636E\u5E93\u300D\u4E0B\u8F7D\u7684 JSON \u6587\u4EF6\u4E00\u81F4\u3002Telegram \u914D\u7F6E\u4FDD\u5B58\u5728\u7AD9\u5185\u4E14\u4E0D\u4F1A\u5199\u8FDB\u5907\u4EFD\u6587\u4EF6\uFF1B\u63A8\u9001\u524D\u8BF7\u5148\u4FDD\u5B58\u914D\u7F6E\u3002"})]}),L]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/ChatRoom-ammSJd4Y.js": {
-              content: 'import{u as z,j as t,d as T,M as S,m as x,B as L,a as g}from"./index-C1Wgc1sf.js";import{r as n}from"./vendor-BbQ_LiY-.js";import{B,S as D}from"./send-BlMsmIhB.js";import{U as I}from"./user-a2FF8pEQ.js";const P=5e3,j=500,H=i=>i?new Date(i*1e3).toLocaleTimeString("zh-CN",{hour12:!1}):"";function X({me:i}){const[o,u]=n.useState(null),[c,m]=n.useState(""),[f,y]=n.useState(!1),[h,r]=n.useState(null),l=n.useRef(null),p=n.useRef(!1),d=n.useRef(null),w=z(),b=async()=>{try{const e=await g("/api/chatroom/messages");u(e.messages||[])}catch{}};n.useEffect(()=>{b();const e=window.setInterval(()=>{document.hidden||b()},P),s=()=>{document.hidden||b()};return document.addEventListener("visibilitychange",s),()=>{window.clearInterval(e),document.removeEventListener("visibilitychange",s)}},[]),n.useEffect(()=>{d.current&&(d.current.scrollTop=d.current.scrollHeight)},[o]);const N=async()=>{if(!p.current){p.current=!0,r(null);try{const e=await g("/api/chatroom/pat","POST",{});u(e.messages||[])}catch(e){w(e.message,"err")}finally{p.current=!1}}},M=()=>{r(null),m(e=>e.includes("@Relay\u52A9\u624B")?e:`${e?e+" ":""}@Relay\u52A9\u624B `)},R=(e,s)=>{l.current&&window.clearTimeout(l.current),l.current=window.setTimeout(()=>r({x:e,y:s}),480)},k=()=>{l.current&&(window.clearTimeout(l.current),l.current=null)},C=async()=>{const e=c.trim();if(!(!e||f)){m(""),y(!0);try{const s=await g("/api/chatroom/messages","POST",{content:e});u(s.messages||[])}catch(s){w(s.message,"err")}finally{y(!1)}}},E=e=>e.role==="bot"?"Relay \u52A9\u624B":e.role==="system"?"\u7CFB\u7EDF":e.nickname||e.email,a=e=>e.role==="user"&&e.userId===i.user.id;return t.jsxs("div",{className:"flex flex-col gap-4",children:[t.jsx(T,{className:"p-4 sm:p-5",children:t.jsxs("div",{className:"flex items-start gap-3",children:[t.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:t.jsx(S,{size:18})}),t.jsxs("div",{children:[t.jsx("h1",{className:"text-base font-bold text-ink",children:"\u804A\u5929\u5BA4"}),t.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u5168\u7AD9\u7528\u6237\u7545\u804A\u533A\uFF0C\u6240\u6709\u4EBA\u53EF\u89C1\uFF1B\u6D88\u606F\u4FDD\u7559 30 \u5929\u81EA\u52A8\u6E05\u7406\u3002\u300CRelay \u52A9\u624B\u300D\u673A\u5668\u4EBA\u5728\u7EBF\u7B54\u7591\uFF0C\u9700\u8981\u4EBA\u5DE5\u5904\u7406\u7684\u95EE\u9898\u53EF\u901A\u8FC7\u5B83\u90AE\u4EF6\u8F6C\u8FBE\u7BA1\u7406\u5458\u3002"})]})]})}),t.jsxs(T,{className:"flex h-[calc(100vh-320px)] min-h-[460px] flex-col overflow-hidden",children:[t.jsx("div",{ref:d,className:"flex-1 space-y-2.5 overflow-y-auto p-4",children:o===null?t.jsx("div",{className:"flex h-full items-center justify-center text-xs text-muted",children:"\u52A0\u8F7D\u4E2D\u2026"}):o.length===0?t.jsxs("div",{className:"flex h-full flex-col items-center justify-center gap-2 text-center",children:[t.jsx(S,{size:30,className:"text-muted"}),t.jsx("p",{className:"text-[13px] text-muted",children:"\u8FD8\u6CA1\u6709\u6D88\u606F\uFF0C\u6765\u8BF4\u7B2C\u4E00\u53E5\u5427"})]}):o.map(e=>e.role==="system"?t.jsx("div",{className:"text-center",children:t.jsx("span",{className:"rounded bg-surface2 px-2 py-0.5 text-[10px] text-muted",children:e.content})},e.id):t.jsxs("div",{className:x("flex gap-2",a(e)?"flex-row-reverse":"flex-row"),children:[t.jsx("div",{className:x("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full",e.role==="bot"?"bg-emerald-500/15 text-emerald-500":a(e)?"bg-brand/15 text-brand":"bg-surface2 text-muted"),children:e.role==="bot"?t.jsx(B,{size:14}):a(e)?t.jsx(I,{size:14}):(e.email[0]||"?").toUpperCase()}),t.jsxs("div",{className:x("max-w-[75%] space-y-0.5",a(e)&&"flex flex-col items-end",e.role==="bot"&&"cursor-context-menu select-none"),onContextMenu:e.role==="bot"?s=>{s.preventDefault(),r({x:s.clientX,y:s.clientY})}:void 0,onTouchStart:e.role==="bot"?s=>{const v=s.touches[0];v&&R(v.clientX,v.clientY)}:void 0,onTouchEnd:e.role==="bot"?()=>k():void 0,onTouchMove:e.role==="bot"?()=>k():void 0,onDoubleClick:e.role==="bot"?()=>void N():void 0,title:e.role==="bot"?"\u53F3\u952E / \u957F\u6309\uFF1A@ \u52A9\u624B\uFF1B\u53CC\u51FB\uFF1A\u62CD\u4E00\u62CD":void 0,children:[t.jsxs("div",{className:"flex items-center gap-1.5 text-[10px] text-muted",children:[t.jsx("span",{className:"font-medium text-ink",children:E(e)}),e.role==="bot"&&t.jsx("span",{className:"rounded bg-emerald-500/10 px-1 text-[9px] text-emerald-500",children:"\u673A\u5668\u4EBA"}),t.jsx("span",{children:H(e.createdAt)})]}),t.jsx("div",{className:x("inline-block whitespace-pre-wrap break-words rounded-xl2 px-3 py-2 text-left text-[13px] leading-relaxed",a(e)?"bg-brand text-white":e.role==="bot"?"bg-emerald-500/10 text-ink":"bg-surface2 text-ink"),children:e.content})]})]}))}),t.jsxs("div",{className:"border-t border-line p-3",children:[t.jsxs("div",{className:"flex items-end gap-2",children:[t.jsx("textarea",{value:c,onChange:e=>m(e.target.value.slice(0,j)),onKeyDown:e=>{e.key==="Enter"&&!e.shiftKey&&!e.nativeEvent.isComposing&&e.keyCode!==229&&(e.preventDefault(),C())},rows:2,placeholder:`\u8F93\u5165\u6D88\u606F\uFF0CEnter \u53D1\u9001\uFF08${j} \u5B57\u4EE5\u5185\uFF09\u2026`,className:"max-h-32 min-h-[46px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink outline-none focus:border-brand/60"}),t.jsxs(L,{className:"h-11",disabled:f||!c.trim(),onClick:()=>void C(),children:[t.jsx(D,{size:14}),f?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001"]})]}),t.jsxs("p",{className:"mt-1 text-right text-[10px] text-muted",children:[c.length,"/",j]})]})]}),h&&t.jsxs(t.Fragment,{children:[t.jsx("div",{className:"fixed inset-0 z-40",onClick:()=>r(null),onContextMenu:e=>{e.preventDefault(),r(null)}}),t.jsxs("div",{className:"fixed z-50 w-40 overflow-hidden rounded-xl border border-line bg-surface shadow-card",style:{left:Math.min(h.x,window.innerWidth-170),top:Math.min(h.y,window.innerHeight-110)},children:[t.jsx("button",{type:"button",className:"flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-surface2",onClick:()=>M(),children:t.jsx("span",{className:"font-medium",children:"@ \u52A9\u624B"})}),t.jsx("button",{type:"button",className:"flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-surface2",onClick:()=>void N(),children:t.jsx("span",{className:"font-medium",children:"\u62CD\u4E00\u62CD"})})]})]})]})}\n',
+            "/assets/ChatRoom-DJrsu_Z8.js": {
+              content: 'import{u as U,j as t,d as L,M as z,m as h,B as $,a as w}from"./index-KwMGOJkp.js";import{r as n}from"./vendor-BbQ_LiY-.js";import{B as H,S as A}from"./send-BqPM7u0p.js";import{U as K}from"./user-C2AHuWH0.js";const X=5e3,N=500,Y=m=>m?new Date(m*1e3).toLocaleTimeString("zh-CN",{hour12:!1}):"";function G({me:m}){const[a,b]=n.useState(null),[r,f]=n.useState(""),[g,k]=n.useState(!1),[j,o]=n.useState(null),i=n.useRef(null),y=n.useRef(!1),[d,C]=n.useState(null),p=n.useRef(null),M=U(),v=async()=>{try{const e=await w("/api/chatroom/messages");b(e.messages||[])}catch{}};n.useEffect(()=>{v();const e=window.setInterval(()=>{document.hidden||v()},X),s=()=>{document.hidden||v()};return document.addEventListener("visibilitychange",s),()=>{window.clearInterval(e),document.removeEventListener("visibilitychange",s)}},[]),n.useEffect(()=>{p.current&&(p.current.scrollTop=p.current.scrollHeight)},[a]);const S=async()=>{if(!y.current){y.current=!0,o(null);try{const e=await w("/api/chatroom/pat","POST",{});b(e.messages||[])}catch(e){M(e.message,"err")}finally{y.current=!1}}},B=()=>{o(null),f(e=>e.includes("@Relay\u52A9\u624B")?e:`${e?e+" ":""}@Relay\u52A9\u624B `)},D=(e,s)=>{i.current&&window.clearTimeout(i.current),i.current=window.setTimeout(()=>o({x:e,y:s}),480)},T=()=>{i.current&&(window.clearTimeout(i.current),i.current=null)},R=async()=>{const e=r.trim();if(!(!e||g)){f(""),k(!0);try{const s=await w("/api/chatroom/messages","POST",{content:e});b(s.messages||[])}catch(s){M(s.message,"err")}finally{k(!1)}}},P=e=>e.role==="bot"?"Relay \u52A9\u624B":e.role==="system"?"\u7CFB\u7EDF":e.nickname||e.email,x=e=>e.role==="user"&&e.userId===m.user.id,E=n.useMemo(()=>{const e=new Map;for(const l of a||[]){if(l.role==="system")continue;const u=l.role==="bot"?"bot":l.userId;if(u==="bot"){e.set("bot","Relay \u52A9\u624B");continue}e.has(u)||e.set(u,l.nickname||l.email.split("@")[0]||l.email)}const s=[...e.entries()].map(([l,u])=>({uid:l,name:u})),c=((d==null?void 0:d.query)||"").toLowerCase(),I=c?s.filter(l=>l.name.toLowerCase().includes(c)):s;return I.length?I:s},[a,d]),O=e=>{f(e);const s=e.lastIndexOf("@");C(s>=0&&!e.slice(s).includes(" ")?{query:e.slice(s+1)}:null)},q=e=>{const s=r.lastIndexOf("@");f(s>=0?r.slice(0,s)+`@${e} `:r+`@${e} `),C(null)};return t.jsxs("div",{className:"flex flex-col gap-4",children:[t.jsx(L,{className:"p-4 sm:p-5",children:t.jsxs("div",{className:"flex items-start gap-3",children:[t.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:t.jsx(z,{size:18})}),t.jsxs("div",{children:[t.jsx("h1",{className:"text-base font-bold text-ink",children:"\u804A\u5929\u5BA4"}),t.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u5168\u7AD9\u7528\u6237\u7545\u804A\u533A\uFF0C\u6240\u6709\u4EBA\u53EF\u89C1\uFF1B\u6D88\u606F\u4FDD\u7559 30 \u5929\u81EA\u52A8\u6E05\u7406\u3002\u300CRelay \u52A9\u624B\u300D\u673A\u5668\u4EBA\u5728\u7EBF\u7B54\u7591\uFF0C\u9700\u8981\u4EBA\u5DE5\u5904\u7406\u7684\u95EE\u9898\u53EF\u901A\u8FC7\u5B83\u90AE\u4EF6\u8F6C\u8FBE\u7BA1\u7406\u5458\u3002"})]})]})}),t.jsxs(L,{className:"flex h-[calc(100vh-320px)] min-h-[460px] flex-col overflow-hidden",children:[t.jsx("div",{ref:p,className:"flex-1 space-y-2.5 overflow-y-auto p-4",children:a===null?t.jsx("div",{className:"flex h-full items-center justify-center text-xs text-muted",children:"\u52A0\u8F7D\u4E2D\u2026"}):a.length===0?t.jsxs("div",{className:"flex h-full flex-col items-center justify-center gap-2 text-center",children:[t.jsx(z,{size:30,className:"text-muted"}),t.jsx("p",{className:"text-[13px] text-muted",children:"\u8FD8\u6CA1\u6709\u6D88\u606F\uFF0C\u6765\u8BF4\u7B2C\u4E00\u53E5\u5427"})]}):a.map(e=>e.role==="system"?t.jsx("div",{className:"text-center",children:t.jsx("span",{className:"rounded bg-surface2 px-2 py-0.5 text-[10px] text-muted",children:e.content})},e.id):t.jsxs("div",{className:h("flex gap-2",x(e)?"flex-row-reverse":"flex-row"),children:[t.jsx("div",{className:h("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full",e.role==="bot"?"bg-emerald-500/15 text-emerald-500":x(e)?"bg-brand/15 text-brand":"bg-surface2 text-muted"),children:e.role==="bot"?t.jsx(H,{size:14}):x(e)?t.jsx(K,{size:14}):(e.email[0]||"?").toUpperCase()}),t.jsxs("div",{className:h("max-w-[75%] space-y-0.5",x(e)&&"flex flex-col items-end",e.role==="bot"&&"cursor-context-menu select-none"),onContextMenu:e.role==="bot"?s=>{s.preventDefault(),o({x:s.clientX,y:s.clientY})}:void 0,onTouchStart:e.role==="bot"?s=>{const c=s.touches[0];c&&D(c.clientX,c.clientY)}:void 0,onTouchEnd:e.role==="bot"?()=>T():void 0,onTouchMove:e.role==="bot"?()=>T():void 0,onDoubleClick:e.role==="bot"?()=>void S():void 0,title:e.role==="bot"?"\u53F3\u952E / \u957F\u6309\uFF1A@ \u52A9\u624B\uFF1B\u53CC\u51FB\uFF1A\u62CD\u4E00\u62CD":void 0,children:[t.jsxs("div",{className:"flex items-center gap-1.5 text-[10px] text-muted",children:[t.jsx("span",{className:"font-medium text-ink",children:P(e)}),e.role==="bot"&&t.jsx("span",{className:"rounded bg-emerald-500/10 px-1 text-[9px] text-emerald-500",children:"\u673A\u5668\u4EBA"}),t.jsx("span",{children:Y(e.createdAt)})]}),t.jsx("div",{className:h("inline-block whitespace-pre-wrap break-words rounded-xl2 px-3 py-2 text-left text-[13px] leading-relaxed",x(e)?"bg-brand text-white":e.role==="bot"?"bg-emerald-500/10 text-ink":"bg-surface2 text-ink"),children:e.content})]})]}))}),t.jsxs("div",{className:"relative border-t border-line p-3",children:[d&&t.jsxs("div",{className:"absolute bottom-full left-3 right-3 mb-2 max-h-56 overflow-y-auto rounded-xl border border-line bg-surface shadow-card",children:[t.jsx("div",{className:"border-b border-line/70 px-3 py-1.5 text-[10px] text-muted",children:"\u9009\u62E9\u8981 @ \u7684\u7528\u6237"}),E.map(e=>{var s;return t.jsxs("button",{type:"button",className:"flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-ink transition-colors hover:bg-surface2",onClick:()=>q(e.name),children:[t.jsx("span",{className:"flex h-6 w-6 items-center justify-center rounded-full bg-surface2 text-[10px] text-muted",children:(s=e.name[0])==null?void 0:s.toUpperCase()}),t.jsx("span",{className:"truncate",children:e.name})]},e.uid)}),E.length===0&&t.jsx("p",{className:"px-3 py-3 text-center text-xs text-muted",children:"\u8FD8\u6CA1\u6709\u53EF @ \u7684\u7528\u6237"})]}),t.jsxs("div",{className:"flex items-end gap-2",children:[t.jsx("textarea",{value:r,onChange:e=>O(e.target.value.slice(0,N)),onKeyDown:e=>{e.key==="Enter"&&!e.shiftKey&&!e.nativeEvent.isComposing&&e.keyCode!==229&&(e.preventDefault(),R())},rows:2,placeholder:`\u8F93\u5165\u6D88\u606F\uFF0CEnter \u53D1\u9001\uFF08${N} \u5B57\u4EE5\u5185\uFF09\u2026`,className:"max-h-32 min-h-[46px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink outline-none focus:border-brand/60"}),t.jsxs($,{className:"h-11",disabled:g||!r.trim(),onClick:()=>void R(),children:[t.jsx(A,{size:14}),g?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001"]})]}),t.jsxs("p",{className:"mt-1 text-right text-[10px] text-muted",children:[r.length,"/",N]})]})]}),j&&t.jsxs(t.Fragment,{children:[t.jsx("div",{className:"fixed inset-0 z-40",onClick:()=>o(null),onContextMenu:e=>{e.preventDefault(),o(null)}}),t.jsxs("div",{className:"fixed z-50 w-40 overflow-hidden rounded-xl border border-line bg-surface shadow-card",style:{left:Math.min(j.x,window.innerWidth-170),top:Math.min(j.y,window.innerHeight-110)},children:[t.jsx("button",{type:"button",className:"flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-surface2",onClick:()=>B(),children:t.jsx("span",{className:"font-medium",children:"@ \u52A9\u624B"})}),t.jsx("button",{type:"button",className:"flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-surface2",onClick:()=>void S(),children:t.jsx("span",{className:"font-medium",children:"\u62CD\u4E00\u62CD"})})]})]})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Dashboard-D0C7JDRR.js": {
-              content: 'import{c as Y,u as re,a as o,Z as ie,C as oe,f as P,b as w,j as e,d as y,S as g,D as ce,e as U,F as A,I as K,B as u,g as de,h as xe}from"./index-C1Wgc1sf.js";import{h as me,r as a}from"./vendor-BbQ_LiY-.js";import{R as Q,A as ue,C as V,X as G,Y as H,T as W,a as X,B as pe,b as he}from"./charts-mu_46IqZ.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const fe=Y("Activity",[["path",{d:"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",key:"169zse"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const be=Y("ShieldQuestion",[["path",{d:"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",key:"oel41y"}],["path",{d:"M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3",key:"mhlwft"}],["path",{d:"M12 17h.01",key:"p32p05"}]]),je=[{key:1,label:"24h"},{key:7,label:"7d"},{key:30,label:"30d"}],ye=l=>l>=1e6?`${+(l/1e6).toFixed(1)}M`:l>=1e3?`${+(l/1e3).toFixed(1)}k`:String(l),ge=l=>l.length>18?`${l.slice(0,17)}\u2026`:l;function Ce(){const{me:l}=me(),m=l.user.role==="superadmin",d=["superadmin","admin","auditor"].includes(l.user.role),[i,T]=a.useState(null),[F,k]=a.useState(null),[p,Z]=a.useState(7),[$,_]=a.useState(null),[N,R]=a.useState(l.balance.available),[J,h]=a.useState(!1),[f,E]=a.useState(""),[O,L]=a.useState(!1),[n,v]=a.useState(null),[ee,b]=a.useState(!1),[C,q]=a.useState(""),[B,z]=a.useState(""),[D,I]=a.useState(!1),[r,j]=a.useState(null),x=re(),te={alipay:"\u652F\u4ED8\u5B9D",wxpay:"\u5FAE\u4FE1\u652F\u4ED8",qqpay:"QQ \u94B1\u5305",usdt:"USDT"};a.useEffect(()=>{o("/api/site").then(t=>{var s;if(!((s=t.payment)!=null&&s.epayEnabled))return v(null);v(t.payment),z(c=>c||t.payment.channels[0]||"alipay"),q(c=>c||String(t.payment.minAmount||10))}).catch(()=>v(null))},[]);const se=async()=>{if(!n)return;const t=Number(C);if(!Number.isFinite(t)||t<n.minAmount||t>n.maxAmount)return x(`\u91D1\u989D\u9700\u5728 \xA5${n.minAmount} ~ \xA5${n.maxAmount} \u4E4B\u95F4`,"err");I(!0);try{const s=await o("/api/pay/epay/create","POST",{amount:t,type:B});j({outTradeNo:s.outTradeNo,amount:s.amount,payUrl:s.payUrl,qrCode:s.qrCode}),s.payUrl&&window.open(s.payUrl,"_blank","noopener")}catch(s){x(s.message,"err")}finally{I(!1)}};a.useEffect(()=>{if(!r)return;let t=!1;const s=async()=>{try{const S=await o(`/api/pay/epay/order/${r.outTradeNo}`);if(t)return;if(S.order.status==="paid"){t=!0;const M=await o("/api/billing/balance").catch(()=>null);M&&R(M.balance.available),x(`\u5145\u503C\u6210\u529F\uFF0C\u5DF2\u5230\u8D26 \xA5${r.amount.toFixed(2)}`),j(null),b(!1)}}catch{}},c=window.setInterval(s,3e3);return s(),()=>{t=!0,window.clearInterval(c)}},[r]);const ae=async()=>{if(!f.trim())return x("\u8BF7\u8F93\u5165\u5361\u5BC6\u5151\u6362\u7801","err");L(!0);try{const t=await o("/api/billing/redeem","POST",{code:f.trim()});x(t.message||`\u6210\u529F\u5145\u503C \xA5${t.amount.toFixed(2)}\uFF01`),R(t.balance),E(""),h(!1)}catch(t){x(t.message,"err")}finally{L(!1)}};a.useEffect(()=>{o(d?"/api/admin/stats":"/api/usage/summary").then(T).catch(()=>T(null))},[d]),a.useEffect(()=>{k(null),o(`${d?"/api/admin/usage/trend":"/api/usage/trend"}?days=${p}`).then(t=>k(t.points)).catch(()=>k([]))},[p,d]),a.useEffect(()=>{o(`${d?"/api/admin/usage/logs":"/api/usage/logs"}?limit=10`).then(t=>_(t.logs)).catch(()=>_([]))},[d]);const ne=[{label:"\u6211\u7684\u8BF7\u6C42\u6570\uFF0824h\uFF09",value:i?P(i.requests):"",icon:ie,color:"text-brand bg-brand/10"},{label:"\u6211\u7684 Token \u6D88\u8017\uFF0824h\uFF09",value:i?P(i.promptTokens+i.completionTokens):"",icon:oe,color:"text-info bg-info/10"},{label:"\u6211\u7684\u6210\u529F\u7387\uFF0824h\uFF09",value:i?`${((1-i.errorRate)*100).toFixed(2)}%`:"",icon:fe,color:"text-ok bg-ok/10"},{label:m?"\u5F53\u524D\u4F59\u989D (\u8D85\u7BA1\u65E0\u9650)":"\u5F53\u524D\u4F59\u989D",value:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency),icon:be,color:"text-brand bg-brand/10"}],le=[{key:"time",label:"\u65F6\u95F4",sortVal:t=>t.created_at,render:t=>e.jsx("span",{className:"text-xs text-muted",children:de(t.created_at)})},{key:"user",label:"\u7528\u6237",render:t=>e.jsxs("code",{className:"text-xs",children:[t.user_id.slice(0,8),"\u2026"]})},{key:"model",label:"\u6A21\u578B",render:t=>e.jsx("span",{className:"font-medium",children:t.public_model})},{key:"status",label:"\u72B6\u6001",render:t=>e.jsx(xe,{value:t.status})},{key:"latency",label:"\u8017\u65F6",sortVal:t=>t.latency_ms,render:t=>`${t.latency_ms} ms`},{key:"tokens",label:"Tokens",sortVal:t=>t.prompt_tokens+t.completion_tokens,render:t=>`${t.prompt_tokens} + ${t.completion_tokens}`},{key:"cost",label:"\u8D39\u7528",render:t=>t.cost_usd.toFixed(4)}];return e.jsxs("div",{className:"flex flex-col gap-5",children:[e.jsx("div",{className:"grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4",children:ne.map(({label:t,value:s,icon:c,color:S})=>e.jsxs(y,{className:"p-4",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:t}),e.jsx("span",{className:`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${S}`,children:e.jsx(c,{size:16})})]}),i||t==="\u5F53\u524D\u4F59\u989D"?e.jsx("div",{className:"mt-2 truncate text-xl font-bold tabular-nums sm:text-2xl",title:String(s),children:s}):e.jsx(g,{className:"mt-3 h-7 w-24"}),e.jsxs("div",{className:"mt-1 text-[11px] text-muted flex items-center justify-between",children:[e.jsx("span",{children:t.includes("\u4F59\u989D")?m?"\u8D85\u7BA1\u4E0D\u5361\u989D\u5EA6 \xB7 \u771F\u5B9E\u6263\u8D39\u8BB0\u8D26":"\u6309\u91CF\u771F\u5B9E\u7ED3\u7B97":"\u8F83\u6628\u65E5 \u2014"}),t.includes("\u4F59\u989D")&&e.jsxs("span",{className:"flex items-center gap-1",children:[(n==null?void 0:n.epayEnabled)&&e.jsx("button",{type:"button",onClick:()=>b(!0),className:"rounded bg-ok/10 hover:bg-ok/20 px-2 py-0.5 text-[11px] font-semibold text-ok transition-colors cursor-pointer",children:"\u5728\u7EBF\u5145\u503C"}),e.jsx("button",{type:"button",onClick:()=>h(!0),className:"rounded bg-brand/10 hover:bg-brand/20 px-2 py-0.5 text-[11px] font-semibold text-brand transition-colors cursor-pointer",children:"\u5361\u5BC6\u5145\u503C"})]})]})]},t))}),e.jsxs(y,{className:"p-5",children:[e.jsxs("div",{className:"mb-4 flex items-center justify-between",children:[e.jsx("h2",{className:"text-sm font-semibold",children:"\u8BF7\u6C42\u91CF\u4E0E Token \u8D8B\u52BF"}),e.jsx("div",{className:"flex gap-1 rounded-lg bg-surface2 p-0.5",role:"tablist","aria-label":"\u65F6\u95F4\u8303\u56F4",children:je.map(t=>e.jsx("button",{role:"tab","aria-selected":p===t.key,onClick:()=>Z(t.key),className:`rounded-md px-3 py-1 text-xs font-medium transition-colors ${p===t.key?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:t.label},t.key))})]}),e.jsx("div",{className:"h-64",children:F===null?e.jsx(g,{className:"h-full"}):e.jsx(Q,{width:"100%",height:"100%",children:e.jsxs(ue,{data:F,margin:{top:4,right:8,bottom:0,left:0},children:[e.jsxs("defs",{children:[e.jsxs("linearGradient",{id:"gReq",x1:"0",y1:"0",x2:"0",y2:"1",children:[e.jsx("stop",{offset:"0%",stopColor:"#F38020",stopOpacity:.35}),e.jsx("stop",{offset:"100%",stopColor:"#F38020",stopOpacity:0})]}),e.jsxs("linearGradient",{id:"gTok",x1:"0",y1:"0",x2:"0",y2:"1",children:[e.jsx("stop",{offset:"0%",stopColor:"#2563EB",stopOpacity:.3}),e.jsx("stop",{offset:"100%",stopColor:"#2563EB",stopOpacity:0})]})]}),e.jsx(V,{strokeDasharray:"3 3",stroke:"rgb(var(--c-line))",vertical:!1}),e.jsx(G,{dataKey:"date",tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(H,{width:44,tickFormatter:ye,tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(W,{contentStyle:{background:"rgb(var(--c-surface))",border:"1px solid rgb(var(--c-line))",borderRadius:10,fontSize:12}}),e.jsx(X,{type:"monotone",dataKey:"requests",name:"\u8BF7\u6C42\u6570",stroke:"#F38020",strokeWidth:2,fill:"url(#gReq)"}),e.jsx(X,{type:"monotone",dataKey:"tokens",name:"Tokens",stroke:"#2563EB",strokeWidth:2,fill:"url(#gTok)"})]})})})]}),e.jsxs("div",{className:"grid gap-5 xl:grid-cols-5",children:[e.jsxs(y,{className:"min-w-0 p-5 xl:col-span-2",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6211\u7684\u5404\u6A21\u578B\u8C03\u7528\u5360\u6BD4\uFF0824h\uFF09"}),e.jsx("div",{className:"h-56",children:i===null?e.jsx(g,{className:"h-full"}):i.byModel.length===0?e.jsx("div",{className:"flex h-full items-center justify-center text-xs text-muted",children:"\u6682\u65E0\u8C03\u7528\u6570\u636E"}):e.jsx(Q,{width:"100%",height:"100%",children:e.jsxs(pe,{data:i.byModel,layout:"vertical",margin:{left:8,right:16},children:[e.jsx(V,{strokeDasharray:"3 3",stroke:"rgb(var(--c-line))",horizontal:!1}),e.jsx(G,{type:"number",tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(H,{type:"category",dataKey:"public_model",width:128,tickFormatter:ge,tick:{fontSize:10,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(W,{contentStyle:{background:"rgb(var(--c-surface))",border:"1px solid rgb(var(--c-line))",borderRadius:10,fontSize:12}}),e.jsx(he,{dataKey:"n",name:"\u8BF7\u6C42\u6570",radius:[0,6,6,0],fill:"#F38020"})]})})})]}),e.jsxs(y,{className:"min-w-0 p-5 xl:col-span-3",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6211\u7684\u6700\u8FD1\u8BF7\u6C42"}),$===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((t,s)=>e.jsx(g,{className:"h-9"},s))}):e.jsx(ce,{cols:le,rows:$.map(t=>({...t,id:t.id})),page:10,expand:t=>e.jsxs("div",{className:"grid grid-cols-2 gap-2 text-xs text-muted",children:[e.jsxs("span",{children:["\u8BF7\u6C42 ID\uFF1A",e.jsx("code",{children:t.request_id})]}),e.jsxs("span",{children:["\u4E0A\u6E38\u5C1D\u8BD5\uFF1A",t.attempts," \u6B21",t.stream?"\uFF08\u6D41\u5F0F\uFF09":""]}),e.jsxs("span",{children:["HTTP ",t.http_status," \xB7 ",t.error_code??"\u2014"]}),e.jsxs("span",{children:["IP\uFF1A",t.ip]})]})})]})]}),e.jsx(U,{open:J,onClose:()=>h(!1),title:"\u5361\u5BC6\u5151\u6362\u5145\u503C",width:440,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsx("span",{className:"font-mono text-sm font-bold text-emerald-500",children:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency)})]}),e.jsx(A,{label:"\u5361\u5BC6\u5151\u6362\u7801",hint:"\u8F93\u5165\u83B7\u5F97\u7684 16~20 \u4F4D\u5361\u5BC6\u4EE3\u7801",children:e.jsx(K,{value:f,onChange:t=>E(t.target.value),placeholder:"\u4F8B\u5982: CARD-7K9A-2X4B-9PQW",autoFocus:!0})}),e.jsx("p",{className:"text-xs text-muted",children:"\u8F93\u5165\u6709\u6548\u5361\u5BC6\u540E\u70B9\u51FB\u5151\u6362\uFF0C\u7CFB\u7EDF\u5C06\u5B9E\u65F6\u4E3A\u60A8\u7684\u8D26\u6237\u589E\u52A0\u5BF9\u5E94\u9762\u989D\u8D44\u91D1\uFF1B\u82E5\u60A8\u5F53\u524D\u4E3A\u666E\u901A\u7528\u6237\uFF0C\u652F\u6301\u7684\u5361\u5BC6\u8FD8\u5C06\u81EA\u52A8\u4E3A\u60A8\u5347\u7EA7\u4E3A VIP \u8D26\u53F7\uFF01"}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(u,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>h(!1),children:"\u53D6\u6D88"}),e.jsx(u,{className:"flex-1 sm:flex-initial",disabled:O||!f.trim(),onClick:ae,children:O?"\u6838\u9500\u4E2D\u2026":"\u7ACB\u5373\u5151\u6362\u52A0\u6B3E"})]})]})}),e.jsx(U,{open:ee,onClose:()=>{b(!1),j(null)},title:"\u5728\u7EBF\u5145\u503C",width:480,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsx("span",{className:"font-mono text-sm font-bold text-emerald-500",children:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency)})]}),r?e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"rounded-lg border border-line p-4 text-center",children:[e.jsxs("p",{className:"text-xs text-muted",children:["\u8BA2\u5355\u53F7 ",r.outTradeNo," \xB7 \u5E94\u4ED8 \xA5",r.amount.toFixed(2)]}),r.qrCode&&/^https?:\\/\\//i.test(r.qrCode)?e.jsx("img",{src:r.qrCode,alt:"\u652F\u4ED8\u4E8C\u7EF4\u7801",className:"mx-auto mt-3 h-44 w-44 rounded-lg bg-white p-1"}):null,e.jsx("p",{className:"mt-3 text-xs text-muted",children:"\u5DF2\u5728\u65B0\u7A97\u53E3\u6253\u5F00\u6536\u94F6\u53F0\uFF0C\u652F\u4ED8\u5B8C\u6210\u540E\u672C\u9875\u4F1A\u81EA\u52A8\u5230\u8D26\uFF0C\u8BF7\u52FF\u5173\u95ED\u3002"}),r.payUrl?e.jsx("a",{href:r.payUrl,target:"_blank",rel:"noopener noreferrer",className:"mt-2 inline-block text-xs font-medium text-brand underline",children:"\u6536\u94F6\u53F0\u6CA1\u80FD\u6253\u5F00\uFF1F\u70B9\u6B64\u91CD\u65B0\u524D\u5F80"}):null,e.jsxs("div",{className:"mt-3 flex items-center justify-center gap-1.5 text-[11px] text-muted",children:[e.jsx("span",{className:"h-1.5 w-1.5 animate-pulse rounded-full bg-ok"}),"\u7B49\u5F85\u652F\u4ED8\u7ED3\u679C\u2026"]})]}),e.jsx("div",{className:"flex justify-end gap-2 pt-2 border-t border-line",children:e.jsx(u,{variant:"ghost",onClick:()=>{j(null)},children:"\u6362\u4E2A\u91D1\u989D\u91CD\u4E0B"})})]}):e.jsxs(e.Fragment,{children:[e.jsx(A,{label:`\u5145\u503C\u91D1\u989D\uFF08\xA5${(n==null?void 0:n.minAmount)??1} ~ \xA5${(n==null?void 0:n.maxAmount)??5e3}\uFF09`,hint:"\u5230\u8D26\u540E\u53EF\u7528\u4E8E\u6240\u6709\u6309\u91CF\u8BA1\u8D39\u6A21\u578B",children:e.jsx(K,{type:"number",value:C,onChange:t=>q(t.target.value),placeholder:"10",autoFocus:!0})}),e.jsx(A,{label:"\u652F\u4ED8\u65B9\u5F0F",children:e.jsx("div",{className:"flex flex-wrap gap-2 pt-1",children:((n==null?void 0:n.channels)??[]).map(t=>e.jsx("button",{type:"button",onClick:()=>z(t),className:`cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${B===t?"border-brand/40 bg-brand/10 text-brand":"border-line text-muted hover:text-ink"}`,children:te[t]??t},t))})}),e.jsx("p",{className:"text-xs text-muted",children:"\u7531\u7B2C\u4E09\u65B9\u6613\u652F\u4ED8\u5E73\u53F0\u6536\u6B3E\uFF0C\u652F\u4ED8\u6210\u529F\u540E\u7531\u5E73\u53F0\u5F02\u6B65\u56DE\u8C03\u5165\u8D26\uFF1B\u82E5\u957F\u65F6\u95F4\u672A\u5230\u8D26\uFF0C\u8BF7\u643A\u5E26\u8BA2\u5355\u53F7\u8054\u7CFB\u5BA2\u670D\u3002"}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(u,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>b(!1),children:"\u53D6\u6D88"}),e.jsx(u,{className:"flex-1 sm:flex-initial",disabled:D||!C,onClick:se,children:D?"\u4E0B\u5355\u4E2D\u2026":"\u524D\u5F80\u652F\u4ED8"})]})]})]})})]})}\n',
+            "/assets/Dashboard-DeAr0cpO.js": {
+              content: 'import{c as Y,u as re,a as o,Z as ie,C as oe,f as P,b as w,j as e,d as y,S as g,D as ce,e as U,F as A,I as K,B as u,g as de,h as xe}from"./index-KwMGOJkp.js";import{h as me,r as a}from"./vendor-BbQ_LiY-.js";import{R as Q,A as ue,C as V,X as G,Y as H,T as W,a as X,B as pe,b as he}from"./charts-mu_46IqZ.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const fe=Y("Activity",[["path",{d:"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",key:"169zse"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const be=Y("ShieldQuestion",[["path",{d:"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",key:"oel41y"}],["path",{d:"M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3",key:"mhlwft"}],["path",{d:"M12 17h.01",key:"p32p05"}]]),je=[{key:1,label:"24h"},{key:7,label:"7d"},{key:30,label:"30d"}],ye=l=>l>=1e6?`${+(l/1e6).toFixed(1)}M`:l>=1e3?`${+(l/1e3).toFixed(1)}k`:String(l),ge=l=>l.length>18?`${l.slice(0,17)}\u2026`:l;function Ce(){const{me:l}=me(),m=l.user.role==="superadmin",d=["superadmin","admin","auditor"].includes(l.user.role),[i,T]=a.useState(null),[F,k]=a.useState(null),[p,Z]=a.useState(7),[$,_]=a.useState(null),[N,R]=a.useState(l.balance.available),[J,h]=a.useState(!1),[f,E]=a.useState(""),[O,L]=a.useState(!1),[n,v]=a.useState(null),[ee,b]=a.useState(!1),[C,q]=a.useState(""),[B,z]=a.useState(""),[D,I]=a.useState(!1),[r,j]=a.useState(null),x=re(),te={alipay:"\u652F\u4ED8\u5B9D",wxpay:"\u5FAE\u4FE1\u652F\u4ED8",qqpay:"QQ \u94B1\u5305",usdt:"USDT"};a.useEffect(()=>{o("/api/site").then(t=>{var s;if(!((s=t.payment)!=null&&s.epayEnabled))return v(null);v(t.payment),z(c=>c||t.payment.channels[0]||"alipay"),q(c=>c||String(t.payment.minAmount||10))}).catch(()=>v(null))},[]);const se=async()=>{if(!n)return;const t=Number(C);if(!Number.isFinite(t)||t<n.minAmount||t>n.maxAmount)return x(`\u91D1\u989D\u9700\u5728 \xA5${n.minAmount} ~ \xA5${n.maxAmount} \u4E4B\u95F4`,"err");I(!0);try{const s=await o("/api/pay/epay/create","POST",{amount:t,type:B});j({outTradeNo:s.outTradeNo,amount:s.amount,payUrl:s.payUrl,qrCode:s.qrCode}),s.payUrl&&window.open(s.payUrl,"_blank","noopener")}catch(s){x(s.message,"err")}finally{I(!1)}};a.useEffect(()=>{if(!r)return;let t=!1;const s=async()=>{try{const S=await o(`/api/pay/epay/order/${r.outTradeNo}`);if(t)return;if(S.order.status==="paid"){t=!0;const M=await o("/api/billing/balance").catch(()=>null);M&&R(M.balance.available),x(`\u5145\u503C\u6210\u529F\uFF0C\u5DF2\u5230\u8D26 \xA5${r.amount.toFixed(2)}`),j(null),b(!1)}}catch{}},c=window.setInterval(s,3e3);return s(),()=>{t=!0,window.clearInterval(c)}},[r]);const ae=async()=>{if(!f.trim())return x("\u8BF7\u8F93\u5165\u5361\u5BC6\u5151\u6362\u7801","err");L(!0);try{const t=await o("/api/billing/redeem","POST",{code:f.trim()});x(t.message||`\u6210\u529F\u5145\u503C \xA5${t.amount.toFixed(2)}\uFF01`),R(t.balance),E(""),h(!1)}catch(t){x(t.message,"err")}finally{L(!1)}};a.useEffect(()=>{o(d?"/api/admin/stats":"/api/usage/summary").then(T).catch(()=>T(null))},[d]),a.useEffect(()=>{k(null),o(`${d?"/api/admin/usage/trend":"/api/usage/trend"}?days=${p}`).then(t=>k(t.points)).catch(()=>k([]))},[p,d]),a.useEffect(()=>{o(`${d?"/api/admin/usage/logs":"/api/usage/logs"}?limit=10`).then(t=>_(t.logs)).catch(()=>_([]))},[d]);const ne=[{label:"\u6211\u7684\u8BF7\u6C42\u6570\uFF0824h\uFF09",value:i?P(i.requests):"",icon:ie,color:"text-brand bg-brand/10"},{label:"\u6211\u7684 Token \u6D88\u8017\uFF0824h\uFF09",value:i?P(i.promptTokens+i.completionTokens):"",icon:oe,color:"text-info bg-info/10"},{label:"\u6211\u7684\u6210\u529F\u7387\uFF0824h\uFF09",value:i?`${((1-i.errorRate)*100).toFixed(2)}%`:"",icon:fe,color:"text-ok bg-ok/10"},{label:m?"\u5F53\u524D\u4F59\u989D (\u8D85\u7BA1\u65E0\u9650)":"\u5F53\u524D\u4F59\u989D",value:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency),icon:be,color:"text-brand bg-brand/10"}],le=[{key:"time",label:"\u65F6\u95F4",sortVal:t=>t.created_at,render:t=>e.jsx("span",{className:"text-xs text-muted",children:de(t.created_at)})},{key:"user",label:"\u7528\u6237",render:t=>e.jsxs("code",{className:"text-xs",children:[t.user_id.slice(0,8),"\u2026"]})},{key:"model",label:"\u6A21\u578B",render:t=>e.jsx("span",{className:"font-medium",children:t.public_model})},{key:"status",label:"\u72B6\u6001",render:t=>e.jsx(xe,{value:t.status})},{key:"latency",label:"\u8017\u65F6",sortVal:t=>t.latency_ms,render:t=>`${t.latency_ms} ms`},{key:"tokens",label:"Tokens",sortVal:t=>t.prompt_tokens+t.completion_tokens,render:t=>`${t.prompt_tokens} + ${t.completion_tokens}`},{key:"cost",label:"\u8D39\u7528",render:t=>t.cost_usd.toFixed(4)}];return e.jsxs("div",{className:"flex flex-col gap-5",children:[e.jsx("div",{className:"grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4",children:ne.map(({label:t,value:s,icon:c,color:S})=>e.jsxs(y,{className:"p-4",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:t}),e.jsx("span",{className:`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${S}`,children:e.jsx(c,{size:16})})]}),i||t==="\u5F53\u524D\u4F59\u989D"?e.jsx("div",{className:"mt-2 truncate text-xl font-bold tabular-nums sm:text-2xl",title:String(s),children:s}):e.jsx(g,{className:"mt-3 h-7 w-24"}),e.jsxs("div",{className:"mt-1 text-[11px] text-muted flex items-center justify-between",children:[e.jsx("span",{children:t.includes("\u4F59\u989D")?m?"\u8D85\u7BA1\u4E0D\u5361\u989D\u5EA6 \xB7 \u771F\u5B9E\u6263\u8D39\u8BB0\u8D26":"\u6309\u91CF\u771F\u5B9E\u7ED3\u7B97":"\u8F83\u6628\u65E5 \u2014"}),t.includes("\u4F59\u989D")&&e.jsxs("span",{className:"flex items-center gap-1",children:[(n==null?void 0:n.epayEnabled)&&e.jsx("button",{type:"button",onClick:()=>b(!0),className:"rounded bg-ok/10 hover:bg-ok/20 px-2 py-0.5 text-[11px] font-semibold text-ok transition-colors cursor-pointer",children:"\u5728\u7EBF\u5145\u503C"}),e.jsx("button",{type:"button",onClick:()=>h(!0),className:"rounded bg-brand/10 hover:bg-brand/20 px-2 py-0.5 text-[11px] font-semibold text-brand transition-colors cursor-pointer",children:"\u5361\u5BC6\u5145\u503C"})]})]})]},t))}),e.jsxs(y,{className:"p-5",children:[e.jsxs("div",{className:"mb-4 flex items-center justify-between",children:[e.jsx("h2",{className:"text-sm font-semibold",children:"\u8BF7\u6C42\u91CF\u4E0E Token \u8D8B\u52BF"}),e.jsx("div",{className:"flex gap-1 rounded-lg bg-surface2 p-0.5",role:"tablist","aria-label":"\u65F6\u95F4\u8303\u56F4",children:je.map(t=>e.jsx("button",{role:"tab","aria-selected":p===t.key,onClick:()=>Z(t.key),className:`rounded-md px-3 py-1 text-xs font-medium transition-colors ${p===t.key?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:t.label},t.key))})]}),e.jsx("div",{className:"h-64",children:F===null?e.jsx(g,{className:"h-full"}):e.jsx(Q,{width:"100%",height:"100%",children:e.jsxs(ue,{data:F,margin:{top:4,right:8,bottom:0,left:0},children:[e.jsxs("defs",{children:[e.jsxs("linearGradient",{id:"gReq",x1:"0",y1:"0",x2:"0",y2:"1",children:[e.jsx("stop",{offset:"0%",stopColor:"#F38020",stopOpacity:.35}),e.jsx("stop",{offset:"100%",stopColor:"#F38020",stopOpacity:0})]}),e.jsxs("linearGradient",{id:"gTok",x1:"0",y1:"0",x2:"0",y2:"1",children:[e.jsx("stop",{offset:"0%",stopColor:"#2563EB",stopOpacity:.3}),e.jsx("stop",{offset:"100%",stopColor:"#2563EB",stopOpacity:0})]})]}),e.jsx(V,{strokeDasharray:"3 3",stroke:"rgb(var(--c-line))",vertical:!1}),e.jsx(G,{dataKey:"date",tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(H,{width:44,tickFormatter:ye,tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(W,{contentStyle:{background:"rgb(var(--c-surface))",border:"1px solid rgb(var(--c-line))",borderRadius:10,fontSize:12}}),e.jsx(X,{type:"monotone",dataKey:"requests",name:"\u8BF7\u6C42\u6570",stroke:"#F38020",strokeWidth:2,fill:"url(#gReq)"}),e.jsx(X,{type:"monotone",dataKey:"tokens",name:"Tokens",stroke:"#2563EB",strokeWidth:2,fill:"url(#gTok)"})]})})})]}),e.jsxs("div",{className:"grid gap-5 xl:grid-cols-5",children:[e.jsxs(y,{className:"min-w-0 p-5 xl:col-span-2",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6211\u7684\u5404\u6A21\u578B\u8C03\u7528\u5360\u6BD4\uFF0824h\uFF09"}),e.jsx("div",{className:"h-56",children:i===null?e.jsx(g,{className:"h-full"}):i.byModel.length===0?e.jsx("div",{className:"flex h-full items-center justify-center text-xs text-muted",children:"\u6682\u65E0\u8C03\u7528\u6570\u636E"}):e.jsx(Q,{width:"100%",height:"100%",children:e.jsxs(pe,{data:i.byModel,layout:"vertical",margin:{left:8,right:16},children:[e.jsx(V,{strokeDasharray:"3 3",stroke:"rgb(var(--c-line))",horizontal:!1}),e.jsx(G,{type:"number",tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(H,{type:"category",dataKey:"public_model",width:128,tickFormatter:ge,tick:{fontSize:10,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(W,{contentStyle:{background:"rgb(var(--c-surface))",border:"1px solid rgb(var(--c-line))",borderRadius:10,fontSize:12}}),e.jsx(he,{dataKey:"n",name:"\u8BF7\u6C42\u6570",radius:[0,6,6,0],fill:"#F38020"})]})})})]}),e.jsxs(y,{className:"min-w-0 p-5 xl:col-span-3",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6211\u7684\u6700\u8FD1\u8BF7\u6C42"}),$===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((t,s)=>e.jsx(g,{className:"h-9"},s))}):e.jsx(ce,{cols:le,rows:$.map(t=>({...t,id:t.id})),page:10,expand:t=>e.jsxs("div",{className:"grid grid-cols-2 gap-2 text-xs text-muted",children:[e.jsxs("span",{children:["\u8BF7\u6C42 ID\uFF1A",e.jsx("code",{children:t.request_id})]}),e.jsxs("span",{children:["\u4E0A\u6E38\u5C1D\u8BD5\uFF1A",t.attempts," \u6B21",t.stream?"\uFF08\u6D41\u5F0F\uFF09":""]}),e.jsxs("span",{children:["HTTP ",t.http_status," \xB7 ",t.error_code??"\u2014"]}),e.jsxs("span",{children:["IP\uFF1A",t.ip]})]})})]})]}),e.jsx(U,{open:J,onClose:()=>h(!1),title:"\u5361\u5BC6\u5151\u6362\u5145\u503C",width:440,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsx("span",{className:"font-mono text-sm font-bold text-emerald-500",children:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency)})]}),e.jsx(A,{label:"\u5361\u5BC6\u5151\u6362\u7801",hint:"\u8F93\u5165\u83B7\u5F97\u7684 16~20 \u4F4D\u5361\u5BC6\u4EE3\u7801",children:e.jsx(K,{value:f,onChange:t=>E(t.target.value),placeholder:"\u4F8B\u5982: CARD-7K9A-2X4B-9PQW",autoFocus:!0})}),e.jsx("p",{className:"text-xs text-muted",children:"\u8F93\u5165\u6709\u6548\u5361\u5BC6\u540E\u70B9\u51FB\u5151\u6362\uFF0C\u7CFB\u7EDF\u5C06\u5B9E\u65F6\u4E3A\u60A8\u7684\u8D26\u6237\u589E\u52A0\u5BF9\u5E94\u9762\u989D\u8D44\u91D1\uFF1B\u82E5\u60A8\u5F53\u524D\u4E3A\u666E\u901A\u7528\u6237\uFF0C\u652F\u6301\u7684\u5361\u5BC6\u8FD8\u5C06\u81EA\u52A8\u4E3A\u60A8\u5347\u7EA7\u4E3A VIP \u8D26\u53F7\uFF01"}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(u,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>h(!1),children:"\u53D6\u6D88"}),e.jsx(u,{className:"flex-1 sm:flex-initial",disabled:O||!f.trim(),onClick:ae,children:O?"\u6838\u9500\u4E2D\u2026":"\u7ACB\u5373\u5151\u6362\u52A0\u6B3E"})]})]})}),e.jsx(U,{open:ee,onClose:()=>{b(!1),j(null)},title:"\u5728\u7EBF\u5145\u503C",width:480,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsx("span",{className:"font-mono text-sm font-bold text-emerald-500",children:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency)})]}),r?e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"rounded-lg border border-line p-4 text-center",children:[e.jsxs("p",{className:"text-xs text-muted",children:["\u8BA2\u5355\u53F7 ",r.outTradeNo," \xB7 \u5E94\u4ED8 \xA5",r.amount.toFixed(2)]}),r.qrCode&&/^https?:\\/\\//i.test(r.qrCode)?e.jsx("img",{src:r.qrCode,alt:"\u652F\u4ED8\u4E8C\u7EF4\u7801",className:"mx-auto mt-3 h-44 w-44 rounded-lg bg-white p-1"}):null,e.jsx("p",{className:"mt-3 text-xs text-muted",children:"\u5DF2\u5728\u65B0\u7A97\u53E3\u6253\u5F00\u6536\u94F6\u53F0\uFF0C\u652F\u4ED8\u5B8C\u6210\u540E\u672C\u9875\u4F1A\u81EA\u52A8\u5230\u8D26\uFF0C\u8BF7\u52FF\u5173\u95ED\u3002"}),r.payUrl?e.jsx("a",{href:r.payUrl,target:"_blank",rel:"noopener noreferrer",className:"mt-2 inline-block text-xs font-medium text-brand underline",children:"\u6536\u94F6\u53F0\u6CA1\u80FD\u6253\u5F00\uFF1F\u70B9\u6B64\u91CD\u65B0\u524D\u5F80"}):null,e.jsxs("div",{className:"mt-3 flex items-center justify-center gap-1.5 text-[11px] text-muted",children:[e.jsx("span",{className:"h-1.5 w-1.5 animate-pulse rounded-full bg-ok"}),"\u7B49\u5F85\u652F\u4ED8\u7ED3\u679C\u2026"]})]}),e.jsx("div",{className:"flex justify-end gap-2 pt-2 border-t border-line",children:e.jsx(u,{variant:"ghost",onClick:()=>{j(null)},children:"\u6362\u4E2A\u91D1\u989D\u91CD\u4E0B"})})]}):e.jsxs(e.Fragment,{children:[e.jsx(A,{label:`\u5145\u503C\u91D1\u989D\uFF08\xA5${(n==null?void 0:n.minAmount)??1} ~ \xA5${(n==null?void 0:n.maxAmount)??5e3}\uFF09`,hint:"\u5230\u8D26\u540E\u53EF\u7528\u4E8E\u6240\u6709\u6309\u91CF\u8BA1\u8D39\u6A21\u578B",children:e.jsx(K,{type:"number",value:C,onChange:t=>q(t.target.value),placeholder:"10",autoFocus:!0})}),e.jsx(A,{label:"\u652F\u4ED8\u65B9\u5F0F",children:e.jsx("div",{className:"flex flex-wrap gap-2 pt-1",children:((n==null?void 0:n.channels)??[]).map(t=>e.jsx("button",{type:"button",onClick:()=>z(t),className:`cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${B===t?"border-brand/40 bg-brand/10 text-brand":"border-line text-muted hover:text-ink"}`,children:te[t]??t},t))})}),e.jsx("p",{className:"text-xs text-muted",children:"\u7531\u7B2C\u4E09\u65B9\u6613\u652F\u4ED8\u5E73\u53F0\u6536\u6B3E\uFF0C\u652F\u4ED8\u6210\u529F\u540E\u7531\u5E73\u53F0\u5F02\u6B65\u56DE\u8C03\u5165\u8D26\uFF1B\u82E5\u957F\u65F6\u95F4\u672A\u5230\u8D26\uFF0C\u8BF7\u643A\u5E26\u8BA2\u5355\u53F7\u8054\u7CFB\u5BA2\u670D\u3002"}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(u,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>b(!1),children:"\u53D6\u6D88"}),e.jsx(u,{className:"flex-1 sm:flex-initial",disabled:D||!C,onClick:se,children:D?"\u4E0B\u5355\u4E2D\u2026":"\u524D\u5F80\u652F\u4ED8"})]})]})]})})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Invite-C63C__Ob.js": {
-              content: `import{c as xt,u as _t,a as tt,j as u,d as et,F as L,I as P,y as Ut,B as nt,g as zt,n as Ht}from"./index-C1Wgc1sf.js";import{r as k}from"./vendor-BbQ_LiY-.js";import{D as Vt}from"./download-74qsMNMY.js";/**
+            "/assets/Invite-CBHRBgyg.js": {
+              content: `import{c as xt,u as _t,a as tt,j as u,d as et,F as L,I as P,y as Ut,B as nt,g as zt,n as Ht}from"./index-KwMGOJkp.js";import{r as k}from"./vendor-BbQ_LiY-.js";import{D as Vt}from"./download-vNmvYjVK.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41897,53 +41897,53 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Keys-Dn_rXLV2.js": {
-              content: 'import{i as S,u as _,j as s,B as n,d as K,D as P,e as g,F as i,I as r,k as T,l as I,a as u,g as y,b as B,h as D}from"./index-C1Wgc1sf.js";import{r as o}from"./vendor-BbQ_LiY-.js";import{P as E}from"./plus-sJaeYLjc.js";function V(){const[h,k]=o.useState(null),[v,c]=o.useState(!1),[f,d]=o.useState(null),[a,l]=o.useState({name:"default",quota:"",expires:"",ip:"",models:"",sign:!1}),{confirm:j,confirmEl:b}=S(),p=_(),x=()=>u("/api/keys").then(e=>k(e.keys)).catch(e=>p(e.message,"err"));o.useEffect(()=>{x()},[]);const C=async()=>{try{const e={name:a.name||"default",requiresSigning:a.sign};a.quota&&(e.quotaUsd=parseFloat(a.quota)),a.expires&&(e.expiresAt=Math.floor(new Date(a.expires).getTime()/1e3)),a.ip.trim()&&(e.ipWhitelist=a.ip.split(",").map(m=>m.trim()).filter(Boolean)),a.models.trim()&&(e.modelWhitelist=a.models.split(",").map(m=>m.trim()).filter(Boolean));const t=await u("/api/keys","POST",e);c(!1),d(t.key),x()}catch(e){p(e.message,"err")}},N=async e=>{await j("\u64A4\u9500\u540E\u8BE5 Key \u7ACB\u5373\u5931\u6548\u4E14\u4E0D\u53EF\u6062\u590D\uFF0C\u786E\u8BA4\u64A4\u9500\uFF1F")&&(await u("/api/keys/actions","POST",{action:"revoke",keyId:e}),p("\u5DF2\u64A4\u9500"),x())},w=async e=>{if(!await j("\u8F6E\u6362\u5C06\u64A4\u9500\u65E7 Key \u5E76\u751F\u6210\u65B0 Key\uFF0C\u786E\u8BA4\uFF1F"))return;const t=await u("/api/keys/actions","POST",{action:"rotate",keyId:e});d(t.created.key),x()},q=[{key:"name",label:"\u540D\u79F0",sortVal:e=>e.name,render:e=>s.jsx("span",{className:"font-medium",children:e.name})},{key:"prefix",label:"Key \u524D\u7F00",render:e=>s.jsxs("code",{className:"rounded bg-surface2 px-1.5 py-0.5 text-xs",children:[e.prefix,"\u2026"]})},{key:"created",label:"\u521B\u5EFA\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:y(e.created_at)})},{key:"used",label:"\u6700\u540E\u4F7F\u7528",sortVal:e=>e.last_used_at??0,render:e=>s.jsx("span",{className:"text-xs text-muted",children:y(e.last_used_at)})},{key:"quota",label:"\u989D\u5EA6",render:e=>e.quota_usd===null?"\u4E0D\u9650":`${B(e.spent_usd)} / ${e.quota_usd}`},{key:"status",label:"\u72B6\u6001",render:e=>s.jsx(D,{value:e.status})},{key:"ops",label:"\u64CD\u4F5C",render:e=>s.jsxs("span",{className:"flex gap-1.5",children:[s.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:t=>{t.stopPropagation(),w(e.id)},children:"\u8F6E\u6362"}),s.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:t=>{t.stopPropagation(),N(e.id)},children:"\u64A4\u9500"})]})}];return s.jsxs("div",{className:"flex flex-col gap-4",children:[s.jsx("div",{className:"flex justify-end",children:s.jsxs(n,{onClick:()=>{l({name:"default",quota:"",expires:"",ip:"",models:"",sign:!1}),c(!0)},children:[s.jsx(E,{size:14}),"\u521B\u5EFA Key"]})}),s.jsx(K,{className:"p-4",children:h===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(4)].map((e,t)=>s.jsx("div",{className:"skeleton h-9"},t))}):s.jsx(P,{cols:q,rows:h.filter(e=>e.status==="active")})}),s.jsxs(g,{open:v,onClose:()=>c(!1),title:"\u521B\u5EFA API Key",children:[s.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[s.jsx(i,{label:"\u540D\u79F0",children:s.jsx(r,{value:a.name,onChange:e=>l({...a,name:e.target.value})})}),s.jsx(i,{label:"\u989D\u5EA6\uFF08\u7559\u7A7A\u4E0D\u9650\uFF09",children:s.jsx(r,{type:"number",step:"0.01",value:a.quota,onChange:e=>l({...a,quota:e.target.value})})}),s.jsx(i,{label:"\u8FC7\u671F\u65F6\u95F4",children:s.jsx(r,{type:"datetime-local",value:a.expires,onChange:e=>l({...a,expires:e.target.value})})}),s.jsx(i,{label:"\u5F3A\u5236\u7B7E\u540D\uFF08\u9632\u91CD\u653E\uFF09",children:s.jsxs(T,{value:a.sign?"1":"0",onChange:e=>l({...a,sign:e.target.value==="1"}),children:[s.jsx("option",{value:"0",children:"\u5173\u95ED"}),s.jsx("option",{value:"1",children:"\u5F00\u542F"})]})}),s.jsx(i,{label:"IP \u767D\u540D\u5355\uFF08\u9017\u53F7\u5206\u9694\uFF09",children:s.jsx(r,{value:a.ip,onChange:e=>l({...a,ip:e.target.value}),placeholder:"1.2.3.4,5.6.7.8"})}),s.jsx(i,{label:"\u6A21\u578B\u767D\u540D\u5355\uFF08\u9017\u53F7\u5206\u9694\uFF09",children:s.jsx(r,{value:a.models,onChange:e=>l({...a,models:e.target.value}),placeholder:"deepseek-chat,gpt-4o"})})]}),s.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[s.jsx(n,{variant:"ghost",onClick:()=>c(!1),children:"\u53D6\u6D88"}),s.jsx(n,{onClick:C,children:"\u521B\u5EFA"})]})]}),s.jsxs(g,{open:!!f,onClose:()=>d(null),title:"Key \u521B\u5EFA\u6210\u529F",width:560,children:[s.jsx("p",{className:"mb-3 rounded-lg bg-warn/10 px-3 py-2 text-xs text-warn",children:"\u26A0\uFE0F \u5B8C\u6574 Key \u53EA\u663E\u793A\u8FD9\u4E00\u6B21\uFF0C\u8BF7\u7ACB\u5373\u590D\u5236\u4FDD\u5B58\u3002\u670D\u52A1\u7AEF\u53EA\u5B58\u54C8\u5E0C\uFF0C\u4E22\u5931\u540E\u53EA\u80FD\u8F6E\u6362\u91CD\u5EFA\u3002"}),s.jsx(I,{text:f??""}),s.jsx("div",{className:"mt-4 flex justify-end",children:s.jsx(n,{onClick:()=>d(null),children:"\u6211\u5DF2\u4FDD\u5B58"})})]}),b]})}\n',
+            "/assets/Keys-BOU2k6at.js": {
+              content: 'import{i as S,u as _,j as s,B as n,d as K,D as P,e as g,F as i,I as r,k as T,l as I,a as u,g as y,b as B,h as D}from"./index-KwMGOJkp.js";import{r as o}from"./vendor-BbQ_LiY-.js";import{P as E}from"./plus-DVAh7yAY.js";function V(){const[h,k]=o.useState(null),[v,c]=o.useState(!1),[f,d]=o.useState(null),[a,l]=o.useState({name:"default",quota:"",expires:"",ip:"",models:"",sign:!1}),{confirm:j,confirmEl:b}=S(),p=_(),x=()=>u("/api/keys").then(e=>k(e.keys)).catch(e=>p(e.message,"err"));o.useEffect(()=>{x()},[]);const C=async()=>{try{const e={name:a.name||"default",requiresSigning:a.sign};a.quota&&(e.quotaUsd=parseFloat(a.quota)),a.expires&&(e.expiresAt=Math.floor(new Date(a.expires).getTime()/1e3)),a.ip.trim()&&(e.ipWhitelist=a.ip.split(",").map(m=>m.trim()).filter(Boolean)),a.models.trim()&&(e.modelWhitelist=a.models.split(",").map(m=>m.trim()).filter(Boolean));const t=await u("/api/keys","POST",e);c(!1),d(t.key),x()}catch(e){p(e.message,"err")}},N=async e=>{await j("\u64A4\u9500\u540E\u8BE5 Key \u7ACB\u5373\u5931\u6548\u4E14\u4E0D\u53EF\u6062\u590D\uFF0C\u786E\u8BA4\u64A4\u9500\uFF1F")&&(await u("/api/keys/actions","POST",{action:"revoke",keyId:e}),p("\u5DF2\u64A4\u9500"),x())},w=async e=>{if(!await j("\u8F6E\u6362\u5C06\u64A4\u9500\u65E7 Key \u5E76\u751F\u6210\u65B0 Key\uFF0C\u786E\u8BA4\uFF1F"))return;const t=await u("/api/keys/actions","POST",{action:"rotate",keyId:e});d(t.created.key),x()},q=[{key:"name",label:"\u540D\u79F0",sortVal:e=>e.name,render:e=>s.jsx("span",{className:"font-medium",children:e.name})},{key:"prefix",label:"Key \u524D\u7F00",render:e=>s.jsxs("code",{className:"rounded bg-surface2 px-1.5 py-0.5 text-xs",children:[e.prefix,"\u2026"]})},{key:"created",label:"\u521B\u5EFA\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:y(e.created_at)})},{key:"used",label:"\u6700\u540E\u4F7F\u7528",sortVal:e=>e.last_used_at??0,render:e=>s.jsx("span",{className:"text-xs text-muted",children:y(e.last_used_at)})},{key:"quota",label:"\u989D\u5EA6",render:e=>e.quota_usd===null?"\u4E0D\u9650":`${B(e.spent_usd)} / ${e.quota_usd}`},{key:"status",label:"\u72B6\u6001",render:e=>s.jsx(D,{value:e.status})},{key:"ops",label:"\u64CD\u4F5C",render:e=>s.jsxs("span",{className:"flex gap-1.5",children:[s.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:t=>{t.stopPropagation(),w(e.id)},children:"\u8F6E\u6362"}),s.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:t=>{t.stopPropagation(),N(e.id)},children:"\u64A4\u9500"})]})}];return s.jsxs("div",{className:"flex flex-col gap-4",children:[s.jsx("div",{className:"flex justify-end",children:s.jsxs(n,{onClick:()=>{l({name:"default",quota:"",expires:"",ip:"",models:"",sign:!1}),c(!0)},children:[s.jsx(E,{size:14}),"\u521B\u5EFA Key"]})}),s.jsx(K,{className:"p-4",children:h===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(4)].map((e,t)=>s.jsx("div",{className:"skeleton h-9"},t))}):s.jsx(P,{cols:q,rows:h.filter(e=>e.status==="active")})}),s.jsxs(g,{open:v,onClose:()=>c(!1),title:"\u521B\u5EFA API Key",children:[s.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[s.jsx(i,{label:"\u540D\u79F0",children:s.jsx(r,{value:a.name,onChange:e=>l({...a,name:e.target.value})})}),s.jsx(i,{label:"\u989D\u5EA6\uFF08\u7559\u7A7A\u4E0D\u9650\uFF09",children:s.jsx(r,{type:"number",step:"0.01",value:a.quota,onChange:e=>l({...a,quota:e.target.value})})}),s.jsx(i,{label:"\u8FC7\u671F\u65F6\u95F4",children:s.jsx(r,{type:"datetime-local",value:a.expires,onChange:e=>l({...a,expires:e.target.value})})}),s.jsx(i,{label:"\u5F3A\u5236\u7B7E\u540D\uFF08\u9632\u91CD\u653E\uFF09",children:s.jsxs(T,{value:a.sign?"1":"0",onChange:e=>l({...a,sign:e.target.value==="1"}),children:[s.jsx("option",{value:"0",children:"\u5173\u95ED"}),s.jsx("option",{value:"1",children:"\u5F00\u542F"})]})}),s.jsx(i,{label:"IP \u767D\u540D\u5355\uFF08\u9017\u53F7\u5206\u9694\uFF09",children:s.jsx(r,{value:a.ip,onChange:e=>l({...a,ip:e.target.value}),placeholder:"1.2.3.4,5.6.7.8"})}),s.jsx(i,{label:"\u6A21\u578B\u767D\u540D\u5355\uFF08\u9017\u53F7\u5206\u9694\uFF09",children:s.jsx(r,{value:a.models,onChange:e=>l({...a,models:e.target.value}),placeholder:"deepseek-chat,gpt-4o"})})]}),s.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[s.jsx(n,{variant:"ghost",onClick:()=>c(!1),children:"\u53D6\u6D88"}),s.jsx(n,{onClick:C,children:"\u521B\u5EFA"})]})]}),s.jsxs(g,{open:!!f,onClose:()=>d(null),title:"Key \u521B\u5EFA\u6210\u529F",width:560,children:[s.jsx("p",{className:"mb-3 rounded-lg bg-warn/10 px-3 py-2 text-xs text-warn",children:"\u26A0\uFE0F \u5B8C\u6574 Key \u53EA\u663E\u793A\u8FD9\u4E00\u6B21\uFF0C\u8BF7\u7ACB\u5373\u590D\u5236\u4FDD\u5B58\u3002\u670D\u52A1\u7AEF\u53EA\u5B58\u54C8\u5E0C\uFF0C\u4E22\u5931\u540E\u53EA\u80FD\u8F6E\u6362\u91CD\u5EFA\u3002"}),s.jsx(I,{text:f??""}),s.jsx("div",{className:"mt-4 flex justify-end",children:s.jsx(n,{onClick:()=>d(null),children:"\u6211\u5DF2\u4FDD\u5B58"})})]}),b]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Logs-CY4B2vum.js": {
-              content: 'import{i as L,u as R,j as s,d as v,B as i,x as U,g,F as u,k as N,I as w,D as C,s as B,n as m,a as J,h as K}from"./index-C1Wgc1sf.js";import{r as l}from"./vendor-BbQ_LiY-.js";import{D as O}from"./download-74qsMNMY.js";import{R as G}from"./refresh-cw-g67Iczt4.js";import{T as S}from"./trash-2-Hgm_5qDX.js";function Y({me:p}){const f=p.user.role==="superadmin"||p.user.role==="auditor",h=p.user.role==="superadmin",[n,I]=l.useState("usage"),[c,j]=l.useState(null),[T,A]=l.useState(0),[_,k]=l.useState(null),[D,E]=l.useState(!1),[t,d]=l.useState({status:"",model:"",userId:"",days:"7"}),{confirm:y,confirmEl:V}=L(),r=R(),b=()=>{j(null);const e=Math.floor(Date.now()/1e3)-parseInt(t.days,10)*86400,a=new URLSearchParams({limit:"200",...t.status&&{status:t.status},...t.model&&{model:t.model},...t.userId&&{userId:t.userId}});J(`/api/admin/usage/logs?${a}`).then(x=>{A(x.total),j(x.logs.filter(q=>q.created_at>e))}).catch(()=>j([]))},o=()=>{k(null),m("list_audit",{limit:300}).then(e=>{k(e.logs),E(!0)}).catch(e=>r(e.message,"err"))};l.useEffect(()=>{b()},[]),l.useEffect(()=>{n==="audit"&&!D&&o()},[n]);const P=async()=>{try{const e=await m("verify_audit_chain");r(e.result.ok?"\u2713 \u54C8\u5E0C\u94FE\u5B8C\u6574\uFF0C\u672A\u68C0\u6D4B\u5230\u7BE1\u6539":`\u2717 \u94FE\u65AD\u88C2\u4E8E ${e.result.brokenAt}`,e.result.ok?"ok":"err")}catch(e){r(e.message,"err")}},$=[{key:"time",label:"\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:g(e.created_at)})},{key:"user",label:"\u7528\u6237",render:e=>s.jsxs("code",{className:"text-xs",children:[e.user_id.slice(0,8),"\u2026"]})},{key:"key",label:"API Key",render:e=>{var a;return s.jsxs("code",{className:"text-xs text-muted",children:[((a=e.api_key_id)==null?void 0:a.slice(0,8))??"\u2014","\u2026"]})}},{key:"model",label:"\u6A21\u578B",sortVal:e=>e.public_model,render:e=>s.jsx("span",{className:"font-medium",children:e.public_model})},{key:"status",label:"\u72B6\u6001",render:e=>s.jsx(K,{value:e.status})},{key:"http",label:"HTTP",render:e=>s.jsx("span",{className:"text-xs",children:e.http_status})},{key:"latency",label:"\u8017\u65F6",sortVal:e=>e.latency_ms,render:e=>s.jsxs("span",{className:"tabular-nums",children:[e.latency_ms," ms"]})},{key:"tokens",label:"Tokens",sortVal:e=>e.prompt_tokens+e.completion_tokens,render:e=>s.jsxs("span",{className:"tabular-nums",children:[e.prompt_tokens," + ",e.completion_tokens]})},{key:"cost",label:"\u8D39\u7528",sortVal:e=>e.cost_usd,render:e=>e.cost_usd.toFixed(4)}],z=[{key:"time",label:"\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:g(e.created_at)})},{key:"actor",label:"\u64CD\u4F5C\u4EBA",render:e=>e.actor_email??s.jsx("code",{className:"text-xs",children:e.actor_user_id??"\u7CFB\u7EDF"})},{key:"action",label:"\u52A8\u4F5C",render:e=>s.jsx("code",{className:"rounded bg-surface2 px-1.5 py-0.5 text-xs",children:e.action})},{key:"target",label:"\u76EE\u6807",render:e=>s.jsx("code",{className:"text-xs text-muted",children:e.target_type?`${e.target_type}:${(e.target_id??"").slice(0,12)}`:"\u2014"})},{key:"ip",label:"IP",render:e=>s.jsx("code",{className:"text-xs",children:e.actor_ip??"\u2014"})},{key:"ops",label:"\u64CD\u4F5C",render:e=>h?s.jsxs(i,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async a=>{if(a.stopPropagation(),!!await y("\u5220\u9664\u8FD9\u6761\u5BA1\u8BA1\u65E5\u5FD7\uFF1F\u5220\u9664\u540E\u5C06\u81EA\u52A8\u91CD\u5EFA\u54C8\u5E0C\u94FE\u3002"))try{await m("delete_audit_log",{id:e.id}),r("\u5DF2\u5220\u9664\u5E76\u91CD\u5EFA\u54C8\u5E0C\u94FE"),o()}catch(x){r(x.message,"err")}},children:[s.jsx(S,{size:12}),"\u5220\u9664"]}):s.jsx("span",{className:"text-xs text-muted",children:"\u2014"})}],F=f?[["usage","\u7528\u91CF\u65E5\u5FD7"],["audit","\u5BA1\u8BA1\u65E5\u5FD7"]]:[["usage","\u7528\u91CF\u65E5\u5FD7"]];return s.jsxs("div",{className:"flex flex-col gap-4",children:[s.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:F.map(([e,a])=>s.jsx("button",{role:"tab","aria-selected":n===e,onClick:()=>I(e),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${n===e?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:a},e))}),n==="usage"&&s.jsxs(v,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[s.jsxs("div",{className:"flex flex-wrap items-start justify-between gap-3",children:[s.jsxs("div",{children:[s.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u7528\u91CF\u65E5\u5FD7"}),s.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u6309\u8BF7\u6C42\u8BB0\u5F55\u6A21\u578B\u8C03\u7528\u3001Token \u4E0E\u8D39\u7528\u660E\u7EC6\uFF0C\u652F\u6301\u7B5B\u9009\u4E0E\u5BFC\u51FA\u3002"})]}),s.jsxs("div",{className:"flex flex-wrap gap-2",children:[s.jsx(i,{onClick:b,children:"\u67E5\u8BE2"}),s.jsxs(i,{variant:"ghost",onClick:()=>c&&U(`usage-${Date.now()}.csv`,["time","user","model","status","http","latency_ms","prompt_tokens","completion_tokens","cost","request_id"],c.map(e=>[g(e.created_at),e.user_id,e.public_model,e.status,e.http_status,e.latency_ms,e.prompt_tokens,e.completion_tokens,e.cost_usd,e.request_id])),children:[s.jsx(O,{size:14}),"\u5BFC\u51FA CSV"]})]})]}),s.jsxs("div",{className:"grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4",children:[s.jsx(u,{label:"\u65F6\u95F4\u8303\u56F4",children:s.jsxs(N,{value:t.days,onChange:e=>d({...t,days:e.target.value}),children:[s.jsx("option",{value:"1",children:"\u8FD1 24 \u5C0F\u65F6"}),s.jsx("option",{value:"7",children:"\u8FD1 7 \u5929"}),s.jsx("option",{value:"30",children:"\u8FD1 30 \u5929"})]})}),s.jsx(u,{label:"\u72B6\u6001",children:s.jsxs(N,{value:t.status,onChange:e=>d({...t,status:e.target.value}),children:[s.jsx("option",{value:"",children:"\u5168\u90E8"}),["success","upstream_error","content_blocked","no_route","insufficient_balance"].map(e=>s.jsx("option",{children:e},e))]})}),s.jsx(u,{label:"\u6A21\u578B\u540D",children:s.jsx(w,{value:t.model,onChange:e=>d({...t,model:e.target.value}),placeholder:"deepseek-chat"})}),s.jsx(u,{label:"\u7528\u6237 ID",children:s.jsx(w,{value:t.userId,onChange:e=>d({...t,userId:e.target.value}),placeholder:"\u7528\u6237 ID"})})]}),c===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(8)].map((e,a)=>s.jsx("div",{className:"skeleton h-9"},a))}):s.jsxs(s.Fragment,{children:[s.jsxs("div",{className:"text-xs text-muted",children:["\u6700\u8FD1 ",c.length," \u6761 / \u547D\u4E2D ",T," \u6761\uFF08\u65F6\u95F4\u5012\u5E8F\uFF09"]}),s.jsx(C,{cols:$,rows:c,page:14,expand:e=>s.jsxs("div",{className:"grid grid-cols-2 gap-2 font-mono text-xs text-muted",children:[s.jsxs("span",{children:["\u8BF7\u6C42 ID\uFF1A",s.jsx("span",{className:"text-ink",children:e.request_id})]}),s.jsxs("span",{children:["Key\uFF1A",e.api_key_id??"\u2014"]}),s.jsxs("span",{children:["\u9519\u8BEF\u7801\uFF1A",e.error_code??"\u2014"]}),s.jsxs("span",{children:["\u91CD\u8BD5/\u5207\u6362\uFF1A",e.attempts," \u6B21",e.stream?" \xB7 \u6D41\u5F0F":""]}),s.jsxs("span",{children:["IP\uFF1A",e.ip]}),s.jsxs("span",{children:["\u4F9B\u5E94\u5546\uFF1A",e.provider_id??"\u2014"]})]})})]})]}),n==="audit"&&f&&s.jsxs(v,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[s.jsxs("div",{className:"flex flex-wrap items-start justify-between gap-3",children:[s.jsxs("div",{children:[s.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u5BA1\u8BA1\u65E5\u5FD7"}),s.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u8BB0\u5F55\u540E\u53F0\u654F\u611F\u64CD\u4F5C\uFF0C\u54C8\u5E0C\u94FE\u53EF\u6821\u9A8C\u5B8C\u6574\u6027\uFF1B\u4EC5\u5C55\u793A\u4FDD\u7559\u671F\u5185\u7684\u65E5\u5FD7\uFF0830\u2013180 \u5929\uFF0C\u9ED8\u8BA4 30 \u5929\uFF09\u3002"})]}),s.jsxs("div",{className:"flex flex-wrap gap-2",children:[s.jsxs(i,{variant:"ghost",onClick:o,children:[s.jsx(G,{size:14}),"\u5237\u65B0"]}),h&&s.jsxs(i,{variant:"ghost",onClick:P,children:[s.jsx(B,{size:14}),"\u6821\u9A8C\u94FE\u5B8C\u6574\u6027"]}),h&&s.jsxs(i,{variant:"ghost",className:"!text-err",onClick:async()=>{if(await y("\u6E05\u7A7A\u5168\u90E8\u5BA1\u8BA1\u65E5\u5FD7\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\uFF08\u54C8\u5E0C\u94FE\u5C06\u91CD\u65B0\u4ECE GENESIS \u5F00\u59CB\uFF09\u3002"))try{await m("clear_audit_logs",{}),r("\u5DF2\u6E05\u7A7A"),o()}catch(e){r(e.message,"err")}},children:[s.jsx(S,{size:14}),"\u6E05\u7A7A\u5168\u90E8"]})]})]}),_===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(8)].map((e,a)=>s.jsx("div",{className:"skeleton h-9"},a))}):s.jsx(C,{cols:z,rows:_,page:20,expand:e=>s.jsx("pre",{className:"max-h-40 overflow-auto text-xs",children:JSON.stringify(JSON.parse(e.meta??"{}"),null,2)})})]}),V]})}\n',
+            "/assets/Logs-gQEd4m_c.js": {
+              content: 'import{i as L,u as R,j as s,d as v,B as i,x as U,g,F as u,k as N,I as w,D as C,s as B,n as m,a as J,h as K}from"./index-KwMGOJkp.js";import{r as l}from"./vendor-BbQ_LiY-.js";import{D as O}from"./download-vNmvYjVK.js";import{R as G}from"./refresh-cw-BrzRfQC6.js";import{T as S}from"./trash-2-BF158Quc.js";function Y({me:p}){const f=p.user.role==="superadmin"||p.user.role==="auditor",h=p.user.role==="superadmin",[n,I]=l.useState("usage"),[c,j]=l.useState(null),[T,A]=l.useState(0),[_,k]=l.useState(null),[D,E]=l.useState(!1),[t,d]=l.useState({status:"",model:"",userId:"",days:"7"}),{confirm:y,confirmEl:V}=L(),r=R(),b=()=>{j(null);const e=Math.floor(Date.now()/1e3)-parseInt(t.days,10)*86400,a=new URLSearchParams({limit:"200",...t.status&&{status:t.status},...t.model&&{model:t.model},...t.userId&&{userId:t.userId}});J(`/api/admin/usage/logs?${a}`).then(x=>{A(x.total),j(x.logs.filter(q=>q.created_at>e))}).catch(()=>j([]))},o=()=>{k(null),m("list_audit",{limit:300}).then(e=>{k(e.logs),E(!0)}).catch(e=>r(e.message,"err"))};l.useEffect(()=>{b()},[]),l.useEffect(()=>{n==="audit"&&!D&&o()},[n]);const P=async()=>{try{const e=await m("verify_audit_chain");r(e.result.ok?"\u2713 \u54C8\u5E0C\u94FE\u5B8C\u6574\uFF0C\u672A\u68C0\u6D4B\u5230\u7BE1\u6539":`\u2717 \u94FE\u65AD\u88C2\u4E8E ${e.result.brokenAt}`,e.result.ok?"ok":"err")}catch(e){r(e.message,"err")}},$=[{key:"time",label:"\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:g(e.created_at)})},{key:"user",label:"\u7528\u6237",render:e=>s.jsxs("code",{className:"text-xs",children:[e.user_id.slice(0,8),"\u2026"]})},{key:"key",label:"API Key",render:e=>{var a;return s.jsxs("code",{className:"text-xs text-muted",children:[((a=e.api_key_id)==null?void 0:a.slice(0,8))??"\u2014","\u2026"]})}},{key:"model",label:"\u6A21\u578B",sortVal:e=>e.public_model,render:e=>s.jsx("span",{className:"font-medium",children:e.public_model})},{key:"status",label:"\u72B6\u6001",render:e=>s.jsx(K,{value:e.status})},{key:"http",label:"HTTP",render:e=>s.jsx("span",{className:"text-xs",children:e.http_status})},{key:"latency",label:"\u8017\u65F6",sortVal:e=>e.latency_ms,render:e=>s.jsxs("span",{className:"tabular-nums",children:[e.latency_ms," ms"]})},{key:"tokens",label:"Tokens",sortVal:e=>e.prompt_tokens+e.completion_tokens,render:e=>s.jsxs("span",{className:"tabular-nums",children:[e.prompt_tokens," + ",e.completion_tokens]})},{key:"cost",label:"\u8D39\u7528",sortVal:e=>e.cost_usd,render:e=>e.cost_usd.toFixed(4)}],z=[{key:"time",label:"\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:g(e.created_at)})},{key:"actor",label:"\u64CD\u4F5C\u4EBA",render:e=>e.actor_email??s.jsx("code",{className:"text-xs",children:e.actor_user_id??"\u7CFB\u7EDF"})},{key:"action",label:"\u52A8\u4F5C",render:e=>s.jsx("code",{className:"rounded bg-surface2 px-1.5 py-0.5 text-xs",children:e.action})},{key:"target",label:"\u76EE\u6807",render:e=>s.jsx("code",{className:"text-xs text-muted",children:e.target_type?`${e.target_type}:${(e.target_id??"").slice(0,12)}`:"\u2014"})},{key:"ip",label:"IP",render:e=>s.jsx("code",{className:"text-xs",children:e.actor_ip??"\u2014"})},{key:"ops",label:"\u64CD\u4F5C",render:e=>h?s.jsxs(i,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async a=>{if(a.stopPropagation(),!!await y("\u5220\u9664\u8FD9\u6761\u5BA1\u8BA1\u65E5\u5FD7\uFF1F\u5220\u9664\u540E\u5C06\u81EA\u52A8\u91CD\u5EFA\u54C8\u5E0C\u94FE\u3002"))try{await m("delete_audit_log",{id:e.id}),r("\u5DF2\u5220\u9664\u5E76\u91CD\u5EFA\u54C8\u5E0C\u94FE"),o()}catch(x){r(x.message,"err")}},children:[s.jsx(S,{size:12}),"\u5220\u9664"]}):s.jsx("span",{className:"text-xs text-muted",children:"\u2014"})}],F=f?[["usage","\u7528\u91CF\u65E5\u5FD7"],["audit","\u5BA1\u8BA1\u65E5\u5FD7"]]:[["usage","\u7528\u91CF\u65E5\u5FD7"]];return s.jsxs("div",{className:"flex flex-col gap-4",children:[s.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:F.map(([e,a])=>s.jsx("button",{role:"tab","aria-selected":n===e,onClick:()=>I(e),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${n===e?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:a},e))}),n==="usage"&&s.jsxs(v,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[s.jsxs("div",{className:"flex flex-wrap items-start justify-between gap-3",children:[s.jsxs("div",{children:[s.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u7528\u91CF\u65E5\u5FD7"}),s.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u6309\u8BF7\u6C42\u8BB0\u5F55\u6A21\u578B\u8C03\u7528\u3001Token \u4E0E\u8D39\u7528\u660E\u7EC6\uFF0C\u652F\u6301\u7B5B\u9009\u4E0E\u5BFC\u51FA\u3002"})]}),s.jsxs("div",{className:"flex flex-wrap gap-2",children:[s.jsx(i,{onClick:b,children:"\u67E5\u8BE2"}),s.jsxs(i,{variant:"ghost",onClick:()=>c&&U(`usage-${Date.now()}.csv`,["time","user","model","status","http","latency_ms","prompt_tokens","completion_tokens","cost","request_id"],c.map(e=>[g(e.created_at),e.user_id,e.public_model,e.status,e.http_status,e.latency_ms,e.prompt_tokens,e.completion_tokens,e.cost_usd,e.request_id])),children:[s.jsx(O,{size:14}),"\u5BFC\u51FA CSV"]})]})]}),s.jsxs("div",{className:"grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4",children:[s.jsx(u,{label:"\u65F6\u95F4\u8303\u56F4",children:s.jsxs(N,{value:t.days,onChange:e=>d({...t,days:e.target.value}),children:[s.jsx("option",{value:"1",children:"\u8FD1 24 \u5C0F\u65F6"}),s.jsx("option",{value:"7",children:"\u8FD1 7 \u5929"}),s.jsx("option",{value:"30",children:"\u8FD1 30 \u5929"})]})}),s.jsx(u,{label:"\u72B6\u6001",children:s.jsxs(N,{value:t.status,onChange:e=>d({...t,status:e.target.value}),children:[s.jsx("option",{value:"",children:"\u5168\u90E8"}),["success","upstream_error","content_blocked","no_route","insufficient_balance"].map(e=>s.jsx("option",{children:e},e))]})}),s.jsx(u,{label:"\u6A21\u578B\u540D",children:s.jsx(w,{value:t.model,onChange:e=>d({...t,model:e.target.value}),placeholder:"deepseek-chat"})}),s.jsx(u,{label:"\u7528\u6237 ID",children:s.jsx(w,{value:t.userId,onChange:e=>d({...t,userId:e.target.value}),placeholder:"\u7528\u6237 ID"})})]}),c===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(8)].map((e,a)=>s.jsx("div",{className:"skeleton h-9"},a))}):s.jsxs(s.Fragment,{children:[s.jsxs("div",{className:"text-xs text-muted",children:["\u6700\u8FD1 ",c.length," \u6761 / \u547D\u4E2D ",T," \u6761\uFF08\u65F6\u95F4\u5012\u5E8F\uFF09"]}),s.jsx(C,{cols:$,rows:c,page:14,expand:e=>s.jsxs("div",{className:"grid grid-cols-2 gap-2 font-mono text-xs text-muted",children:[s.jsxs("span",{children:["\u8BF7\u6C42 ID\uFF1A",s.jsx("span",{className:"text-ink",children:e.request_id})]}),s.jsxs("span",{children:["Key\uFF1A",e.api_key_id??"\u2014"]}),s.jsxs("span",{children:["\u9519\u8BEF\u7801\uFF1A",e.error_code??"\u2014"]}),s.jsxs("span",{children:["\u91CD\u8BD5/\u5207\u6362\uFF1A",e.attempts," \u6B21",e.stream?" \xB7 \u6D41\u5F0F":""]}),s.jsxs("span",{children:["IP\uFF1A",e.ip]}),s.jsxs("span",{children:["\u4F9B\u5E94\u5546\uFF1A",e.provider_id??"\u2014"]})]})})]})]}),n==="audit"&&f&&s.jsxs(v,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[s.jsxs("div",{className:"flex flex-wrap items-start justify-between gap-3",children:[s.jsxs("div",{children:[s.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u5BA1\u8BA1\u65E5\u5FD7"}),s.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u8BB0\u5F55\u540E\u53F0\u654F\u611F\u64CD\u4F5C\uFF0C\u54C8\u5E0C\u94FE\u53EF\u6821\u9A8C\u5B8C\u6574\u6027\uFF1B\u4EC5\u5C55\u793A\u4FDD\u7559\u671F\u5185\u7684\u65E5\u5FD7\uFF0830\u2013180 \u5929\uFF0C\u9ED8\u8BA4 30 \u5929\uFF09\u3002"})]}),s.jsxs("div",{className:"flex flex-wrap gap-2",children:[s.jsxs(i,{variant:"ghost",onClick:o,children:[s.jsx(G,{size:14}),"\u5237\u65B0"]}),h&&s.jsxs(i,{variant:"ghost",onClick:P,children:[s.jsx(B,{size:14}),"\u6821\u9A8C\u94FE\u5B8C\u6574\u6027"]}),h&&s.jsxs(i,{variant:"ghost",className:"!text-err",onClick:async()=>{if(await y("\u6E05\u7A7A\u5168\u90E8\u5BA1\u8BA1\u65E5\u5FD7\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\uFF08\u54C8\u5E0C\u94FE\u5C06\u91CD\u65B0\u4ECE GENESIS \u5F00\u59CB\uFF09\u3002"))try{await m("clear_audit_logs",{}),r("\u5DF2\u6E05\u7A7A"),o()}catch(e){r(e.message,"err")}},children:[s.jsx(S,{size:14}),"\u6E05\u7A7A\u5168\u90E8"]})]})]}),_===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(8)].map((e,a)=>s.jsx("div",{className:"skeleton h-9"},a))}):s.jsx(C,{cols:z,rows:_,page:20,expand:e=>s.jsx("pre",{className:"max-h-40 overflow-auto text-xs",children:JSON.stringify(JSON.parse(e.meta??"{}"),null,2)})})]}),V]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/ModelsPricing-ZXeWf5_f.js": {
-              content: 'import{c as R,u as V,a as q,j as e,d as A,L as B,q as T,o as z,I as o,E as K,r as O,m as G,i as U,n as E,B as w,D as H,e as D,F as n,k as W,h as J}from"./index-C1Wgc1sf.js";import{r as d,h as Q}from"./vendor-BbQ_LiY-.js";import{P as X}from"./plus-sJaeYLjc.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Y=R("Cpu",[["rect",{width:"16",height:"16",x:"4",y:"4",rx:"2",key:"14l7u7"}],["rect",{width:"6",height:"6",x:"9",y:"9",rx:"1",key:"5aljv4"}],["path",{d:"M15 2v2",key:"13l42r"}],["path",{d:"M15 20v2",key:"15mkzm"}],["path",{d:"M2 15h2",key:"1gxd5l"}],["path",{d:"M2 9h2",key:"1bbxkp"}],["path",{d:"M20 15h2",key:"19e6y8"}],["path",{d:"M20 9h2",key:"19tzq7"}],["path",{d:"M9 2v2",key:"165o2o"}],["path",{d:"M9 20v2",key:"i2bqo8"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Z=R("Search",[["circle",{cx:"11",cy:"11",r:"8",key:"4ej97u"}],["path",{d:"m21 21-4.3-4.3",key:"1qie3q"}]]);function ee({me:k}){const[x,h]=d.useState(null),[_,M]=d.useState([]),[f,C]=d.useState(""),[j,i]=d.useState(null),c=V(),b=`${window.location.origin}/v1`;d.useEffect(()=>{q("/api/models").then(t=>{h(t.models),t.providers&&M(t.providers)}).catch(t=>c(t.message,"err"))},[]);const N=async(t,r)=>{try{await navigator.clipboard.writeText(t),i(t),c(`\u5DF2\u590D\u5236 ${r}: ${t}`),setTimeout(()=>i(null),1800)}catch{c("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u957F\u6309\u590D\u5236","err")}},v=(x??[]).filter(t=>t.enabled===1),u=f.trim().toLowerCase(),l=[],m=new Set;for(const t of _){m.add(t.id);const r=v.filter(p=>p.provider_id===t.id||p.provider_slug===t.slug);l.push({provider:t,models:r})}for(const t of v)t.provider_id&&!m.has(t.provider_id)&&(m.add(t.provider_id),l.push({provider:{id:t.provider_id,name:t.provider_name||t.provider_id,slug:t.provider_slug||t.provider_id,kind:"openai_compat",status:"active"},models:v.filter(r=>r.provider_id===t.provider_id)}));const I=l.map(t=>{const r=t.provider.name.toLowerCase().includes(u)||t.provider.slug.toLowerCase().includes(u),p=t.models.filter(y=>r||y.public_name.toLowerCase().includes(u)||y.upstream_model.toLowerCase().includes(u)||`${t.provider.slug}/${y.public_name}`.toLowerCase().includes(u));return{...t,models:p,matches:r||p.length>0}}).filter(t=>u?t.matches:!0);return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs(A,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-4 md:flex-row md:items-center md:justify-between",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"flex h-7 w-7 items-center justify-center rounded-lg bg-brand/10 text-brand",children:e.jsx(B,{size:16})}),e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u6A21\u578B\u6C60 (Model Pool)"})]}),e.jsxs("p",{className:"mt-1 text-xs text-muted max-w-2xl",children:["\u5DF2\u5C31\u7EEA\u7684\u6240\u6709\u4E0A\u6E38\u5927\u6A21\u578B\u76EE\u5F55\u3002\u6A21\u578B\u8C03\u7528\u683C\u5F0F\u7EDF\u4E00\u89C4\u8303\u4E3A",e.jsx("code",{className:"mx-1 rounded bg-surface2 px-1 text-ink font-mono font-medium",children:"\u63D0\u4F9B\u5546ID/\u6A21\u578BID"}),"\uFF08\u4F8B\u5982 ",e.jsx("span",{className:"font-mono text-ink",children:"deepseek/deepseek-chat"})," \u6216 ",e.jsx("span",{className:"font-mono text-ink",children:"kilo/kilo-auto/free"}),"\uFF09\u3002\u70B9\u51FB\u4EFB\u610F\u6A21\u578B\u80F6\u56CA\u5373\u53EF\u4E00\u952E\u590D\u5236\u5E76\u586B\u5165\u5BA2\u6237\u7AEF\u3002"]})]}),e.jsxs("div",{className:"flex w-full md:w-auto items-center flex-nowrap gap-2 rounded-xl border border-line bg-surface2/60 px-2.5 py-1.5 text-xs min-w-0 shrink-0",children:[e.jsx("span",{className:"shrink-0 rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand font-mono",children:"API BASE"}),e.jsx("code",{className:"flex-1 min-w-0 font-mono text-xs text-ink truncate whitespace-nowrap max-w-[200px] sm:max-w-[280px]",children:b}),e.jsxs("button",{type:"button",onClick:()=>N(b,"API Base"),className:"shrink-0 flex items-center gap-1 rounded-md bg-brand/10 hover:bg-brand/20 text-brand px-2 py-1 text-[11px] font-medium transition-colors whitespace-nowrap",title:"\u590D\u5236 API \u6839\u5730\u5740",children:[j===b?e.jsx(T,{size:12,className:"text-emerald-500"}):e.jsx(z,{size:12}),e.jsx("span",{children:j===b?"\u5DF2\u590D\u5236":"\u590D\u5236"})]})]})]}),e.jsxs("div",{className:"mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-line/70 pt-3.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-4 text-xs text-muted",children:[e.jsxs("div",{children:["\u6E20\u9053\u603B\u8BA1\uFF1A",e.jsx("span",{className:"font-semibold text-ink font-mono",children:_.length})]}),e.jsxs("div",{children:["\u53EF\u7528\u6A21\u578B\uFF1A",e.jsx("span",{className:"font-semibold text-emerald-500 font-mono",children:v.length})," \u4E2A"]}),e.jsx("div",{className:"hidden sm:inline text-muted/60",children:"\xB7"}),e.jsxs("div",{className:"hidden sm:inline",children:["\u8C03\u7528\u683C\u5F0F\uFF1A",e.jsx("code",{className:"font-mono text-ink",children:"model"})," \u6216 ",e.jsx("code",{className:"font-mono text-ink",children:"provider/model"})]})]}),e.jsxs("div",{className:"relative w-full sm:w-72",children:[e.jsx(Z,{size:14,className:"absolute left-3 top-1/2 -translate-y-1/2 text-muted"}),e.jsx(o,{value:f,onChange:t=>C(t.target.value),placeholder:"\u641C\u7D22\u6E20\u9053\u6216\u6A21\u578B\u540D\u79F0...",className:"!pl-8 !py-1.5 text-xs"})]})]})]}),x===null?e.jsx("div",{className:"flex flex-col gap-3",children:[...Array(4)].map((t,r)=>e.jsx("div",{className:"skeleton h-28 rounded-xl2"},r))}):I.length===0?e.jsx(A,{children:e.jsx(K,{icon:e.jsx(Y,{size:32}),title:"\u672A\u53D1\u73B0\u5339\u914D\u7684\u6A21\u578B",hint:u?"\u8BF7\u5C1D\u8BD5\u66F4\u6362\u5173\u952E\u8BCD\u641C\u7D22\u5176\u5B83\u6E20\u9053\u6216\u6A21\u578B":"\u6682\u65E0\u53EF\u7528\u6A21\u578B\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458\u5728\u300C\u63D0\u4F9B\u5546\u300D\u6216\u300C\u5B9A\u4EF7\u300D\u4E0A\u67B6\u6A21\u578B"})}):e.jsx("div",{className:"flex flex-col gap-3",children:I.map(({provider:t,models:r})=>{var S,L,$;const p=t.slug==="opencode"||t.slug==="duckai"||t.slug==="kilo"||t.kind==="kilo"||t.kind==="opencode"||t.kind==="duckai",y=(S=t.kind)!=null&&S.startsWith("oauth:")?"OAuth \u6388\u6743":(L=t.kind)!=null&&L.startsWith("web:")?"Web \u53CD\u4EE3":t.slug==="anthropic"||t.kind==="anthropic"?"Anthropic \u5B98\u65B9\u534F\u8BAE":p?"\u514D Key \u76F4\u8FDE":"OpenAI \u517C\u5BB9";return e.jsxs(A,{className:"p-4 sm:p-4.5 flex flex-col gap-3",children:[e.jsxs("div",{className:"flex items-center justify-between gap-2 sm:gap-3 flex-nowrap border-b border-line/60 pb-2.5 min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1",children:[e.jsx("div",{className:"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-xs font-bold text-brand",children:(($=t.name[0])==null?void 0:$.toUpperCase())||e.jsx(O,{size:14})}),e.jsxs("div",{className:"flex items-center gap-1.5 sm:gap-2 min-w-0",children:[e.jsx("span",{className:"text-xs font-bold text-ink truncate",children:t.name}),e.jsx("code",{className:"text-[10px] text-muted rounded bg-surface2 px-1.5 py-0.5 font-mono shrink-0",children:t.slug})]})]}),e.jsxs("div",{className:"flex items-center gap-1.5 sm:gap-2 shrink-0",children:[e.jsx("span",{className:"rounded bg-line/70 px-2 py-0.5 text-[10px] text-muted font-medium whitespace-nowrap",children:y}),e.jsxs("span",{className:"flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-500 whitespace-nowrap",children:[e.jsx("span",{className:"h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0"}),r.length," \u4E2A\u5C31\u7EEA"]})]})]}),r.length===0?e.jsx("div",{className:"py-2 text-xs text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u5DF2\u542F\u7528\u6A21\u578B"}):e.jsx("div",{className:"flex flex-wrap gap-2",children:r.map(P=>{const s=P.public_name.startsWith(`${t.slug}/`)?P.public_name:`${t.slug}/${P.public_name}`,a=j===s;return e.jsxs("button",{type:"button",onClick:()=>N(s,"\u6A21\u578B ID"),className:G("group inline-flex items-center flex-nowrap shrink-0 max-w-full gap-1.5 rounded-lg border border-line bg-surface2/60 px-2.5 py-1.5 text-xs font-mono transition-all hover:border-brand/40 hover:bg-brand/5 hover:text-brand",a&&"!border-emerald-500/80 !bg-emerald-500/10 !text-emerald-500 font-semibold"),title:"\u70B9\u51FB\u590D\u5236\u6A21\u578B ID (\u63D0\u4F9B\u5546ID/\u6A21\u578BID)",children:[e.jsx("code",{className:"text-xs font-mono font-medium truncate max-w-[190px] sm:max-w-none whitespace-nowrap",children:s}),a?e.jsx(T,{size:12,className:"text-emerald-500 shrink-0"}):e.jsx(z,{size:12,className:"text-muted/60 group-hover:text-brand shrink-0 transition-colors"}),a&&e.jsx("span",{className:"text-[10px] font-sans font-medium text-emerald-500 shrink-0 whitespace-nowrap",children:"\u5DF2\u590D\u5236"})]},P.id)})})]},t.id)})})]})}function se({me:k}){const x=k.user.role==="superadmin",[h,_]=d.useState(null),[M,f]=d.useState([]),[C,j]=d.useState(!1),[i,c]=d.useState({publicName:"",providerId:"",upstream:"",priority:"10",cost:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",password:""}),[b,N]=d.useState(null),[v,u]=d.useState(""),[l,m]=d.useState({id:"",publicName:"",oldPublicName:"",providerId:"",upstreamModel:"",priority:"10",costWeight:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",enabled:!0}),{confirm:I,confirmEl:t}=U(),r=V(),p=()=>q("/api/models").then(s=>_(s.models)).catch(s=>r(s.message,"err"));d.useEffect(()=>{p(),x&&E("list_providers").then(s=>f(s.providers)).catch(()=>{})},[x]);const y=async()=>{if(!i.publicName.trim())return r("\u8BF7\u586B\u5199\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D","err");if(!i.providerId)return r("\u8BF7\u9009\u62E9\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053","err");if(!i.upstream.trim())return r("\u8BF7\u586B\u5199\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D","err");if(!i.password.trim())return r("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u64CD\u4F5C","err");const s=parseFloat(i.inputPerMillion),a=parseFloat(i.outputPerMillion);if(isNaN(s)||isNaN(a)||s<0||a<0)return r("\u8BF7\u8F93\u5165\u5408\u6CD5\u7684\u8F93\u5165/\u8F93\u51FA\u4EF7\u683C","err");const g=i.rpmLimit.trim()===""?null:parseInt(i.rpmLimit.trim(),10);if(g!==null&&(isNaN(g)||g<0))return r("RPM \u9650\u6D41\u8BF7\u8F93\u5165\u5927\u4E8E\u7B49\u4E8E 0 \u7684\u6574\u6570\uFF080 \u4EE3\u8868\u4E0D\u9650\uFF09","err");try{await E("upsert_model",{publicName:i.publicName.trim(),providerId:i.providerId,upstreamModel:i.upstream.trim(),priority:+i.priority||10,costWeight:+i.cost||1,inputPerMillion:s,outputPerMillion:a,rpmLimit:g,password:i.password.trim()}),r("\u6A21\u578B\u6620\u5C04\u5DF2\u4FDD\u5B58\u5E76\u4E0A\u67B6"),j(!1),c({publicName:"",providerId:"",upstream:"",priority:"10",cost:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",password:""}),p()}catch(F){r(F.message,"err")}},S=s=>{N(s),u(""),m({id:s.id,publicName:s.public_name,oldPublicName:s.public_name,providerId:s.provider_id||"",upstreamModel:s.upstream_model,priority:String(s.priority??10),costWeight:String(s.cost_weight??1),inputPerMillion:String(s.input_per_million??0),outputPerMillion:String(s.output_per_million??0),rpmLimit:s.rpm_limit!=null?String(s.rpm_limit):"",enabled:s.enabled===1})},L=async()=>{if(!l.publicName.trim())return r("\u8BF7\u586B\u5199\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D","err");if(!l.providerId)return r("\u8BF7\u9009\u62E9\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053","err");if(!l.upstreamModel.trim())return r("\u8BF7\u586B\u5199\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D","err");if(!v.trim())return r("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u4FEE\u6539","err");const s=parseFloat(l.inputPerMillion),a=parseFloat(l.outputPerMillion);if(isNaN(s)||isNaN(a)||s<0||a<0)return r("\u8BF7\u8F93\u5165\u5408\u6CD5\u7684\u8F93\u5165/\u8F93\u51FA\u4EF7\u683C","err");const g=l.rpmLimit.trim()===""?null:parseInt(l.rpmLimit.trim(),10);if(g!==null&&(isNaN(g)||g<0))return r("RPM \u9650\u6D41\u8BF7\u8F93\u5165\u5927\u4E8E\u7B49\u4E8E 0 \u7684\u6574\u6570\uFF080 \u4EE3\u8868\u4E0D\u9650\uFF09","err");try{await E("upsert_model",{id:l.id,publicName:l.publicName.trim(),oldPublicName:l.oldPublicName,providerId:l.providerId,upstreamModel:l.upstreamModel.trim(),priority:+l.priority||10,costWeight:+l.costWeight||1,inputPerMillion:s,outputPerMillion:a,rpmLimit:g,enabled:l.enabled,password:v.trim()}),r(`\u300C${l.publicName}\u300D\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7\u5DF2\u66F4\u65B0`),N(null),u(""),p()}catch(F){r(F.message,"err")}},$=async s=>{if(await I(`\u5220\u9664\u6A21\u578B\u6620\u5C04\u300C${s.public_name} \u2192 ${s.upstream_model}\u300D\uFF1F`))try{await E("delete_model",{id:s.id}),r("\u5DF2\u5220\u9664"),p()}catch(a){r(a.message,"err")}},P=[{key:"public",label:"\u5BF9\u5916\u6A21\u578B\u540D",sortVal:s=>s.public_name,render:s=>e.jsx("span",{className:"font-medium text-ink truncate max-w-[140px] sm:max-w-[200px] inline-block",title:s.public_name,children:s.public_name})},{key:"upstream",label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B",sortVal:s=>`${s.provider_slug||""}/${s.upstream_model}`,render:s=>{const a=s.provider_slug&&!s.upstream_model.startsWith(`${s.provider_slug}/`)?`${s.provider_slug}/${s.upstream_model}`:s.upstream_model;return e.jsx("code",{className:"text-xs font-mono text-muted hover:text-ink truncate max-w-[140px] sm:max-w-[200px] md:max-w-[260px] inline-block",title:a,children:a})}},{key:"provider",label:"\u4F9B\u5E94\u5546\u6E20\u9053",render:s=>s.provider_name??"\u2014"},{key:"priority",label:"\u4F18\u5148\u7EA7",sortVal:s=>s.priority,render:s=>e.jsxs("span",{className:"text-xs",children:[s.priority,"\uFF08\u5C0F=\u4F18\u5148\uFF09"]})},{key:"in",label:"\u8F93\u5165\u4EF7 / 1M",sortVal:s=>s.input_per_million??0,render:s=>e.jsx("span",{className:"font-mono text-xs font-medium text-ink",children:s.input_per_million!=null?`\xA5${Number(s.input_per_million).toFixed(2)}`:"\u672A\u5B9A\u4EF7"})},{key:"out",label:"\u8F93\u51FA\u4EF7 / 1M",sortVal:s=>s.output_per_million??0,render:s=>e.jsx("span",{className:"font-mono text-xs font-medium text-ink",children:s.output_per_million!=null?`\xA5${Number(s.output_per_million).toFixed(2)}`:"\u672A\u5B9A\u4EF7"})},{key:"rpm",label:"RPM \u9650\u6D41",sortVal:s=>s.rpm_limit===0?-1:s.rpm_limit??999999,render:s=>s.rpm_limit===0?e.jsx("span",{className:"rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500 whitespace-nowrap",children:"\u4E0D\u9650\u6D41"}):typeof s.rpm_limit=="number"&&s.rpm_limit>0?e.jsxs("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-mono font-medium text-brand whitespace-nowrap",children:[s.rpm_limit," RPM"]}):e.jsx("span",{className:"text-[11px] text-muted whitespace-nowrap",children:"\u7EE7\u627F\u5168\u5C40"})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(J,{value:s.enabled?"active":"pending"})},...x?[{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsx(w,{variant:"soft",className:"!h-7 !px-2.5 text-xs",onClick:()=>S(s),children:"\u7F16\u8F91"}),e.jsx(w,{variant:"ghost",className:"!h-7 !px-2 text-xs !text-err",onClick:()=>$(s),children:"\u5220\u9664"})]})}]:[]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[x&&e.jsx("div",{className:"flex justify-end",children:e.jsxs(w,{onClick:()=>j(!0),children:[e.jsx(X,{size:14}),"\u65B0\u589E\u6620\u5C04\u4E0E\u5B9A\u4EF7"]})}),e.jsx(A,{className:"p-4",children:h===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,a)=>e.jsx("div",{className:"skeleton h-9"},a))}):e.jsx(H,{cols:P,rows:h})}),e.jsx(D,{open:C,onClose:()=>j(!1),title:"\u65B0\u589E\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7",width:540,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:"\u4E3A\u4E0A\u6E38\u4F9B\u5E94\u5546\u5173\u8054\u5BF9\u5916\u6A21\u578B\u540D\u5E76\u8BBE\u5B9A\u8C03\u7528\u5355\u4EF7\u4E0E\u9650\u6D41\u3002\u591A\u4E2A\u4F9B\u5E94\u5546\u53EF\u914D\u7F6E\u76F8\u540C\u7684\u5BF9\u5916\u6A21\u578B\u540D\uFF0C\u7F51\u5173\u5C06\u6309\u4F18\u5148\u7EA7\u81EA\u52A8\u6545\u969C\u8F6C\u79FB\u4E0E\u5BB9\u707E\u3002"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(n,{label:"\u6240\u5C5E\u4F9B\u5E94\u5546",children:e.jsxs(W,{value:i.providerId,onChange:s=>c({...i,providerId:s.target.value}),children:[e.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u4F9B\u5E94\u5546"}),M.map(s=>e.jsxs("option",{value:s.id,children:[s.name,"\uFF08",s.slug,"\uFF09"]},s.id))]})}),e.jsx(n,{label:"\u4F18\u5148\u7EA7\uFF08\u6570\u5B57\u8D8A\u5C0F\u8D8A\u4F18\u5148\uFF09",children:e.jsx(o,{type:"number",value:i.priority,onChange:s=>c({...i,priority:s.target.value}),placeholder:"10"})}),e.jsx(n,{label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D",children:e.jsx(o,{value:i.upstream,onChange:s=>{const a=s.target.value;c({...i,upstream:a,publicName:i.publicName?i.publicName:a})},placeholder:"\u4F8B\u5982: deepseek-chat \u6216 gpt-4o"})}),e.jsx(n,{label:"\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D",children:e.jsx(o,{value:i.publicName,onChange:s=>c({...i,publicName:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u8F93\u5165\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:i.inputPerMillion,onChange:s=>c({...i,inputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx(n,{label:"\u8F93\u51FA\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:i.outputPerMillion,onChange:s=>c({...i,outputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u6A21\u578B\u72EC\u7ACB RPM \u9650\u6D41",hint:"\u586B 0 \u4E3A\u8BE5\u6A21\u578B\u7EDD\u5BF9\u4E0D\u9650\uFF1B\u7559\u7A7A\u81EA\u52A8\u7EE7\u627F\u5168\u5C40\u8BBE\u7F6E",children:e.jsx(o,{type:"number",min:"0",value:i.rpmLimit,onChange:s=>c({...i,rpmLimit:s.target.value}),placeholder:"\u7559\u7A7A\u7EE7\u627F\u5168\u5C40\u9ED8\u8BA4\uFF08\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF09"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u521B\u5EFA\u65B0\u6A21\u578B\u6620\u5C04\u9700\u6838\u9A8C\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u8EAB\u4EFD",children:e.jsx(o,{type:"password",value:i.password,onChange:s=>c({...i,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-line",children:[e.jsx(w,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>j(!1),children:"\u53D6\u6D88"}),e.jsx(w,{className:"flex-1 sm:flex-initial",onClick:y,children:"\u4FDD\u5B58\u5E76\u4E0A\u67B6"})]})]})}),e.jsx(D,{open:!!b,onClose:()=>N(null),title:`\u7F16\u8F91\u6A21\u578B\u4E0E\u5B9A\u4EF7 \u2014 ${(b==null?void 0:b.public_name)??""}`,width:540,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:"\u4FEE\u6539\u6A21\u578B\u6620\u5C04\u4E0E\u8C03\u7528\u5B9A\u4EF7\u3002\u4FEE\u6539\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D\u540E\uFF0C\u7CFB\u7EDF\u4F1A\u81EA\u52A8\u540C\u6B65\u66F4\u65B0\u5BF9\u5E94\u5B9A\u4EF7\u914D\u7F6E\u5E76\u70ED\u91CD\u8F7D\u8DEF\u7531\u3002"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(n,{label:"\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053",children:e.jsxs(W,{value:l.providerId,onChange:s=>m({...l,providerId:s.target.value}),children:[e.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u4F9B\u5E94\u5546"}),M.map(s=>e.jsxs("option",{value:s.id,children:[s.name,"\uFF08",s.slug,"\uFF09"]},s.id))]})}),e.jsx(n,{label:"\u4F18\u5148\u7EA7\uFF08\u6570\u5B57\u8D8A\u5C0F\u8D8A\u4F18\u5148\uFF09",children:e.jsx(o,{type:"number",value:l.priority,onChange:s=>m({...l,priority:s.target.value}),placeholder:"10"})}),e.jsx(n,{label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D",children:e.jsx(o,{value:l.upstreamModel,onChange:s=>m({...l,upstreamModel:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D",children:e.jsx(o,{value:l.publicName,onChange:s=>m({...l,publicName:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u8F93\u5165\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:l.inputPerMillion,onChange:s=>m({...l,inputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx(n,{label:"\u8F93\u51FA\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:l.outputPerMillion,onChange:s=>m({...l,outputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u6A21\u578B\u72EC\u7ACB RPM \u9650\u6D41",hint:"\u586B 0 \u4E3A\u8BE5\u6A21\u578B\u7EDD\u5BF9\u4E0D\u9650\uFF1B\u7559\u7A7A\u81EA\u52A8\u7EE7\u627F\u5168\u5C40\u8BBE\u7F6E",children:e.jsx(o,{type:"number",min:"0",value:l.rpmLimit,onChange:s=>m({...l,rpmLimit:s.target.value}),placeholder:"\u7559\u7A7A\u7EE7\u627F\u5168\u5C40\u9ED8\u8BA4\uFF08\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF09"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u4FEE\u6539\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7\u5C5E\u6838\u5FC3\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u9A8C\u8BC1\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u8EAB\u4EFD",children:e.jsx(o,{type:"password",value:v,onChange:s=>u(s.target.value),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsx("div",{className:"flex items-center gap-2 pt-1",children:e.jsxs("label",{className:"flex items-center gap-2 text-xs font-medium cursor-pointer",children:[e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:l.enabled,onChange:s=>m({...l,enabled:s.target.checked})}),"\u542F\u7528\u8BE5\u6A21\u578B\u4E0A\u67B6\u8C03\u5EA6"]})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-line",children:[e.jsx(w,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>N(null),children:"\u53D6\u6D88"}),e.jsx(w,{className:"flex-1 sm:flex-initial",onClick:L,children:"\u4FDD\u5B58\u4FEE\u6539"})]})]})}),t]})}function re(){const{me:k}=Q(),x=k.user.role==="superadmin",[h,_]=d.useState("models"),M=x?[["models","\u6A21\u578B\u6C60"],["pricing","\u5B9A\u4EF7"]]:[["models","\u6A21\u578B\u6C60"]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:M.map(([f,C])=>e.jsx("button",{role:"tab","aria-selected":h===f,onClick:()=>_(f),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${h===f?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:C},f))}),h==="models"&&e.jsx(ee,{me:k}),h==="pricing"&&x&&e.jsx(se,{me:k})]})}\n',
+            "/assets/ModelsPricing-B3A7W-XX.js": {
+              content: 'import{c as R,u as V,a as q,j as e,d as A,L as B,q as T,o as z,I as o,E as K,r as O,m as G,i as U,n as E,B as w,D as H,e as D,F as n,k as W,h as J}from"./index-KwMGOJkp.js";import{r as d,h as Q}from"./vendor-BbQ_LiY-.js";import{P as X}from"./plus-DVAh7yAY.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Y=R("Cpu",[["rect",{width:"16",height:"16",x:"4",y:"4",rx:"2",key:"14l7u7"}],["rect",{width:"6",height:"6",x:"9",y:"9",rx:"1",key:"5aljv4"}],["path",{d:"M15 2v2",key:"13l42r"}],["path",{d:"M15 20v2",key:"15mkzm"}],["path",{d:"M2 15h2",key:"1gxd5l"}],["path",{d:"M2 9h2",key:"1bbxkp"}],["path",{d:"M20 15h2",key:"19e6y8"}],["path",{d:"M20 9h2",key:"19tzq7"}],["path",{d:"M9 2v2",key:"165o2o"}],["path",{d:"M9 20v2",key:"i2bqo8"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Z=R("Search",[["circle",{cx:"11",cy:"11",r:"8",key:"4ej97u"}],["path",{d:"m21 21-4.3-4.3",key:"1qie3q"}]]);function ee({me:k}){const[x,h]=d.useState(null),[_,M]=d.useState([]),[f,C]=d.useState(""),[j,i]=d.useState(null),c=V(),b=`${window.location.origin}/v1`;d.useEffect(()=>{q("/api/models").then(t=>{h(t.models),t.providers&&M(t.providers)}).catch(t=>c(t.message,"err"))},[]);const N=async(t,r)=>{try{await navigator.clipboard.writeText(t),i(t),c(`\u5DF2\u590D\u5236 ${r}: ${t}`),setTimeout(()=>i(null),1800)}catch{c("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u957F\u6309\u590D\u5236","err")}},v=(x??[]).filter(t=>t.enabled===1),u=f.trim().toLowerCase(),l=[],m=new Set;for(const t of _){m.add(t.id);const r=v.filter(p=>p.provider_id===t.id||p.provider_slug===t.slug);l.push({provider:t,models:r})}for(const t of v)t.provider_id&&!m.has(t.provider_id)&&(m.add(t.provider_id),l.push({provider:{id:t.provider_id,name:t.provider_name||t.provider_id,slug:t.provider_slug||t.provider_id,kind:"openai_compat",status:"active"},models:v.filter(r=>r.provider_id===t.provider_id)}));const I=l.map(t=>{const r=t.provider.name.toLowerCase().includes(u)||t.provider.slug.toLowerCase().includes(u),p=t.models.filter(y=>r||y.public_name.toLowerCase().includes(u)||y.upstream_model.toLowerCase().includes(u)||`${t.provider.slug}/${y.public_name}`.toLowerCase().includes(u));return{...t,models:p,matches:r||p.length>0}}).filter(t=>u?t.matches:!0);return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs(A,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-4 md:flex-row md:items-center md:justify-between",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"flex h-7 w-7 items-center justify-center rounded-lg bg-brand/10 text-brand",children:e.jsx(B,{size:16})}),e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u6A21\u578B\u6C60 (Model Pool)"})]}),e.jsxs("p",{className:"mt-1 text-xs text-muted max-w-2xl",children:["\u5DF2\u5C31\u7EEA\u7684\u6240\u6709\u4E0A\u6E38\u5927\u6A21\u578B\u76EE\u5F55\u3002\u6A21\u578B\u8C03\u7528\u683C\u5F0F\u7EDF\u4E00\u89C4\u8303\u4E3A",e.jsx("code",{className:"mx-1 rounded bg-surface2 px-1 text-ink font-mono font-medium",children:"\u63D0\u4F9B\u5546ID/\u6A21\u578BID"}),"\uFF08\u4F8B\u5982 ",e.jsx("span",{className:"font-mono text-ink",children:"deepseek/deepseek-chat"})," \u6216 ",e.jsx("span",{className:"font-mono text-ink",children:"kilo/kilo-auto/free"}),"\uFF09\u3002\u70B9\u51FB\u4EFB\u610F\u6A21\u578B\u80F6\u56CA\u5373\u53EF\u4E00\u952E\u590D\u5236\u5E76\u586B\u5165\u5BA2\u6237\u7AEF\u3002"]})]}),e.jsxs("div",{className:"flex w-full md:w-auto items-center flex-nowrap gap-2 rounded-xl border border-line bg-surface2/60 px-2.5 py-1.5 text-xs min-w-0 shrink-0",children:[e.jsx("span",{className:"shrink-0 rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand font-mono",children:"API BASE"}),e.jsx("code",{className:"flex-1 min-w-0 font-mono text-xs text-ink truncate whitespace-nowrap max-w-[200px] sm:max-w-[280px]",children:b}),e.jsxs("button",{type:"button",onClick:()=>N(b,"API Base"),className:"shrink-0 flex items-center gap-1 rounded-md bg-brand/10 hover:bg-brand/20 text-brand px-2 py-1 text-[11px] font-medium transition-colors whitespace-nowrap",title:"\u590D\u5236 API \u6839\u5730\u5740",children:[j===b?e.jsx(T,{size:12,className:"text-emerald-500"}):e.jsx(z,{size:12}),e.jsx("span",{children:j===b?"\u5DF2\u590D\u5236":"\u590D\u5236"})]})]})]}),e.jsxs("div",{className:"mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-line/70 pt-3.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-4 text-xs text-muted",children:[e.jsxs("div",{children:["\u6E20\u9053\u603B\u8BA1\uFF1A",e.jsx("span",{className:"font-semibold text-ink font-mono",children:_.length})]}),e.jsxs("div",{children:["\u53EF\u7528\u6A21\u578B\uFF1A",e.jsx("span",{className:"font-semibold text-emerald-500 font-mono",children:v.length})," \u4E2A"]}),e.jsx("div",{className:"hidden sm:inline text-muted/60",children:"\xB7"}),e.jsxs("div",{className:"hidden sm:inline",children:["\u8C03\u7528\u683C\u5F0F\uFF1A",e.jsx("code",{className:"font-mono text-ink",children:"model"})," \u6216 ",e.jsx("code",{className:"font-mono text-ink",children:"provider/model"})]})]}),e.jsxs("div",{className:"relative w-full sm:w-72",children:[e.jsx(Z,{size:14,className:"absolute left-3 top-1/2 -translate-y-1/2 text-muted"}),e.jsx(o,{value:f,onChange:t=>C(t.target.value),placeholder:"\u641C\u7D22\u6E20\u9053\u6216\u6A21\u578B\u540D\u79F0...",className:"!pl-8 !py-1.5 text-xs"})]})]})]}),x===null?e.jsx("div",{className:"flex flex-col gap-3",children:[...Array(4)].map((t,r)=>e.jsx("div",{className:"skeleton h-28 rounded-xl2"},r))}):I.length===0?e.jsx(A,{children:e.jsx(K,{icon:e.jsx(Y,{size:32}),title:"\u672A\u53D1\u73B0\u5339\u914D\u7684\u6A21\u578B",hint:u?"\u8BF7\u5C1D\u8BD5\u66F4\u6362\u5173\u952E\u8BCD\u641C\u7D22\u5176\u5B83\u6E20\u9053\u6216\u6A21\u578B":"\u6682\u65E0\u53EF\u7528\u6A21\u578B\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458\u5728\u300C\u63D0\u4F9B\u5546\u300D\u6216\u300C\u5B9A\u4EF7\u300D\u4E0A\u67B6\u6A21\u578B"})}):e.jsx("div",{className:"flex flex-col gap-3",children:I.map(({provider:t,models:r})=>{var S,L,$;const p=t.slug==="opencode"||t.slug==="duckai"||t.slug==="kilo"||t.kind==="kilo"||t.kind==="opencode"||t.kind==="duckai",y=(S=t.kind)!=null&&S.startsWith("oauth:")?"OAuth \u6388\u6743":(L=t.kind)!=null&&L.startsWith("web:")?"Web \u53CD\u4EE3":t.slug==="anthropic"||t.kind==="anthropic"?"Anthropic \u5B98\u65B9\u534F\u8BAE":p?"\u514D Key \u76F4\u8FDE":"OpenAI \u517C\u5BB9";return e.jsxs(A,{className:"p-4 sm:p-4.5 flex flex-col gap-3",children:[e.jsxs("div",{className:"flex items-center justify-between gap-2 sm:gap-3 flex-nowrap border-b border-line/60 pb-2.5 min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1",children:[e.jsx("div",{className:"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-xs font-bold text-brand",children:(($=t.name[0])==null?void 0:$.toUpperCase())||e.jsx(O,{size:14})}),e.jsxs("div",{className:"flex items-center gap-1.5 sm:gap-2 min-w-0",children:[e.jsx("span",{className:"text-xs font-bold text-ink truncate",children:t.name}),e.jsx("code",{className:"text-[10px] text-muted rounded bg-surface2 px-1.5 py-0.5 font-mono shrink-0",children:t.slug})]})]}),e.jsxs("div",{className:"flex items-center gap-1.5 sm:gap-2 shrink-0",children:[e.jsx("span",{className:"rounded bg-line/70 px-2 py-0.5 text-[10px] text-muted font-medium whitespace-nowrap",children:y}),e.jsxs("span",{className:"flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-500 whitespace-nowrap",children:[e.jsx("span",{className:"h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0"}),r.length," \u4E2A\u5C31\u7EEA"]})]})]}),r.length===0?e.jsx("div",{className:"py-2 text-xs text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u5DF2\u542F\u7528\u6A21\u578B"}):e.jsx("div",{className:"flex flex-wrap gap-2",children:r.map(P=>{const s=P.public_name.startsWith(`${t.slug}/`)?P.public_name:`${t.slug}/${P.public_name}`,a=j===s;return e.jsxs("button",{type:"button",onClick:()=>N(s,"\u6A21\u578B ID"),className:G("group inline-flex items-center flex-nowrap shrink-0 max-w-full gap-1.5 rounded-lg border border-line bg-surface2/60 px-2.5 py-1.5 text-xs font-mono transition-all hover:border-brand/40 hover:bg-brand/5 hover:text-brand",a&&"!border-emerald-500/80 !bg-emerald-500/10 !text-emerald-500 font-semibold"),title:"\u70B9\u51FB\u590D\u5236\u6A21\u578B ID (\u63D0\u4F9B\u5546ID/\u6A21\u578BID)",children:[e.jsx("code",{className:"text-xs font-mono font-medium truncate max-w-[190px] sm:max-w-none whitespace-nowrap",children:s}),a?e.jsx(T,{size:12,className:"text-emerald-500 shrink-0"}):e.jsx(z,{size:12,className:"text-muted/60 group-hover:text-brand shrink-0 transition-colors"}),a&&e.jsx("span",{className:"text-[10px] font-sans font-medium text-emerald-500 shrink-0 whitespace-nowrap",children:"\u5DF2\u590D\u5236"})]},P.id)})})]},t.id)})})]})}function se({me:k}){const x=k.user.role==="superadmin",[h,_]=d.useState(null),[M,f]=d.useState([]),[C,j]=d.useState(!1),[i,c]=d.useState({publicName:"",providerId:"",upstream:"",priority:"10",cost:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",password:""}),[b,N]=d.useState(null),[v,u]=d.useState(""),[l,m]=d.useState({id:"",publicName:"",oldPublicName:"",providerId:"",upstreamModel:"",priority:"10",costWeight:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",enabled:!0}),{confirm:I,confirmEl:t}=U(),r=V(),p=()=>q("/api/models").then(s=>_(s.models)).catch(s=>r(s.message,"err"));d.useEffect(()=>{p(),x&&E("list_providers").then(s=>f(s.providers)).catch(()=>{})},[x]);const y=async()=>{if(!i.publicName.trim())return r("\u8BF7\u586B\u5199\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D","err");if(!i.providerId)return r("\u8BF7\u9009\u62E9\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053","err");if(!i.upstream.trim())return r("\u8BF7\u586B\u5199\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D","err");if(!i.password.trim())return r("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u64CD\u4F5C","err");const s=parseFloat(i.inputPerMillion),a=parseFloat(i.outputPerMillion);if(isNaN(s)||isNaN(a)||s<0||a<0)return r("\u8BF7\u8F93\u5165\u5408\u6CD5\u7684\u8F93\u5165/\u8F93\u51FA\u4EF7\u683C","err");const g=i.rpmLimit.trim()===""?null:parseInt(i.rpmLimit.trim(),10);if(g!==null&&(isNaN(g)||g<0))return r("RPM \u9650\u6D41\u8BF7\u8F93\u5165\u5927\u4E8E\u7B49\u4E8E 0 \u7684\u6574\u6570\uFF080 \u4EE3\u8868\u4E0D\u9650\uFF09","err");try{await E("upsert_model",{publicName:i.publicName.trim(),providerId:i.providerId,upstreamModel:i.upstream.trim(),priority:+i.priority||10,costWeight:+i.cost||1,inputPerMillion:s,outputPerMillion:a,rpmLimit:g,password:i.password.trim()}),r("\u6A21\u578B\u6620\u5C04\u5DF2\u4FDD\u5B58\u5E76\u4E0A\u67B6"),j(!1),c({publicName:"",providerId:"",upstream:"",priority:"10",cost:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",password:""}),p()}catch(F){r(F.message,"err")}},S=s=>{N(s),u(""),m({id:s.id,publicName:s.public_name,oldPublicName:s.public_name,providerId:s.provider_id||"",upstreamModel:s.upstream_model,priority:String(s.priority??10),costWeight:String(s.cost_weight??1),inputPerMillion:String(s.input_per_million??0),outputPerMillion:String(s.output_per_million??0),rpmLimit:s.rpm_limit!=null?String(s.rpm_limit):"",enabled:s.enabled===1})},L=async()=>{if(!l.publicName.trim())return r("\u8BF7\u586B\u5199\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D","err");if(!l.providerId)return r("\u8BF7\u9009\u62E9\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053","err");if(!l.upstreamModel.trim())return r("\u8BF7\u586B\u5199\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D","err");if(!v.trim())return r("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u4FEE\u6539","err");const s=parseFloat(l.inputPerMillion),a=parseFloat(l.outputPerMillion);if(isNaN(s)||isNaN(a)||s<0||a<0)return r("\u8BF7\u8F93\u5165\u5408\u6CD5\u7684\u8F93\u5165/\u8F93\u51FA\u4EF7\u683C","err");const g=l.rpmLimit.trim()===""?null:parseInt(l.rpmLimit.trim(),10);if(g!==null&&(isNaN(g)||g<0))return r("RPM \u9650\u6D41\u8BF7\u8F93\u5165\u5927\u4E8E\u7B49\u4E8E 0 \u7684\u6574\u6570\uFF080 \u4EE3\u8868\u4E0D\u9650\uFF09","err");try{await E("upsert_model",{id:l.id,publicName:l.publicName.trim(),oldPublicName:l.oldPublicName,providerId:l.providerId,upstreamModel:l.upstreamModel.trim(),priority:+l.priority||10,costWeight:+l.costWeight||1,inputPerMillion:s,outputPerMillion:a,rpmLimit:g,enabled:l.enabled,password:v.trim()}),r(`\u300C${l.publicName}\u300D\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7\u5DF2\u66F4\u65B0`),N(null),u(""),p()}catch(F){r(F.message,"err")}},$=async s=>{if(await I(`\u5220\u9664\u6A21\u578B\u6620\u5C04\u300C${s.public_name} \u2192 ${s.upstream_model}\u300D\uFF1F`))try{await E("delete_model",{id:s.id}),r("\u5DF2\u5220\u9664"),p()}catch(a){r(a.message,"err")}},P=[{key:"public",label:"\u5BF9\u5916\u6A21\u578B\u540D",sortVal:s=>s.public_name,render:s=>e.jsx("span",{className:"font-medium text-ink truncate max-w-[140px] sm:max-w-[200px] inline-block",title:s.public_name,children:s.public_name})},{key:"upstream",label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B",sortVal:s=>`${s.provider_slug||""}/${s.upstream_model}`,render:s=>{const a=s.provider_slug&&!s.upstream_model.startsWith(`${s.provider_slug}/`)?`${s.provider_slug}/${s.upstream_model}`:s.upstream_model;return e.jsx("code",{className:"text-xs font-mono text-muted hover:text-ink truncate max-w-[140px] sm:max-w-[200px] md:max-w-[260px] inline-block",title:a,children:a})}},{key:"provider",label:"\u4F9B\u5E94\u5546\u6E20\u9053",render:s=>s.provider_name??"\u2014"},{key:"priority",label:"\u4F18\u5148\u7EA7",sortVal:s=>s.priority,render:s=>e.jsxs("span",{className:"text-xs",children:[s.priority,"\uFF08\u5C0F=\u4F18\u5148\uFF09"]})},{key:"in",label:"\u8F93\u5165\u4EF7 / 1M",sortVal:s=>s.input_per_million??0,render:s=>e.jsx("span",{className:"font-mono text-xs font-medium text-ink",children:s.input_per_million!=null?`\xA5${Number(s.input_per_million).toFixed(2)}`:"\u672A\u5B9A\u4EF7"})},{key:"out",label:"\u8F93\u51FA\u4EF7 / 1M",sortVal:s=>s.output_per_million??0,render:s=>e.jsx("span",{className:"font-mono text-xs font-medium text-ink",children:s.output_per_million!=null?`\xA5${Number(s.output_per_million).toFixed(2)}`:"\u672A\u5B9A\u4EF7"})},{key:"rpm",label:"RPM \u9650\u6D41",sortVal:s=>s.rpm_limit===0?-1:s.rpm_limit??999999,render:s=>s.rpm_limit===0?e.jsx("span",{className:"rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500 whitespace-nowrap",children:"\u4E0D\u9650\u6D41"}):typeof s.rpm_limit=="number"&&s.rpm_limit>0?e.jsxs("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-mono font-medium text-brand whitespace-nowrap",children:[s.rpm_limit," RPM"]}):e.jsx("span",{className:"text-[11px] text-muted whitespace-nowrap",children:"\u7EE7\u627F\u5168\u5C40"})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(J,{value:s.enabled?"active":"pending"})},...x?[{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsx(w,{variant:"soft",className:"!h-7 !px-2.5 text-xs",onClick:()=>S(s),children:"\u7F16\u8F91"}),e.jsx(w,{variant:"ghost",className:"!h-7 !px-2 text-xs !text-err",onClick:()=>$(s),children:"\u5220\u9664"})]})}]:[]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[x&&e.jsx("div",{className:"flex justify-end",children:e.jsxs(w,{onClick:()=>j(!0),children:[e.jsx(X,{size:14}),"\u65B0\u589E\u6620\u5C04\u4E0E\u5B9A\u4EF7"]})}),e.jsx(A,{className:"p-4",children:h===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,a)=>e.jsx("div",{className:"skeleton h-9"},a))}):e.jsx(H,{cols:P,rows:h})}),e.jsx(D,{open:C,onClose:()=>j(!1),title:"\u65B0\u589E\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7",width:540,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:"\u4E3A\u4E0A\u6E38\u4F9B\u5E94\u5546\u5173\u8054\u5BF9\u5916\u6A21\u578B\u540D\u5E76\u8BBE\u5B9A\u8C03\u7528\u5355\u4EF7\u4E0E\u9650\u6D41\u3002\u591A\u4E2A\u4F9B\u5E94\u5546\u53EF\u914D\u7F6E\u76F8\u540C\u7684\u5BF9\u5916\u6A21\u578B\u540D\uFF0C\u7F51\u5173\u5C06\u6309\u4F18\u5148\u7EA7\u81EA\u52A8\u6545\u969C\u8F6C\u79FB\u4E0E\u5BB9\u707E\u3002"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(n,{label:"\u6240\u5C5E\u4F9B\u5E94\u5546",children:e.jsxs(W,{value:i.providerId,onChange:s=>c({...i,providerId:s.target.value}),children:[e.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u4F9B\u5E94\u5546"}),M.map(s=>e.jsxs("option",{value:s.id,children:[s.name,"\uFF08",s.slug,"\uFF09"]},s.id))]})}),e.jsx(n,{label:"\u4F18\u5148\u7EA7\uFF08\u6570\u5B57\u8D8A\u5C0F\u8D8A\u4F18\u5148\uFF09",children:e.jsx(o,{type:"number",value:i.priority,onChange:s=>c({...i,priority:s.target.value}),placeholder:"10"})}),e.jsx(n,{label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D",children:e.jsx(o,{value:i.upstream,onChange:s=>{const a=s.target.value;c({...i,upstream:a,publicName:i.publicName?i.publicName:a})},placeholder:"\u4F8B\u5982: deepseek-chat \u6216 gpt-4o"})}),e.jsx(n,{label:"\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D",children:e.jsx(o,{value:i.publicName,onChange:s=>c({...i,publicName:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u8F93\u5165\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:i.inputPerMillion,onChange:s=>c({...i,inputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx(n,{label:"\u8F93\u51FA\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:i.outputPerMillion,onChange:s=>c({...i,outputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u6A21\u578B\u72EC\u7ACB RPM \u9650\u6D41",hint:"\u586B 0 \u4E3A\u8BE5\u6A21\u578B\u7EDD\u5BF9\u4E0D\u9650\uFF1B\u7559\u7A7A\u81EA\u52A8\u7EE7\u627F\u5168\u5C40\u8BBE\u7F6E",children:e.jsx(o,{type:"number",min:"0",value:i.rpmLimit,onChange:s=>c({...i,rpmLimit:s.target.value}),placeholder:"\u7559\u7A7A\u7EE7\u627F\u5168\u5C40\u9ED8\u8BA4\uFF08\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF09"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u521B\u5EFA\u65B0\u6A21\u578B\u6620\u5C04\u9700\u6838\u9A8C\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u8EAB\u4EFD",children:e.jsx(o,{type:"password",value:i.password,onChange:s=>c({...i,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-line",children:[e.jsx(w,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>j(!1),children:"\u53D6\u6D88"}),e.jsx(w,{className:"flex-1 sm:flex-initial",onClick:y,children:"\u4FDD\u5B58\u5E76\u4E0A\u67B6"})]})]})}),e.jsx(D,{open:!!b,onClose:()=>N(null),title:`\u7F16\u8F91\u6A21\u578B\u4E0E\u5B9A\u4EF7 \u2014 ${(b==null?void 0:b.public_name)??""}`,width:540,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:"\u4FEE\u6539\u6A21\u578B\u6620\u5C04\u4E0E\u8C03\u7528\u5B9A\u4EF7\u3002\u4FEE\u6539\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D\u540E\uFF0C\u7CFB\u7EDF\u4F1A\u81EA\u52A8\u540C\u6B65\u66F4\u65B0\u5BF9\u5E94\u5B9A\u4EF7\u914D\u7F6E\u5E76\u70ED\u91CD\u8F7D\u8DEF\u7531\u3002"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(n,{label:"\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053",children:e.jsxs(W,{value:l.providerId,onChange:s=>m({...l,providerId:s.target.value}),children:[e.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u4F9B\u5E94\u5546"}),M.map(s=>e.jsxs("option",{value:s.id,children:[s.name,"\uFF08",s.slug,"\uFF09"]},s.id))]})}),e.jsx(n,{label:"\u4F18\u5148\u7EA7\uFF08\u6570\u5B57\u8D8A\u5C0F\u8D8A\u4F18\u5148\uFF09",children:e.jsx(o,{type:"number",value:l.priority,onChange:s=>m({...l,priority:s.target.value}),placeholder:"10"})}),e.jsx(n,{label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D",children:e.jsx(o,{value:l.upstreamModel,onChange:s=>m({...l,upstreamModel:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D",children:e.jsx(o,{value:l.publicName,onChange:s=>m({...l,publicName:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u8F93\u5165\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:l.inputPerMillion,onChange:s=>m({...l,inputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx(n,{label:"\u8F93\u51FA\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:l.outputPerMillion,onChange:s=>m({...l,outputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u6A21\u578B\u72EC\u7ACB RPM \u9650\u6D41",hint:"\u586B 0 \u4E3A\u8BE5\u6A21\u578B\u7EDD\u5BF9\u4E0D\u9650\uFF1B\u7559\u7A7A\u81EA\u52A8\u7EE7\u627F\u5168\u5C40\u8BBE\u7F6E",children:e.jsx(o,{type:"number",min:"0",value:l.rpmLimit,onChange:s=>m({...l,rpmLimit:s.target.value}),placeholder:"\u7559\u7A7A\u7EE7\u627F\u5168\u5C40\u9ED8\u8BA4\uFF08\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF09"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u4FEE\u6539\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7\u5C5E\u6838\u5FC3\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u9A8C\u8BC1\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u8EAB\u4EFD",children:e.jsx(o,{type:"password",value:v,onChange:s=>u(s.target.value),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsx("div",{className:"flex items-center gap-2 pt-1",children:e.jsxs("label",{className:"flex items-center gap-2 text-xs font-medium cursor-pointer",children:[e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:l.enabled,onChange:s=>m({...l,enabled:s.target.checked})}),"\u542F\u7528\u8BE5\u6A21\u578B\u4E0A\u67B6\u8C03\u5EA6"]})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-line",children:[e.jsx(w,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>N(null),children:"\u53D6\u6D88"}),e.jsx(w,{className:"flex-1 sm:flex-initial",onClick:L,children:"\u4FDD\u5B58\u4FEE\u6539"})]})]})}),t]})}function re(){const{me:k}=Q(),x=k.user.role==="superadmin",[h,_]=d.useState("models"),M=x?[["models","\u6A21\u578B\u6C60"],["pricing","\u5B9A\u4EF7"]]:[["models","\u6A21\u578B\u6C60"]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:M.map(([f,C])=>e.jsx("button",{role:"tab","aria-selected":h===f,onClick:()=>_(f),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${h===f?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:C},f))}),h==="models"&&e.jsx(ee,{me:k}),h==="pricing"&&x&&e.jsx(se,{me:k})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Playground-Ev-DpHvX.js": {
-              content: 'import{c as L,u as tt,a as D,j as t,d as Z,p as ke,B as ee,m as P,k as w,o as st}from"./index-C1Wgc1sf.js";import{r as o,L as at}from"./vendor-BbQ_LiY-.js";import{B as nt,S as rt}from"./send-BlMsmIhB.js";import{U as it}from"./user-a2FF8pEQ.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ot=L("AudioLines",[["path",{d:"M2 10v3",key:"1fnikh"}],["path",{d:"M6 6v11",key:"11sgs0"}],["path",{d:"M10 3v18",key:"yhl04a"}],["path",{d:"M14 8v7",key:"3a1oy3"}],["path",{d:"M18 5v13",key:"123xd1"}],["path",{d:"M22 10v3",key:"154ddg"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const lt=L("Eraser",[["path",{d:"m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21",key:"182aya"}],["path",{d:"M22 21H7",key:"t4ddhn"}],["path",{d:"m5 11 9 9",key:"1mo9qw"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ct=L("Image",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",ry:"2",key:"1m3agn"}],["circle",{cx:"9",cy:"9",r:"2",key:"af1f0g"}],["path",{d:"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21",key:"1xmnt7"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const dt=L("Square",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",key:"afitv7"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ut=L("Video",[["path",{d:"m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5",key:"ftymec"}],["rect",{x:"2",y:"6",width:"14",height:"12",rx:"2",key:"158x01"}]]),z=[{key:"chat",label:"\u5BF9\u8BDD",path:"/v1/chat/completions",icon:nt,hint:"OpenAI Chat Completions \xB7 \u6D41\u5F0F\u8F93\u51FA"},{key:"image",label:"\u56FE\u7247",path:"/v1/images/generations",icon:ct,hint:"OpenAI Images API \xB7 \u540C\u6B65\u8FD4\u56DE\u56FE\u7247"},{key:"video",label:"\u89C6\u9891",path:"/v1/videos/generations",icon:ut,hint:"\u5F02\u6B65\u4EFB\u52A1 \xB7 \u63D0\u4EA4\u540E\u81EA\u52A8\u8F6E\u8BE2\u5230\u5B8C\u6210"},{key:"audio",label:"\u97F3\u9891",path:"/v1/audio/speech",icon:ot,hint:"\u5185\u7F6E Edge TTS\uFF08\u514D\u8D39\uFF09\xB7 \u6587\u672C\u8F6C\u8BED\u97F3"}],xt={chat:"\u6682\u65E0\u53EF\u7528\u5BF9\u8BDD\u6A21\u578B",image:"\u5F53\u524D\u6CA1\u6709\u5206\u7C7B\u5230\u56FE\u7247\u7AEF\u70B9\u7684\u6A21\u578B\uFF08\u652F\u6301 agnes-image / Codex / ChatGPT / Duck.ai \u6E20\u9053\uFF09",video:"\u5F53\u524D\u6CA1\u6709\u53EF\u7528\u7684\u89C6\u9891\u6A21\u578B\uFF08\u652F\u6301 agnes-video \u7CFB\u5217\uFF09",audio:"\u97F3\u9891\u8D70\u5185\u7F6E Edge TTS\uFF0C\u4EFB\u610F\u8D26\u53F7\u53EF\u7528\uFF0C\u65E0\u9700\u9009\u62E9\u6A21\u578B"},S=()=>Math.random().toString(36).slice(2,10);function ft({me:te}){var fe,be,ye;const[_,Ne]=o.useState([]),[d,se]=o.useState("chat"),[p,ae]=o.useState(""),[ne,we]=o.useState(""),[F,Se]=o.useState(.7),[re,Ie]=o.useState(1024),[ie,Ce]=o.useState("1024x1024"),[oe,Me]=o.useState(1),[le,Pe]=o.useState("1280x720"),[ce,_e]=o.useState("5"),[U,Ee]=o.useState([]),[k,de]=o.useState("zh-CN-XiaoxiaoNeural"),[R,Te]=o.useState("+0%"),[J,ze]=o.useState("+0%"),[B,Ae]=o.useState("+0Hz"),[W,ue]=o.useState(!1),[Oe,$e]=o.useState(!1),[E,T]=o.useState([]),[H,A]=o.useState(""),[O,h]=o.useState(!1),[xe,Le]=o.useState([]),[f,me]=o.useState(""),[Ue,Re]=o.useState(!1),K=o.useRef(null),b=o.useRef(null),V=o.useRef(null),y=tt();o.useEffect(()=>{D("/api/playground/models").then(e=>{Ne(e.models);const r=e.models.find(s=>s.kind==="chat");ae(s=>s||(r?I(r):e.models[0]?I(e.models[0]):""))}).catch(e=>y(e.message,"err")),D("/api/playground/voices").then(e=>{Ee(e.voices||[]),de(r=>{var s,n;return r||((n=(s=e.voices)==null?void 0:s[0])==null?void 0:n.id)||"zh-CN-XiaoxiaoNeural"})}).catch(()=>{})},[]),o.useEffect(()=>{D("/api/keys").then(e=>{const r=e.keys.filter(a=>a.status==="active").sort((a,l)=>l.created_at-a.created_at);Le(r);const s=Date.now()/1e3,n=r.find(a=>(!a.expires_at||a.expires_at>s)&&(a.quota_usd===null||a.spent_usd<a.quota_usd));me(a=>{var l;return a||(n==null?void 0:n.id)||((l=r[0])==null?void 0:l.id)||""})}).catch(e=>y(e.message,"err")).finally(()=>Re(!0))},[]),o.useEffect(()=>{V.current&&(V.current.scrollTop=V.current.scrollHeight)},[E]),o.useEffect(()=>()=>{b.current&&window.clearInterval(b.current)},[]);const I=e=>`${e.slug}/${e.id}`,Ke=o.useMemo(()=>{const e=new Map;for(const s of _){const n=e.get(s.provider)||[];n.push(s),e.set(s.provider,n)}const r=[...e.entries()].map(([s,n])=>{const a=n.filter(c=>c.kind===d),l=n.filter(c=>c.kind!==d);return{prov:s,list:[...a,...l],recN:a.length}});return r.sort((s,n)=>(n.recN>0?1:0)-(s.recN>0?1:0)||s.prov.localeCompare(n.prov)),r.map(s=>[s.prov,s.list])},[_,d]),Ve=o.useMemo(()=>{const e=new Map;for(const r of U){const s=e.get(r.group)||[];s.push(r),e.set(r.group,s)}return[...e.entries()]},[U]),q=d!=="audio",$=_.find(e=>I(e)===p),qe=q&&!!$&&$.kind!==d,De=e=>{$e(!0),se(e)},Fe=e=>{var s;ae(e);const r=_.find(n=>I(n)===e);if(r&&r.kind!==d){if(Oe)return;se(r.kind),y(`\u5DF2\u81EA\u52A8\u5207\u6362\u5230\u300C${(s=z.find(n=>n.key===r.kind))==null?void 0:s.label}\u300D\u7AEF\u70B9`)}},pe=()=>{var e;(e=K.current)==null||e.abort(),K.current=null,b.current&&(window.clearInterval(b.current),b.current=null),h(!1)},Je=()=>{pe(),T([])},x=(e,r)=>T(s=>s.map(n=>n.id===e?r(n):n)),Be=async()=>{var e;if(!W){ue(!0);try{const r=await fetch("/api/playground/speech",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:"edge-tts",input:"\u4F60\u597D\uFF0C\u8FD9\u662F\u5F53\u524D\u97F3\u8272\u7684\u8BD5\u542C\u6548\u679C\u3002",voice:k,rate:R,volume:J,pitch:B,key_id:f})}),s=(r.headers.get("content-type")||"").toLowerCase();if(!r.ok||!s.startsWith("audio")){const l=await r.json().catch(()=>null);y(((e=l==null?void 0:l.error)==null?void 0:e.message)??"\u8BD5\u542C\u5931\u8D25","err");return}const n=await r.blob();new Audio(URL.createObjectURL(n)).play()}catch(r){y(r.message||"\u8BD5\u542C\u5931\u8D25","err")}finally{ue(!1)}}},We=e=>!e||O?!1:f?q&&!p?(y("\u8BF7\u5148\u9009\u62E9\u6A21\u578B","err"),!1):!0:(y("\u5F53\u524D\u8D26\u6237\u6CA1\u6709\u53EF\u7528\u7684 API Key\uFF0C\u8BF7\u5148\u5230\u300CAPI \u5BC6\u94A5\u300D\u9875\u521B\u5EFA","err"),!1),He=async e=>{var l,c,j,m;const r={id:S(),role:"user",endpoint:"chat",content:e},s=S(),n=[...E.filter(i=>i.endpoint==="chat"),r].map(i=>({role:i.role,content:i.content}));T(i=>[...i,r,{id:s,role:"assistant",endpoint:"chat",content:"",model:p}]),A(""),h(!0);const a=new AbortController;K.current=a;try{const i=await fetch("/api/playground/chat",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,messages:n,system:ne,temperature:F,max_tokens:re,stream:!0,key_id:f}),signal:a.signal});if(!i.ok){const C=await i.json().catch(()=>null);x(s,X=>{var M;return{...X,error:((M=C==null?void 0:C.error)==null?void 0:M.message)??`\u8BF7\u6C42\u5931\u8D25 (${i.status})`}});return}const u=(l=i.body)==null?void 0:l.getReader();if(!u)throw new Error("\u6D4F\u89C8\u5668\u4E0D\u652F\u6301\u6D41\u5F0F\u8BFB\u53D6");const N=new TextDecoder;let v="",G=0;for(;;){const{done:C,value:X}=await u.read();if(C)break;v+=N.decode(X,{stream:!0});let M=v.indexOf(`\n`);for(;M>=0;){const je=v.slice(0,M).trim();if(v=v.slice(M+1),je.startsWith("data:")){const Y=je.slice(5).trim();if(Y&&Y!=="[DONE]")try{const g=JSON.parse(Y),Q=(m=(j=(c=g==null?void 0:g.choices)==null?void 0:c[0])==null?void 0:j.delta)==null?void 0:m.content;typeof Q=="string"&&Q&&x(s,ve=>({...ve,content:ve.content+Q})),g!=null&&g.usage&&(G=typeof g.usage.total_tokens=="number"?g.usage.total_tokens:(g.usage.prompt_tokens||0)+(g.usage.completion_tokens||0))}catch{}}M=v.indexOf(`\n`)}}G&&x(s,C=>({...C,tokens:G}))}catch(i){i.name!=="AbortError"&&x(s,u=>({...u,error:i.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1),K.current=null}},Ge=async e=>{var n;const r={id:S(),role:"user",endpoint:"image",content:e},s=S();T(a=>[...a,r,{id:s,role:"assistant",endpoint:"image",content:"",model:p}]),A(""),h(!0);try{const a=await fetch("/api/playground/images",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,prompt:e,size:ie,n:oe,key_id:f})}),l=await a.json().catch(()=>null);if(!a.ok){x(s,i=>{var u;return{...i,error:((u=l==null?void 0:l.error)==null?void 0:u.message)??`\u8BF7\u6C42\u5931\u8D25 (${a.status})`}});return}const c=(n=l==null?void 0:l.data)==null?void 0:n[0],j=typeof(c==null?void 0:c.url)=="string"?c.url:"",m=typeof(c==null?void 0:c.b64_json)=="string"?c.b64_json:"";if(!j&&!m){x(s,i=>({...i,error:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u56FE\u7247\u6570\u636E"}));return}x(s,i=>({...i,mediaUrl:j||`data:image/png;base64,${m}`,mediaMime:"image",content:""}))}catch(a){x(s,l=>({...l,error:a.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1)}},Xe=async e=>{const r={id:S(),role:"user",endpoint:"video",content:e},s=S();T(n=>[...n,r,{id:s,role:"assistant",endpoint:"video",content:"",model:p,taskStatus:"\u63D0\u4EA4\u4E2D"}]),A(""),h(!0);try{const n=await fetch("/api/playground/videos",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,prompt:e,size:le,seconds:ce,key_id:f})}),a=await n.json().catch(()=>null);if(n.ok)x(s,m=>({...m,taskId:String((a==null?void 0:a.id)??""),taskStatus:String((a==null?void 0:a.status)??"queued"),taskProgress:Number(a==null?void 0:a.progress)||0}));else{const m=typeof(a==null?void 0:a.task_id)=="string"?a.task_id:"";if(!m){x(s,i=>{var u;return{...i,error:((u=a==null?void 0:a.error)==null?void 0:u.message)??`\u8BF7\u6C42\u5931\u8D25 (${n.status})`}});return}x(s,i=>{var u;return{...i,taskId:m,taskStatus:"queued",taskWaitingSlot:!0,error:(u=a==null?void 0:a.error)==null?void 0:u.message}})}const l=String((a==null?void 0:a.task_id)||(a==null?void 0:a.id)||"");if(!l)return;let c=0;const j=window.setInterval(async()=>{c++;try{const i=(await D(`/api/playground/videos/${l}`)).task||{};x(s,N=>({...N,taskId:l,taskStatus:String(i.status??N.taskStatus),taskProgress:Number(i.progress)||N.taskProgress||0,mediaUrl:typeof i.url=="string"&&i.url?i.url:N.mediaUrl}));const u=String(i.status);(u==="completed"||u==="failed"||u==="cancelled"||c>120)&&(b.current&&(window.clearInterval(b.current),b.current=null),(u==="failed"||u==="cancelled")&&x(s,N=>{var v;return{...N,error:((v=i==null?void 0:i.error)==null?void 0:v.message)||`\u4EFB\u52A1${u==="failed"?"\u5931\u8D25":"\u5DF2\u53D6\u6D88"}`}}),h(!1))}catch{}},5e3);b.current=j}catch(n){x(s,a=>({...a,error:n.message||"\u8BF7\u6C42\u5931\u8D25"})),h(!1)}},Ye=async e=>{const r={id:S(),role:"user",endpoint:"audio",content:e},s=S();T(n=>[...n,r,{id:s,role:"assistant",endpoint:"audio",content:""}]),A(""),h(!0);try{const n=await fetch("/api/playground/speech",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:"edge-tts",input:e,voice:k,rate:R,volume:J,pitch:B,key_id:f})}),a=(n.headers.get("content-type")||"").toLowerCase();if(!n.ok||!a.startsWith("audio")){const c=await n.json().catch(()=>null);x(s,j=>{var m;return{...j,error:((m=c==null?void 0:c.error)==null?void 0:m.message)??`\u8BF7\u6C42\u5931\u8D25 (${n.status})`}});return}const l=await n.blob();x(s,c=>({...c,mediaUrl:URL.createObjectURL(l),mediaMime:"audio",model:`${k} \xB7 ${R}`}))}catch(n){x(s,a=>({...a,error:n.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1)}},he=()=>{const e=H.trim();if(We(e))return d==="chat"?He(e):d==="image"?Ge(e):d==="video"?Xe(e):Ye(e)},Qe=async e=>{try{await navigator.clipboard.writeText(e),y("\u5DF2\u590D\u5236")}catch{y("\u590D\u5236\u5931\u8D25","err")}},Ze=d==="image"?"\u63CF\u8FF0\u4F60\u60F3\u751F\u6210\u7684\u56FE\u7247\u2026":d==="video"?"\u63CF\u8FF0\u4F60\u60F3\u751F\u6210\u7684\u89C6\u9891\u2026":d==="audio"?"\u8F93\u5165\u8981\u8F6C\u6210\u8BED\u97F3\u7684\u6587\u672C\u2026":"\u8F93\u5165\u5185\u5BB9\u2026",ge=E.some(e=>e.endpoint==="video"&&!!e.taskId&&!["completed","failed","cancelled"].includes(e.taskStatus||"")&&!e.error),et=ge?"\u751F\u6210\u4E2D\u2026":O?"\u5904\u7406\u4E2D\u2026":"\u53D1\u9001";return t.jsxs("div",{className:"flex flex-col gap-4",children:[t.jsx(Z,{className:"p-4 sm:p-5",children:t.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[t.jsxs("div",{className:"flex items-start gap-3",children:[t.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:t.jsx(ke,{size:18})}),t.jsxs("div",{children:[t.jsx("h1",{className:"text-base font-bold text-ink",children:"\u64CD\u7EC3\u573A"}),t.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u4F7F\u7528\u4F60\u8D26\u6237\u81EA\u5DF1\u7684 API Key \u8C03\u7528\uFF0C\u8D70\u7F51\u5173\u540C\u4E00\u5957\u8DEF\u7531\uFF1B\u6BCF\u5206\u949F\u6700\u591A 20 \u6B21\uFF0C\u4E0D\u8BA1\u91CF\u3002"})]})]}),t.jsx("div",{className:"flex items-center gap-2",children:t.jsxs(ee,{variant:"ghost",className:"h-9",onClick:Je,disabled:!E.length,children:[t.jsx(lt,{size:14})," \u6E05\u7A7A"]})})]})}),t.jsxs("div",{className:"grid gap-4 lg:grid-cols-[320px,1fr]",children:[t.jsx(Z,{className:"h-fit p-4",children:t.jsxs("div",{className:"space-y-3",children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"API \u7AEF\u70B9"}),t.jsx("div",{className:"grid grid-cols-4 gap-1 rounded-lg bg-surface2 p-1",children:z.map(e=>{const r=e.icon;return t.jsxs("button",{type:"button",title:e.hint,onClick:()=>De(e.key),className:P("inline-flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-[11px] font-medium transition-colors",d===e.key?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:[t.jsx(r,{size:14}),e.label]},e.key)})}),t.jsx("p",{className:"mt-1 font-mono text-[10px] text-muted",children:(fe=z.find(e=>e.key===d))==null?void 0:fe.path})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"API Key"}),xe.length>0?t.jsxs(t.Fragment,{children:[t.jsx(w,{value:f,onChange:e=>me(e.target.value),className:"w-full",children:xe.map(e=>t.jsxs("option",{value:e.id,children:[e.name," \xB7 ",e.prefix]},e.id))}),t.jsx("p",{className:"mt-1 text-[10px] text-muted",children:"\u53EA\u4F7F\u7528\u5F53\u524D\u8D26\u6237\u81EA\u5DF1\u540D\u4E0B\u7684 Key"})]}):t.jsx("div",{className:"rounded-lg border border-line bg-surface2 px-2.5 py-2 text-[11px] leading-relaxed text-muted",children:Ue?t.jsxs(t.Fragment,{children:["\u5F53\u524D\u8D26\u6237\u8FD8\u6CA1\u6709\u53EF\u7528\u7684 API Key\uFF0C\u8BF7\u5148\u5230"," ",t.jsx(at,{to:"/dashboard/keys",className:"font-medium text-brand hover:underline",children:"API \u5BC6\u94A5"})," ","\u9875\u521B\u5EFA\u3002"]}):"\u6B63\u5728\u8BFB\u53D6\u4F60\u7684 API Key\u2026"})]}),q?t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u6A21\u578B"}),_.length>0?t.jsxs(w,{value:p,onChange:e=>Fe(e.target.value),className:"w-full",children:[!_.some(e=>I(e)===p)&&t.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u6A21\u578B"}),Ke.map(([e,r])=>t.jsx("optgroup",{label:`${e}\uFF08${r.length}\uFF09`,children:r.map(s=>t.jsxs("option",{value:I(s),children:[s.kind===d?"\u2713 ":"",I(s),s.paid?"\uFF08\u4ED8\u8D39\uFF09":""]},`${s.slug}/${s.id}`))},e))]}):t.jsx("div",{className:"rounded-lg border border-line bg-surface2 px-2.5 py-2 text-[11px] text-muted",children:xt[d]}),t.jsx("p",{className:"mt-1 text-[10px] text-muted",children:qe?`\u5F53\u524D\u6A21\u578B\u5206\u7C7B\u5C5E\u4E8E\u300C${(be=z.find(e=>e.key===($==null?void 0:$.kind)))==null?void 0:be.label}\u300D\uFF0C\u5DF2\u6309\u4F60\u7684\u624B\u52A8\u9009\u62E9\u4FDD\u7559\u5728\u5F53\u524D\u7AEF\u70B9`:te.user.role==="superadmin"||te.user.role==="admin"?"\u7BA1\u7406\u5458\u53EF\u89C1\u5168\u90E8\u6A21\u578B\uFF08\u542B\u4ED8\u8D39\uFF09\uFF1B\u63A8\u8350\u7EC4\u4E3A\u8BE5\u7AEF\u70B9\u539F\u751F\u6A21\u578B":"\u666E\u901A\u7528\u6237\u4EC5\u663E\u793A\u514D\u8D39\u6A21\u578B"})]}):t.jsxs("div",{children:[t.jsxs("div",{className:"flex items-center justify-between",children:[t.jsxs("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:["\u97F3\u8272\uFF08",U.length," \u4E2A\uFF0C\u6309\u8BED\u8A00\u5206\u7EC4\uFF09"]}),t.jsx("button",{type:"button",className:"text-[11px] font-medium text-brand hover:underline disabled:opacity-50",disabled:W||!f,onClick:Be,children:W?"\u751F\u6210\u8BD5\u542C\u4E2D\u2026":"\u25B6 \u8BD5\u542C\u5F53\u524D\u97F3\u8272"})]}),t.jsxs(w,{value:k,onChange:e=>de(e.target.value),className:"w-full",children:[Ve.map(([e,r])=>t.jsx("optgroup",{label:e,children:r.map(s=>t.jsxs("option",{value:s.id,children:[s.label," \xB7 ",s.id.replace(/Neural$/,"")]},s.id))},e)),!U.some(e=>e.id===k)&&t.jsx("option",{value:k,children:k})]}),t.jsx("p",{className:"mt-1 font-mono text-[10px] text-muted",children:k}),t.jsxs("div",{className:"mt-2 grid grid-cols-3 gap-2",children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u8BED\u901F"}),t.jsx(w,{value:R,onChange:e=>Te(e.target.value),className:"w-full",children:["-50%","-25%","-10%","+0%","+10%","+25%","+50%","+100%"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u97F3\u91CF"}),t.jsx(w,{value:J,onChange:e=>ze(e.target.value),className:"w-full",children:["-50%","-25%","+0%","+25%","+50%"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u97F3\u8C03"}),t.jsx(w,{value:B,onChange:e=>Ae(e.target.value),className:"w-full",children:["-20%","-10%","+0%","+10%","+20%"].map(e=>t.jsx("option",{value:e,children:e},e))})]})]})]}),d==="chat"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u7CFB\u7EDF\u63D0\u793A\u8BCD\uFF08\u53EF\u9009\uFF09"}),t.jsx("textarea",{value:ne,onChange:e=>we(e.target.value),rows:3,placeholder:"\u4F8B\u5982\uFF1A\u4F60\u662F\u4E00\u4E2A\u7B80\u6D01\u7684\u52A9\u624B\uFF0C\u56DE\u7B54\u4E0D\u8D85\u8FC7\u4E09\u53E5\u8BDD\u3002",className:"w-full resize-y rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]}),t.jsxs("div",{className:"flex items-center justify-between gap-2",children:[t.jsx("label",{className:"text-[11px] font-medium text-muted",children:"\u6E29\u5EA6"}),t.jsx("span",{className:"font-mono text-[11px] text-ink",children:F.toFixed(1)})]}),t.jsx("input",{type:"range",min:0,max:2,step:.1,value:F,onChange:e=>Se(Number(e.target.value)),className:"w-full accent-brand"}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u6700\u5927\u8F93\u51FA tokens"}),t.jsx("input",{type:"number",min:16,max:8192,value:re,onChange:e=>Ie(Math.max(16,Math.min(8192,Number(e.target.value)||1024))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]}),d==="image"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5C3A\u5BF8"}),t.jsx(w,{value:ie,onChange:e=>Ce(e.target.value),className:"w-full",children:["1024x1024","1024x1792","1792x1024","512x512","768x768"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5F20\u6570"}),t.jsx("input",{type:"number",min:1,max:4,value:oe,onChange:e=>Me(Math.max(1,Math.min(4,Number(e.target.value)||1))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]}),d==="video"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5C3A\u5BF8"}),t.jsx(w,{value:le,onChange:e=>Pe(e.target.value),className:"w-full",children:["1280x720","720x1280","1024x1024"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u65F6\u957F\uFF08\u79D2\uFF09"}),t.jsx("input",{type:"number",min:1,max:60,value:ce,onChange:e=>_e(String(Math.max(1,Math.min(60,Number(e.target.value)||5)))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]})]})}),t.jsxs(Z,{className:"flex min-h-[520px] flex-col overflow-hidden",children:[t.jsx("div",{ref:V,className:"flex-1 space-y-3 overflow-y-auto p-4",children:E.length===0?t.jsxs("div",{className:"flex h-full flex-col items-center justify-center gap-2 py-16 text-center",children:[t.jsx(ke,{size:30,className:"text-muted"}),t.jsx("p",{className:"text-[13px] text-muted",children:d==="chat"?"\u9009\u4E2A\u6A21\u578B\uFF0C\u968F\u4FBF\u95EE\u70B9\u4EC0\u4E48":`\u8BD5\u8BD5${(ye=z.find(e=>e.key===d))==null?void 0:ye.label}\u751F\u6210`}),t.jsx("p",{className:"text-[11px] text-muted",children:"Enter \u53D1\u9001 \xB7 Shift + Enter \u6362\u884C"})]}):E.map(e=>t.jsxs("div",{className:P("flex gap-2.5",e.role==="user"&&"flex-row-reverse"),children:[t.jsx("div",{className:P("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full",e.role==="user"?"bg-brand/15 text-brand":"bg-surface2 text-muted"),children:e.role==="user"?t.jsx(it,{size:14}):(()=>{var s;const r=(s=z.find(n=>n.key===e.endpoint))==null?void 0:s.icon;return r?t.jsx(r,{size:14}):null})()}),t.jsxs("div",{className:P("max-w-[85%] space-y-1",e.role==="user"&&"text-right"),children:[t.jsxs("div",{className:P("inline-block whitespace-pre-wrap break-words rounded-xl2 px-3.5 py-2.5 text-left text-[13px] leading-relaxed",e.role==="user"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.mediaMime==="image"&&e.mediaUrl&&t.jsx("img",{src:e.mediaUrl,alt:"\u751F\u6210\u7ED3\u679C",className:"max-h-80 rounded-lg border border-line"}),e.mediaMime==="video"&&e.mediaUrl&&t.jsx("video",{src:e.mediaUrl,controls:!0,className:"max-h-80 rounded-lg border border-line"}),e.mediaMime==="audio"&&e.mediaUrl&&t.jsx("audio",{src:e.mediaUrl,controls:!0,className:"w-72"}),e.content&&t.jsx("span",{children:e.content||(O?"\u2026":"")}),e.taskId&&t.jsxs("span",{className:"mt-1 flex items-center gap-2 text-[11px] text-muted",children:["\u4EFB\u52A1 ",e.taskId.slice(0,14),"\u2026",t.jsx("span",{className:P("rounded px-1 py-0.5 text-[10px]",e.taskStatus==="completed"?"bg-emerald-500/10 text-emerald-500":e.taskStatus==="failed"||e.taskStatus==="cancelled"?"bg-red-500/10 text-red-500":"bg-amber-500/10 text-amber-500"),children:e.taskWaitingSlot?"\u5F85\u63D0\u4EA4":e.taskStatus==="in_progress"?"\u751F\u6210\u4E2D":e.taskStatus==="queued"?"\u6392\u961F\u4E2D":e.taskStatus}),typeof e.taskProgress=="number"&&e.taskProgress>0&&e.taskStatus!=="completed"&&t.jsxs("span",{className:"font-mono",children:[Math.round(e.taskProgress),"%"]})]}),e.error&&t.jsx("span",{className:"mt-1 block text-[11px] text-err",children:e.error})]}),t.jsxs("div",{className:P("flex items-center gap-2 text-[10px] text-muted",e.role==="user"&&"justify-end"),children:[e.role==="assistant"&&e.model&&t.jsx("span",{children:e.model}),e.role==="assistant"&&e.tokens?t.jsxs("span",{children:[e.tokens," tokens"]}):null,e.content&&t.jsxs("button",{type:"button",className:"hover:text-ink",onClick:()=>Qe(e.content),children:[t.jsx(st,{size:10,className:"mr-0.5 inline"}),"\u590D\u5236"]})]})]})]},e.id))}),t.jsx("div",{className:"border-t border-line p-3",children:t.jsxs("div",{className:"flex items-end gap-2",children:[t.jsx("textarea",{value:H,onChange:e=>A(e.target.value),onKeyDown:e=>{e.key==="Enter"&&!e.shiftKey&&!e.nativeEvent.isComposing&&e.keyCode!==229&&(e.preventDefault(),he())},rows:2,placeholder:Ze,className:"max-h-40 min-h-[46px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink outline-none focus:border-brand/60"}),O&&d==="chat"?t.jsxs(ee,{variant:"danger",className:"h-11",onClick:pe,children:[t.jsx(dt,{size:14})," \u505C\u6B62"]}):t.jsxs(ee,{className:"h-11",onClick:he,disabled:!H.trim()||!f||O||ge||q&&!p,children:[t.jsx(rt,{size:14})," ",et]})]})})]})]})]})}\n',
+            "/assets/Playground-C1lpUxDf.js": {
+              content: 'import{c as L,u as tt,a as D,j as t,d as Z,p as ke,B as ee,m as P,k as w,o as st}from"./index-KwMGOJkp.js";import{r as o,L as at}from"./vendor-BbQ_LiY-.js";import{B as nt,S as rt}from"./send-BqPM7u0p.js";import{U as it}from"./user-C2AHuWH0.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ot=L("AudioLines",[["path",{d:"M2 10v3",key:"1fnikh"}],["path",{d:"M6 6v11",key:"11sgs0"}],["path",{d:"M10 3v18",key:"yhl04a"}],["path",{d:"M14 8v7",key:"3a1oy3"}],["path",{d:"M18 5v13",key:"123xd1"}],["path",{d:"M22 10v3",key:"154ddg"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const lt=L("Eraser",[["path",{d:"m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21",key:"182aya"}],["path",{d:"M22 21H7",key:"t4ddhn"}],["path",{d:"m5 11 9 9",key:"1mo9qw"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ct=L("Image",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",ry:"2",key:"1m3agn"}],["circle",{cx:"9",cy:"9",r:"2",key:"af1f0g"}],["path",{d:"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21",key:"1xmnt7"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const dt=L("Square",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",key:"afitv7"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ut=L("Video",[["path",{d:"m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5",key:"ftymec"}],["rect",{x:"2",y:"6",width:"14",height:"12",rx:"2",key:"158x01"}]]),z=[{key:"chat",label:"\u5BF9\u8BDD",path:"/v1/chat/completions",icon:nt,hint:"OpenAI Chat Completions \xB7 \u6D41\u5F0F\u8F93\u51FA"},{key:"image",label:"\u56FE\u7247",path:"/v1/images/generations",icon:ct,hint:"OpenAI Images API \xB7 \u540C\u6B65\u8FD4\u56DE\u56FE\u7247"},{key:"video",label:"\u89C6\u9891",path:"/v1/videos/generations",icon:ut,hint:"\u5F02\u6B65\u4EFB\u52A1 \xB7 \u63D0\u4EA4\u540E\u81EA\u52A8\u8F6E\u8BE2\u5230\u5B8C\u6210"},{key:"audio",label:"\u97F3\u9891",path:"/v1/audio/speech",icon:ot,hint:"\u5185\u7F6E Edge TTS\uFF08\u514D\u8D39\uFF09\xB7 \u6587\u672C\u8F6C\u8BED\u97F3"}],xt={chat:"\u6682\u65E0\u53EF\u7528\u5BF9\u8BDD\u6A21\u578B",image:"\u5F53\u524D\u6CA1\u6709\u5206\u7C7B\u5230\u56FE\u7247\u7AEF\u70B9\u7684\u6A21\u578B\uFF08\u652F\u6301 agnes-image / Codex / ChatGPT / Duck.ai \u6E20\u9053\uFF09",video:"\u5F53\u524D\u6CA1\u6709\u53EF\u7528\u7684\u89C6\u9891\u6A21\u578B\uFF08\u652F\u6301 agnes-video \u7CFB\u5217\uFF09",audio:"\u97F3\u9891\u8D70\u5185\u7F6E Edge TTS\uFF0C\u4EFB\u610F\u8D26\u53F7\u53EF\u7528\uFF0C\u65E0\u9700\u9009\u62E9\u6A21\u578B"},S=()=>Math.random().toString(36).slice(2,10);function ft({me:te}){var fe,be,ye;const[_,Ne]=o.useState([]),[d,se]=o.useState("chat"),[p,ae]=o.useState(""),[ne,we]=o.useState(""),[F,Se]=o.useState(.7),[re,Ie]=o.useState(1024),[ie,Ce]=o.useState("1024x1024"),[oe,Me]=o.useState(1),[le,Pe]=o.useState("1280x720"),[ce,_e]=o.useState("5"),[U,Ee]=o.useState([]),[k,de]=o.useState("zh-CN-XiaoxiaoNeural"),[R,Te]=o.useState("+0%"),[J,ze]=o.useState("+0%"),[B,Ae]=o.useState("+0Hz"),[W,ue]=o.useState(!1),[Oe,$e]=o.useState(!1),[E,T]=o.useState([]),[H,A]=o.useState(""),[O,h]=o.useState(!1),[xe,Le]=o.useState([]),[f,me]=o.useState(""),[Ue,Re]=o.useState(!1),K=o.useRef(null),b=o.useRef(null),V=o.useRef(null),y=tt();o.useEffect(()=>{D("/api/playground/models").then(e=>{Ne(e.models);const r=e.models.find(s=>s.kind==="chat");ae(s=>s||(r?I(r):e.models[0]?I(e.models[0]):""))}).catch(e=>y(e.message,"err")),D("/api/playground/voices").then(e=>{Ee(e.voices||[]),de(r=>{var s,n;return r||((n=(s=e.voices)==null?void 0:s[0])==null?void 0:n.id)||"zh-CN-XiaoxiaoNeural"})}).catch(()=>{})},[]),o.useEffect(()=>{D("/api/keys").then(e=>{const r=e.keys.filter(a=>a.status==="active").sort((a,l)=>l.created_at-a.created_at);Le(r);const s=Date.now()/1e3,n=r.find(a=>(!a.expires_at||a.expires_at>s)&&(a.quota_usd===null||a.spent_usd<a.quota_usd));me(a=>{var l;return a||(n==null?void 0:n.id)||((l=r[0])==null?void 0:l.id)||""})}).catch(e=>y(e.message,"err")).finally(()=>Re(!0))},[]),o.useEffect(()=>{V.current&&(V.current.scrollTop=V.current.scrollHeight)},[E]),o.useEffect(()=>()=>{b.current&&window.clearInterval(b.current)},[]);const I=e=>`${e.slug}/${e.id}`,Ke=o.useMemo(()=>{const e=new Map;for(const s of _){const n=e.get(s.provider)||[];n.push(s),e.set(s.provider,n)}const r=[...e.entries()].map(([s,n])=>{const a=n.filter(c=>c.kind===d),l=n.filter(c=>c.kind!==d);return{prov:s,list:[...a,...l],recN:a.length}});return r.sort((s,n)=>(n.recN>0?1:0)-(s.recN>0?1:0)||s.prov.localeCompare(n.prov)),r.map(s=>[s.prov,s.list])},[_,d]),Ve=o.useMemo(()=>{const e=new Map;for(const r of U){const s=e.get(r.group)||[];s.push(r),e.set(r.group,s)}return[...e.entries()]},[U]),q=d!=="audio",$=_.find(e=>I(e)===p),qe=q&&!!$&&$.kind!==d,De=e=>{$e(!0),se(e)},Fe=e=>{var s;ae(e);const r=_.find(n=>I(n)===e);if(r&&r.kind!==d){if(Oe)return;se(r.kind),y(`\u5DF2\u81EA\u52A8\u5207\u6362\u5230\u300C${(s=z.find(n=>n.key===r.kind))==null?void 0:s.label}\u300D\u7AEF\u70B9`)}},pe=()=>{var e;(e=K.current)==null||e.abort(),K.current=null,b.current&&(window.clearInterval(b.current),b.current=null),h(!1)},Je=()=>{pe(),T([])},x=(e,r)=>T(s=>s.map(n=>n.id===e?r(n):n)),Be=async()=>{var e;if(!W){ue(!0);try{const r=await fetch("/api/playground/speech",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:"edge-tts",input:"\u4F60\u597D\uFF0C\u8FD9\u662F\u5F53\u524D\u97F3\u8272\u7684\u8BD5\u542C\u6548\u679C\u3002",voice:k,rate:R,volume:J,pitch:B,key_id:f})}),s=(r.headers.get("content-type")||"").toLowerCase();if(!r.ok||!s.startsWith("audio")){const l=await r.json().catch(()=>null);y(((e=l==null?void 0:l.error)==null?void 0:e.message)??"\u8BD5\u542C\u5931\u8D25","err");return}const n=await r.blob();new Audio(URL.createObjectURL(n)).play()}catch(r){y(r.message||"\u8BD5\u542C\u5931\u8D25","err")}finally{ue(!1)}}},We=e=>!e||O?!1:f?q&&!p?(y("\u8BF7\u5148\u9009\u62E9\u6A21\u578B","err"),!1):!0:(y("\u5F53\u524D\u8D26\u6237\u6CA1\u6709\u53EF\u7528\u7684 API Key\uFF0C\u8BF7\u5148\u5230\u300CAPI \u5BC6\u94A5\u300D\u9875\u521B\u5EFA","err"),!1),He=async e=>{var l,c,j,m;const r={id:S(),role:"user",endpoint:"chat",content:e},s=S(),n=[...E.filter(i=>i.endpoint==="chat"),r].map(i=>({role:i.role,content:i.content}));T(i=>[...i,r,{id:s,role:"assistant",endpoint:"chat",content:"",model:p}]),A(""),h(!0);const a=new AbortController;K.current=a;try{const i=await fetch("/api/playground/chat",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,messages:n,system:ne,temperature:F,max_tokens:re,stream:!0,key_id:f}),signal:a.signal});if(!i.ok){const C=await i.json().catch(()=>null);x(s,X=>{var M;return{...X,error:((M=C==null?void 0:C.error)==null?void 0:M.message)??`\u8BF7\u6C42\u5931\u8D25 (${i.status})`}});return}const u=(l=i.body)==null?void 0:l.getReader();if(!u)throw new Error("\u6D4F\u89C8\u5668\u4E0D\u652F\u6301\u6D41\u5F0F\u8BFB\u53D6");const N=new TextDecoder;let v="",G=0;for(;;){const{done:C,value:X}=await u.read();if(C)break;v+=N.decode(X,{stream:!0});let M=v.indexOf(`\n`);for(;M>=0;){const je=v.slice(0,M).trim();if(v=v.slice(M+1),je.startsWith("data:")){const Y=je.slice(5).trim();if(Y&&Y!=="[DONE]")try{const g=JSON.parse(Y),Q=(m=(j=(c=g==null?void 0:g.choices)==null?void 0:c[0])==null?void 0:j.delta)==null?void 0:m.content;typeof Q=="string"&&Q&&x(s,ve=>({...ve,content:ve.content+Q})),g!=null&&g.usage&&(G=typeof g.usage.total_tokens=="number"?g.usage.total_tokens:(g.usage.prompt_tokens||0)+(g.usage.completion_tokens||0))}catch{}}M=v.indexOf(`\n`)}}G&&x(s,C=>({...C,tokens:G}))}catch(i){i.name!=="AbortError"&&x(s,u=>({...u,error:i.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1),K.current=null}},Ge=async e=>{var n;const r={id:S(),role:"user",endpoint:"image",content:e},s=S();T(a=>[...a,r,{id:s,role:"assistant",endpoint:"image",content:"",model:p}]),A(""),h(!0);try{const a=await fetch("/api/playground/images",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,prompt:e,size:ie,n:oe,key_id:f})}),l=await a.json().catch(()=>null);if(!a.ok){x(s,i=>{var u;return{...i,error:((u=l==null?void 0:l.error)==null?void 0:u.message)??`\u8BF7\u6C42\u5931\u8D25 (${a.status})`}});return}const c=(n=l==null?void 0:l.data)==null?void 0:n[0],j=typeof(c==null?void 0:c.url)=="string"?c.url:"",m=typeof(c==null?void 0:c.b64_json)=="string"?c.b64_json:"";if(!j&&!m){x(s,i=>({...i,error:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u56FE\u7247\u6570\u636E"}));return}x(s,i=>({...i,mediaUrl:j||`data:image/png;base64,${m}`,mediaMime:"image",content:""}))}catch(a){x(s,l=>({...l,error:a.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1)}},Xe=async e=>{const r={id:S(),role:"user",endpoint:"video",content:e},s=S();T(n=>[...n,r,{id:s,role:"assistant",endpoint:"video",content:"",model:p,taskStatus:"\u63D0\u4EA4\u4E2D"}]),A(""),h(!0);try{const n=await fetch("/api/playground/videos",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,prompt:e,size:le,seconds:ce,key_id:f})}),a=await n.json().catch(()=>null);if(n.ok)x(s,m=>({...m,taskId:String((a==null?void 0:a.id)??""),taskStatus:String((a==null?void 0:a.status)??"queued"),taskProgress:Number(a==null?void 0:a.progress)||0}));else{const m=typeof(a==null?void 0:a.task_id)=="string"?a.task_id:"";if(!m){x(s,i=>{var u;return{...i,error:((u=a==null?void 0:a.error)==null?void 0:u.message)??`\u8BF7\u6C42\u5931\u8D25 (${n.status})`}});return}x(s,i=>{var u;return{...i,taskId:m,taskStatus:"queued",taskWaitingSlot:!0,error:(u=a==null?void 0:a.error)==null?void 0:u.message}})}const l=String((a==null?void 0:a.task_id)||(a==null?void 0:a.id)||"");if(!l)return;let c=0;const j=window.setInterval(async()=>{c++;try{const i=(await D(`/api/playground/videos/${l}`)).task||{};x(s,N=>({...N,taskId:l,taskStatus:String(i.status??N.taskStatus),taskProgress:Number(i.progress)||N.taskProgress||0,mediaUrl:typeof i.url=="string"&&i.url?i.url:N.mediaUrl}));const u=String(i.status);(u==="completed"||u==="failed"||u==="cancelled"||c>120)&&(b.current&&(window.clearInterval(b.current),b.current=null),(u==="failed"||u==="cancelled")&&x(s,N=>{var v;return{...N,error:((v=i==null?void 0:i.error)==null?void 0:v.message)||`\u4EFB\u52A1${u==="failed"?"\u5931\u8D25":"\u5DF2\u53D6\u6D88"}`}}),h(!1))}catch{}},5e3);b.current=j}catch(n){x(s,a=>({...a,error:n.message||"\u8BF7\u6C42\u5931\u8D25"})),h(!1)}},Ye=async e=>{const r={id:S(),role:"user",endpoint:"audio",content:e},s=S();T(n=>[...n,r,{id:s,role:"assistant",endpoint:"audio",content:""}]),A(""),h(!0);try{const n=await fetch("/api/playground/speech",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:"edge-tts",input:e,voice:k,rate:R,volume:J,pitch:B,key_id:f})}),a=(n.headers.get("content-type")||"").toLowerCase();if(!n.ok||!a.startsWith("audio")){const c=await n.json().catch(()=>null);x(s,j=>{var m;return{...j,error:((m=c==null?void 0:c.error)==null?void 0:m.message)??`\u8BF7\u6C42\u5931\u8D25 (${n.status})`}});return}const l=await n.blob();x(s,c=>({...c,mediaUrl:URL.createObjectURL(l),mediaMime:"audio",model:`${k} \xB7 ${R}`}))}catch(n){x(s,a=>({...a,error:n.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1)}},he=()=>{const e=H.trim();if(We(e))return d==="chat"?He(e):d==="image"?Ge(e):d==="video"?Xe(e):Ye(e)},Qe=async e=>{try{await navigator.clipboard.writeText(e),y("\u5DF2\u590D\u5236")}catch{y("\u590D\u5236\u5931\u8D25","err")}},Ze=d==="image"?"\u63CF\u8FF0\u4F60\u60F3\u751F\u6210\u7684\u56FE\u7247\u2026":d==="video"?"\u63CF\u8FF0\u4F60\u60F3\u751F\u6210\u7684\u89C6\u9891\u2026":d==="audio"?"\u8F93\u5165\u8981\u8F6C\u6210\u8BED\u97F3\u7684\u6587\u672C\u2026":"\u8F93\u5165\u5185\u5BB9\u2026",ge=E.some(e=>e.endpoint==="video"&&!!e.taskId&&!["completed","failed","cancelled"].includes(e.taskStatus||"")&&!e.error),et=ge?"\u751F\u6210\u4E2D\u2026":O?"\u5904\u7406\u4E2D\u2026":"\u53D1\u9001";return t.jsxs("div",{className:"flex flex-col gap-4",children:[t.jsx(Z,{className:"p-4 sm:p-5",children:t.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[t.jsxs("div",{className:"flex items-start gap-3",children:[t.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:t.jsx(ke,{size:18})}),t.jsxs("div",{children:[t.jsx("h1",{className:"text-base font-bold text-ink",children:"\u64CD\u7EC3\u573A"}),t.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u4F7F\u7528\u4F60\u8D26\u6237\u81EA\u5DF1\u7684 API Key \u8C03\u7528\uFF0C\u8D70\u7F51\u5173\u540C\u4E00\u5957\u8DEF\u7531\uFF1B\u6BCF\u5206\u949F\u6700\u591A 20 \u6B21\uFF0C\u4E0D\u8BA1\u91CF\u3002"})]})]}),t.jsx("div",{className:"flex items-center gap-2",children:t.jsxs(ee,{variant:"ghost",className:"h-9",onClick:Je,disabled:!E.length,children:[t.jsx(lt,{size:14})," \u6E05\u7A7A"]})})]})}),t.jsxs("div",{className:"grid gap-4 lg:grid-cols-[320px,1fr]",children:[t.jsx(Z,{className:"h-fit p-4",children:t.jsxs("div",{className:"space-y-3",children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"API \u7AEF\u70B9"}),t.jsx("div",{className:"grid grid-cols-4 gap-1 rounded-lg bg-surface2 p-1",children:z.map(e=>{const r=e.icon;return t.jsxs("button",{type:"button",title:e.hint,onClick:()=>De(e.key),className:P("inline-flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-[11px] font-medium transition-colors",d===e.key?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:[t.jsx(r,{size:14}),e.label]},e.key)})}),t.jsx("p",{className:"mt-1 font-mono text-[10px] text-muted",children:(fe=z.find(e=>e.key===d))==null?void 0:fe.path})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"API Key"}),xe.length>0?t.jsxs(t.Fragment,{children:[t.jsx(w,{value:f,onChange:e=>me(e.target.value),className:"w-full",children:xe.map(e=>t.jsxs("option",{value:e.id,children:[e.name," \xB7 ",e.prefix]},e.id))}),t.jsx("p",{className:"mt-1 text-[10px] text-muted",children:"\u53EA\u4F7F\u7528\u5F53\u524D\u8D26\u6237\u81EA\u5DF1\u540D\u4E0B\u7684 Key"})]}):t.jsx("div",{className:"rounded-lg border border-line bg-surface2 px-2.5 py-2 text-[11px] leading-relaxed text-muted",children:Ue?t.jsxs(t.Fragment,{children:["\u5F53\u524D\u8D26\u6237\u8FD8\u6CA1\u6709\u53EF\u7528\u7684 API Key\uFF0C\u8BF7\u5148\u5230"," ",t.jsx(at,{to:"/dashboard/keys",className:"font-medium text-brand hover:underline",children:"API \u5BC6\u94A5"})," ","\u9875\u521B\u5EFA\u3002"]}):"\u6B63\u5728\u8BFB\u53D6\u4F60\u7684 API Key\u2026"})]}),q?t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u6A21\u578B"}),_.length>0?t.jsxs(w,{value:p,onChange:e=>Fe(e.target.value),className:"w-full",children:[!_.some(e=>I(e)===p)&&t.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u6A21\u578B"}),Ke.map(([e,r])=>t.jsx("optgroup",{label:`${e}\uFF08${r.length}\uFF09`,children:r.map(s=>t.jsxs("option",{value:I(s),children:[s.kind===d?"\u2713 ":"",I(s),s.paid?"\uFF08\u4ED8\u8D39\uFF09":""]},`${s.slug}/${s.id}`))},e))]}):t.jsx("div",{className:"rounded-lg border border-line bg-surface2 px-2.5 py-2 text-[11px] text-muted",children:xt[d]}),t.jsx("p",{className:"mt-1 text-[10px] text-muted",children:qe?`\u5F53\u524D\u6A21\u578B\u5206\u7C7B\u5C5E\u4E8E\u300C${(be=z.find(e=>e.key===($==null?void 0:$.kind)))==null?void 0:be.label}\u300D\uFF0C\u5DF2\u6309\u4F60\u7684\u624B\u52A8\u9009\u62E9\u4FDD\u7559\u5728\u5F53\u524D\u7AEF\u70B9`:te.user.role==="superadmin"||te.user.role==="admin"?"\u7BA1\u7406\u5458\u53EF\u89C1\u5168\u90E8\u6A21\u578B\uFF08\u542B\u4ED8\u8D39\uFF09\uFF1B\u63A8\u8350\u7EC4\u4E3A\u8BE5\u7AEF\u70B9\u539F\u751F\u6A21\u578B":"\u666E\u901A\u7528\u6237\u4EC5\u663E\u793A\u514D\u8D39\u6A21\u578B"})]}):t.jsxs("div",{children:[t.jsxs("div",{className:"flex items-center justify-between",children:[t.jsxs("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:["\u97F3\u8272\uFF08",U.length," \u4E2A\uFF0C\u6309\u8BED\u8A00\u5206\u7EC4\uFF09"]}),t.jsx("button",{type:"button",className:"text-[11px] font-medium text-brand hover:underline disabled:opacity-50",disabled:W||!f,onClick:Be,children:W?"\u751F\u6210\u8BD5\u542C\u4E2D\u2026":"\u25B6 \u8BD5\u542C\u5F53\u524D\u97F3\u8272"})]}),t.jsxs(w,{value:k,onChange:e=>de(e.target.value),className:"w-full",children:[Ve.map(([e,r])=>t.jsx("optgroup",{label:e,children:r.map(s=>t.jsxs("option",{value:s.id,children:[s.label," \xB7 ",s.id.replace(/Neural$/,"")]},s.id))},e)),!U.some(e=>e.id===k)&&t.jsx("option",{value:k,children:k})]}),t.jsx("p",{className:"mt-1 font-mono text-[10px] text-muted",children:k}),t.jsxs("div",{className:"mt-2 grid grid-cols-3 gap-2",children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u8BED\u901F"}),t.jsx(w,{value:R,onChange:e=>Te(e.target.value),className:"w-full",children:["-50%","-25%","-10%","+0%","+10%","+25%","+50%","+100%"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u97F3\u91CF"}),t.jsx(w,{value:J,onChange:e=>ze(e.target.value),className:"w-full",children:["-50%","-25%","+0%","+25%","+50%"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u97F3\u8C03"}),t.jsx(w,{value:B,onChange:e=>Ae(e.target.value),className:"w-full",children:["-20%","-10%","+0%","+10%","+20%"].map(e=>t.jsx("option",{value:e,children:e},e))})]})]})]}),d==="chat"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u7CFB\u7EDF\u63D0\u793A\u8BCD\uFF08\u53EF\u9009\uFF09"}),t.jsx("textarea",{value:ne,onChange:e=>we(e.target.value),rows:3,placeholder:"\u4F8B\u5982\uFF1A\u4F60\u662F\u4E00\u4E2A\u7B80\u6D01\u7684\u52A9\u624B\uFF0C\u56DE\u7B54\u4E0D\u8D85\u8FC7\u4E09\u53E5\u8BDD\u3002",className:"w-full resize-y rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]}),t.jsxs("div",{className:"flex items-center justify-between gap-2",children:[t.jsx("label",{className:"text-[11px] font-medium text-muted",children:"\u6E29\u5EA6"}),t.jsx("span",{className:"font-mono text-[11px] text-ink",children:F.toFixed(1)})]}),t.jsx("input",{type:"range",min:0,max:2,step:.1,value:F,onChange:e=>Se(Number(e.target.value)),className:"w-full accent-brand"}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u6700\u5927\u8F93\u51FA tokens"}),t.jsx("input",{type:"number",min:16,max:8192,value:re,onChange:e=>Ie(Math.max(16,Math.min(8192,Number(e.target.value)||1024))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]}),d==="image"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5C3A\u5BF8"}),t.jsx(w,{value:ie,onChange:e=>Ce(e.target.value),className:"w-full",children:["1024x1024","1024x1792","1792x1024","512x512","768x768"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5F20\u6570"}),t.jsx("input",{type:"number",min:1,max:4,value:oe,onChange:e=>Me(Math.max(1,Math.min(4,Number(e.target.value)||1))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]}),d==="video"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5C3A\u5BF8"}),t.jsx(w,{value:le,onChange:e=>Pe(e.target.value),className:"w-full",children:["1280x720","720x1280","1024x1024"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u65F6\u957F\uFF08\u79D2\uFF09"}),t.jsx("input",{type:"number",min:1,max:60,value:ce,onChange:e=>_e(String(Math.max(1,Math.min(60,Number(e.target.value)||5)))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]})]})}),t.jsxs(Z,{className:"flex min-h-[520px] flex-col overflow-hidden",children:[t.jsx("div",{ref:V,className:"flex-1 space-y-3 overflow-y-auto p-4",children:E.length===0?t.jsxs("div",{className:"flex h-full flex-col items-center justify-center gap-2 py-16 text-center",children:[t.jsx(ke,{size:30,className:"text-muted"}),t.jsx("p",{className:"text-[13px] text-muted",children:d==="chat"?"\u9009\u4E2A\u6A21\u578B\uFF0C\u968F\u4FBF\u95EE\u70B9\u4EC0\u4E48":`\u8BD5\u8BD5${(ye=z.find(e=>e.key===d))==null?void 0:ye.label}\u751F\u6210`}),t.jsx("p",{className:"text-[11px] text-muted",children:"Enter \u53D1\u9001 \xB7 Shift + Enter \u6362\u884C"})]}):E.map(e=>t.jsxs("div",{className:P("flex gap-2.5",e.role==="user"&&"flex-row-reverse"),children:[t.jsx("div",{className:P("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full",e.role==="user"?"bg-brand/15 text-brand":"bg-surface2 text-muted"),children:e.role==="user"?t.jsx(it,{size:14}):(()=>{var s;const r=(s=z.find(n=>n.key===e.endpoint))==null?void 0:s.icon;return r?t.jsx(r,{size:14}):null})()}),t.jsxs("div",{className:P("max-w-[85%] space-y-1",e.role==="user"&&"text-right"),children:[t.jsxs("div",{className:P("inline-block whitespace-pre-wrap break-words rounded-xl2 px-3.5 py-2.5 text-left text-[13px] leading-relaxed",e.role==="user"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.mediaMime==="image"&&e.mediaUrl&&t.jsx("img",{src:e.mediaUrl,alt:"\u751F\u6210\u7ED3\u679C",className:"max-h-80 rounded-lg border border-line"}),e.mediaMime==="video"&&e.mediaUrl&&t.jsx("video",{src:e.mediaUrl,controls:!0,className:"max-h-80 rounded-lg border border-line"}),e.mediaMime==="audio"&&e.mediaUrl&&t.jsx("audio",{src:e.mediaUrl,controls:!0,className:"w-72"}),e.content&&t.jsx("span",{children:e.content||(O?"\u2026":"")}),e.taskId&&t.jsxs("span",{className:"mt-1 flex items-center gap-2 text-[11px] text-muted",children:["\u4EFB\u52A1 ",e.taskId.slice(0,14),"\u2026",t.jsx("span",{className:P("rounded px-1 py-0.5 text-[10px]",e.taskStatus==="completed"?"bg-emerald-500/10 text-emerald-500":e.taskStatus==="failed"||e.taskStatus==="cancelled"?"bg-red-500/10 text-red-500":"bg-amber-500/10 text-amber-500"),children:e.taskWaitingSlot?"\u5F85\u63D0\u4EA4":e.taskStatus==="in_progress"?"\u751F\u6210\u4E2D":e.taskStatus==="queued"?"\u6392\u961F\u4E2D":e.taskStatus}),typeof e.taskProgress=="number"&&e.taskProgress>0&&e.taskStatus!=="completed"&&t.jsxs("span",{className:"font-mono",children:[Math.round(e.taskProgress),"%"]})]}),e.error&&t.jsx("span",{className:"mt-1 block text-[11px] text-err",children:e.error})]}),t.jsxs("div",{className:P("flex items-center gap-2 text-[10px] text-muted",e.role==="user"&&"justify-end"),children:[e.role==="assistant"&&e.model&&t.jsx("span",{children:e.model}),e.role==="assistant"&&e.tokens?t.jsxs("span",{children:[e.tokens," tokens"]}):null,e.content&&t.jsxs("button",{type:"button",className:"hover:text-ink",onClick:()=>Qe(e.content),children:[t.jsx(st,{size:10,className:"mr-0.5 inline"}),"\u590D\u5236"]})]})]})]},e.id))}),t.jsx("div",{className:"border-t border-line p-3",children:t.jsxs("div",{className:"flex items-end gap-2",children:[t.jsx("textarea",{value:H,onChange:e=>A(e.target.value),onKeyDown:e=>{e.key==="Enter"&&!e.shiftKey&&!e.nativeEvent.isComposing&&e.keyCode!==229&&(e.preventDefault(),he())},rows:2,placeholder:Ze,className:"max-h-40 min-h-[46px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink outline-none focus:border-brand/60"}),O&&d==="chat"?t.jsxs(ee,{variant:"danger",className:"h-11",onClick:pe,children:[t.jsx(dt,{size:14})," \u505C\u6B62"]}):t.jsxs(ee,{className:"h-11",onClick:he,disabled:!H.trim()||!f||O||ge||q&&!p,children:[t.jsx(rt,{size:14})," ",et]})]})})]})]})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Profile-DJoYjjFw.js": {
-              content: 'import{c as K,u as H,j as e,d as U,B as u,m as f,E as J,s as V,e as F,F as m,I as p,k as W,a as j,K as Q}from"./index-C1Wgc1sf.js";import{r as l}from"./vendor-BbQ_LiY-.js";import{R as _}from"./refresh-cw-g67Iczt4.js";import{P as X}from"./plus-sJaeYLjc.js";import{M as q}from"./message-square-CuYbKyMO.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Y=K("Camera",[["path",{d:"M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z",key:"1tc9qg"}],["circle",{cx:"12",cy:"13",r:"3",key:"1vg3eu"}]]),Z={pending:{label:"\u5F85\u5BA1\u6838",cls:"bg-amber-500/10 text-amber-500"},approved:{label:"\u5DF2\u901A\u8FC7",cls:"bg-emerald-500/10 text-emerald-500"},rejected:{label:"\u5DF2\u9A73\u56DE",cls:"bg-red-500/10 text-red-500"}},G=r=>r?new Date(r*1e3).toLocaleString("zh-CN",{hour12:!1}):"\u2014";function ee({meEmail:r}){const[k,w]=l.useState(null),[P,R]=l.useState(!1),[E,N]=l.useState(!1),[T,z]=l.useState(!1),[n,C]=l.useState(null),[c,y]=l.useState(""),[L,A]=l.useState(!1),[h,M]=l.useState(""),[o,$]=l.useState({}),x=H(),[t,g]=l.useState({name:"",slug:"",baseUrl:"",kind:"openai_compat",authScheme:"bearer",key:"",password:""}),S=async(s=!1)=>{s||R(!0);try{const i=await j("/api/user/providers");w(i.submissions||[])}catch(i){s||x(i.message,"err")}finally{s||R(!1)}};l.useEffect(()=>{S()},[]);const a=async()=>{const s=t;if(!s.name.trim()||!s.slug.trim()||!s.baseUrl.trim()||!s.password)return x("\u540D\u79F0 / \u6807\u8BC6\u7B26 / Base URL / \u8D26\u6237\u5BC6\u7801 \u5747\u5FC5\u586B","err");z(!0);try{await j("/api/user/providers","POST",{...s}),x("\u5DF2\u63D0\u4EA4\uFF0C\u7B49\u5F85\u8D85\u7EA7\u7BA1\u7406\u5458\u5BA1\u6838","ok"),N(!1),g({name:"",slug:"",baseUrl:"",kind:"openai_compat",authScheme:"bearer",key:"",password:""}),await S(!0)}catch(i){x(i.message,"err")}finally{z(!1)}},d=async s=>{const i=s.submissionId||"form";M(i);try{const v=await j("/api/user/providers/test","POST",s);$(I=>({...I,[i]:v.result})),v.result.ok||x(v.result.message,"err")}catch(v){x(v.message,"err")}finally{M("")}},b=async s=>{try{const i=await j(`/api/user/providers/${s.id}/messages`);C({sub:s,messages:i.messages||[]})}catch(i){x(i.message,"err")}},O=async()=>{if(!(!n||!c.trim())){A(!0);try{await j(`/api/user/providers/${n.sub.id}/messages`,"POST",{content:c.trim()}),y("");const s=await j(`/api/user/providers/${n.sub.id}/messages`);C({sub:n.sub,messages:s.messages||[]})}catch(s){x(s.message,"err")}finally{A(!1)}}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx(U,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{children:[e.jsx("h2",{className:"text-sm font-semibold",children:"\u6211\u7684\u4F9B\u5E94\u5546"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u63D0\u4EA4\u9700\u6821\u9A8C\u8D26\u6237\u5BC6\u7801\uFF1B\u63D0\u4EA4\u540E\u8FDB\u5165\u5F85\u5BA1\u6838\u72B6\u6001\uFF0C\u4E0D\u53EF\u81EA\u884C\u4FEE\u6539\u6216\u5220\u9664\u3002\u9700\u8981\u8C03\u6574\u65F6\u901A\u8FC7\u7AD9\u5185\u4FE1\u8054\u7CFB\u7BA1\u7406\u5458\u3002"})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs(u,{variant:"soft",className:"h-9",onClick:()=>void S(!0),disabled:P,children:[e.jsx(_,{size:14,className:f(P&&"animate-spin")}),P?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs(u,{className:"h-9",onClick:()=>N(!0),children:[e.jsx(X,{size:14}),"\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546"]})]})]})}),k===null?e.jsx(U,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):k.length===0?e.jsx(U,{children:e.jsx(J,{icon:e.jsx(V,{size:32}),title:"\u8FD8\u6CA1\u6709\u63D0\u4EA4\u8FC7\u4F9B\u5E94\u5546",hint:"\u70B9\u53F3\u4E0A\u89D2\u300C\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546\u300D\uFF0C\u5BA1\u6838\u901A\u8FC7\u540E\u4F1A\u51FA\u73B0\u5728\u5168\u7AD9\u6E20\u9053\u5217\u8868\u4E2D\u3002"})}):k.map(s=>{const i=Z[s.status];return e.jsxs(U,{className:"p-4",children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-sm font-semibold text-ink",children:s.name}),e.jsx("code",{className:"rounded bg-line px-1.5 py-0.5 text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:f("rounded px-1.5 py-0.5 text-[10px] font-medium",i.cls),children:i.label})]}),e.jsx("div",{className:"mt-1 truncate text-[11px] text-muted font-mono",children:s.baseUrl}),s.status==="rejected"&&s.rejectionReason&&e.jsxs("div",{className:"mt-1.5 rounded-lg bg-red-500/10 px-2.5 py-1.5 text-[11px] text-err",children:["\u9A73\u56DE\u539F\u56E0\uFF1A",s.rejectionReason]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-[10px] text-muted",children:G(s.createdAt)}),s.status==="pending"&&e.jsxs(u,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:h===s.id,onClick:()=>void d({submissionId:s.id}),children:[e.jsx(_,{size:12,className:f(h===s.id&&"animate-spin")}),h===s.id?"\u6D4B\u8BD5\u4E2D\u2026":"\u6D4B\u8BD5\u8FDE\u901A"]}),e.jsxs(u,{variant:"soft",className:"!h-7 !px-2 text-[11px]",onClick:()=>void b(s),children:[e.jsx(q,{size:12}),"\u5F80\u6765\u6D88\u606F"]})]})]}),o[s.id]&&e.jsxs("div",{className:f("mt-2 rounded-lg px-2.5 py-1.5 text-[11px]",o[s.id].ok?"bg-emerald-500/10 text-emerald-500":"bg-red-500/10 text-err"),children:["\u8FDE\u901A\u6D4B\u8BD5\uFF1A",o[s.id].message]})]},s.id)}),e.jsx(F,{open:E,onClose:()=>N(!1),title:"\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546\uFF08\u5BA1\u6838\u5236\uFF09",width:520,children:e.jsxs("div",{className:"space-y-3",children:[e.jsx(m,{label:"\u4F9B\u5E94\u5546\u540D\u79F0",children:e.jsx(p,{value:t.name,onChange:s=>g({...t,name:s.target.value}),placeholder:"\u4F8B\u5982\uFF1A\u6211\u7684 OpenAI \u4E2D\u8F6C"})}),e.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[e.jsx(m,{label:"\u6E20\u9053\u6807\u8BC6\u7B26\uFF08slug\uFF09",children:e.jsx(p,{value:t.slug,onChange:s=>g({...t,slug:s.target.value.toLowerCase()}),placeholder:"my-openai-relay"})}),e.jsx(m,{label:"\u6E20\u9053\u7C7B\u578B",children:e.jsxs(W,{value:t.kind,onChange:s=>g({...t,kind:s.target.value}),className:"w-full",children:[e.jsx("option",{value:"openai_compat",children:"OpenAI \u517C\u5BB9"}),e.jsx("option",{value:"anthropic",children:"Anthropic \u539F\u751F"})]})})]}),e.jsx(m,{label:"Base URL",children:e.jsx(p,{value:t.baseUrl,onChange:s=>g({...t,baseUrl:s.target.value}),placeholder:"https://api.example.com/v1"})}),e.jsx(m,{label:"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u53EF\u9009\uFF0C\u5BA1\u6838\u901A\u8FC7\u540E\u7531\u7BA1\u7406\u5458\u5F55\u5165\uFF09",children:e.jsx(p,{type:"password",value:t.key,onChange:s=>g({...t,key:s.target.value}),placeholder:"sk-\u2026"})}),e.jsx(m,{label:"\u8D26\u6237\u5BC6\u7801\uFF08\u654F\u611F\u64CD\u4F5C\u6821\u9A8C\uFF09",hint:"\u63D0\u4EA4\u5C5E\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u9A8C\u8BC1\u4F60\u7684\u767B\u5F55\u5BC6\u7801",children:e.jsx(p,{type:"password",value:t.password,onChange:s=>g({...t,password:s.target.value}),autoComplete:"current-password"})}),o.form&&e.jsxs("div",{className:f("rounded-lg px-2.5 py-1.5 text-[11px]",o.form.ok?"bg-emerald-500/10 text-emerald-500":"bg-red-500/10 text-err"),children:["\u8FDE\u901A\u6D4B\u8BD5\uFF1A",o.form.message]}),e.jsxs("div",{className:"flex items-center justify-between gap-2 pt-1",children:[e.jsxs(u,{variant:"soft",className:"h-9",disabled:h==="form"||!t.baseUrl.trim(),onClick:()=>void d({baseUrl:t.baseUrl,kind:t.kind,authScheme:t.authScheme,key:t.key}),title:"\u7528\u5F53\u524D\u8868\u5355\u7684\u5730\u5740\u4E0E\u5BC6\u94A5\u8BBF\u95EE\u4E0A\u6E38 /models\uFF0C\u9A8C\u8BC1\u80FD\u5426\u8FDE\u901A",children:[e.jsx(_,{size:13,className:f(h==="form"&&"animate-spin")}),h==="form"?"\u6D4B\u8BD5\u4E2D\u2026":"\u6D4B\u8BD5\u8FDE\u901A"]}),e.jsxs("div",{className:"flex gap-2",children:[e.jsx(u,{variant:"ghost",onClick:()=>N(!1),children:"\u53D6\u6D88"}),e.jsx(u,{onClick:()=>void a(),disabled:T,children:T?"\u63D0\u4EA4\u4E2D\u2026":"\u63D0\u4EA4\u5BA1\u6838"})]})]})]})}),e.jsxs(F,{open:!!n,onClose:()=>C(null),title:`\u5F80\u6765\u6D88\u606F \xB7 ${(n==null?void 0:n.sub.name)??""}`,width:560,children:[e.jsxs("div",{className:"max-h-[46vh] space-y-2.5 overflow-y-auto pr-1",children:[((n==null?void 0:n.messages)||[]).length===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u6682\u65E0\u6D88\u606F"}),((n==null?void 0:n.messages)||[]).map(s=>e.jsx("div",{className:f("flex",s.fromRole==="user"?"justify-end":"justify-start"),children:e.jsxs("div",{className:f("max-w-[80%] rounded-xl2 px-3 py-2 text-[12px] leading-relaxed",s.fromRole==="user"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.jsxs("div",{className:f("mb-1 text-[10px]",s.fromRole==="user"?"text-white/70":"text-muted"),children:[s.fromRole==="admin"?"\u7BA1\u7406\u5458":r," \xB7 ",G(s.createdAt)]}),e.jsx("div",{className:"whitespace-pre-wrap break-words",children:s.content})]})},s.id))]}),e.jsxs("div",{className:"mt-3 flex items-end gap-2 border-t border-line pt-3",children:[e.jsx("textarea",{value:c,onChange:s=>y(s.target.value),rows:2,placeholder:"\u7ED9\u7BA1\u7406\u5458\u7559\u8A00\uFF08\u5982\u9700\u4FEE\u6539\u5DF2\u63D0\u4EA4\u7684\u4FE1\u606F\uFF0C\u8BF7\u8BF4\u660E\u5185\u5BB9\uFF09\u2026",className:"max-h-28 min-h-[44px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs(u,{className:"h-11",disabled:L||!c.trim(),onClick:()=>void O(),children:[e.jsx(q,{size:14}),L?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001"]})]})]})]})}function ie({me:r,onRefresh:k}){var S;const[w,P]=l.useState("profile"),R=r.user.role==="superadmin",[E,N]=l.useState(r.nickname??""),[T,z]=l.useState(r.bio??""),[n,C]=l.useState(r.avatarUrl??""),[c,y]=l.useState({old:"",next:"",confirm:""}),[L,A]=l.useState(!1),[h,M]=l.useState(!1),o=H();l.useEffect(()=>{N(r.nickname??""),z(r.bio??""),C(r.avatarUrl??"")},[r]);const $=async()=>{A(!0);try{await j("/api/user/profile","PATCH",{nickname:E,bio:T}),o("\u8D44\u6599\u5DF2\u4FDD\u5B58"),k()}catch(a){o(a.message,"err")}finally{A(!1)}},x=a=>new Promise((d,b)=>{const O=URL.createObjectURL(a),s=new Image;s.onload=()=>{URL.revokeObjectURL(O);const v=Math.min(1,256/Math.max(s.width,s.height)),I=Math.max(1,Math.round(s.width*v)),D=Math.max(1,Math.round(s.height*v)),B=document.createElement("canvas");B.width=I,B.height=D,B.getContext("2d").drawImage(s,0,0,I,D),d(B.toDataURL("image/png"))},s.onerror=()=>{URL.revokeObjectURL(O),b(new Error("\u65E0\u6CD5\u8BFB\u53D6\u8BE5\u56FE\u7247\uFF0C\u8BF7\u6362\u4E00\u5F20\uFF08\u652F\u6301 JPG/PNG/WebP\uFF09"))},s.src=O}),t=async a=>{try{const d=await x(a),b=await j("/api/user/profile","POST",{dataBase64:d});C(b.avatarUrl),o("\u5934\u50CF\u5DF2\u66F4\u65B0"),k()}catch(d){o(d.message,"err")}},g=async()=>{if(c.next!==c.confirm)return o("\u4E24\u6B21\u8F93\u5165\u7684\u65B0\u5BC6\u7801\u4E0D\u4E00\u81F4","err");M(!0);try{const a=await j("/api/user/profile","PUT",{oldPassword:c.old,newPassword:c.next});o(a.message??"\u5BC6\u7801\u5DF2\u66F4\u65B0"),y({old:"",next:"",confirm:""})}catch(a){o(a.message,"err")}finally{M(!1)}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["profile","\u4E2A\u4EBA\u8D44\u6599"],["password","\u4FEE\u6539\u5BC6\u7801"],...R?[]:[["providers","\u6211\u7684\u4F9B\u5E94\u5546"]]].map(([a,d])=>e.jsx("button",{role:"tab","aria-selected":w===a,onClick:()=>P(a),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${w===a?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:d},a))}),w==="profile"&&e.jsxs(U,{className:"p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u4E2A\u4EBA\u8D44\u6599"}),e.jsx("p",{className:"mb-5 text-xs text-muted",children:"\u6635\u79F0\u4E0E\u4ECB\u7ECD\u4F1A\u5C55\u793A\u5728\u4F60\u7684\u8D26\u53F7\u4FE1\u606F\u4E2D\u3002"}),e.jsxs("div",{className:"flex items-center gap-5",children:[e.jsxs("label",{className:"group relative cursor-pointer",children:[e.jsx("span",{className:"flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-brand/15 text-xl font-semibold text-brand",children:n?e.jsx("img",{src:n,alt:"\u5934\u50CF",className:"h-full w-full object-cover"}):(S=r.user.email[0])==null?void 0:S.toUpperCase()}),e.jsx("span",{className:"absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity group-hover:opacity-100",children:e.jsx(Y,{size:18,className:"text-white"})}),e.jsx("input",{type:"file",accept:"image/png,image/jpeg,image/webp,image/svg+xml",className:"hidden",onChange:a=>{var b;const d=(b=a.target.files)==null?void 0:b[0];d&&t(d)}})]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-sm font-semibold",children:r.user.email}),e.jsxs("div",{className:"text-xs text-muted",children:["\u89D2\u8272\uFF1A",r.user.role," \xB7 \u70B9\u51FB\u5934\u50CF\u66F4\u6362\uFF08\u81EA\u52A8\u538B\u7F29\u4E3A 256\xD7256\uFF09"]})]})]}),e.jsxs("div",{className:"mt-5 grid gap-3 sm:grid-cols-2",children:[e.jsx(m,{label:"\u6635\u79F0\uFF08\u6700\u957F 32 \u5B57\uFF09",children:e.jsx(p,{value:E,onChange:a=>N(a.target.value),placeholder:"\u672A\u8BBE\u7F6E"})}),e.jsx(m,{label:"\u6CE8\u518C\u90AE\u7BB1\uFF08\u4E0D\u53EF\u4FEE\u6539\uFF09",children:e.jsx(p,{value:r.user.email,disabled:!0})}),e.jsx("div",{className:"sm:col-span-2",children:e.jsx(m,{label:"\u4E2A\u4EBA\u4ECB\u7ECD\uFF08\u6700\u957F 200 \u5B57\uFF09",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:3,value:T,onChange:a=>z(a.target.value),placeholder:"\u4ECB\u7ECD\u4E00\u4E0B\u81EA\u5DF1\u2026"})})})]}),e.jsx("div",{className:"mt-4",children:e.jsx(u,{disabled:L,onClick:$,children:L?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u8D44\u6599"})})]}),w==="providers"&&!R&&e.jsx(ee,{meEmail:r.user.email}),w==="password"&&e.jsxs(U,{className:"p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(Q,{size:15}),"\u4FEE\u6539\u5BC6\u7801"]}),e.jsx("p",{className:"mb-5 text-xs text-muted",children:"\u4FEE\u6539\u6210\u529F\u540E\u5176\u4ED6\u8BBE\u5907\u5C06\u9000\u51FA\u767B\u5F55\uFF0C\u5F53\u524D\u4F1A\u8BDD\u4FDD\u6301\u3002"}),e.jsxs("div",{className:"grid gap-3 sm:grid-cols-3",children:[e.jsx(m,{label:"\u5F53\u524D\u5BC6\u7801",children:e.jsx(p,{type:"password",value:c.old,onChange:a=>y({...c,old:a.target.value}),autoComplete:"current-password"})}),e.jsx(m,{label:"\u65B0\u5BC6\u7801\uFF08\u81F3\u5C11 10 \u4F4D\uFF09",children:e.jsx(p,{type:"password",value:c.next,onChange:a=>y({...c,next:a.target.value}),autoComplete:"new-password"})}),e.jsx(m,{label:"\u786E\u8BA4\u65B0\u5BC6\u7801",children:e.jsx(p,{type:"password",value:c.confirm,onChange:a=>y({...c,confirm:a.target.value}),autoComplete:"new-password"})})]}),e.jsx("div",{className:"mt-4",children:e.jsx(u,{disabled:h,onClick:g,children:h?"\u63D0\u4EA4\u4E2D\u2026":"\u4FEE\u6539\u5BC6\u7801"})})]})]})}\n',
+            "/assets/Profile-BxTu0tlP.js": {
+              content: 'import{c as K,u as H,j as e,d as U,B as u,m as f,E as J,s as V,e as F,F as m,I as p,k as W,a as j,K as Q}from"./index-KwMGOJkp.js";import{r as l}from"./vendor-BbQ_LiY-.js";import{R as _}from"./refresh-cw-BrzRfQC6.js";import{P as X}from"./plus-DVAh7yAY.js";import{M as q}from"./message-square-CrX_4GgU.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Y=K("Camera",[["path",{d:"M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z",key:"1tc9qg"}],["circle",{cx:"12",cy:"13",r:"3",key:"1vg3eu"}]]),Z={pending:{label:"\u5F85\u5BA1\u6838",cls:"bg-amber-500/10 text-amber-500"},approved:{label:"\u5DF2\u901A\u8FC7",cls:"bg-emerald-500/10 text-emerald-500"},rejected:{label:"\u5DF2\u9A73\u56DE",cls:"bg-red-500/10 text-red-500"}},G=r=>r?new Date(r*1e3).toLocaleString("zh-CN",{hour12:!1}):"\u2014";function ee({meEmail:r}){const[k,w]=l.useState(null),[P,R]=l.useState(!1),[E,N]=l.useState(!1),[T,z]=l.useState(!1),[n,C]=l.useState(null),[c,y]=l.useState(""),[L,A]=l.useState(!1),[h,M]=l.useState(""),[o,$]=l.useState({}),x=H(),[t,g]=l.useState({name:"",slug:"",baseUrl:"",kind:"openai_compat",authScheme:"bearer",key:"",password:""}),S=async(s=!1)=>{s||R(!0);try{const i=await j("/api/user/providers");w(i.submissions||[])}catch(i){s||x(i.message,"err")}finally{s||R(!1)}};l.useEffect(()=>{S()},[]);const a=async()=>{const s=t;if(!s.name.trim()||!s.slug.trim()||!s.baseUrl.trim()||!s.password)return x("\u540D\u79F0 / \u6807\u8BC6\u7B26 / Base URL / \u8D26\u6237\u5BC6\u7801 \u5747\u5FC5\u586B","err");z(!0);try{await j("/api/user/providers","POST",{...s}),x("\u5DF2\u63D0\u4EA4\uFF0C\u7B49\u5F85\u8D85\u7EA7\u7BA1\u7406\u5458\u5BA1\u6838","ok"),N(!1),g({name:"",slug:"",baseUrl:"",kind:"openai_compat",authScheme:"bearer",key:"",password:""}),await S(!0)}catch(i){x(i.message,"err")}finally{z(!1)}},d=async s=>{const i=s.submissionId||"form";M(i);try{const v=await j("/api/user/providers/test","POST",s);$(I=>({...I,[i]:v.result})),v.result.ok||x(v.result.message,"err")}catch(v){x(v.message,"err")}finally{M("")}},b=async s=>{try{const i=await j(`/api/user/providers/${s.id}/messages`);C({sub:s,messages:i.messages||[]})}catch(i){x(i.message,"err")}},O=async()=>{if(!(!n||!c.trim())){A(!0);try{await j(`/api/user/providers/${n.sub.id}/messages`,"POST",{content:c.trim()}),y("");const s=await j(`/api/user/providers/${n.sub.id}/messages`);C({sub:n.sub,messages:s.messages||[]})}catch(s){x(s.message,"err")}finally{A(!1)}}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx(U,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{children:[e.jsx("h2",{className:"text-sm font-semibold",children:"\u6211\u7684\u4F9B\u5E94\u5546"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u63D0\u4EA4\u9700\u6821\u9A8C\u8D26\u6237\u5BC6\u7801\uFF1B\u63D0\u4EA4\u540E\u8FDB\u5165\u5F85\u5BA1\u6838\u72B6\u6001\uFF0C\u4E0D\u53EF\u81EA\u884C\u4FEE\u6539\u6216\u5220\u9664\u3002\u9700\u8981\u8C03\u6574\u65F6\u901A\u8FC7\u7AD9\u5185\u4FE1\u8054\u7CFB\u7BA1\u7406\u5458\u3002"})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs(u,{variant:"soft",className:"h-9",onClick:()=>void S(!0),disabled:P,children:[e.jsx(_,{size:14,className:f(P&&"animate-spin")}),P?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs(u,{className:"h-9",onClick:()=>N(!0),children:[e.jsx(X,{size:14}),"\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546"]})]})]})}),k===null?e.jsx(U,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):k.length===0?e.jsx(U,{children:e.jsx(J,{icon:e.jsx(V,{size:32}),title:"\u8FD8\u6CA1\u6709\u63D0\u4EA4\u8FC7\u4F9B\u5E94\u5546",hint:"\u70B9\u53F3\u4E0A\u89D2\u300C\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546\u300D\uFF0C\u5BA1\u6838\u901A\u8FC7\u540E\u4F1A\u51FA\u73B0\u5728\u5168\u7AD9\u6E20\u9053\u5217\u8868\u4E2D\u3002"})}):k.map(s=>{const i=Z[s.status];return e.jsxs(U,{className:"p-4",children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-sm font-semibold text-ink",children:s.name}),e.jsx("code",{className:"rounded bg-line px-1.5 py-0.5 text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:f("rounded px-1.5 py-0.5 text-[10px] font-medium",i.cls),children:i.label})]}),e.jsx("div",{className:"mt-1 truncate text-[11px] text-muted font-mono",children:s.baseUrl}),s.status==="rejected"&&s.rejectionReason&&e.jsxs("div",{className:"mt-1.5 rounded-lg bg-red-500/10 px-2.5 py-1.5 text-[11px] text-err",children:["\u9A73\u56DE\u539F\u56E0\uFF1A",s.rejectionReason]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-[10px] text-muted",children:G(s.createdAt)}),s.status==="pending"&&e.jsxs(u,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:h===s.id,onClick:()=>void d({submissionId:s.id}),children:[e.jsx(_,{size:12,className:f(h===s.id&&"animate-spin")}),h===s.id?"\u6D4B\u8BD5\u4E2D\u2026":"\u6D4B\u8BD5\u8FDE\u901A"]}),e.jsxs(u,{variant:"soft",className:"!h-7 !px-2 text-[11px]",onClick:()=>void b(s),children:[e.jsx(q,{size:12}),"\u5F80\u6765\u6D88\u606F"]})]})]}),o[s.id]&&e.jsxs("div",{className:f("mt-2 rounded-lg px-2.5 py-1.5 text-[11px]",o[s.id].ok?"bg-emerald-500/10 text-emerald-500":"bg-red-500/10 text-err"),children:["\u8FDE\u901A\u6D4B\u8BD5\uFF1A",o[s.id].message]})]},s.id)}),e.jsx(F,{open:E,onClose:()=>N(!1),title:"\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546\uFF08\u5BA1\u6838\u5236\uFF09",width:520,children:e.jsxs("div",{className:"space-y-3",children:[e.jsx(m,{label:"\u4F9B\u5E94\u5546\u540D\u79F0",children:e.jsx(p,{value:t.name,onChange:s=>g({...t,name:s.target.value}),placeholder:"\u4F8B\u5982\uFF1A\u6211\u7684 OpenAI \u4E2D\u8F6C"})}),e.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[e.jsx(m,{label:"\u6E20\u9053\u6807\u8BC6\u7B26\uFF08slug\uFF09",children:e.jsx(p,{value:t.slug,onChange:s=>g({...t,slug:s.target.value.toLowerCase()}),placeholder:"my-openai-relay"})}),e.jsx(m,{label:"\u6E20\u9053\u7C7B\u578B",children:e.jsxs(W,{value:t.kind,onChange:s=>g({...t,kind:s.target.value}),className:"w-full",children:[e.jsx("option",{value:"openai_compat",children:"OpenAI \u517C\u5BB9"}),e.jsx("option",{value:"anthropic",children:"Anthropic \u539F\u751F"})]})})]}),e.jsx(m,{label:"Base URL",children:e.jsx(p,{value:t.baseUrl,onChange:s=>g({...t,baseUrl:s.target.value}),placeholder:"https://api.example.com/v1"})}),e.jsx(m,{label:"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u53EF\u9009\uFF0C\u5BA1\u6838\u901A\u8FC7\u540E\u7531\u7BA1\u7406\u5458\u5F55\u5165\uFF09",children:e.jsx(p,{type:"password",value:t.key,onChange:s=>g({...t,key:s.target.value}),placeholder:"sk-\u2026"})}),e.jsx(m,{label:"\u8D26\u6237\u5BC6\u7801\uFF08\u654F\u611F\u64CD\u4F5C\u6821\u9A8C\uFF09",hint:"\u63D0\u4EA4\u5C5E\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u9A8C\u8BC1\u4F60\u7684\u767B\u5F55\u5BC6\u7801",children:e.jsx(p,{type:"password",value:t.password,onChange:s=>g({...t,password:s.target.value}),autoComplete:"current-password"})}),o.form&&e.jsxs("div",{className:f("rounded-lg px-2.5 py-1.5 text-[11px]",o.form.ok?"bg-emerald-500/10 text-emerald-500":"bg-red-500/10 text-err"),children:["\u8FDE\u901A\u6D4B\u8BD5\uFF1A",o.form.message]}),e.jsxs("div",{className:"flex items-center justify-between gap-2 pt-1",children:[e.jsxs(u,{variant:"soft",className:"h-9",disabled:h==="form"||!t.baseUrl.trim(),onClick:()=>void d({baseUrl:t.baseUrl,kind:t.kind,authScheme:t.authScheme,key:t.key}),title:"\u7528\u5F53\u524D\u8868\u5355\u7684\u5730\u5740\u4E0E\u5BC6\u94A5\u8BBF\u95EE\u4E0A\u6E38 /models\uFF0C\u9A8C\u8BC1\u80FD\u5426\u8FDE\u901A",children:[e.jsx(_,{size:13,className:f(h==="form"&&"animate-spin")}),h==="form"?"\u6D4B\u8BD5\u4E2D\u2026":"\u6D4B\u8BD5\u8FDE\u901A"]}),e.jsxs("div",{className:"flex gap-2",children:[e.jsx(u,{variant:"ghost",onClick:()=>N(!1),children:"\u53D6\u6D88"}),e.jsx(u,{onClick:()=>void a(),disabled:T,children:T?"\u63D0\u4EA4\u4E2D\u2026":"\u63D0\u4EA4\u5BA1\u6838"})]})]})]})}),e.jsxs(F,{open:!!n,onClose:()=>C(null),title:`\u5F80\u6765\u6D88\u606F \xB7 ${(n==null?void 0:n.sub.name)??""}`,width:560,children:[e.jsxs("div",{className:"max-h-[46vh] space-y-2.5 overflow-y-auto pr-1",children:[((n==null?void 0:n.messages)||[]).length===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u6682\u65E0\u6D88\u606F"}),((n==null?void 0:n.messages)||[]).map(s=>e.jsx("div",{className:f("flex",s.fromRole==="user"?"justify-end":"justify-start"),children:e.jsxs("div",{className:f("max-w-[80%] rounded-xl2 px-3 py-2 text-[12px] leading-relaxed",s.fromRole==="user"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.jsxs("div",{className:f("mb-1 text-[10px]",s.fromRole==="user"?"text-white/70":"text-muted"),children:[s.fromRole==="admin"?"\u7BA1\u7406\u5458":r," \xB7 ",G(s.createdAt)]}),e.jsx("div",{className:"whitespace-pre-wrap break-words",children:s.content})]})},s.id))]}),e.jsxs("div",{className:"mt-3 flex items-end gap-2 border-t border-line pt-3",children:[e.jsx("textarea",{value:c,onChange:s=>y(s.target.value),rows:2,placeholder:"\u7ED9\u7BA1\u7406\u5458\u7559\u8A00\uFF08\u5982\u9700\u4FEE\u6539\u5DF2\u63D0\u4EA4\u7684\u4FE1\u606F\uFF0C\u8BF7\u8BF4\u660E\u5185\u5BB9\uFF09\u2026",className:"max-h-28 min-h-[44px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs(u,{className:"h-11",disabled:L||!c.trim(),onClick:()=>void O(),children:[e.jsx(q,{size:14}),L?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001"]})]})]})]})}function ie({me:r,onRefresh:k}){var S;const[w,P]=l.useState("profile"),R=r.user.role==="superadmin",[E,N]=l.useState(r.nickname??""),[T,z]=l.useState(r.bio??""),[n,C]=l.useState(r.avatarUrl??""),[c,y]=l.useState({old:"",next:"",confirm:""}),[L,A]=l.useState(!1),[h,M]=l.useState(!1),o=H();l.useEffect(()=>{N(r.nickname??""),z(r.bio??""),C(r.avatarUrl??"")},[r]);const $=async()=>{A(!0);try{await j("/api/user/profile","PATCH",{nickname:E,bio:T}),o("\u8D44\u6599\u5DF2\u4FDD\u5B58"),k()}catch(a){o(a.message,"err")}finally{A(!1)}},x=a=>new Promise((d,b)=>{const O=URL.createObjectURL(a),s=new Image;s.onload=()=>{URL.revokeObjectURL(O);const v=Math.min(1,256/Math.max(s.width,s.height)),I=Math.max(1,Math.round(s.width*v)),D=Math.max(1,Math.round(s.height*v)),B=document.createElement("canvas");B.width=I,B.height=D,B.getContext("2d").drawImage(s,0,0,I,D),d(B.toDataURL("image/png"))},s.onerror=()=>{URL.revokeObjectURL(O),b(new Error("\u65E0\u6CD5\u8BFB\u53D6\u8BE5\u56FE\u7247\uFF0C\u8BF7\u6362\u4E00\u5F20\uFF08\u652F\u6301 JPG/PNG/WebP\uFF09"))},s.src=O}),t=async a=>{try{const d=await x(a),b=await j("/api/user/profile","POST",{dataBase64:d});C(b.avatarUrl),o("\u5934\u50CF\u5DF2\u66F4\u65B0"),k()}catch(d){o(d.message,"err")}},g=async()=>{if(c.next!==c.confirm)return o("\u4E24\u6B21\u8F93\u5165\u7684\u65B0\u5BC6\u7801\u4E0D\u4E00\u81F4","err");M(!0);try{const a=await j("/api/user/profile","PUT",{oldPassword:c.old,newPassword:c.next});o(a.message??"\u5BC6\u7801\u5DF2\u66F4\u65B0"),y({old:"",next:"",confirm:""})}catch(a){o(a.message,"err")}finally{M(!1)}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["profile","\u4E2A\u4EBA\u8D44\u6599"],["password","\u4FEE\u6539\u5BC6\u7801"],...R?[]:[["providers","\u6211\u7684\u4F9B\u5E94\u5546"]]].map(([a,d])=>e.jsx("button",{role:"tab","aria-selected":w===a,onClick:()=>P(a),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${w===a?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:d},a))}),w==="profile"&&e.jsxs(U,{className:"p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u4E2A\u4EBA\u8D44\u6599"}),e.jsx("p",{className:"mb-5 text-xs text-muted",children:"\u6635\u79F0\u4E0E\u4ECB\u7ECD\u4F1A\u5C55\u793A\u5728\u4F60\u7684\u8D26\u53F7\u4FE1\u606F\u4E2D\u3002"}),e.jsxs("div",{className:"flex items-center gap-5",children:[e.jsxs("label",{className:"group relative cursor-pointer",children:[e.jsx("span",{className:"flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-brand/15 text-xl font-semibold text-brand",children:n?e.jsx("img",{src:n,alt:"\u5934\u50CF",className:"h-full w-full object-cover"}):(S=r.user.email[0])==null?void 0:S.toUpperCase()}),e.jsx("span",{className:"absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity group-hover:opacity-100",children:e.jsx(Y,{size:18,className:"text-white"})}),e.jsx("input",{type:"file",accept:"image/png,image/jpeg,image/webp,image/svg+xml",className:"hidden",onChange:a=>{var b;const d=(b=a.target.files)==null?void 0:b[0];d&&t(d)}})]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-sm font-semibold",children:r.user.email}),e.jsxs("div",{className:"text-xs text-muted",children:["\u89D2\u8272\uFF1A",r.user.role," \xB7 \u70B9\u51FB\u5934\u50CF\u66F4\u6362\uFF08\u81EA\u52A8\u538B\u7F29\u4E3A 256\xD7256\uFF09"]})]})]}),e.jsxs("div",{className:"mt-5 grid gap-3 sm:grid-cols-2",children:[e.jsx(m,{label:"\u6635\u79F0\uFF08\u6700\u957F 32 \u5B57\uFF09",children:e.jsx(p,{value:E,onChange:a=>N(a.target.value),placeholder:"\u672A\u8BBE\u7F6E"})}),e.jsx(m,{label:"\u6CE8\u518C\u90AE\u7BB1\uFF08\u4E0D\u53EF\u4FEE\u6539\uFF09",children:e.jsx(p,{value:r.user.email,disabled:!0})}),e.jsx("div",{className:"sm:col-span-2",children:e.jsx(m,{label:"\u4E2A\u4EBA\u4ECB\u7ECD\uFF08\u6700\u957F 200 \u5B57\uFF09",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:3,value:T,onChange:a=>z(a.target.value),placeholder:"\u4ECB\u7ECD\u4E00\u4E0B\u81EA\u5DF1\u2026"})})})]}),e.jsx("div",{className:"mt-4",children:e.jsx(u,{disabled:L,onClick:$,children:L?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u8D44\u6599"})})]}),w==="providers"&&!R&&e.jsx(ee,{meEmail:r.user.email}),w==="password"&&e.jsxs(U,{className:"p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(Q,{size:15}),"\u4FEE\u6539\u5BC6\u7801"]}),e.jsx("p",{className:"mb-5 text-xs text-muted",children:"\u4FEE\u6539\u6210\u529F\u540E\u5176\u4ED6\u8BBE\u5907\u5C06\u9000\u51FA\u767B\u5F55\uFF0C\u5F53\u524D\u4F1A\u8BDD\u4FDD\u6301\u3002"}),e.jsxs("div",{className:"grid gap-3 sm:grid-cols-3",children:[e.jsx(m,{label:"\u5F53\u524D\u5BC6\u7801",children:e.jsx(p,{type:"password",value:c.old,onChange:a=>y({...c,old:a.target.value}),autoComplete:"current-password"})}),e.jsx(m,{label:"\u65B0\u5BC6\u7801\uFF08\u81F3\u5C11 10 \u4F4D\uFF09",children:e.jsx(p,{type:"password",value:c.next,onChange:a=>y({...c,next:a.target.value}),autoComplete:"new-password"})}),e.jsx(m,{label:"\u786E\u8BA4\u65B0\u5BC6\u7801",children:e.jsx(p,{type:"password",value:c.confirm,onChange:a=>y({...c,confirm:a.target.value}),autoComplete:"new-password"})})]}),e.jsx("div",{className:"mt-4",children:e.jsx(u,{disabled:h,onClick:g,children:h?"\u63D0\u4EA4\u4E2D\u2026":"\u4FEE\u6539\u5BC6\u7801"})})]})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Providers-iZTn0OUh.js": {
-              content: 'import{c as he,u as Fe,i as Qe,j as e,d as Z,E as Ze,q as Pe,m as A,B as o,X as xs,e as Q,n as y,r as ms,h as ke,s as us,U as Re,G as ps,F as O,k as Le,I as M,o as Ne,t as se}from"./index-C1Wgc1sf.js";import{r as j}from"./vendor-BbQ_LiY-.js";import{M as Ee}from"./message-square-CuYbKyMO.js";import{R as I}from"./refresh-cw-g67Iczt4.js";import{P as we}from"./plus-sJaeYLjc.js";import{T as ue}from"./trash-2-Hgm_5qDX.js";import{S as hs,T as fs}from"./triangle-alert-BVzhzJGL.js";import{C as gs}from"./circle-check-DY1J2Ix2.js";import{E as Ce}from"./external-link-BXEONH_n.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const pe=he("Key",[["path",{d:"m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4",key:"g0fldk"}],["path",{d:"m21 2-9.6 9.6",key:"1j0ho8"}],["circle",{cx:"7.5",cy:"15.5",r:"5.5",key:"yqb3hr"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Ge=he("LogIn",[["path",{d:"M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4",key:"u53s6r"}],["polyline",{points:"10 17 15 12 10 7",key:"1ail0h"}],["line",{x1:"15",x2:"3",y1:"12",y2:"12",key:"v6grx8"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const js=he("Pencil",[["path",{d:"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z",key:"1a8usu"}],["path",{d:"m15 5 4 4",key:"1mk7zo"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const _e=he("Power",[["path",{d:"M12 2v10",key:"mnfbl"}],["path",{d:"M18.4 6.6a9 9 0 1 1-12.77.04",key:"obofu9"}]]),vs={pending:{label:"\u5F85\u5BA1\u6838",cls:"bg-amber-500/10 text-amber-500"},approved:{label:"\u5DF2\u901A\u8FC7",cls:"bg-emerald-500/10 text-emerald-500"},rejected:{label:"\u5DF2\u9A73\u56DE",cls:"bg-red-500/10 text-red-500"}},qe=f=>f?new Date(f*1e3).toLocaleString("zh-CN",{hour12:!1}):"\u2014";function bs(){const[f,P]=j.useState(null),[R,fe]=j.useState(0),[ge,L]=j.useState(!1),[m,$]=j.useState(""),[k,E]=j.useState(null),[r,U]=j.useState(null),[T,G]=j.useState(""),[ae,q]=j.useState(!1),[V,re]=j.useState(""),[B,ne]=j.useState({}),K=Fe(),{confirm:ie,confirmEl:x}=Qe(),w=async(n=!1)=>{n||L(!0);try{const v=await y("list_provider_submissions"),z=v.result??v;P(z.submissions||[]),fe(z.pendingCount||0)}catch(v){n||K(v.message,"err")}finally{n||L(!1)}};j.useEffect(()=>{w()},[]);const W=async n=>{try{const v=await y("provider_submission_thread",{id:n.id}),z=v.result??v;U({sub:n,messages:z.messages||[]})}catch(v){K(v.message,"err")}},J=async()=>{if(!(!r||!T.trim())){q(!0);try{await y("provider_submission_reply",{id:r.sub.id,content:T.trim()}),G(""),await W(r.sub),await w(!0)}catch(n){K(n.message,"err")}finally{q(!1)}}},a=async(n,v,z)=>{$(n.id);try{await y("provider_submission_review",{id:n.id,decision:v,reason:z}),K(v==="approved"?`\u5DF2\u901A\u8FC7\uFF1A\u6E20\u9053\u300C${n.name}\u300D\u5DF2\u521B\u5EFA\u5E76\u8FDB\u5165\u5168\u7AD9\u5217\u8868`:"\u5DF2\u9A73\u56DE\u5E76\u901A\u77E5\u63D0\u4EA4\u7528\u6237","ok"),E(null),await w(!0)}catch(p){K(p.message,"err")}finally{$("")}},C=async n=>{re(n.id);try{const v=await y("provider_submission_test",{id:n.id}),z=v.result??v;ne(p=>({...p,[n.id]:z})),z.ok||K(z.message,"err")}catch(v){K(v.message,"err")}finally{re("")}},H=async n=>{await ie(`\u901A\u8FC7\u300C${n.name}\u300D\u7684\u63D0\u4EA4\uFF1F\u5C06\u521B\u5EFA\u6B63\u5F0F\u6E20\u9053${n.hasKey?"\u5E76\u5F55\u5165\u7528\u6237\u63D0\u4EA4\u7684\u5BC6\u94A5":"\uFF08\u65E0\u5BC6\u94A5\uFF0C\u9700\u624B\u52A8\u5F55\u5165\uFF09"}\u3002`)&&await a(n,"approved")},d=(f||[]).slice().sort((n,v)=>{const z=n.status==="pending"?0:n.status==="approved"?1:2,p=v.status==="pending"?0:v.status==="approved"?1:2;return z-p||v.updatedAt-n.updatedAt});return e.jsxs("div",{className:"flex flex-col gap-4",children:[x,e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:["\u7528\u6237\u63D0\u4EA4\u7684\u4F9B\u5E94\u5546\u5728\u8FD9\u91CC\u5BA1\u6838\uFF1A\u901A\u8FC7\u540E\u521B\u5EFA\u6B63\u5F0F\u6E20\u9053\uFF08\u8FDB\u5165\u5168\u7AD9\u5217\u8868\u4E0E\u8DEF\u7531\uFF09\uFF0C\u9A73\u56DE\u5FC5\u987B\u586B\u5199\u539F\u56E0\uFF08\u5BF9\u63D0\u4EA4\u7528\u6237\u53EF\u89C1\uFF09\u3002 \u5F53\u524D\u5F85\u5BA1\u6838 ",e.jsx("b",{className:"text-amber-500",children:R})," \u6761\u3002"]}),f===null?e.jsx(Z,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):d.length===0?e.jsx(Z,{children:e.jsx(Ze,{icon:e.jsx(Pe,{size:32}),title:"\u6682\u65E0\u7528\u6237\u63D0\u4EA4",hint:"\u666E\u901A\u7528\u6237\u5728\u300C\u4E2A\u4EBA\u4E3B\u9875 \u2192 \u6211\u7684\u4F9B\u5E94\u5546\u300D\u63D0\u4EA4\u6E20\u9053\u540E\uFF0C\u8FD9\u91CC\u4F1A\u51FA\u73B0\u5F85\u5BA1\u6838\u8BB0\u5F55\u3002"})}):d.map(n=>{const v=vs[n.status];return e.jsxs(Z,{className:"p-4",children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-sm font-semibold text-ink",children:n.name}),e.jsx("code",{className:"rounded bg-line px-1.5 py-0.5 text-[10px] text-muted font-mono",children:n.slug}),e.jsx("span",{className:A("rounded px-1.5 py-0.5 text-[10px] font-medium",v.cls),children:v.label}),n.hasKey&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] text-brand",children:"\u542B\u5BC6\u94A5"}),n.providerId&&e.jsxs("code",{className:"rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-500 font-mono",children:[n.providerId.slice(0,8),"\u2026"]})]}),e.jsx("div",{className:"mt-1 truncate text-[11px] text-muted font-mono",children:n.baseUrl}),e.jsxs("div",{className:"mt-1 text-[10px] text-muted",children:["\u63D0\u4EA4\u4EBA ",n.ownerEmail||"\u2014"," \xB7 ",qe(n.createdAt),n.status==="rejected"&&n.rejectionReason&&e.jsxs("span",{className:"text-err",children:[" \xB7 \u9A73\u56DE\u539F\u56E0\uFF1A",n.rejectionReason]})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs(o,{variant:"soft",className:"!h-7 !px-2 text-[11px]",onClick:()=>void W(n),children:[e.jsx(Ee,{size:12}),"\u5F80\u6765"]}),n.status==="pending"&&e.jsxs(e.Fragment,{children:[e.jsxs(o,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:V===n.id,onClick:()=>void C(n),title:"\u89E3\u5BC6\u7528\u6237\u5BC6\u94A5\u8BBF\u95EE\u4E0A\u6E38 /models \u9A8C\u8BC1\u8FDE\u901A",children:[e.jsx(I,{size:12,className:A(V===n.id&&"animate-spin")}),V===n.id?"\u6D4B\u8BD5\u4E2D\u2026":"\u6D4B\u8BD5\u8FDE\u901A"]}),e.jsxs(o,{variant:"soft",className:"!h-7 !px-2 text-[11px] !text-emerald-500",disabled:m===n.id,onClick:()=>void H(n),children:[e.jsx(Pe,{size:12}),"\u901A\u8FC7"]}),e.jsxs(o,{variant:"soft",className:"!h-7 !px-2 text-[11px] !text-err",disabled:m===n.id,onClick:()=>E({sub:n,reason:""}),children:[e.jsx(xs,{size:12}),"\u9A73\u56DE"]})]})]})]}),B[n.id]&&e.jsxs("div",{className:A("mt-2 rounded-lg px-2.5 py-1.5 text-[11px]",B[n.id].ok?"bg-emerald-500/10 text-emerald-500":"bg-red-500/10 text-err"),children:["\u8FDE\u901A\u6D4B\u8BD5\uFF1A",B[n.id].message]})]},n.id)}),e.jsxs(Q,{open:!!k,onClose:()=>E(null),title:`\u9A73\u56DE\u300C${(k==null?void 0:k.sub.name)??""}\u300D`,width:480,children:[e.jsx("p",{className:"mb-3 text-xs text-muted",children:"\u9A73\u56DE\u539F\u56E0\u5C06\u540C\u6B65\u5230\u7AD9\u5185\u4FE1\u7EBF\u7A0B\uFF0C\u5BF9\u63D0\u4EA4\u7528\u6237\u53EF\u89C1\u3002"}),e.jsx("textarea",{rows:3,value:(k==null?void 0:k.reason)??"",onChange:n=>E(v=>v&&{...v,reason:n.target.value}),placeholder:"\u4F8B\u5982\uFF1ABase URL \u4E0D\u53EF\u8FBE / \u5BC6\u94A5\u65E0\u6548 / \u4E0E\u73B0\u6709\u6E20\u9053\u91CD\u590D\u2026",className:"w-full resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs("div",{className:"mt-3 flex justify-end gap-2",children:[e.jsx(o,{variant:"ghost",onClick:()=>E(null),children:"\u53D6\u6D88"}),e.jsx(o,{variant:"danger",disabled:!(k!=null&&k.reason.trim())||m===(k==null?void 0:k.sub.id),onClick:()=>k&&void a(k.sub,"rejected",k.reason.trim()),children:m===(k==null?void 0:k.sub.id)?"\u5904\u7406\u4E2D\u2026":"\u786E\u8BA4\u9A73\u56DE"})]})]}),e.jsxs(Q,{open:!!r,onClose:()=>U(null),title:`\u5F80\u6765\u6D88\u606F \xB7 ${(r==null?void 0:r.sub.name)??""}`,width:560,children:[e.jsxs("div",{className:"max-h-[46vh] space-y-2.5 overflow-y-auto pr-1",children:[((r==null?void 0:r.messages)||[]).length===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u6682\u65E0\u6D88\u606F"}),((r==null?void 0:r.messages)||[]).map(n=>e.jsx("div",{className:A("flex",n.fromRole==="admin"?"justify-end":"justify-start"),children:e.jsxs("div",{className:A("max-w-[80%] rounded-xl2 px-3 py-2 text-[12px] leading-relaxed",n.fromRole==="admin"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.jsxs("div",{className:A("mb-1 text-[10px]",n.fromRole==="admin"?"text-white/70":"text-muted"),children:[n.fromRole==="admin"?"\u7BA1\u7406\u5458\uFF08\u6211\uFF09":n.fromEmail," \xB7 ",qe(n.createdAt)]}),e.jsx("div",{className:"whitespace-pre-wrap break-words",children:n.content})]})},n.id))]}),e.jsxs("div",{className:"mt-3 flex items-end gap-2 border-t border-line pt-3",children:[e.jsx("textarea",{value:T,onChange:n=>G(n.target.value),rows:2,placeholder:"\u56DE\u590D\u63D0\u4EA4\u7528\u6237\uFF08\u5904\u7406\u7ED3\u679C\u3001\u4FEE\u6539\u8981\u6C42\u7B49\uFF09\u2026",className:"max-h-28 min-h-[44px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs(o,{className:"h-11",disabled:ae||!T.trim(),onClick:()=>void J(),children:[e.jsx(Ee,{size:14}),ae?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001"]})]})]}),ge&&e.jsx("div",{className:"fixed bottom-6 right-6 rounded-full bg-surface p-2 shadow-card text-muted",children:e.jsx(I,{size:16,className:"animate-spin"})})]})}const Be={deepseek:{name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com"},openai:{name:"OpenAI",slug:"openai",kind:"openai_compat",url:"https://api.openai.com"},anthropic:{name:"Anthropic",slug:"anthropic",kind:"anthropic",url:"https://api.anthropic.com"},google:{name:"Google Gemini",slug:"google",kind:"openai_compat",url:"https://generativelanguage.googleapis.com/v1beta/openai"},kilo:{name:"Kilo (\u514DKey)",slug:"kilo",kind:"openai_compat",url:"https://api.kilo.ai/api/gateway"},opencode:{name:"OpenCode (\u514DKey)",slug:"opencode",kind:"openai_compat",url:"https://opencode.ai/zen/v1"},duckai:{name:"Duck.ai (\u514DKey)",slug:"duckai",kind:"openai_compat",url:"https://duck.ai"},bigmodel:{name:"\u667A\u8C31 GLM (BigModel)",slug:"bigmodel",kind:"openai_compat",url:"https://open.bigmodel.cn/api/paas/v4"},lingbao:{name:"\u7075\u5B9D UI \u6865\u63A5",slug:"lingbao",kind:"openai_compat",url:"http://127.0.0.1:20141"}},te=f=>f==="opencode"||f==="duckai"||f==="kilo",ys=f=>!!f&&f.startsWith("oauth:"),ks=f=>!!f&&f.startsWith("web:"),_=f=>ys(f==null?void 0:f.kind),S=f=>ks(f==null?void 0:f.kind),We=[{type:"claude",name:"Claude (Anthropic)",slug:"claude-oauth",baseUrl:"https://api.anthropic.com",mode:"redirect",desc:"Claude Code OAuth \u6388\u6743\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Anthropic Messages \u534F\u8BAE\u3002",models:["claude-sonnet-4-5","claude-opus-4-5","claude-haiku-4-5"]},{type:"codex",name:"Codex",slug:"codex-oauth",baseUrl:"https://chatgpt.com/backend-api/codex",mode:"redirect",desc:"Codex \u8D26\u53F7\u6388\u6743\uFF08Codex CLI\uFF09\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Responses \u534F\u8BAE\u3002",models:["gpt-5.5","gpt-5.4","gpt-5.3-codex"]},{type:"antigravity",name:"Antigravity (Google)",slug:"antigravity-oauth",baseUrl:"https://daily-cloudcode-pa.googleapis.com",mode:"redirect",desc:"Google \u8D26\u53F7\u6388\u6743\uFF08Antigravity \u5BA2\u6237\u7AEF\uFF09\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Gemini \u534F\u8BAE\u3002",models:["gemini-3.7-flash","gemini-3.1-pro"]},{type:"kimi",name:"Kimi (Moonshot)",slug:"kimi-oauth",baseUrl:"https://api.kimi.ai/coding",mode:"device",desc:"Kimi \u8BBE\u5907\u7801\u6388\u6743\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\uFF08\u56FD\u9645\u7AD9/\u4E2D\u56FD\u7AD9\u81EA\u52A8\u8BC6\u522B\uFF09\u3002",models:["kimi-for-coding","kimi-for-coding-highspeed"]},{type:"qwen",name:"Qwen (\u901A\u4E49\u5343\u95EE)",slug:"qwen-oauth",baseUrl:"https://portal.qwen.ai/v1",mode:"device",desc:"Qwen \u8BBE\u5907\u7801\u6388\u6743\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\u3002",models:["coder-model","qwen3-coder-plus"]},{type:"grok",name:"Grok (xAI)",slug:"grok-oauth",baseUrl:"https://cli-chat-proxy.grok.com/v1",mode:"device",desc:"xAI \u8BBE\u5907\u7801\u6388\u6743\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Responses \u534F\u8BAE\u3002",models:["grok-4.6","grok-4.5"]},{type:"codebuddy",name:"CodeBuddy / WorkBuddy (\u817E\u8BAF)",slug:"codebuddy-oauth",baseUrl:"https://copilot.tencent.com",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u5185\u7248",baseUrl:"https://copilot.tencent.com",desc:"copilot.tencent.com / codebuddy.cn\uFF0C\u817E\u8BAF\u4E91\u8D26\u53F7\u4F53\u7CFB"},{label:"\u56FD\u9645\u7248",baseUrl:"https://www.workbuddy.ai",desc:"workbuddy.ai\uFF0C\u4E0E\u56FD\u5185\u7248\u8D26\u53F7\u5B8C\u5168\u72EC\u7ACB"}],desc:"\u817E\u8BAF CodeBuddy / WorkBuddy \u8D26\u53F7\u6388\u6743\uFF0C\u56FD\u5185\u7248\u4E0E\u56FD\u9645\u7248\u5171\u7528\u540C\u4E00\u5165\u53E3\uFF0C\u6388\u6743\u65F6\u9009\u62E9\u533A\u57DF\u3002",models:["deepseek-v4.1-flash"]},{type:"zcode",name:"ZCode (\u667A\u8C31)",slug:"zcode-oauth",baseUrl:"https://zcode.z.ai",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08chat.z.ai\uFF09",baseUrl:"https://chat.z.ai",desc:"chat.z.ai OAuth\uFF08\u90AE\u7BB1\u767B\u5F55\uFF09\uFF0C\u8D70 z.ai \u7684\u4F53\u9A8C/\u7F16\u7A0B\u5957\u9910\u989D\u5EA6"},{label:"\u56FD\u5185\u7248\uFF08zchat.z.ai\uFF09",baseUrl:"https://zchat.z.ai",desc:"zchat.z.ai OAuth\uFF08\u624B\u673A\u53F7\u767B\u5F55\uFF09\uFF1B\u65E7\u7684 bigmodel \u5FAE\u4FE1\u626B\u7801\u5165\u53E3\u5DF2\u4E0B\u7EBF"}],desc:"\u667A\u8C31 ZCode \u5BA2\u6237\u7AEF\u989D\u5EA6\u901A\u9053\uFF08GLM-5.3 / GLM-5.3-Flash\uFF09\uFF0CAnthropic \u534F\u8BAE\u53CD\u4EE3\uFF1B\u767B\u5F55\u5DF2\u8FC1\u5230 Z.ai OAuth\uFF1A\u56FD\u9645 chat.z.ai\u3001\u56FD\u5185 zchat.z.ai\uFF0Cbigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0D\u53EF\u7528\u3002",models:["GLM-5.3","GLM-5.3-Flash"]},{type:"qoder",name:"Qoder",slug:"qoder-oauth",baseUrl:"https://qoder.com",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08qoder.com\uFF09",baseUrl:"https://qoder.com",desc:"api3.qoder.sh \u63A8\u7406\u96C6\u7FA4\uFF0C\u8D26\u53F7\u4E0E\u56FD\u5185\u7248\u72EC\u7ACB"},{label:"\u56FD\u5185\u7248\uFF08qoder.com.cn\uFF09",baseUrl:"https://qoder.com.cn",desc:"gateway.qoder.com.cn\uFF0CQoderWork \u8D26\u53F7\u4F53\u7CFB"}],desc:"Qoder \u8D26\u53F7\u8BBE\u5907\u6388\u6743\uFF08COSY \u7B7E\u540D\u53CD\u4EE3\uFF09\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\uFF0C\u652F\u6301\u6BCF\u65E5\u7B7E\u5230\u9886 Credits\u3002",models:["auto","qmodel_38max","qfmodel","qmodel_latest","gmodel","dmodel"]},{type:"trae",name:"Trae (\u5B57\u8282\u8DF3\u52A8)",slug:"trae-oauth",baseUrl:"https://core-normal.traeapi.us",mode:"redirect",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08trae.ai\uFF09",baseUrl:"https://core-normal.traeapi.us",desc:"core-normal.traeapi.us / coresg-normal.trae.ai\uFF0CBearer \u9274\u6743"},{label:"\u56FD\u5185\u7248\uFF08trae.cn\uFF09",baseUrl:"https://trae-api-cn.mchost.guru",desc:"trae-api-cn.mchost.guru\uFF0CCloud-IDE-JWT \u9274\u6743\uFF0C\u4E0E\u56FD\u5185\u8D26\u53F7\u7ED1\u5B9A"}],desc:"Trae IDE \u8D26\u53F7\u6388\u6743\uFF08\u56FD\u5185\u7248 / \u56FD\u9645\u7248\u8D26\u53F7\u4F53\u7CFB\u72EC\u7ACB\uFF09\u3002\u6388\u6743\u540E\u6D4F\u89C8\u5668\u4F1A\u8DF3\u5230 127.0.0.1 \u56DE\u8C03\u5730\u5740\uFF0C\u628A\u5730\u5740\u680F\u6574\u6BB5 URL \u7C98\u8D34\u56DE\u6765\u5373\u53EF\u3002",models:["Gemini-3.1-Pro-Preview","Claude-Sonnet-4.6","GPT-5.5","glm-5.3","kimi-k3","deepseek-V3"]},{type:"cline",name:"Cline",slug:"cline-oauth",baseUrl:"https://api.cline.bot",mode:"device",desc:"Cline \u8D26\u53F7 WorkOS \u8BBE\u5907\u7801\u6388\u6743\uFF0C\u81EA\u52A8\u9002\u914D\u514D\u8D39\u901A\u9053\u4E0E\u300C\u8D26\u53F7\xD7\u6A21\u578B\u300D\u51B7\u5374\u3002",models:["cline-free/mimo-v2.6-flash","cline-free/nemotron-3.5-super-vl","nvidia/nemotron-3.5-lightning:free"]}],He=[{type:"deepseek",name:"DeepSeek \u7F51\u9875\u7248",slug:"deepseek-web",baseUrl:"https://chat.deepseek.com/api/v0",desc:"\u7F51\u9875 userToken \u53CD\u4EE3\uFF0C\u81EA\u52A8\u89E3 PoW\uFF1Btoken \u7EA6 24h \u6709\u6548\u3002",credHint:"userToken\uFF08chat.deepseek.com \u767B\u5F55\u540E localStorage \u91CC\u7684 JWT\uFF09\u6216\u5B98\u65B9 API Key\uFF08sk- \u5F00\u5934\uFF09",models:["deepseek-v4-flash","deepseek-v4-pro","deepseek-v4-flash-search"]},{type:"kimiweb",name:"Kimi \u7F51\u9875\u7248",slug:"kimi-web",baseUrl:"https://www.kimi.ai",desc:"Kimi \u7F51\u9875 Connect-RPC \u534F\u8BAE\u53CD\u4EE3\uFF0Crefresh_token \u81EA\u52A8\u7EED\u671F\u3002",credHint:"access_token(JWT) \u6216 refresh_token\uFF08www.kimi.ai \u767B\u5F55\u540E Local Storage\uFF09",models:["k3","k3-agent-ultra","k2d6","k2d6-search"]},{type:"geminiweb",name:"Gemini \u7F51\u9875\u7248",slug:"gemini-web",baseUrl:"https://gemini.google.com",desc:"Gemini \u7F51\u9875 Cookie \u53CD\u4EE3\uFF08SAPISIDHASH \u9274\u6743\uFF09\uFF1B\u4E0D\u7559\u51ED\u636E\u53EF\u76F4\u63A5\u533F\u540D\u4F7F\u7528\uFF0C\u989D\u5EA6\u4E0E\u6A21\u578B\u53D7\u9650\u3002",credHint:"Cookie \u5B57\u7B26\u4E32\uFF08\u542B __Secure-1PSID / __Secure-3PSID / SAPISID\uFF09\uFF1B\u7559\u7A7A\u5373\u533F\u540D\u6A21\u5F0F",models:["gemini-3.7-flash","gemini-3.1-pro","gemini-3.5-flash-thinking"],anonymous:!0},{type:"minimaxweb",name:"MiniMax Agent \u7F51\u9875\u7248",slug:"minimax-web",baseUrl:"https://agent.minimaxi.com",desc:"MiniMax Agent \u7F51\u9875 SSE \u53CD\u4EE3\uFF0C\u9700\u8981\u7F51\u9875\u4F1A\u8BDD\u7B7E\u540D\u53C2\u6570\u3002",credHint:"token|agentId|uuid|deviceId|userId\uFF08token \u4E3A JWT\uFF0C\u5176\u4F59\u53EF\u4ECE HAR \u53D6\uFF0C\u81F3\u5C11\u586B token\uFF09",models:["MiniMax-M3","MiniMax-M3-thinking","MiniMax-M2.1"]},{type:"lingxi",name:"\u7075\u7280\u7F51\u9875\u7248\uFF08\u4E2D\u56FD\u79FB\u52A8\uFF09",slug:"lingxi-web",baseUrl:"https://ai.yun.139.com",desc:"\u4E2D\u56FD\u79FB\u52A8\u7075\u7280\u7F51\u9875\u53CD\u4EE3\uFF0CBasic \u6388\u6743 + userId\u3002",credHint:"authorization|userId|sourceChannel\uFF08authorization \u5F62\u5982 Basic xxx\uFF09",models:["lingxi-default","qwen-3.7-plus","deepseek-4.0-pro"]},{type:"chatgptweb",name:"ChatGPT \u7F51\u9875\u7248",slug:"chatgpt-web",baseUrl:"https://chatgpt.com",desc:"ChatGPT \u7F51\u9875/App \u534F\u8BAE\u53CD\u4EE3\uFF08sentinel + PoW\uFF09\uFF0C\u9002\u5408 Free \u8D26\u53F7\u3002",credHint:"refresh_token\uFF08rt_xxx / rt.1.xxx\uFF1B\u4E5F\u652F\u6301\u53D1\u8D27\u6574\u884C\u81EA\u52A8\u63D0\u53D6\uFF09",models:["gpt-5-5","gpt-5-4","gpt-5-3"]}];function Ks(){var Ke,Oe,Me,Te;const[f,P]=j.useState(null),[R,fe]=j.useState("direct"),[ge,L]=j.useState(!1),[m,$]=j.useState({id:"",name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com",key:""}),[k,E]=j.useState(!1),[r,U]=j.useState(null),[T,G]=j.useState(""),[ae,q]=j.useState("prod"),[V,re]=j.useState(!1),B=j.useRef(!1),ne=j.useRef(!1),K=j.useRef(!1),ie=j.useRef(!1),[x,w]=j.useState(null),[W,J]=j.useState(""),[a,C]=j.useState(null),H=j.useRef(null),[d,n]=j.useState(null),{confirm:v,confirmEl:z}=Qe(),p=Fe(),Y=()=>y("list_providers").then(s=>P(s.providers)).catch(s=>p(s.message,"err"));j.useEffect(()=>{Y()},[]),j.useEffect(()=>()=>ce(),[]);const ze=()=>{$({id:"",name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com",key:""}),L(!0)},Ve=s=>{$({id:s.id,name:s.name,slug:s.slug,kind:s.kind||(s.slug==="anthropic"?"anthropic":"openai_compat"),url:s.base_url,key:""}),L(!0)},Je=s=>{const t=Be[s];t&&$(l=>({...l,name:t.name,slug:t.slug,kind:t.kind,url:t.url}))},Ye=async()=>{var t;if(ne.current)return;if(!m.name.trim())return p("\u8BF7\u586B\u5199\u4F9B\u5E94\u5546\u540D\u79F0","err");if(!m.slug.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053\u6807\u8BC6\u7B26 (Slug)","err");const s=te(m.slug);if(!m.id&&!m.key.trim()&&!s)return p("\u6DFB\u52A0\u4F9B\u5E94\u5546\u5FC5\u987B\u5F55\u5165\u4E0A\u6E38\u5BC6\u94A5","err");ne.current=!0,E(!0);try{const l={name:m.name.trim(),slug:m.slug.trim().toLowerCase(),kind:m.kind,baseUrl:m.url.trim()};m.id&&(l.id=m.id),m.key.trim()&&(l.key=m.key.trim()),await y("upsert_provider",l);const i=m.id||((t=(await y("list_providers")).providers.find(c=>c.name===m.name))==null?void 0:t.id)||"";p("\u4F9B\u5E94\u5546\u5DF2\u4FDD\u5B58"),L(!1),Y(),i&&(w({providerId:i,providerName:m.name,models:[],picked:new Set,loading:!0}),await le(i,m.name,m.url,m.key.trim()))}catch(l){p(l.message,"err")}finally{ne.current=!1,E(!1)}},Se=j.useRef({}),le=async(s,t,l,i)=>{i&&(Se.current[s]=i);const c=i||Se.current[s]||"";let u=null,N="";if(c&&l)try{const h=await fetch(`${l.replace(/\\/+$/,"")}/v1/models`,{headers:{authorization:`Bearer ${c}`},signal:AbortSignal.timeout(2e4)});h.ok&&(u=((await h.json()).data??[]).map(g=>g.id).filter(g=>!!g).sort())}catch{}if(u===null)try{const h=await y("list_upstream_models",{providerId:s});u=h.models,h.note&&(N=h.degraded?`\u4E0A\u6E38\u6A21\u578B\u76EE\u5F55\u4E0D\u53EF\u7528\uFF0C\u5DF2\u56DE\u9000\u515C\u5E95\u6E05\u5355\uFF1A${h.note}`:h.note)}catch(h){w({providerId:s,providerName:t,models:[],picked:new Set,loading:!1,error:h.message});return}w({providerId:s,providerName:t,models:u??[],picked:new Set(u??[]),loading:!1,note:N||void 0})},Xe=(s,t)=>{J(""),w({providerId:s,providerName:t,models:[],picked:new Set,loading:!1})},de=async(s,t)=>{const l=(f??[]).find(i=>i.id===s);w({providerId:s,providerName:t,models:[],picked:new Set,loading:!0}),await le(s,t,(l==null?void 0:l.base_url)??"","")},Ae=()=>{if(!W.trim()||!x)return;const s=W.split(/[\\r\\n,]+/).map(i=>i.trim()).filter(Boolean);if(!s.length)return;const t=Array.from(new Set([...x.models,...s])),l=new Set(x.picked);s.forEach(i=>l.add(i)),w({...x,models:t,picked:l}),J(""),p(`\u5DF2\u6DFB\u52A0 ${s.length} \u4E2A\u6A21\u578B\u5230\u52FE\u9009\u5217\u8868`)},Ue=async()=>{var t;if(!x)return;const s=[...x.picked];if(!s.length)return p("\u8BF7\u81F3\u5C11\u9009\u62E9\u4E00\u4E2A\u6A21\u578B","err");try{const l=await y("import_models",{providerId:x.providerId,models:s,priority:10});p(`\u5DF2\u5BFC\u5165 ${((t=l.result)==null?void 0:t.imported)??s.length} \u4E2A\u6A21\u578B\uFF0C\u53EF\u5728\u300C\u6A21\u578B\u4E0E\u5B9A\u4EF7\u300D\u8C03\u6574\u5B9A\u4EF7`),w(null),Y()}catch(l){p(l.message,"err")}},De=async()=>{var s,t,l;if(!(!T.trim()||!r)&&!B.current){B.current=!0,re(!0);try{const i=await y("upsert_provider_key",{providerId:r.id,key:T.trim(),label:ae.trim()||(_(r)||S(r)?`account-${(r.key_count??0)+1}`:"prod")}),c=(s=i.result)!=null&&s.fingerprint?`\uFF08\u6307\u7EB9 ${i.result.fingerprint}\uFF09`:"";(t=i.result)!=null&&t.duplicate&&!((l=i.result)!=null&&l.count)?p(`\u8BE5\u51ED\u636E\u5DF2\u5728\u6C60\u4E2D\uFF0C\u672A\u91CD\u590D\u6DFB\u52A0${c}`):p(_(r)||S(r)?`\u8D26\u53F7\u51ED\u636E\u5DF2\u52A0\u5BC6\u5165\u5E93${c}`:`\u5BC6\u94A5\u5DF2\u52A0\u5BC6\u5165\u5E93${c}`);const u=T.trim();G("");const N=await y("list_providers");P(N.providers);const h=N.providers.find(b=>b.id===r.id);h&&U(h),!_(r)&&(!h||h.keys&&h.keys.length<=1)&&(w({providerId:r.id,providerName:r.name,models:[],picked:new Set,loading:!0}),await le(r.id,r.name,r.base_url,S(r)?"":u))}catch(i){p(i.message,"err")}finally{B.current=!1,re(!1)}}},es=async(s,t)=>{if(await v("\u786E\u8BA4\u5220\u9664\u8BE5\u51ED\u636E\uFF1F\u8BE5\u51ED\u636E\u5C06\u4ECE\u591A Key \u8C03\u5EA6\u6C60\u4E2D\u5F7B\u5E95\u79FB\u9664\u3002"))try{await y("delete_provider_key",{providerId:s,keyId:t}),p("\u51ED\u636E\u5DF2\u4ECE\u6C60\u4E2D\u5220\u9664");const l=await y("list_providers");P(l.providers);const i=l.providers.find(c=>c.id===s);i&&U(i)}catch(l){p(l.message,"err")}},ss=async(s,t,l)=>{const i=l==="active"?"disabled":"active";try{await y("toggle_provider_key",{providerId:s,keyId:t,status:i}),p(`\u8D26\u53F7\u5DF2${i==="active"?"\u542F\u7528":"\u505C\u7528"}`);const c=await y("list_providers");P(c.providers);const u=c.providers.find(N=>N.id===s);u&&U(u)}catch(c){p(c.message,"err")}},X=async s=>{const t=s.status==="active"?"disabled":"active";try{await y("toggle_provider",{id:s.id,status:t}),p(`\u5DF2${t==="active"?"\u542F\u7528":"\u505C\u7528"}\u6E20\u9053\u300C${s.name}\u300D`),Y()}catch(l){p(l.message,"err")}},je=async s=>{if(await v(`\u5220\u9664\u4F9B\u5E94\u5546\u300C${s.name}\u300D\uFF1F\u5176\u6A21\u578B\u6620\u5C04\u4E0E\u4E0A\u6E38\u51ED\u636E\u5C06\u4E00\u5E76\u5220\u9664\uFF0C\u4E0D\u53EF\u6062\u590D\u3002`))try{await y("delete_provider",{id:s.id}),p("\u5DF2\u5220\u9664"),Y()}catch(t){p(t.message,"err")}},ce=()=>{H.current!==null&&(window.clearTimeout(H.current),H.current=null)},oe=()=>{ce(),C(null)},ve=async s=>{try{await navigator.clipboard.writeText(s),p("\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F")}catch{p("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u590D\u5236","err")}},ts=(s,t)=>(t==null?void 0:t.base_url)||s.baseUrl,xe=(s,t)=>s.regionSelect?s.type==="zcode"?/zchat\\.z\\.ai/i.test(t)?{slug:"zcode-cn-oauth",name:"ZCode \u56FD\u5185\u7248 (zchat)"}:/bigmodel\\.cn/i.test(t)?{slug:"zcode-bigmodel-oauth",name:"ZCode \u56FD\u5185\u7248 (bigmodel\xB7\u65E7)"}:{slug:"zcode-oauth",name:"ZCode \u56FD\u9645\u7248 (chat.z.ai)"}:s.type==="qoder"?/qoder\\.com\\.cn/i.test(t)?{slug:"qoder-cn-oauth",name:"Qoder \u56FD\u5185\u7248"}:{slug:"qoder-oauth",name:"Qoder \u56FD\u9645\u7248 (qoder.com)"}:s.type==="trae"?/trae\\.cn|trae\\.com\\.cn|mchost\\.guru/i.test(t)?{slug:"trae-cn-oauth",name:"Trae \u56FD\u5185\u7248 (trae.cn)"}:{slug:"trae-global-oauth",name:"Trae \u56FD\u9645\u7248 (trae.ai)"}:/workbuddy\\.ai/i.test(t)?{slug:"codebuddy-global-oauth",name:"CodeBuddy \u56FD\u9645\u7248"}:{slug:"codebuddy-oauth",name:"CodeBuddy \u56FD\u5185\u7248"}:null,as=s=>{const t=new Set([s.slug]);for(const l of s.regions??[]){const i=xe(s,l.baseUrl);i&&t.add(i.slug)}return s.type==="zcode"&&t.add("zcode-bigmodel-oauth"),[...t]},Ie=async(s,t,l,i,c)=>{var u,N,h,b;C(g=>g&&{...g,busy:!0,message:"\u6B63\u5728\u4FDD\u5B58\u8D26\u53F7\u51ED\u636E\u2026"});try{const g=xe(s,t),ee=(g==null?void 0:g.slug)??s.slug,F=(g==null?void 0:g.name)??s.name,me=await se("oauth_add_account",{provider:s.type,slug:ee,name:F,baseUrl:t,refreshToken:l,...i?{email:i}:{},...c?{identity:c}:{}}),ye=((u=me.result)==null?void 0:u.providerId)||"";if(!ye)throw new Error("OAuth \u6E20\u9053\u4FDD\u5B58\u5931\u8D25");p((N=me.result)!=null&&N.duplicate&&((h=me.result)==null?void 0:h.count)===0?"\u8BE5\u51ED\u636E\u5DF2\u5728\u6C60\u4E2D\uFF0C\u672A\u91CD\u590D\u6DFB\u52A0":`\u6388\u6743\u6210\u529F\uFF0C\u8D26\u53F7\u5DF2\u52A0\u5BC6\u5165\u5E93\uFF08\u6307\u7EB9 ${((b=me.result)==null?void 0:b.fingerprint)??""}\uFF09`),ce(),C(null);const os=await y("list_providers");P(os.providers),w({providerId:ye,providerName:F,models:[],picked:new Set,loading:!0}),await le(ye,F,t,"")}catch(g){const ee=g.message;p(ee,"err"),C(F=>F&&{...F,step:"error",message:ee,busy:!1})}},rs=(s,t,l,i)=>{const c=async()=>{var u;try{const N=await y("oauth_poll",{provider:s.type,state:l}),h=N.result??N,b=h.refresh_token||h.refreshToken;if(h.status==="ok"&&b){await Ie(s,t,b,h.email,(u=h.account)==null?void 0:u.uid);return}if(h.status==="error"){C(g=>g&&{...g,step:"error",message:h.message||"\u6388\u6743\u5931\u8D25"});return}C(g=>g&&{...g,message:"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026"}),H.current=window.setTimeout(c,Math.max(2,i)*1e3)}catch(N){C(h=>h&&{...h,step:"error",message:N.message})}};H.current=window.setTimeout(c,Math.max(2,i)*1e3)},be=async(s,t)=>{if(ce(),s.regionSelect){C({meta:s,provider:t??null,mode:s.mode,baseUrl:s.baseUrl,url:"",state:"",step:"region",codeInput:""});return}await $e(s,t??null,ts(s,t??null))},$e=async(s,t,l)=>{if(ce(),s.type==="zcode"&&/bigmodel\\.cn/i.test(l)){try{const i=await y("list_providers");let c=!1;i.providers.some(N=>N.slug==="zcode-bigmodel-oauth")||(await se("upsert_provider",{name:"ZCode \u56FD\u5185\u7248 (bigmodel\xB7\u65E7)",slug:"zcode-bigmodel-oauth",kind:"oauth:zcode",baseUrl:l}),c=!0);const u=c?await y("list_providers"):i;P(u.providers),C(null),p(c?"\u5DF2\u521B\u5EFA\u65E7\u7248\u56FD\u5185\u6E20\u9053\uFF1A\u8BF7\u7C98\u8D34\u5BA2\u6237\u7AEF access_token\u3002\u6CE8\u610F bigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0B\u7EBF\uFF0C\u5EFA\u8BAE\u6539\u7528 zchat.z.ai \u91CD\u65B0\u6388\u6743":"\u65E7\u7248\u56FD\u5185\u6E20\u9053\u5DF2\u5B58\u5728\uFF0C\u76F4\u63A5\u590D\u7528\uFF1A\u8BF7\u5728\u8BE5\u6E20\u9053\u5361\u7247\u4E0A\u7C98\u8D34\u5BA2\u6237\u7AEF access_token\u3002\u6CE8\u610F bigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0B\u7EBF\uFF0C\u5EFA\u8BAE\u6539\u7528 zchat.z.ai \u91CD\u65B0\u6388\u6743","ok")}catch(i){C(c=>c&&{...c,step:"error",message:i.message})}return}C({meta:s,provider:t,mode:s.mode,baseUrl:l,url:"",state:"",step:"loading",codeInput:""});try{const c=(await se("oauth_start",{provider:s.type,baseUrl:l})).result??{},u=c.mode||s.mode;C({meta:s,provider:t,mode:u,baseUrl:l,url:c.url??"",state:c.state??"",userCode:c.user_code,verificationUri:c.verification_uri,verificationUriComplete:c.verification_uri_complete,interval:Number(c.interval)||5,step:u==="redirect"?"ready":"polling",codeInput:"",message:u==="device"?"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026":u==="redirect-poll"?"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u5B8C\u6210\u767B\u5F55\u2026":void 0}),u!=="redirect"&&c.state&&rs(s,l,c.state,Number(c.interval)||5)}catch(i){C(c=>c&&{...c,step:"error",message:i.message})}},ns=async()=>{var s,t,l,i;if(a&&!ie.current){if(!a.codeInput.trim())return p("\u8BF7\u7C98\u8D34\u6388\u6743\u8FD4\u56DE\u7684 code \u6216\u6574\u6BB5\u56DE\u8C03\u5730\u5740","err");ie.current=!0,C({...a,busy:!0,message:"\u6B63\u5728\u6362\u53D6 access_token\u2026"});try{const c=await se("oauth_complete",{provider:a.meta.type,code:a.codeInput.trim(),state:a.state,baseUrl:a.baseUrl}),u=(s=c.result)==null?void 0:s.refreshToken;if(!u)throw new Error("\u4E0A\u6E38\u672A\u8FD4\u56DE refresh_token");await Ie(a.meta,a.baseUrl,u,(t=c.result)==null?void 0:t.email,(i=(l=c.result)==null?void 0:l.account)==null?void 0:i.uid)}catch(c){p(c.message,"err"),C(u=>u&&{...u,step:"error",message:c.message,busy:!1})}finally{ie.current=!1}}},is=()=>{a&&be(a.meta,a.provider??void 0)},ls=(s,t)=>{n({meta:s,provider:t??null,name:(t==null?void 0:t.name)??s.name,slug:(t==null?void 0:t.slug)??s.slug,baseUrl:(t==null?void 0:t.base_url)??s.baseUrl,credential:""})},ds=async()=>{var t,l,i;if(!d||K.current)return;const s=d;if(!s.provider&&!s.credential.trim()&&!s.meta.anonymous)return p("\u8BF7\u7C98\u8D34\u8D26\u53F7\u51ED\u636E","err");if(!s.provider){if(!s.name.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053\u540D\u79F0","err");if(!s.slug.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053 Slug","err");if(!s.baseUrl.trim())return p("\u8BF7\u586B\u5199 Base URL","err")}K.current=!0,n({...s,saving:!0});try{let c=((t=s.provider)==null?void 0:t.id)||"";if(c)await se("upsert_provider_key",{providerId:c,key:s.credential.trim(),label:`account-${(((l=s.provider)==null?void 0:l.key_count)??0)+1}`});else{await se("upsert_provider",{name:s.name.trim(),slug:s.slug.trim().toLowerCase(),kind:`web:${s.meta.type}`,baseUrl:s.baseUrl.trim(),key:s.credential.trim()||void 0});const u=await y("list_providers");c=((i=u.providers.find(N=>N.slug===s.slug.trim().toLowerCase()))==null?void 0:i.id)||"",P(u.providers)}if(!c)throw new Error("Web \u6E20\u9053\u521B\u5EFA\u5931\u8D25");p(s.credential.trim()?"Web \u6E20\u9053\u51ED\u636E\u5DF2\u52A0\u5BC6\u5165\u5E93":"Web \u6E20\u9053\u5DF2\u63A5\u5165\uFF08\u533F\u540D\u6A21\u5F0F\uFF0C\u65E0\u51ED\u636E\uFF09"),n(null),Y(),w({providerId:c,providerName:s.name,models:[],picked:new Set,loading:!0}),await le(c,s.name,s.baseUrl,"")}catch(c){p(c.message,"err"),n(u=>u&&{...u,saving:!1})}finally{K.current=!1}},cs=s=>(f??[]).find(t=>t.slug===s.slug||t.kind===`web:${s.type}`),D=(s=>s?He.find(t=>t.slug===s.slug||s.kind===`web:${t.type}`):void 0)(r);return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["direct","API \u76F4\u8FDE"],["oauth","OAuth \u6388\u6743"],["web","Web \u53CD\u4EE3"],["subs","\u7528\u6237\u63D0\u4EA4"]].map(([s,t])=>e.jsx("button",{role:"tab","aria-selected":R===s,onClick:()=>fe(s),className:A("rounded-md px-4 py-1.5 text-xs font-medium transition-colors",R===s?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:t},s))}),R==="subs"&&e.jsx(bs,{}),R==="direct"&&e.jsxs(e.Fragment,{children:[e.jsx("div",{className:"flex justify-end",children:e.jsxs(o,{onClick:ze,children:[e.jsx(we,{size:14}),"\u6DFB\u52A0\u4F9B\u5E94\u5546"]})}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(8)].map((s,t)=>e.jsx("div",{className:"skeleton h-36 rounded-xl2"},t))}):f.filter(s=>!_(s)&&!S(s)).length===0?e.jsx(Z,{children:e.jsx(Ze,{icon:e.jsx(ms,{size:32}),title:"\u8FD8\u6CA1\u6709\u4E0A\u6E38\u4F9B\u5E94\u5546",hint:"\u6DFB\u52A0\u4F60\u6301\u6709\u6388\u6743\u7684\u4F9B\u5E94\u5546\u5E76\u5F55\u5165\u5BC6\u94A5\uFF0C\u5373\u53EF\u4E00\u952E\u5BFC\u5165\u6A21\u578B\u5217\u8868\u3002",action:e.jsx(o,{className:"mt-2",onClick:ze,children:"\u6DFB\u52A0\u4F9B\u5E94\u5546"})})}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:f.filter(s=>!_(s)&&!S(s)).map(s=>{var t;return e.jsxs(Z,{className:A("p-4 flex flex-col justify-between transition-all",s.status==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-sm font-bold text-brand",children:s.name[0]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"flex items-center gap-1.5 mt-0.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:"text-[9px] rounded bg-line px-1 text-muted",children:s.slug==="anthropic"||s.kind==="anthropic"?"Anthropic \u539F\u751F":te(s.slug)?"\u514D Key":"OpenAI \u517C\u5BB9"})]})]})]}),e.jsx("button",{type:"button",onClick:()=>X(s),title:`\u70B9\u51FB${s.status==="active"?"\u505C\u7528":"\u542F\u7528"}\u8BE5\u6E20\u9053\uFF08\u505C\u7528\u540E\u76F8\u5E94\u6A21\u578B\u5728\u6A21\u578B\u6C60\u4E0E\u5B9A\u4EF7\u4E2D\u9690\u85CF\uFF09`,className:"cursor-pointer transition-transform hover:scale-105 shrink-0",children:e.jsx(ke,{value:s.status})})]}),e.jsxs("dl",{className:"mt-3 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0 text-muted",children:"\u7AEF\u70B9"}),e.jsx("code",{className:"truncate text-ink max-w-[140px]",title:s.base_url,children:s.base_url})]}),e.jsxs("div",{className:"flex justify-between items-center",children:[e.jsx("span",{children:"\u5BC6\u94A5"}),e.jsx("span",{className:"text-ink truncate",children:te(s.slug)?e.jsx("span",{className:"text-emerald-500 font-medium",children:"\u514D Key"}):e.jsxs("span",{className:"inline-flex items-center gap-1",children:[s.key_count," \u4E2A",s.key_count===0?e.jsx("span",{className:"text-warn",children:"\uFF08\u672A\u5F55\uFF09"}):(t=s.keys)!=null&&t.some(l=>l.health_status==="demoted")?e.jsx("span",{className:"text-err font-medium text-[10px]",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-emerald-500 font-medium text-[10px]",children:"\u5C31\u7EEA"})]})})]}),s.authorization_expires_at&&e.jsxs("div",{className:"flex justify-between",children:[e.jsx("span",{children:"\u6388\u6743\u5230\u671F"}),e.jsx("span",{className:"text-ink",children:new Date(s.authorization_expires_at*1e3).toLocaleDateString("zh-CN")})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>de(s.id,s.name),title:"\u4ECE\u4E0A\u6E38\u5BFC\u5165\u6216\u624B\u52A8\u6DFB\u52A0\u6A21\u578B","aria-label":"\u5BFC\u5165\u6A21\u578B",children:e.jsx(I,{size:13})}),e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>Xe(s.id,s.name),title:"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B","aria-label":"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B",children:e.jsx(we,{size:13})}),!te(s.slug)&&e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{U(s),G(""),q("prod")},title:`\u7BA1\u7406\u591A Key \u8F6E\u6362\u6C60\uFF08\u5F53\u524D ${s.key_count} \u4E2A\uFF09`,"aria-label":"\u5BC6\u94A5\u6C60",children:e.jsx(pe,{size:13})}),e.jsx(o,{variant:"ghost",className:A("!h-7 !w-7 !px-0",s.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>X(s),title:`\u5207\u6362\u6E20\u9053\u542F\u7528/\u505C\u7528\u72B6\u6001\uFF08\u5F53\u524D${s.status==="active"?"\u542F\u7528":"\u505C\u7528"}\uFF09`,"aria-label":s.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(_e,{size:13})}),e.jsx(o,{variant:"ghost",className:"!h-7 !w-7 !px-0",onClick:()=>Ve(s),title:"\u7F16\u8F91\u4F9B\u5E94\u5546","aria-label":"\u7F16\u8F91\u4F9B\u5E94\u5546",children:e.jsx(js,{size:13})}),e.jsx(o,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>je(s),title:"\u5220\u9664\u4F9B\u5E94\u5546","aria-label":`\u5220\u9664 ${s.name}`,children:e.jsx(ue,{size:13})})]})]},s.id)})})]}),R==="oauth"&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:"OAuth \u6E20\u9053\u901A\u8FC7\u8D26\u53F7\u6388\u6743\u63A5\u5165\uFF08\u5B9E\u73B0\u79FB\u690D\u81EA CLIProxyAPI\uFF09\uFF1Arefresh_token \u7ECF AES-256-GCM \u52A0\u5BC6\u540E\u5B58\u5165\u6E20\u9053\u51ED\u636E\u6C60\uFF0C access_token \u81EA\u52A8\u5237\u65B0\uFF1B\u540C\u4E00\u6E20\u9053\u53EF\u6388\u6743\u591A\u4E2A\u8D26\u53F7\uFF0C\u81EA\u52A8\u8F6E\u6362\u3001\u9047 429/401 \u81EA\u52A8\u7194\u65AD\u51B7\u5374\u3002"}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(8)].map((s,t)=>e.jsx("div",{className:"skeleton h-40 rounded-xl2"},t))}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:We.map(s=>{const t=new Set(as(s)),l=(f??[]).filter(b=>t.has(b.slug)),i=l.find(b=>(b.key_count??0)>0)??l[0]??null,c=Math.max(0,l.length-1),u=l.reduce((b,g)=>b+(g.key_count??0),0),N=l.some(b=>{var g;return(g=b.keys)==null?void 0:g.some(ee=>ee.health_status==="demoted")}),h=b=>{const g=xe(s,b.base_url);return g?g.name:b.name};return e.jsxs(Z,{className:A("p-4 flex flex-col justify-between transition-all",(i==null?void 0:i.status)==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(us,{size:16})}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"mt-0.5 flex items-center gap-1.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:(i==null?void 0:i.slug)??s.slug}),e.jsx("span",{className:"rounded bg-brand/10 px-1 text-[9px] font-medium text-brand",children:"OAuth"}),c>0&&e.jsxs("span",{className:"rounded bg-line px-1 text-[9px] text-muted",title:`${s.name} \u8FD8\u6709 ${c} \u4E2A\u5176\u4ED6\u533A\u57DF\u7684\u6E20\u9053\uFF0C\u53EF\u5728\u300C\u8D26\u53F7\u6C60\u300D\u4E2D\u67E5\u770B`,children:["+",c," \u533A\u57DF"]})]})]})]}),i?e.jsx("button",{type:"button",onClick:()=>X(i),title:"\u70B9\u51FB\u5207\u6362\u542F\u7528/\u505C\u7528",className:"shrink-0 cursor-pointer transition-transform hover:scale-105",children:e.jsx(ke,{value:i.status})}):e.jsx("span",{className:"shrink-0 rounded bg-line px-1.5 py-0.5 text-[10px] text-muted",children:"\u672A\u63A5\u5165"})]}),e.jsx("p",{className:"mt-2.5 text-[11px] leading-relaxed text-muted",children:s.desc}),e.jsxs("dl",{className:"mt-2.5 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u6388\u6743\u65B9\u5F0F"}),e.jsx("span",{className:"text-ink",children:s.mode==="device"?"\u8BBE\u5907\u7801\u8F6E\u8BE2":s.mode==="redirect-poll"?"\u6388\u6743\u94FE\u63A5 + \u8F6E\u8BE2":"PKCE \u6388\u6743\u94FE\u63A5"})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u8D26\u53F7"}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(Re,{size:11,className:"text-muted"}),l.length?`${u} \u4E2A`:"\u2014",u>0&&(N?e.jsx("span",{className:"text-[10px] font-medium text-err",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-[10px] font-medium text-emerald-500",children:"\u5C31\u7EEA"}))]})]}),l.length>1&&e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u533A\u57DF"}),e.jsx("span",{className:"truncate text-ink",title:l.map(b=>`${h(b)}\uFF08${b.key_count} \u4E2A\u8D26\u53F7${b.status==="disabled"?" \xB7 \u505C\u7528":""}\uFF09`).join("\uFF1B"),children:l.map(b=>`${h(b)} ${b.key_count}`).join(" / ")})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u5019\u9009\u6A21\u578B"}),e.jsxs("code",{className:"truncate text-ink max-w-[170px]",title:s.models.join(", "),children:[s.models[0]," \u7B49 ",s.models.length," \u4E2A"]})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsxs(o,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>be(s,i),children:[e.jsx(Ge,{size:12}),i?"\u6388\u6743\u65B0\u8D26\u53F7":"\u6388\u6743\u5E76\u6DFB\u52A0"]}),i&&e.jsxs(e.Fragment,{children:[e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>de(i.id,i.name),title:"\u62C9\u53D6/\u5BFC\u5165\u6A21\u578B","aria-label":"\u6A21\u578B\u7BA1\u7406",children:e.jsx(I,{size:13})}),e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{U(i),G(""),q(`account-${i.key_count+1}`)},title:"\u7BA1\u7406\u6388\u6743\u8D26\u53F7","aria-label":"\u8D26\u53F7\u7BA1\u7406",children:e.jsx(pe,{size:13})}),e.jsx(o,{variant:"ghost",className:A("!h-7 !w-7 !px-0 ml-auto",i.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>X(i),title:i.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053","aria-label":i.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(_e,{size:13})}),e.jsx(o,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>je(i),title:"\u5220\u9664\u6E20\u9053","aria-label":"\u5220\u9664\u6E20\u9053",children:e.jsx(ue,{size:13})})]})]})]},s.slug)})})]}),R==="web"&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:"Web \u53CD\u4EE3\u6E20\u9053\u4F7F\u7528\u6D4F\u89C8\u5668\u7F51\u9875\u4F1A\u8BDD\u51ED\u636E\uFF08Cookie / userToken / refresh_token\uFF09\uFF0C\u65E0\u9700\u5B98\u65B9 API Key\uFF1B \u51ED\u636E\u7ECF AES-256-GCM \u52A0\u5BC6\u540E\u5B58\u5165\u6E20\u9053\u51ED\u636E\u6C60\uFF0C\u591A\u8D26\u53F7\u81EA\u52A8\u8F6E\u6362\uFF0C\u9047 401/429 \u81EA\u52A8\u7194\u65AD\u3002"}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(6)].map((s,t)=>e.jsx("div",{className:"skeleton h-40 rounded-xl2"},t))}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:He.map(s=>{var l;const t=cs(s);return e.jsxs(Z,{className:A("p-4 flex flex-col justify-between transition-all",(t==null?void 0:t.status)==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(ps,{size:16})}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"mt-0.5 flex items-center gap-1.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:"rounded bg-amber-500/10 px-1 text-[9px] font-medium text-amber-500",children:"Web"})]})]})]}),t?e.jsx("button",{type:"button",onClick:()=>X(t),title:"\u70B9\u51FB\u5207\u6362\u542F\u7528/\u505C\u7528",className:"shrink-0 cursor-pointer transition-transform hover:scale-105",children:e.jsx(ke,{value:t.status})}):e.jsx("span",{className:"shrink-0 rounded bg-line px-1.5 py-0.5 text-[10px] text-muted",children:"\u672A\u63A5\u5165"})]}),e.jsx("p",{className:"mt-2.5 text-[11px] leading-relaxed text-muted",children:s.desc}),e.jsxs("dl",{className:"mt-2.5 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u51ED\u636E"}),e.jsx("code",{className:"truncate text-ink max-w-[190px]",title:s.credHint,children:s.credHint})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u8D26\u53F7"}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(Re,{size:11,className:"text-muted"}),t?`${t.key_count} \u4E2A`:"\u2014",t&&t.key_count>0&&((l=t.keys)!=null&&l.some(i=>i.health_status==="demoted")?e.jsx("span",{className:"text-[10px] font-medium text-err",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-[10px] font-medium text-emerald-500",children:"\u5C31\u7EEA"}))]})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u5019\u9009\u6A21\u578B"}),e.jsxs("code",{className:"truncate text-ink max-w-[170px]",title:s.models.join(", "),children:[s.models[0]," \u7B49 ",s.models.length," \u4E2A"]})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsxs(o,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>ls(s,t),children:[e.jsx(we,{size:12}),t?"\u6DFB\u52A0\u8D26\u53F7":"\u63A5\u5165\u5E76\u6DFB\u52A0"]}),t&&e.jsxs(e.Fragment,{children:[e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>de(t.id,t.name),title:"\u62C9\u53D6/\u5BFC\u5165\u6A21\u578B","aria-label":"\u6A21\u578B\u7BA1\u7406",children:e.jsx(I,{size:13})}),e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{U(t),G(""),q(`account-${t.key_count+1}`)},title:"\u7BA1\u7406\u8D26\u53F7\u51ED\u636E","aria-label":"\u8D26\u53F7\u7BA1\u7406",children:e.jsx(pe,{size:13})}),e.jsx(o,{variant:"ghost",className:A("!h-7 !w-7 !px-0 ml-auto",t.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>X(t),title:t.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053","aria-label":t.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(_e,{size:13})}),e.jsx(o,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>je(t),title:"\u5220\u9664\u6E20\u9053","aria-label":"\u5220\u9664\u6E20\u9053",children:e.jsx(ue,{size:13})})]})]})]},s.slug)})})]}),e.jsx(Q,{open:ge,onClose:()=>L(!1),title:m.id?"\u7F16\u8F91\u4F9B\u5E94\u5546":"\u6DFB\u52A0\u4F9B\u5E94\u5546",width:560,children:e.jsxs("div",{className:"space-y-3.5",children:[!m.id&&e.jsx(O,{label:"\u5FEB\u901F\u8F7D\u5165\u9884\u8BBE\u6A21\u677F\uFF08\u53EF\u9009\uFF0C\u70B9\u51FB\u5FEB\u901F\u586B\u5165\uFF09",children:e.jsxs(Le,{onChange:s=>Je(s.target.value),defaultValue:"",children:[e.jsx("option",{value:"",children:"\u81EA\u5B9A\u4E49\u6216\u9009\u62E9\u5E38\u89C1\u9884\u8BBE..."}),Object.entries(Be).map(([s,t])=>e.jsxs("option",{value:s,children:[t.name,"\uFF08",t.kind==="anthropic"?"Anthropic \u5B98\u65B9":"OpenAI \u517C\u5BB9","\uFF09"]},s))]})}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(O,{label:"\u4F9B\u5E94\u5546\u540D\u79F0",children:e.jsx(M,{value:m.name,onChange:s=>$({...m,name:s.target.value}),placeholder:"\u4F8B\u5982: DeepSeek \u6216 OpenAI"})}),e.jsx(O,{label:"\u6E20\u9053\u6807\u8BC6 (Slug)",children:e.jsx(M,{value:m.slug,onChange:s=>$({...m,slug:s.target.value}),placeholder:"\u4F8B\u5982: deepseek"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(O,{label:"\u63A5\u53E3\u534F\u8BAE\u7C7B\u578B (Protocol)",children:e.jsxs(Le,{value:m.kind,onChange:s=>{const t=s.target.value;$({...m,kind:t,url:t==="anthropic"?"https://api.anthropic.com":m.url})},children:[e.jsx("option",{value:"openai_compat",children:"OpenAI \u517C\u5BB9\u534F\u8BAE (OpenAI / DeepSeek / Kilo / OpenCode / Google \u7B49)"}),e.jsx("option",{value:"anthropic",children:"Anthropic \u5B98\u65B9\u534F\u8BAE (Claude \u539F\u751F Messages)"})]})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(O,{label:m.kind==="anthropic"?"Base URL\uFF08Anthropic \u5B98\u65B9\u7AEF\u70B9\uFF09":"Base URL\uFF08OpenAI \u517C\u5BB9\u7AEF\u70B9\uFF09",children:e.jsx(M,{value:m.url,onChange:s=>$({...m,url:s.target.value}),placeholder:m.kind==="anthropic"?"https://api.anthropic.com":"https://api.openai.com"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(O,{label:te(m.slug)?"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u514D Key \u6E20\u9053\uFF0C\u65E0\u9700\u586B\u5199\uFF09":m.id?"\u8FFD\u52A0\u65B0\u5BC6\u94A5\uFF08\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF0C\u652F\u6301\u591A\u884C\u6279\u91CF\u5F55\u5165\uFF09":"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u5FC5\u586B\uFF0C\u652F\u6301\u7C98\u8D34\u591A\u4E2A\u4E00\u884C\u4E00\u4E2A\uFF09",children:e.jsx("textarea",{value:m.key,onChange:s=>$({...m,key:s.target.value}),placeholder:te(m.slug)?"\u8BE5\u6E20\u9053\u5B8C\u5168\u514D\u8D39\u514D Key\uFF0C\u76F4\u63A5\u4FDD\u5B58\u5373\u53EF":`sk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy (\u652F\u6301\u7C98\u8D34\u591A\u4E2AKey\u4E00\u884C\u4E00\u4E2A\uFF0C\u81EA\u52A8\u8FDB\u5165\u591AKey\u8F6E\u6362\u6C60)`,rows:2,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(o,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>L(!1),children:"\u53D6\u6D88"}),e.jsx(o,{className:"flex-1 sm:flex-initial",disabled:k,onClick:Ye,children:k?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u5E76\u83B7\u53D6\u6A21\u578B\u5217\u8868"})]})]})}),e.jsx(Q,{open:!!x,onClose:()=>w(null),title:`\u6E20\u9053\u6A21\u578B\u7BA1\u7406 \u2014 ${(x==null?void 0:x.providerName)??""}`,width:540,children:x!=null&&x.loading?e.jsxs("div",{className:"flex items-center justify-center gap-2 py-10 text-sm text-muted",children:[e.jsx(I,{size:16,className:"animate-spin"}),"\u6B63\u5728\u4ECE\u4E0A\u6E38\u62C9\u53D6\u6A21\u578B\u5217\u8868\u2026"]}):x!=null&&x.error?e.jsxs("div",{className:"py-4",children:[e.jsx("p",{className:"text-[13px] text-err mb-3",children:x.error}),e.jsxs("div",{className:"rounded-lg border border-dashed border-line p-3 bg-surface2/30 mb-4",children:[e.jsx("div",{className:"text-xs font-semibold text-ink mb-1.5",children:"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B\uFF08\u8DF3\u8FC7\u81EA\u52A8\u53D1\u73B0\uFF09"}),e.jsxs("div",{className:"flex gap-2",children:[e.jsx(M,{className:"!py-1 text-xs",value:W,onChange:s=>J(s.target.value),placeholder:"\u5982: deepseek-chat, deepseek-reasoner"}),e.jsx(o,{variant:"soft",className:"!h-[34px] !px-3 shrink-0 text-xs",onClick:Ae,children:"\u52A0\u5165"})]})]}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(o,{variant:"ghost",onClick:()=>w(null),children:"\u5173\u95ED"}),e.jsxs(o,{onClick:()=>de(x.providerId,x.providerName),children:[e.jsx(I,{size:14}),"\u91CD\u8BD5\u4E0A\u6E38\u53D1\u73B0"]}),x.picked.size>0&&e.jsxs(o,{onClick:Ue,children:["\u5BFC\u5165\u5DF2\u52A0\u6A21\u578B (",x.picked.size,")"]})]})]}):e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"mb-2 flex items-center justify-between gap-2",children:[e.jsxs("span",{className:"text-xs text-muted",children:["\u5019\u9009\u6A21\u578B\u6E05\u5355\uFF08\u5DF2\u52FE\u9009 ",(x==null?void 0:x.picked.size)??0," \u4E2A\uFF09\uFF1A"]}),e.jsxs("div",{className:"flex shrink-0 items-center gap-2",children:[e.jsx("button",{className:"text-xs text-brand hover:underline",onClick:()=>x&&w({...x,picked:new Set(x.models)}),children:"\u5168\u9009"}),e.jsxs(o,{variant:"ghost",className:"!h-6 !px-2 text-xs",title:"\u91CD\u65B0\u4ECE\u4E0A\u6E38\u62C9\u53D6\u6A21\u578B\u5217\u8868",onClick:()=>x&&de(x.providerId,x.providerName),children:[e.jsx(I,{size:12}),"\u91CD\u65B0\u62C9\u53D6\u6A21\u578B"]})]})]}),(x==null?void 0:x.note)&&e.jsx("p",{className:"mb-2 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-600",children:x.note}),e.jsxs("div",{className:"max-h-60 space-y-1 overflow-y-auto rounded-lg border border-line p-2",children:[(x==null?void 0:x.models.length)===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u672A\u53D1\u73B0\u4E0A\u6E38\u6A21\u578B\uFF0C\u53EF\u5728\u4E0B\u65B9\u624B\u52A8\u8F93\u5165\u6A21\u578B\u540D\u79F0\u6DFB\u52A0"}),x==null?void 0:x.models.map(s=>e.jsxs("label",{className:A("flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-colors",x.picked.has(s)?"bg-brand/10 text-ink":"hover:bg-surface2"),children:[e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:x.picked.has(s),onChange:()=>{const t=new Set(x.picked);t.has(s)?t.delete(s):t.add(s),w({...x,picked:t})}}),e.jsx("code",{className:"font-mono",children:s})]},s))]}),e.jsxs("div",{className:"mt-2.5 rounded-lg border border-dashed border-line p-2.5 bg-surface2/30",children:[e.jsx("div",{className:"text-[11px] font-semibold text-ink mb-1",children:"\u624B\u52A8\u8F93\u5165\u6A21\u578B\u540D\uFF08\u5982\u4E0A\u6E38\u672A\u8FD4\u56DE\uFF0C\u6216\u81EA\u5B9A\u4E49\u6A21\u578B\uFF09"}),e.jsxs("div",{className:"flex gap-2",children:[e.jsx(M,{className:"!py-1 text-xs",value:W,onChange:s=>J(s.target.value),placeholder:"\u4F8B\u5982: deepseek-chat \u6216 gpt-5 (\u652F\u6301\u9017\u53F7/\u6362\u884C\u8F93\u5165\u591A\u4E2A)"}),e.jsx(o,{variant:"soft",className:"!h-[34px] !px-3 shrink-0 text-xs",onClick:Ae,children:"\u52A0\u5165\u6E05\u5355"})]})]}),e.jsx("p",{className:"mt-2.5 text-[11px] text-muted",children:"\u5BFC\u5165\u540E\u6A21\u578B\u5373\u523B\u4E0A\u67B6\uFF1B\u5BF9\u5916\u6A21\u578B\u540D\u9ED8\u8BA4\u4E0E\u4E0A\u6E38\u4E00\u81F4\uFF0C\u53EF\u5728\u300C\u6A21\u578B\u4E0E\u5B9A\u4EF7\u300D\u4FEE\u6539\u6216\u914D\u7F6E\u81EA\u5B9A\u4E49\u522B\u540D\u3002"}),e.jsxs("div",{className:"mt-3.5 flex justify-end gap-2",children:[e.jsx(o,{variant:"ghost",onClick:()=>w(null),children:"\u53D6\u6D88"}),e.jsxs(o,{onClick:Ue,disabled:!(x!=null&&x.picked.size),children:["\u5BFC\u5165\u6240\u9009\u6A21\u578B (",(x==null?void 0:x.picked.size)??0,")"]})]})]})}),e.jsx(Q,{open:!!r,onClose:()=>U(null),title:`${_(r)?"\u6388\u6743\u8D26\u53F7\u7BA1\u7406":S(r)?"Web \u8D26\u53F7\u51ED\u636E\u7BA1\u7406":"\u5BC6\u94A5\u6C60\u7BA1\u7406"} \u2014 ${(r==null?void 0:r.name)??""}`,width:560,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:_(r)?"\u6BCF\u4E2A\u8D26\u53F7\u5BF9\u5E94\u4E00\u6761 refresh_token\uFF08AES-256-GCM \u52A0\u5BC6\u5B58\u50A8\uFF09\uFF0C\u7F51\u5173\u81EA\u52A8\u5237\u65B0 access_token \u5E76\u968F\u673A\u8F6E\u6362\uFF1B\u9047 429/401 \u81EA\u52A8\u964D\u6743\u51B7\u5374\uFF0C\u5230\u671F\u81EA\u52A8\u6062\u590D\u3002":S(r)?`${(D==null?void 0:D.credHint)??"\u7F51\u9875\u4F1A\u8BDD\u51ED\u636E"}\u3002\u6BCF\u4E2A\u8D26\u53F7\u4E00\u6761\u51ED\u636E\uFF08AES-256-GCM \u52A0\u5BC6\u5B58\u50A8\uFF09\uFF0C\u968F\u673A\u8F6E\u6362\uFF1B\u9047 401/429 \u81EA\u52A8\u7194\u65AD\u51B7\u5374\u3002`:"\u5DF2\u5F00\u542F\u591A Key \u8D1F\u8F7D\u5747\u8861\u4E0E\u5065\u5EB7\u7194\u65AD\u3002\u7F51\u5173\u4F7F\u7528 Fisher-Yates \u968F\u673A\u6253\u6563\u5B9E\u73B0\u5747\u5300\u8F6E\u6362\u5206\u6D41\uFF1B\u9047 429 \u81EA\u52A8\u964D\u6743\u8DF3\u8FC7\u5E76\u8F6E\u6362\u4E0B\u4E00\u4E2A Key\uFF0C60 \u79D2\u540E\u81EA\u52A8\u8BD5\u7528\u81EA\u6108\u3002"}),_(r)&&e.jsxs(o,{className:"w-full",variant:"soft",onClick:()=>{const s=r,t=We.find(l=>l.slug===(s==null?void 0:s.slug));!s||!t||(U(null),be(t,s))},children:[e.jsx(Ge,{size:13}),"\u6388\u6743\u65B0\u8D26\u53F7"]}),e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"text-xs font-semibold text-ink flex items-center justify-between",children:[e.jsxs("span",{className:"flex items-center gap-1.5",children:[e.jsx(pe,{size:13,className:"text-brand"}),_(r)?`\u5DF2\u6388\u6743\u8D26\u53F7\uFF08${(r==null?void 0:r.key_count)??((Ke=r==null?void 0:r.keys)==null?void 0:Ke.length)??0} \u4E2A\uFF09`:S(r)?`\u5DF2\u63A5\u5165\u8D26\u53F7\uFF08${(r==null?void 0:r.key_count)??((Oe=r==null?void 0:r.keys)==null?void 0:Oe.length)??0} \u4E2A\uFF09`:`\u5F53\u524D\u8F6E\u6362 Key \u5217\u8868\uFF08${(r==null?void 0:r.key_count)??((Me=r==null?void 0:r.keys)==null?void 0:Me.length)??0} \u4E2A\uFF09`]}),e.jsx("span",{className:"text-[11px] text-muted",children:r!=null&&r.keys_truncated?`\u4EC5\u5C55\u793A\u524D ${((Te=r==null?void 0:r.keys)==null?void 0:Te.length)??0} \u4E2A\uFF0C\u5171 ${(r==null?void 0:r.key_count)??0} \u4E2A`:_(r)||S(r)?"\u652F\u6301\u591A\u8D26\u53F7\u81EA\u52A8\u8F6E\u6362":"\u652F\u6301\u65E0\u7F1D\u6302\u8F7D\u4EFB\u610F\u591A\u4E2A Key"})]}),!(r!=null&&r.keys)||r.keys.length===0?e.jsx("div",{className:"rounded-lg border border-line p-3 text-center text-xs text-muted",children:_(r)?"\u6682\u65E0\u5DF2\u6388\u6743\u8D26\u53F7\uFF0C\u8BF7\u70B9\u51FB\u4E0A\u65B9\u300C\u6388\u6743\u65B0\u8D26\u53F7\u300D":S(r)?"\u6682\u65E0\u8D26\u53F7\u51ED\u636E\uFF0C\u8BF7\u5728\u4E0B\u65B9\u7C98\u8D34":"\u6682\u65E0\u5BC6\u94A5\uFF0C\u8BF7\u5728\u4E0B\u65B9\u5F55\u5165\u6216\u6279\u91CF\u7C98\u8D34 Key"}):e.jsx("div",{className:"max-h-52 space-y-1.5 overflow-y-auto rounded-lg border border-line p-2",children:r.keys.map(s=>e.jsxs("div",{className:"flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 rounded-lg bg-surface2/60 p-2 sm:px-2.5 sm:py-1.5 text-xs",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-1.5 min-w-0",children:[e.jsxs("code",{className:"text-ink font-mono font-medium truncate max-w-[120px] sm:max-w-[140px]",children:[s.fingerprint,"..."]}),e.jsx("span",{className:"rounded bg-line px-1 py-0.5 text-[10px] text-muted",children:s.label||"prod"}),s.status==="disabled"?e.jsx("span",{className:"rounded bg-zinc-500/10 px-1 py-0.5 text-[10px] text-zinc-400",children:"\u5DF2\u505C\u7528"}):s.health_status==="demoted"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-red-500/10 px-1 py-0.5 text-[10px] font-medium text-red-500",children:[e.jsx(hs,{size:10})," \u7194\u65AD\u51B7\u5374"]}):s.health_status==="unhealthy"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-amber-500/10 px-1 py-0.5 text-[10px] font-medium text-amber-500",children:[e.jsx(fs,{size:10})," \u5F02\u5E38(",s.failures,"\u6B21)"]}):e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-emerald-500/10 px-1 py-0.5 text-[10px] font-medium text-emerald-500",children:[e.jsx(gs,{size:10})," ",_(r)||S(r)?"\u8D26\u53F7\u5C31\u7EEA":"\u8F6E\u6362\u5C31\u7EEA"]})]}),e.jsxs("div",{className:"flex items-center justify-end gap-1 shrink-0 self-end sm:self-auto pt-0.5 sm:pt-0",children:[e.jsx(o,{variant:"ghost",className:"!h-6 !px-2 text-[11px]",onClick:()=>ss(r.id,s.id,s.status),children:s.status==="active"?"\u505C\u7528":"\u542F\u7528"}),e.jsxs(o,{variant:"ghost",className:"!h-6 !px-2 text-[11px] !text-err",onClick:()=>es(r.id,s.id),children:[e.jsx(ue,{size:11,className:"mr-0.5"}),"\u5220\u9664"]})]})]},s.id))})]}),e.jsxs("div",{className:"rounded-lg border border-dashed border-line p-3 space-y-2.5 bg-surface/50",children:[e.jsx("div",{className:"text-xs font-semibold text-ink",children:_(r)?"\u624B\u52A8\u8FFD\u52A0 refresh_token":S(r)?"\u8FFD\u52A0\u8D26\u53F7\u51ED\u636E":"\u6279\u91CF\u8FFD\u52A0\u65B0\u5BC6\u94A5"}),e.jsx("div",{className:"space-y-1",children:e.jsx("textarea",{value:T,onChange:s=>G(s.target.value),placeholder:_(r)?`\u7C98\u8D34 refresh_token\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF0C\u4F8B\u5982\uFF1A\nrt_xxxxxxxxxxxxxxxx\nrt_yyyyyyyyyyyyyyyy`:S(r)?`\u6BCF\u884C\u4E00\u4E2A\u8D26\u53F7\u51ED\u636E\uFF0C\u683C\u5F0F\uFF1A\n${(D==null?void 0:D.credHint)??""}`:`\u652F\u6301\u5355\u4E2A\u6216\u6279\u91CF\u7C98\u8D34\u591A\u4E2A Key\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF0C\u4F8B\u5982\uFF1A\nsk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy`,rows:3,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),e.jsxs("div",{className:"flex flex-col sm:flex-row sm:items-center justify-between gap-2.5",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-[11px] text-muted shrink-0",children:"\u6807\u7B7E"}),e.jsx(M,{className:"!py-1 flex-1 sm:!w-28 text-xs",value:ae,onChange:s=>q(s.target.value),placeholder:_(r)?"\u5982 account-2":"\u5982 prod-2"})]}),e.jsxs("div",{className:"flex items-center justify-end gap-2",children:[e.jsx(o,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>U(null),children:"\u5173\u95ED"}),e.jsx(o,{className:"flex-1 sm:flex-initial",onClick:De,disabled:!T.trim()||V,children:V?"\u4FDD\u5B58\u4E2D\u2026":_(r)||S(r)?"\u4FDD\u5B58\u8D26\u53F7\u51ED\u636E":"\u4FDD\u5B58\u5E76\u8FFD\u52A0\u81F3\u6C60"})]})]})]})]})}),e.jsx(Q,{open:!!d,onClose:()=>n(null),title:`${d!=null&&d.provider?"\u6DFB\u52A0\u8D26\u53F7":"\u63A5\u5165 Web \u53CD\u4EE3"} \u2014 ${(d==null?void 0:d.meta.name)??""}`,width:560,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"rounded-lg border border-line bg-surface2/50 p-3 text-[11px] text-muted leading-relaxed",children:["\u51ED\u636E\u4ECE\u6D4F\u89C8\u5668\u7F51\u9875\u4F1A\u8BDD\u83B7\u53D6\uFF1A",e.jsx("span",{className:"text-ink",children:d==null?void 0:d.meta.credHint}),e.jsx("br",{}),"\u6BCF\u884C\u4E00\u4E2A\u8D26\u53F7\uFF0C\u7C98\u8D34\u591A\u4E2A\u4F1A\u81EA\u52A8\u8FDB\u5165\u8F6E\u6362\u6C60\uFF1B\u51ED\u636E\u4EC5\u52A0\u5BC6\u5B58\u50A8\uFF0C\u4E0D\u4F1A\u56DE\u663E\u3002"]}),!(d!=null&&d.provider)&&e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(O,{label:"\u6E20\u9053\u540D\u79F0",children:e.jsx(M,{value:(d==null?void 0:d.name)??"",onChange:s=>d&&n({...d,name:s.target.value})})}),e.jsx(O,{label:"\u6E20\u9053 Slug",children:e.jsx(M,{value:(d==null?void 0:d.slug)??"",onChange:s=>d&&n({...d,slug:s.target.value})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(O,{label:"Base URL",children:e.jsx(M,{value:(d==null?void 0:d.baseUrl)??"",onChange:s=>d&&n({...d,baseUrl:s.target.value})})})})]}),e.jsx(O,{label:d!=null&&d.provider?"\u8FFD\u52A0\u8D26\u53F7\u51ED\u636E\uFF08\u4E00\u884C\u4E00\u4E2A\uFF09":d!=null&&d.meta.anonymous?"\u8D26\u53F7\u51ED\u636E\uFF08\u53EF\u9009\uFF0C\u7559\u7A7A\u8D70\u533F\u540D\u6A21\u5F0F\uFF09":"\u8D26\u53F7\u51ED\u636E\uFF08\u5FC5\u586B\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF09",children:e.jsx("textarea",{value:(d==null?void 0:d.credential)??"",onChange:s=>d&&n({...d,credential:s.target.value}),rows:4,placeholder:d==null?void 0:d.meta.credHint,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(o,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>n(null),children:"\u53D6\u6D88"}),e.jsx(o,{className:"flex-1 sm:flex-initial",onClick:ds,disabled:!!(d!=null&&d.saving)||!(d!=null&&d.credential.trim())&&!(d!=null&&d.meta.anonymous&&!(d!=null&&d.provider)),children:d!=null&&d.saving?"\u4FDD\u5B58\u4E2D\u2026":d!=null&&d.provider?"\u4FDD\u5B58\u5E76\u8FFD\u52A0":d!=null&&d.credential.trim()?"\u4FDD\u5B58\u5E76\u63A5\u5165":"\u533F\u540D\u63A5\u5165"})]})]})}),e.jsx(Q,{open:!!a,onClose:oe,title:`OAuth \u6388\u6743 \u2014 ${(a==null?void 0:a.meta.name)??""}`,width:560,children:(a==null?void 0:a.step)==="region"?e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx("p",{className:"text-xs leading-relaxed text-muted",children:"\u8BE5\u6E20\u9053\u56FD\u5185\u7248\u4E0E\u56FD\u9645\u7248\u8D26\u53F7\u4F53\u7CFB\u5B8C\u5168\u72EC\u7ACB\uFF0C\u8BF7\u9009\u62E9\u8981\u6388\u6743\u7684\u533A\u57DF\u3002\u9009\u9519\u533A\u57DF\u4F1A\u5BFC\u81F4\u6388\u6743\u6210\u529F\u4F46\u65E0\u6CD5\u8C03\u7528\u3002"}),(a.meta.regions||[]).map(s=>{const t=xe(a.meta,s.baseUrl),l=t?(f??[]).find(i=>i.slug===t.slug)??null:null;return e.jsxs("button",{onClick:()=>void $e(a.meta,l,s.baseUrl),className:"flex flex-col gap-1 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 text-left transition-colors hover:border-brand/40 hover:bg-brand/5",children:[e.jsxs("span",{className:"flex items-center gap-2 text-sm font-semibold text-ink",children:[s.label,l&&e.jsx("span",{className:"rounded bg-brand/10 px-1 text-[10px] font-medium text-brand",children:"\u590D\u7528\u5DF2\u6709\u6E20\u9053"})]}),e.jsx("span",{className:"text-[11px] text-muted",children:s.desc})]},s.baseUrl)})]}):(a==null?void 0:a.step)==="loading"?e.jsxs("div",{className:"flex items-center justify-center gap-2 py-10 text-sm text-muted",children:[e.jsx(I,{size:16,className:"animate-spin"}),"\u6B63\u5728\u5411 ",a.meta.name," \u53D1\u8D77\u6388\u6743\u8BF7\u6C42\u2026"]}):(a==null?void 0:a.step)==="error"?e.jsxs("div",{className:"space-y-4",children:[e.jsx("div",{className:"rounded-lg border border-err/30 bg-err/5 p-3 text-xs text-err leading-relaxed",children:a.message}),e.jsx("p",{className:"text-[11px] text-muted",children:"\u63D0\u793A\uFF1A\u6388\u6743\u94FE\u63A5\u6709\u6548\u671F\u7EA6 10 \u5206\u949F\uFF1B\u82E5\u4F7F\u7528\u4E86\u4EE3\u7406/\u65E0\u75D5\u7A97\u53E3\uFF0C\u8BF7\u4FDD\u6301\u540C\u4E00\u6D4F\u89C8\u5668\u5B8C\u6210\u6388\u6743\u3002\u4E5F\u53EF\u5728\u4E0B\u65B9\u624B\u52A8\u7C98\u8D34 refresh_token\u3002"}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(o,{variant:"ghost",onClick:oe,children:"\u5173\u95ED"}),e.jsxs(o,{onClick:is,children:[e.jsx(I,{size:14}),"\u91CD\u65B0\u53D1\u8D77\u6388\u6743"]})]})]}):(a==null?void 0:a.mode)==="redirect-poll"?e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs leading-relaxed text-muted",children:["\u8BF7\u5728\u6D4F\u89C8\u5668\u4E2D\u6253\u5F00\u4E0B\u65B9\u6388\u6743\u9875\uFF0C\u767B\u5F55 ",a.meta.name," \u8D26\u53F7\u5E76\u786E\u8BA4\u6388\u6743\u3002\u5B8C\u6210\u540E\u672C\u5F39\u7A97\u4F1A\u81EA\u52A8\u83B7\u53D6\u5E76\u4FDD\u5B58\u51ED\u636E\u3002"]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx(M,{readOnly:!0,value:a.url,className:"!py-1 flex-1 text-[11px] font-mono"}),e.jsx(o,{variant:"soft",className:"!h-[34px] !px-2.5 shrink-0",onClick:()=>ve(a.url),title:"\u590D\u5236\u6388\u6743\u94FE\u63A5",children:e.jsx(Ne,{size:12})}),e.jsxs(o,{className:"!h-[34px] !px-3 shrink-0",onClick:()=>window.open(a.url,"_blank","noopener,noreferrer"),children:[e.jsx(Ce,{size:12}),"\u6253\u5F00\u6388\u6743\u9875"]})]}),e.jsxs("div",{className:"flex items-center gap-2 rounded-lg border border-line bg-surface p-3 text-xs text-muted",children:[e.jsx(I,{size:13,className:"animate-spin text-brand"}),e.jsx("span",{children:a.message||"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u5B8C\u6210\u767B\u5F55\u2026"}),e.jsxs("span",{className:"ml-auto text-[10px]",children:["\u6BCF ",a.interval||5,"s \u8F6E\u8BE2"]})]}),e.jsxs("p",{className:"text-[11px] text-muted",children:["\u6388\u6743\u94FE\u63A5\u7531 ",a.meta.name," \u5B98\u65B9\u7B7E\u53D1\uFF0C\u6709\u6548\u671F\u7EA6 1 \u5C0F\u65F6\u3002\u5982\u9700\u4E3A\u540C\u4E00\u6E20\u9053\u6DFB\u52A0\u7B2C\u4E8C\u4E2A\u8D26\u53F7\uFF0C\u5EFA\u8BAE\u4F7F\u7528\u65E0\u75D5\u7A97\u53E3\u6253\u5F00\u6388\u6743\u9875\u3002"]}),e.jsx("div",{className:"flex justify-end",children:e.jsx(o,{variant:"ghost",onClick:oe,children:"\u53D6\u6D88\u6388\u6743"})})]}):(a==null?void 0:a.mode)==="device"?e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs text-muted leading-relaxed",children:["\u8BF7\u5728\u6D4F\u89C8\u5668\u4E2D\u6253\u5F00\u4E0B\u65B9\u6388\u6743\u9875\uFF0C\u767B\u5F55 ",a.meta.name," \u8D26\u53F7\u5E76\u786E\u8BA4\u8BBE\u5907\u7801\uFF1A"]}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/60 p-3 text-center",children:[e.jsx("div",{className:"text-[11px] text-muted",children:"\u8BBE\u5907\u7801 / User Code"}),e.jsx("div",{className:"mt-1 font-mono text-2xl font-bold tracking-widest text-brand",children:a.userCode||"\u2014"}),e.jsxs("div",{className:"mt-2 flex flex-wrap items-center justify-center gap-2",children:[e.jsxs(o,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>ve(a.userCode||""),children:[e.jsx(Ne,{size:11}),"\u590D\u5236\u8BBE\u5907\u7801"]}),e.jsxs(o,{className:"!h-7 !px-2.5 text-[11px]",onClick:()=>window.open(a.verificationUriComplete||a.verificationUri||a.url,"_blank","noopener,noreferrer"),children:[e.jsx(Ce,{size:11}),"\u6253\u5F00\u6388\u6743\u9875"]})]}),(a.verificationUriComplete||a.verificationUri)&&e.jsx("div",{className:"mt-2 truncate text-[10px] text-muted",title:a.verificationUriComplete||a.verificationUri,children:a.verificationUriComplete||a.verificationUri})]}),e.jsxs("div",{className:"flex items-center gap-2 rounded-lg border border-line bg-surface p-3 text-xs text-muted",children:[e.jsx(I,{size:13,className:"animate-spin text-brand"}),e.jsx("span",{children:a.message||"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026"}),a.interval?e.jsxs("span",{className:"ml-auto text-[10px]",children:["\u6BCF ",a.interval,"s \u8F6E\u8BE2"]}):null]}),e.jsx("p",{className:"text-[11px] text-muted",children:"\u5982\u9700\u4E3A\u540C\u4E00\u6E20\u9053\u6DFB\u52A0\u7B2C\u4E8C\u4E2A\u8D26\u53F7\uFF0C\u8BF7\u4F7F\u7528\u65E0\u75D5\u7A97\u53E3\u6253\u5F00\u6388\u6743\u9875\uFF0C\u907F\u514D\u6D4F\u89C8\u5668\u590D\u7528\u5DF2\u767B\u5F55\u4F1A\u8BDD\u3002"}),e.jsx("div",{className:"flex justify-end",children:e.jsx(o,{variant:"ghost",onClick:oe,children:"\u53D6\u6D88\u6388\u6743"})})]}):e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs leading-relaxed text-muted",children:["1. \u70B9\u51FB\u4E0B\u65B9\u6309\u94AE\u6253\u5F00 ",a==null?void 0:a.meta.name," \u6388\u6743\u9875\u5E76\u767B\u5F55\uFF1B",e.jsx("br",{}),"2. \u6388\u6743\u540E\u6D4F\u89C8\u5668\u4F1A\u8DF3\u8F6C\u5230 ",e.jsx("code",{className:"rounded bg-line px-1",children:"127.0.0.1"})," \u56DE\u8C03\u5730\u5740\uFF08\u9875\u9762\u6253\u4E0D\u5F00\u5C5E\u6B63\u5E38\u73B0\u8C61\uFF09\uFF1B",e.jsx("br",{}),"3. ",(a==null?void 0:a.meta.type)==="trae"?"\u76F4\u63A5\u590D\u5236\u5730\u5740\u680F\u7684\u6574\u6BB5\u56DE\u8C03 URL\uFF08\u5FC5\u987B\u542B refreshToken / authCode\uFF09\u7C98\u8D34\u5230\u4E0B\u65B9\u3002":e.jsxs(e.Fragment,{children:["\u590D\u5236\u5730\u5740\u680F ",e.jsx("code",{className:"rounded bg-line px-1",children:"code="})," \u540E\u7684\u6574\u6BB5\u5185\u5BB9\uFF08\u6216\u6574\u6BB5\u56DE\u8C03 URL\uFF09\u7C98\u8D34\u5230\u4E0B\u65B9\u3002"]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx(M,{readOnly:!0,value:(a==null?void 0:a.url)??"",className:"!py-1 flex-1 text-[11px] font-mono"}),e.jsx(o,{variant:"soft",className:"!h-[34px] !px-2.5 shrink-0",onClick:()=>ve((a==null?void 0:a.url)??""),title:"\u590D\u5236\u6388\u6743\u94FE\u63A5",children:e.jsx(Ne,{size:12})}),e.jsxs(o,{className:"!h-[34px] !px-3 shrink-0",onClick:()=>window.open((a==null?void 0:a.url)??"","_blank","noopener,noreferrer"),children:[e.jsx(Ce,{size:12}),"\u6253\u5F00"]})]}),e.jsx(O,{label:"\u6388\u6743 code \u6216\u6574\u6BB5\u56DE\u8C03\u5730\u5740",children:e.jsx("textarea",{value:(a==null?void 0:a.codeInput)??"",onChange:s=>a&&C({...a,codeInput:s.target.value}),rows:3,placeholder:"\u7C98\u8D34 code \u6216 http://localhost:xxxxx/callback?code=...",className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),(a==null?void 0:a.message)&&e.jsx("div",{className:"text-[11px] text-muted",children:a.message}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(o,{variant:"ghost",onClick:oe,children:"\u53D6\u6D88"}),e.jsx(o,{onClick:ns,disabled:(a==null?void 0:a.busy)||!(a!=null&&a.codeInput.trim()),children:a!=null&&a.busy?"\u6B63\u5728\u9A8C\u8BC1\u2026":"\u5B8C\u6210\u6388\u6743"})]})]})}),z]})}\n',
+            "/assets/Providers-BrPQBm8U.js": {
+              content: 'import{c as he,u as Fe,i as Qe,j as e,d as Z,E as Ze,q as Pe,m as A,B as o,X as xs,e as Q,n as y,r as ms,h as ke,s as us,U as Re,G as ps,F as O,k as Le,I as M,o as Ne,t as se}from"./index-KwMGOJkp.js";import{r as j}from"./vendor-BbQ_LiY-.js";import{M as Ee}from"./message-square-CrX_4GgU.js";import{R as I}from"./refresh-cw-BrzRfQC6.js";import{P as we}from"./plus-DVAh7yAY.js";import{T as ue}from"./trash-2-BF158Quc.js";import{S as hs,T as fs}from"./triangle-alert-CuVylkfm.js";import{C as gs}from"./circle-check-B2pLGJPh.js";import{E as Ce}from"./external-link-3zVIAjg3.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const pe=he("Key",[["path",{d:"m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4",key:"g0fldk"}],["path",{d:"m21 2-9.6 9.6",key:"1j0ho8"}],["circle",{cx:"7.5",cy:"15.5",r:"5.5",key:"yqb3hr"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Ge=he("LogIn",[["path",{d:"M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4",key:"u53s6r"}],["polyline",{points:"10 17 15 12 10 7",key:"1ail0h"}],["line",{x1:"15",x2:"3",y1:"12",y2:"12",key:"v6grx8"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const js=he("Pencil",[["path",{d:"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z",key:"1a8usu"}],["path",{d:"m15 5 4 4",key:"1mk7zo"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const _e=he("Power",[["path",{d:"M12 2v10",key:"mnfbl"}],["path",{d:"M18.4 6.6a9 9 0 1 1-12.77.04",key:"obofu9"}]]),vs={pending:{label:"\u5F85\u5BA1\u6838",cls:"bg-amber-500/10 text-amber-500"},approved:{label:"\u5DF2\u901A\u8FC7",cls:"bg-emerald-500/10 text-emerald-500"},rejected:{label:"\u5DF2\u9A73\u56DE",cls:"bg-red-500/10 text-red-500"}},qe=f=>f?new Date(f*1e3).toLocaleString("zh-CN",{hour12:!1}):"\u2014";function bs(){const[f,P]=j.useState(null),[R,fe]=j.useState(0),[ge,L]=j.useState(!1),[m,$]=j.useState(""),[k,E]=j.useState(null),[r,U]=j.useState(null),[T,G]=j.useState(""),[ae,q]=j.useState(!1),[V,re]=j.useState(""),[B,ne]=j.useState({}),K=Fe(),{confirm:ie,confirmEl:x}=Qe(),w=async(n=!1)=>{n||L(!0);try{const v=await y("list_provider_submissions"),z=v.result??v;P(z.submissions||[]),fe(z.pendingCount||0)}catch(v){n||K(v.message,"err")}finally{n||L(!1)}};j.useEffect(()=>{w()},[]);const W=async n=>{try{const v=await y("provider_submission_thread",{id:n.id}),z=v.result??v;U({sub:n,messages:z.messages||[]})}catch(v){K(v.message,"err")}},J=async()=>{if(!(!r||!T.trim())){q(!0);try{await y("provider_submission_reply",{id:r.sub.id,content:T.trim()}),G(""),await W(r.sub),await w(!0)}catch(n){K(n.message,"err")}finally{q(!1)}}},a=async(n,v,z)=>{$(n.id);try{await y("provider_submission_review",{id:n.id,decision:v,reason:z}),K(v==="approved"?`\u5DF2\u901A\u8FC7\uFF1A\u6E20\u9053\u300C${n.name}\u300D\u5DF2\u521B\u5EFA\u5E76\u8FDB\u5165\u5168\u7AD9\u5217\u8868`:"\u5DF2\u9A73\u56DE\u5E76\u901A\u77E5\u63D0\u4EA4\u7528\u6237","ok"),E(null),await w(!0)}catch(p){K(p.message,"err")}finally{$("")}},C=async n=>{re(n.id);try{const v=await y("provider_submission_test",{id:n.id}),z=v.result??v;ne(p=>({...p,[n.id]:z})),z.ok||K(z.message,"err")}catch(v){K(v.message,"err")}finally{re("")}},H=async n=>{await ie(`\u901A\u8FC7\u300C${n.name}\u300D\u7684\u63D0\u4EA4\uFF1F\u5C06\u521B\u5EFA\u6B63\u5F0F\u6E20\u9053${n.hasKey?"\u5E76\u5F55\u5165\u7528\u6237\u63D0\u4EA4\u7684\u5BC6\u94A5":"\uFF08\u65E0\u5BC6\u94A5\uFF0C\u9700\u624B\u52A8\u5F55\u5165\uFF09"}\u3002`)&&await a(n,"approved")},d=(f||[]).slice().sort((n,v)=>{const z=n.status==="pending"?0:n.status==="approved"?1:2,p=v.status==="pending"?0:v.status==="approved"?1:2;return z-p||v.updatedAt-n.updatedAt});return e.jsxs("div",{className:"flex flex-col gap-4",children:[x,e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:["\u7528\u6237\u63D0\u4EA4\u7684\u4F9B\u5E94\u5546\u5728\u8FD9\u91CC\u5BA1\u6838\uFF1A\u901A\u8FC7\u540E\u521B\u5EFA\u6B63\u5F0F\u6E20\u9053\uFF08\u8FDB\u5165\u5168\u7AD9\u5217\u8868\u4E0E\u8DEF\u7531\uFF09\uFF0C\u9A73\u56DE\u5FC5\u987B\u586B\u5199\u539F\u56E0\uFF08\u5BF9\u63D0\u4EA4\u7528\u6237\u53EF\u89C1\uFF09\u3002 \u5F53\u524D\u5F85\u5BA1\u6838 ",e.jsx("b",{className:"text-amber-500",children:R})," \u6761\u3002"]}),f===null?e.jsx(Z,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):d.length===0?e.jsx(Z,{children:e.jsx(Ze,{icon:e.jsx(Pe,{size:32}),title:"\u6682\u65E0\u7528\u6237\u63D0\u4EA4",hint:"\u666E\u901A\u7528\u6237\u5728\u300C\u4E2A\u4EBA\u4E3B\u9875 \u2192 \u6211\u7684\u4F9B\u5E94\u5546\u300D\u63D0\u4EA4\u6E20\u9053\u540E\uFF0C\u8FD9\u91CC\u4F1A\u51FA\u73B0\u5F85\u5BA1\u6838\u8BB0\u5F55\u3002"})}):d.map(n=>{const v=vs[n.status];return e.jsxs(Z,{className:"p-4",children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-sm font-semibold text-ink",children:n.name}),e.jsx("code",{className:"rounded bg-line px-1.5 py-0.5 text-[10px] text-muted font-mono",children:n.slug}),e.jsx("span",{className:A("rounded px-1.5 py-0.5 text-[10px] font-medium",v.cls),children:v.label}),n.hasKey&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] text-brand",children:"\u542B\u5BC6\u94A5"}),n.providerId&&e.jsxs("code",{className:"rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-500 font-mono",children:[n.providerId.slice(0,8),"\u2026"]})]}),e.jsx("div",{className:"mt-1 truncate text-[11px] text-muted font-mono",children:n.baseUrl}),e.jsxs("div",{className:"mt-1 text-[10px] text-muted",children:["\u63D0\u4EA4\u4EBA ",n.ownerEmail||"\u2014"," \xB7 ",qe(n.createdAt),n.status==="rejected"&&n.rejectionReason&&e.jsxs("span",{className:"text-err",children:[" \xB7 \u9A73\u56DE\u539F\u56E0\uFF1A",n.rejectionReason]})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs(o,{variant:"soft",className:"!h-7 !px-2 text-[11px]",onClick:()=>void W(n),children:[e.jsx(Ee,{size:12}),"\u5F80\u6765"]}),n.status==="pending"&&e.jsxs(e.Fragment,{children:[e.jsxs(o,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:V===n.id,onClick:()=>void C(n),title:"\u89E3\u5BC6\u7528\u6237\u5BC6\u94A5\u8BBF\u95EE\u4E0A\u6E38 /models \u9A8C\u8BC1\u8FDE\u901A",children:[e.jsx(I,{size:12,className:A(V===n.id&&"animate-spin")}),V===n.id?"\u6D4B\u8BD5\u4E2D\u2026":"\u6D4B\u8BD5\u8FDE\u901A"]}),e.jsxs(o,{variant:"soft",className:"!h-7 !px-2 text-[11px] !text-emerald-500",disabled:m===n.id,onClick:()=>void H(n),children:[e.jsx(Pe,{size:12}),"\u901A\u8FC7"]}),e.jsxs(o,{variant:"soft",className:"!h-7 !px-2 text-[11px] !text-err",disabled:m===n.id,onClick:()=>E({sub:n,reason:""}),children:[e.jsx(xs,{size:12}),"\u9A73\u56DE"]})]})]})]}),B[n.id]&&e.jsxs("div",{className:A("mt-2 rounded-lg px-2.5 py-1.5 text-[11px]",B[n.id].ok?"bg-emerald-500/10 text-emerald-500":"bg-red-500/10 text-err"),children:["\u8FDE\u901A\u6D4B\u8BD5\uFF1A",B[n.id].message]})]},n.id)}),e.jsxs(Q,{open:!!k,onClose:()=>E(null),title:`\u9A73\u56DE\u300C${(k==null?void 0:k.sub.name)??""}\u300D`,width:480,children:[e.jsx("p",{className:"mb-3 text-xs text-muted",children:"\u9A73\u56DE\u539F\u56E0\u5C06\u540C\u6B65\u5230\u7AD9\u5185\u4FE1\u7EBF\u7A0B\uFF0C\u5BF9\u63D0\u4EA4\u7528\u6237\u53EF\u89C1\u3002"}),e.jsx("textarea",{rows:3,value:(k==null?void 0:k.reason)??"",onChange:n=>E(v=>v&&{...v,reason:n.target.value}),placeholder:"\u4F8B\u5982\uFF1ABase URL \u4E0D\u53EF\u8FBE / \u5BC6\u94A5\u65E0\u6548 / \u4E0E\u73B0\u6709\u6E20\u9053\u91CD\u590D\u2026",className:"w-full resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs("div",{className:"mt-3 flex justify-end gap-2",children:[e.jsx(o,{variant:"ghost",onClick:()=>E(null),children:"\u53D6\u6D88"}),e.jsx(o,{variant:"danger",disabled:!(k!=null&&k.reason.trim())||m===(k==null?void 0:k.sub.id),onClick:()=>k&&void a(k.sub,"rejected",k.reason.trim()),children:m===(k==null?void 0:k.sub.id)?"\u5904\u7406\u4E2D\u2026":"\u786E\u8BA4\u9A73\u56DE"})]})]}),e.jsxs(Q,{open:!!r,onClose:()=>U(null),title:`\u5F80\u6765\u6D88\u606F \xB7 ${(r==null?void 0:r.sub.name)??""}`,width:560,children:[e.jsxs("div",{className:"max-h-[46vh] space-y-2.5 overflow-y-auto pr-1",children:[((r==null?void 0:r.messages)||[]).length===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u6682\u65E0\u6D88\u606F"}),((r==null?void 0:r.messages)||[]).map(n=>e.jsx("div",{className:A("flex",n.fromRole==="admin"?"justify-end":"justify-start"),children:e.jsxs("div",{className:A("max-w-[80%] rounded-xl2 px-3 py-2 text-[12px] leading-relaxed",n.fromRole==="admin"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.jsxs("div",{className:A("mb-1 text-[10px]",n.fromRole==="admin"?"text-white/70":"text-muted"),children:[n.fromRole==="admin"?"\u7BA1\u7406\u5458\uFF08\u6211\uFF09":n.fromEmail," \xB7 ",qe(n.createdAt)]}),e.jsx("div",{className:"whitespace-pre-wrap break-words",children:n.content})]})},n.id))]}),e.jsxs("div",{className:"mt-3 flex items-end gap-2 border-t border-line pt-3",children:[e.jsx("textarea",{value:T,onChange:n=>G(n.target.value),rows:2,placeholder:"\u56DE\u590D\u63D0\u4EA4\u7528\u6237\uFF08\u5904\u7406\u7ED3\u679C\u3001\u4FEE\u6539\u8981\u6C42\u7B49\uFF09\u2026",className:"max-h-28 min-h-[44px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs(o,{className:"h-11",disabled:ae||!T.trim(),onClick:()=>void J(),children:[e.jsx(Ee,{size:14}),ae?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001"]})]})]}),ge&&e.jsx("div",{className:"fixed bottom-6 right-6 rounded-full bg-surface p-2 shadow-card text-muted",children:e.jsx(I,{size:16,className:"animate-spin"})})]})}const Be={deepseek:{name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com"},openai:{name:"OpenAI",slug:"openai",kind:"openai_compat",url:"https://api.openai.com"},anthropic:{name:"Anthropic",slug:"anthropic",kind:"anthropic",url:"https://api.anthropic.com"},google:{name:"Google Gemini",slug:"google",kind:"openai_compat",url:"https://generativelanguage.googleapis.com/v1beta/openai"},kilo:{name:"Kilo (\u514DKey)",slug:"kilo",kind:"openai_compat",url:"https://api.kilo.ai/api/gateway"},opencode:{name:"OpenCode (\u514DKey)",slug:"opencode",kind:"openai_compat",url:"https://opencode.ai/zen/v1"},duckai:{name:"Duck.ai (\u514DKey)",slug:"duckai",kind:"openai_compat",url:"https://duck.ai"},bigmodel:{name:"\u667A\u8C31 GLM (BigModel)",slug:"bigmodel",kind:"openai_compat",url:"https://open.bigmodel.cn/api/paas/v4"},lingbao:{name:"\u7075\u5B9D UI \u6865\u63A5",slug:"lingbao",kind:"openai_compat",url:"http://127.0.0.1:20141"}},te=f=>f==="opencode"||f==="duckai"||f==="kilo",ys=f=>!!f&&f.startsWith("oauth:"),ks=f=>!!f&&f.startsWith("web:"),_=f=>ys(f==null?void 0:f.kind),S=f=>ks(f==null?void 0:f.kind),We=[{type:"claude",name:"Claude (Anthropic)",slug:"claude-oauth",baseUrl:"https://api.anthropic.com",mode:"redirect",desc:"Claude Code OAuth \u6388\u6743\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Anthropic Messages \u534F\u8BAE\u3002",models:["claude-sonnet-4-5","claude-opus-4-5","claude-haiku-4-5"]},{type:"codex",name:"Codex",slug:"codex-oauth",baseUrl:"https://chatgpt.com/backend-api/codex",mode:"redirect",desc:"Codex \u8D26\u53F7\u6388\u6743\uFF08Codex CLI\uFF09\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Responses \u534F\u8BAE\u3002",models:["gpt-5.5","gpt-5.4","gpt-5.3-codex"]},{type:"antigravity",name:"Antigravity (Google)",slug:"antigravity-oauth",baseUrl:"https://daily-cloudcode-pa.googleapis.com",mode:"redirect",desc:"Google \u8D26\u53F7\u6388\u6743\uFF08Antigravity \u5BA2\u6237\u7AEF\uFF09\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Gemini \u534F\u8BAE\u3002",models:["gemini-3.7-flash","gemini-3.1-pro"]},{type:"kimi",name:"Kimi (Moonshot)",slug:"kimi-oauth",baseUrl:"https://api.kimi.ai/coding",mode:"device",desc:"Kimi \u8BBE\u5907\u7801\u6388\u6743\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\uFF08\u56FD\u9645\u7AD9/\u4E2D\u56FD\u7AD9\u81EA\u52A8\u8BC6\u522B\uFF09\u3002",models:["kimi-for-coding","kimi-for-coding-highspeed"]},{type:"qwen",name:"Qwen (\u901A\u4E49\u5343\u95EE)",slug:"qwen-oauth",baseUrl:"https://portal.qwen.ai/v1",mode:"device",desc:"Qwen \u8BBE\u5907\u7801\u6388\u6743\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\u3002",models:["coder-model","qwen3-coder-plus"]},{type:"grok",name:"Grok (xAI)",slug:"grok-oauth",baseUrl:"https://cli-chat-proxy.grok.com/v1",mode:"device",desc:"xAI \u8BBE\u5907\u7801\u6388\u6743\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Responses \u534F\u8BAE\u3002",models:["grok-4.6","grok-4.5"]},{type:"codebuddy",name:"CodeBuddy / WorkBuddy (\u817E\u8BAF)",slug:"codebuddy-oauth",baseUrl:"https://copilot.tencent.com",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u5185\u7248",baseUrl:"https://copilot.tencent.com",desc:"copilot.tencent.com / codebuddy.cn\uFF0C\u817E\u8BAF\u4E91\u8D26\u53F7\u4F53\u7CFB"},{label:"\u56FD\u9645\u7248",baseUrl:"https://www.workbuddy.ai",desc:"workbuddy.ai\uFF0C\u4E0E\u56FD\u5185\u7248\u8D26\u53F7\u5B8C\u5168\u72EC\u7ACB"}],desc:"\u817E\u8BAF CodeBuddy / WorkBuddy \u8D26\u53F7\u6388\u6743\uFF0C\u56FD\u5185\u7248\u4E0E\u56FD\u9645\u7248\u5171\u7528\u540C\u4E00\u5165\u53E3\uFF0C\u6388\u6743\u65F6\u9009\u62E9\u533A\u57DF\u3002",models:["deepseek-v4.1-flash"]},{type:"zcode",name:"ZCode (\u667A\u8C31)",slug:"zcode-oauth",baseUrl:"https://zcode.z.ai",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08chat.z.ai\uFF09",baseUrl:"https://chat.z.ai",desc:"chat.z.ai OAuth\uFF08\u90AE\u7BB1\u767B\u5F55\uFF09\uFF0C\u8D70 z.ai \u7684\u4F53\u9A8C/\u7F16\u7A0B\u5957\u9910\u989D\u5EA6"},{label:"\u56FD\u5185\u7248\uFF08zchat.z.ai\uFF09",baseUrl:"https://zchat.z.ai",desc:"zchat.z.ai OAuth\uFF08\u624B\u673A\u53F7\u767B\u5F55\uFF09\uFF1B\u65E7\u7684 bigmodel \u5FAE\u4FE1\u626B\u7801\u5165\u53E3\u5DF2\u4E0B\u7EBF"}],desc:"\u667A\u8C31 ZCode \u5BA2\u6237\u7AEF\u989D\u5EA6\u901A\u9053\uFF08GLM-5.3 / GLM-5.3-Flash\uFF09\uFF0CAnthropic \u534F\u8BAE\u53CD\u4EE3\uFF1B\u767B\u5F55\u5DF2\u8FC1\u5230 Z.ai OAuth\uFF1A\u56FD\u9645 chat.z.ai\u3001\u56FD\u5185 zchat.z.ai\uFF0Cbigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0D\u53EF\u7528\u3002",models:["GLM-5.3","GLM-5.3-Flash"]},{type:"qoder",name:"Qoder",slug:"qoder-oauth",baseUrl:"https://qoder.com",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08qoder.com\uFF09",baseUrl:"https://qoder.com",desc:"api3.qoder.sh \u63A8\u7406\u96C6\u7FA4\uFF0C\u8D26\u53F7\u4E0E\u56FD\u5185\u7248\u72EC\u7ACB"},{label:"\u56FD\u5185\u7248\uFF08qoder.com.cn\uFF09",baseUrl:"https://qoder.com.cn",desc:"gateway.qoder.com.cn\uFF0CQoderWork \u8D26\u53F7\u4F53\u7CFB"}],desc:"Qoder \u8D26\u53F7\u8BBE\u5907\u6388\u6743\uFF08COSY \u7B7E\u540D\u53CD\u4EE3\uFF09\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\uFF0C\u652F\u6301\u6BCF\u65E5\u7B7E\u5230\u9886 Credits\u3002",models:["auto","qmodel_38max","qfmodel","qmodel_latest","gmodel","dmodel"]},{type:"trae",name:"Trae (\u5B57\u8282\u8DF3\u52A8)",slug:"trae-oauth",baseUrl:"https://core-normal.traeapi.us",mode:"redirect",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08trae.ai\uFF09",baseUrl:"https://core-normal.traeapi.us",desc:"core-normal.traeapi.us / coresg-normal.trae.ai\uFF0CBearer \u9274\u6743"},{label:"\u56FD\u5185\u7248\uFF08trae.cn\uFF09",baseUrl:"https://trae-api-cn.mchost.guru",desc:"trae-api-cn.mchost.guru\uFF0CCloud-IDE-JWT \u9274\u6743\uFF0C\u4E0E\u56FD\u5185\u8D26\u53F7\u7ED1\u5B9A"}],desc:"Trae IDE \u8D26\u53F7\u6388\u6743\uFF08\u56FD\u5185\u7248 / \u56FD\u9645\u7248\u8D26\u53F7\u4F53\u7CFB\u72EC\u7ACB\uFF09\u3002\u6388\u6743\u540E\u6D4F\u89C8\u5668\u4F1A\u8DF3\u5230 127.0.0.1 \u56DE\u8C03\u5730\u5740\uFF0C\u628A\u5730\u5740\u680F\u6574\u6BB5 URL \u7C98\u8D34\u56DE\u6765\u5373\u53EF\u3002",models:["Gemini-3.1-Pro-Preview","Claude-Sonnet-4.6","GPT-5.5","glm-5.3","kimi-k3","deepseek-V3"]},{type:"cline",name:"Cline",slug:"cline-oauth",baseUrl:"https://api.cline.bot",mode:"device",desc:"Cline \u8D26\u53F7 WorkOS \u8BBE\u5907\u7801\u6388\u6743\uFF0C\u81EA\u52A8\u9002\u914D\u514D\u8D39\u901A\u9053\u4E0E\u300C\u8D26\u53F7\xD7\u6A21\u578B\u300D\u51B7\u5374\u3002",models:["cline-free/mimo-v2.6-flash","cline-free/nemotron-3.5-super-vl","nvidia/nemotron-3.5-lightning:free"]}],He=[{type:"deepseek",name:"DeepSeek \u7F51\u9875\u7248",slug:"deepseek-web",baseUrl:"https://chat.deepseek.com/api/v0",desc:"\u7F51\u9875 userToken \u53CD\u4EE3\uFF0C\u81EA\u52A8\u89E3 PoW\uFF1Btoken \u7EA6 24h \u6709\u6548\u3002",credHint:"userToken\uFF08chat.deepseek.com \u767B\u5F55\u540E localStorage \u91CC\u7684 JWT\uFF09\u6216\u5B98\u65B9 API Key\uFF08sk- \u5F00\u5934\uFF09",models:["deepseek-v4-flash","deepseek-v4-pro","deepseek-v4-flash-search"]},{type:"kimiweb",name:"Kimi \u7F51\u9875\u7248",slug:"kimi-web",baseUrl:"https://www.kimi.ai",desc:"Kimi \u7F51\u9875 Connect-RPC \u534F\u8BAE\u53CD\u4EE3\uFF0Crefresh_token \u81EA\u52A8\u7EED\u671F\u3002",credHint:"access_token(JWT) \u6216 refresh_token\uFF08www.kimi.ai \u767B\u5F55\u540E Local Storage\uFF09",models:["k3","k3-agent-ultra","k2d6","k2d6-search"]},{type:"geminiweb",name:"Gemini \u7F51\u9875\u7248",slug:"gemini-web",baseUrl:"https://gemini.google.com",desc:"Gemini \u7F51\u9875 Cookie \u53CD\u4EE3\uFF08SAPISIDHASH \u9274\u6743\uFF09\uFF1B\u4E0D\u7559\u51ED\u636E\u53EF\u76F4\u63A5\u533F\u540D\u4F7F\u7528\uFF0C\u989D\u5EA6\u4E0E\u6A21\u578B\u53D7\u9650\u3002",credHint:"Cookie \u5B57\u7B26\u4E32\uFF08\u542B __Secure-1PSID / __Secure-3PSID / SAPISID\uFF09\uFF1B\u7559\u7A7A\u5373\u533F\u540D\u6A21\u5F0F",models:["gemini-3.7-flash","gemini-3.1-pro","gemini-3.5-flash-thinking"],anonymous:!0},{type:"minimaxweb",name:"MiniMax Agent \u7F51\u9875\u7248",slug:"minimax-web",baseUrl:"https://agent.minimaxi.com",desc:"MiniMax Agent \u7F51\u9875 SSE \u53CD\u4EE3\uFF0C\u9700\u8981\u7F51\u9875\u4F1A\u8BDD\u7B7E\u540D\u53C2\u6570\u3002",credHint:"token|agentId|uuid|deviceId|userId\uFF08token \u4E3A JWT\uFF0C\u5176\u4F59\u53EF\u4ECE HAR \u53D6\uFF0C\u81F3\u5C11\u586B token\uFF09",models:["MiniMax-M3","MiniMax-M3-thinking","MiniMax-M2.1"]},{type:"lingxi",name:"\u7075\u7280\u7F51\u9875\u7248\uFF08\u4E2D\u56FD\u79FB\u52A8\uFF09",slug:"lingxi-web",baseUrl:"https://ai.yun.139.com",desc:"\u4E2D\u56FD\u79FB\u52A8\u7075\u7280\u7F51\u9875\u53CD\u4EE3\uFF0CBasic \u6388\u6743 + userId\u3002",credHint:"authorization|userId|sourceChannel\uFF08authorization \u5F62\u5982 Basic xxx\uFF09",models:["lingxi-default","qwen-3.7-plus","deepseek-4.0-pro"]},{type:"chatgptweb",name:"ChatGPT \u7F51\u9875\u7248",slug:"chatgpt-web",baseUrl:"https://chatgpt.com",desc:"ChatGPT \u7F51\u9875/App \u534F\u8BAE\u53CD\u4EE3\uFF08sentinel + PoW\uFF09\uFF0C\u9002\u5408 Free \u8D26\u53F7\u3002",credHint:"refresh_token\uFF08rt_xxx / rt.1.xxx\uFF1B\u4E5F\u652F\u6301\u53D1\u8D27\u6574\u884C\u81EA\u52A8\u63D0\u53D6\uFF09",models:["gpt-5-5","gpt-5-4","gpt-5-3"]}];function Ks(){var Ke,Oe,Me,Te;const[f,P]=j.useState(null),[R,fe]=j.useState("direct"),[ge,L]=j.useState(!1),[m,$]=j.useState({id:"",name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com",key:""}),[k,E]=j.useState(!1),[r,U]=j.useState(null),[T,G]=j.useState(""),[ae,q]=j.useState("prod"),[V,re]=j.useState(!1),B=j.useRef(!1),ne=j.useRef(!1),K=j.useRef(!1),ie=j.useRef(!1),[x,w]=j.useState(null),[W,J]=j.useState(""),[a,C]=j.useState(null),H=j.useRef(null),[d,n]=j.useState(null),{confirm:v,confirmEl:z}=Qe(),p=Fe(),Y=()=>y("list_providers").then(s=>P(s.providers)).catch(s=>p(s.message,"err"));j.useEffect(()=>{Y()},[]),j.useEffect(()=>()=>ce(),[]);const ze=()=>{$({id:"",name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com",key:""}),L(!0)},Ve=s=>{$({id:s.id,name:s.name,slug:s.slug,kind:s.kind||(s.slug==="anthropic"?"anthropic":"openai_compat"),url:s.base_url,key:""}),L(!0)},Je=s=>{const t=Be[s];t&&$(l=>({...l,name:t.name,slug:t.slug,kind:t.kind,url:t.url}))},Ye=async()=>{var t;if(ne.current)return;if(!m.name.trim())return p("\u8BF7\u586B\u5199\u4F9B\u5E94\u5546\u540D\u79F0","err");if(!m.slug.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053\u6807\u8BC6\u7B26 (Slug)","err");const s=te(m.slug);if(!m.id&&!m.key.trim()&&!s)return p("\u6DFB\u52A0\u4F9B\u5E94\u5546\u5FC5\u987B\u5F55\u5165\u4E0A\u6E38\u5BC6\u94A5","err");ne.current=!0,E(!0);try{const l={name:m.name.trim(),slug:m.slug.trim().toLowerCase(),kind:m.kind,baseUrl:m.url.trim()};m.id&&(l.id=m.id),m.key.trim()&&(l.key=m.key.trim()),await y("upsert_provider",l);const i=m.id||((t=(await y("list_providers")).providers.find(c=>c.name===m.name))==null?void 0:t.id)||"";p("\u4F9B\u5E94\u5546\u5DF2\u4FDD\u5B58"),L(!1),Y(),i&&(w({providerId:i,providerName:m.name,models:[],picked:new Set,loading:!0}),await le(i,m.name,m.url,m.key.trim()))}catch(l){p(l.message,"err")}finally{ne.current=!1,E(!1)}},Se=j.useRef({}),le=async(s,t,l,i)=>{i&&(Se.current[s]=i);const c=i||Se.current[s]||"";let u=null,N="";if(c&&l)try{const h=await fetch(`${l.replace(/\\/+$/,"")}/v1/models`,{headers:{authorization:`Bearer ${c}`},signal:AbortSignal.timeout(2e4)});h.ok&&(u=((await h.json()).data??[]).map(g=>g.id).filter(g=>!!g).sort())}catch{}if(u===null)try{const h=await y("list_upstream_models",{providerId:s});u=h.models,h.note&&(N=h.degraded?`\u4E0A\u6E38\u6A21\u578B\u76EE\u5F55\u4E0D\u53EF\u7528\uFF0C\u5DF2\u56DE\u9000\u515C\u5E95\u6E05\u5355\uFF1A${h.note}`:h.note)}catch(h){w({providerId:s,providerName:t,models:[],picked:new Set,loading:!1,error:h.message});return}w({providerId:s,providerName:t,models:u??[],picked:new Set(u??[]),loading:!1,note:N||void 0})},Xe=(s,t)=>{J(""),w({providerId:s,providerName:t,models:[],picked:new Set,loading:!1})},de=async(s,t)=>{const l=(f??[]).find(i=>i.id===s);w({providerId:s,providerName:t,models:[],picked:new Set,loading:!0}),await le(s,t,(l==null?void 0:l.base_url)??"","")},Ae=()=>{if(!W.trim()||!x)return;const s=W.split(/[\\r\\n,]+/).map(i=>i.trim()).filter(Boolean);if(!s.length)return;const t=Array.from(new Set([...x.models,...s])),l=new Set(x.picked);s.forEach(i=>l.add(i)),w({...x,models:t,picked:l}),J(""),p(`\u5DF2\u6DFB\u52A0 ${s.length} \u4E2A\u6A21\u578B\u5230\u52FE\u9009\u5217\u8868`)},Ue=async()=>{var t;if(!x)return;const s=[...x.picked];if(!s.length)return p("\u8BF7\u81F3\u5C11\u9009\u62E9\u4E00\u4E2A\u6A21\u578B","err");try{const l=await y("import_models",{providerId:x.providerId,models:s,priority:10});p(`\u5DF2\u5BFC\u5165 ${((t=l.result)==null?void 0:t.imported)??s.length} \u4E2A\u6A21\u578B\uFF0C\u53EF\u5728\u300C\u6A21\u578B\u4E0E\u5B9A\u4EF7\u300D\u8C03\u6574\u5B9A\u4EF7`),w(null),Y()}catch(l){p(l.message,"err")}},De=async()=>{var s,t,l;if(!(!T.trim()||!r)&&!B.current){B.current=!0,re(!0);try{const i=await y("upsert_provider_key",{providerId:r.id,key:T.trim(),label:ae.trim()||(_(r)||S(r)?`account-${(r.key_count??0)+1}`:"prod")}),c=(s=i.result)!=null&&s.fingerprint?`\uFF08\u6307\u7EB9 ${i.result.fingerprint}\uFF09`:"";(t=i.result)!=null&&t.duplicate&&!((l=i.result)!=null&&l.count)?p(`\u8BE5\u51ED\u636E\u5DF2\u5728\u6C60\u4E2D\uFF0C\u672A\u91CD\u590D\u6DFB\u52A0${c}`):p(_(r)||S(r)?`\u8D26\u53F7\u51ED\u636E\u5DF2\u52A0\u5BC6\u5165\u5E93${c}`:`\u5BC6\u94A5\u5DF2\u52A0\u5BC6\u5165\u5E93${c}`);const u=T.trim();G("");const N=await y("list_providers");P(N.providers);const h=N.providers.find(b=>b.id===r.id);h&&U(h),!_(r)&&(!h||h.keys&&h.keys.length<=1)&&(w({providerId:r.id,providerName:r.name,models:[],picked:new Set,loading:!0}),await le(r.id,r.name,r.base_url,S(r)?"":u))}catch(i){p(i.message,"err")}finally{B.current=!1,re(!1)}}},es=async(s,t)=>{if(await v("\u786E\u8BA4\u5220\u9664\u8BE5\u51ED\u636E\uFF1F\u8BE5\u51ED\u636E\u5C06\u4ECE\u591A Key \u8C03\u5EA6\u6C60\u4E2D\u5F7B\u5E95\u79FB\u9664\u3002"))try{await y("delete_provider_key",{providerId:s,keyId:t}),p("\u51ED\u636E\u5DF2\u4ECE\u6C60\u4E2D\u5220\u9664");const l=await y("list_providers");P(l.providers);const i=l.providers.find(c=>c.id===s);i&&U(i)}catch(l){p(l.message,"err")}},ss=async(s,t,l)=>{const i=l==="active"?"disabled":"active";try{await y("toggle_provider_key",{providerId:s,keyId:t,status:i}),p(`\u8D26\u53F7\u5DF2${i==="active"?"\u542F\u7528":"\u505C\u7528"}`);const c=await y("list_providers");P(c.providers);const u=c.providers.find(N=>N.id===s);u&&U(u)}catch(c){p(c.message,"err")}},X=async s=>{const t=s.status==="active"?"disabled":"active";try{await y("toggle_provider",{id:s.id,status:t}),p(`\u5DF2${t==="active"?"\u542F\u7528":"\u505C\u7528"}\u6E20\u9053\u300C${s.name}\u300D`),Y()}catch(l){p(l.message,"err")}},je=async s=>{if(await v(`\u5220\u9664\u4F9B\u5E94\u5546\u300C${s.name}\u300D\uFF1F\u5176\u6A21\u578B\u6620\u5C04\u4E0E\u4E0A\u6E38\u51ED\u636E\u5C06\u4E00\u5E76\u5220\u9664\uFF0C\u4E0D\u53EF\u6062\u590D\u3002`))try{await y("delete_provider",{id:s.id}),p("\u5DF2\u5220\u9664"),Y()}catch(t){p(t.message,"err")}},ce=()=>{H.current!==null&&(window.clearTimeout(H.current),H.current=null)},oe=()=>{ce(),C(null)},ve=async s=>{try{await navigator.clipboard.writeText(s),p("\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F")}catch{p("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u590D\u5236","err")}},ts=(s,t)=>(t==null?void 0:t.base_url)||s.baseUrl,xe=(s,t)=>s.regionSelect?s.type==="zcode"?/zchat\\.z\\.ai/i.test(t)?{slug:"zcode-cn-oauth",name:"ZCode \u56FD\u5185\u7248 (zchat)"}:/bigmodel\\.cn/i.test(t)?{slug:"zcode-bigmodel-oauth",name:"ZCode \u56FD\u5185\u7248 (bigmodel\xB7\u65E7)"}:{slug:"zcode-oauth",name:"ZCode \u56FD\u9645\u7248 (chat.z.ai)"}:s.type==="qoder"?/qoder\\.com\\.cn/i.test(t)?{slug:"qoder-cn-oauth",name:"Qoder \u56FD\u5185\u7248"}:{slug:"qoder-oauth",name:"Qoder \u56FD\u9645\u7248 (qoder.com)"}:s.type==="trae"?/trae\\.cn|trae\\.com\\.cn|mchost\\.guru/i.test(t)?{slug:"trae-cn-oauth",name:"Trae \u56FD\u5185\u7248 (trae.cn)"}:{slug:"trae-global-oauth",name:"Trae \u56FD\u9645\u7248 (trae.ai)"}:/workbuddy\\.ai/i.test(t)?{slug:"codebuddy-global-oauth",name:"CodeBuddy \u56FD\u9645\u7248"}:{slug:"codebuddy-oauth",name:"CodeBuddy \u56FD\u5185\u7248"}:null,as=s=>{const t=new Set([s.slug]);for(const l of s.regions??[]){const i=xe(s,l.baseUrl);i&&t.add(i.slug)}return s.type==="zcode"&&t.add("zcode-bigmodel-oauth"),[...t]},Ie=async(s,t,l,i,c)=>{var u,N,h,b;C(g=>g&&{...g,busy:!0,message:"\u6B63\u5728\u4FDD\u5B58\u8D26\u53F7\u51ED\u636E\u2026"});try{const g=xe(s,t),ee=(g==null?void 0:g.slug)??s.slug,F=(g==null?void 0:g.name)??s.name,me=await se("oauth_add_account",{provider:s.type,slug:ee,name:F,baseUrl:t,refreshToken:l,...i?{email:i}:{},...c?{identity:c}:{}}),ye=((u=me.result)==null?void 0:u.providerId)||"";if(!ye)throw new Error("OAuth \u6E20\u9053\u4FDD\u5B58\u5931\u8D25");p((N=me.result)!=null&&N.duplicate&&((h=me.result)==null?void 0:h.count)===0?"\u8BE5\u51ED\u636E\u5DF2\u5728\u6C60\u4E2D\uFF0C\u672A\u91CD\u590D\u6DFB\u52A0":`\u6388\u6743\u6210\u529F\uFF0C\u8D26\u53F7\u5DF2\u52A0\u5BC6\u5165\u5E93\uFF08\u6307\u7EB9 ${((b=me.result)==null?void 0:b.fingerprint)??""}\uFF09`),ce(),C(null);const os=await y("list_providers");P(os.providers),w({providerId:ye,providerName:F,models:[],picked:new Set,loading:!0}),await le(ye,F,t,"")}catch(g){const ee=g.message;p(ee,"err"),C(F=>F&&{...F,step:"error",message:ee,busy:!1})}},rs=(s,t,l,i)=>{const c=async()=>{var u;try{const N=await y("oauth_poll",{provider:s.type,state:l}),h=N.result??N,b=h.refresh_token||h.refreshToken;if(h.status==="ok"&&b){await Ie(s,t,b,h.email,(u=h.account)==null?void 0:u.uid);return}if(h.status==="error"){C(g=>g&&{...g,step:"error",message:h.message||"\u6388\u6743\u5931\u8D25"});return}C(g=>g&&{...g,message:"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026"}),H.current=window.setTimeout(c,Math.max(2,i)*1e3)}catch(N){C(h=>h&&{...h,step:"error",message:N.message})}};H.current=window.setTimeout(c,Math.max(2,i)*1e3)},be=async(s,t)=>{if(ce(),s.regionSelect){C({meta:s,provider:t??null,mode:s.mode,baseUrl:s.baseUrl,url:"",state:"",step:"region",codeInput:""});return}await $e(s,t??null,ts(s,t??null))},$e=async(s,t,l)=>{if(ce(),s.type==="zcode"&&/bigmodel\\.cn/i.test(l)){try{const i=await y("list_providers");let c=!1;i.providers.some(N=>N.slug==="zcode-bigmodel-oauth")||(await se("upsert_provider",{name:"ZCode \u56FD\u5185\u7248 (bigmodel\xB7\u65E7)",slug:"zcode-bigmodel-oauth",kind:"oauth:zcode",baseUrl:l}),c=!0);const u=c?await y("list_providers"):i;P(u.providers),C(null),p(c?"\u5DF2\u521B\u5EFA\u65E7\u7248\u56FD\u5185\u6E20\u9053\uFF1A\u8BF7\u7C98\u8D34\u5BA2\u6237\u7AEF access_token\u3002\u6CE8\u610F bigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0B\u7EBF\uFF0C\u5EFA\u8BAE\u6539\u7528 zchat.z.ai \u91CD\u65B0\u6388\u6743":"\u65E7\u7248\u56FD\u5185\u6E20\u9053\u5DF2\u5B58\u5728\uFF0C\u76F4\u63A5\u590D\u7528\uFF1A\u8BF7\u5728\u8BE5\u6E20\u9053\u5361\u7247\u4E0A\u7C98\u8D34\u5BA2\u6237\u7AEF access_token\u3002\u6CE8\u610F bigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0B\u7EBF\uFF0C\u5EFA\u8BAE\u6539\u7528 zchat.z.ai \u91CD\u65B0\u6388\u6743","ok")}catch(i){C(c=>c&&{...c,step:"error",message:i.message})}return}C({meta:s,provider:t,mode:s.mode,baseUrl:l,url:"",state:"",step:"loading",codeInput:""});try{const c=(await se("oauth_start",{provider:s.type,baseUrl:l})).result??{},u=c.mode||s.mode;C({meta:s,provider:t,mode:u,baseUrl:l,url:c.url??"",state:c.state??"",userCode:c.user_code,verificationUri:c.verification_uri,verificationUriComplete:c.verification_uri_complete,interval:Number(c.interval)||5,step:u==="redirect"?"ready":"polling",codeInput:"",message:u==="device"?"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026":u==="redirect-poll"?"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u5B8C\u6210\u767B\u5F55\u2026":void 0}),u!=="redirect"&&c.state&&rs(s,l,c.state,Number(c.interval)||5)}catch(i){C(c=>c&&{...c,step:"error",message:i.message})}},ns=async()=>{var s,t,l,i;if(a&&!ie.current){if(!a.codeInput.trim())return p("\u8BF7\u7C98\u8D34\u6388\u6743\u8FD4\u56DE\u7684 code \u6216\u6574\u6BB5\u56DE\u8C03\u5730\u5740","err");ie.current=!0,C({...a,busy:!0,message:"\u6B63\u5728\u6362\u53D6 access_token\u2026"});try{const c=await se("oauth_complete",{provider:a.meta.type,code:a.codeInput.trim(),state:a.state,baseUrl:a.baseUrl}),u=(s=c.result)==null?void 0:s.refreshToken;if(!u)throw new Error("\u4E0A\u6E38\u672A\u8FD4\u56DE refresh_token");await Ie(a.meta,a.baseUrl,u,(t=c.result)==null?void 0:t.email,(i=(l=c.result)==null?void 0:l.account)==null?void 0:i.uid)}catch(c){p(c.message,"err"),C(u=>u&&{...u,step:"error",message:c.message,busy:!1})}finally{ie.current=!1}}},is=()=>{a&&be(a.meta,a.provider??void 0)},ls=(s,t)=>{n({meta:s,provider:t??null,name:(t==null?void 0:t.name)??s.name,slug:(t==null?void 0:t.slug)??s.slug,baseUrl:(t==null?void 0:t.base_url)??s.baseUrl,credential:""})},ds=async()=>{var t,l,i;if(!d||K.current)return;const s=d;if(!s.provider&&!s.credential.trim()&&!s.meta.anonymous)return p("\u8BF7\u7C98\u8D34\u8D26\u53F7\u51ED\u636E","err");if(!s.provider){if(!s.name.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053\u540D\u79F0","err");if(!s.slug.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053 Slug","err");if(!s.baseUrl.trim())return p("\u8BF7\u586B\u5199 Base URL","err")}K.current=!0,n({...s,saving:!0});try{let c=((t=s.provider)==null?void 0:t.id)||"";if(c)await se("upsert_provider_key",{providerId:c,key:s.credential.trim(),label:`account-${(((l=s.provider)==null?void 0:l.key_count)??0)+1}`});else{await se("upsert_provider",{name:s.name.trim(),slug:s.slug.trim().toLowerCase(),kind:`web:${s.meta.type}`,baseUrl:s.baseUrl.trim(),key:s.credential.trim()||void 0});const u=await y("list_providers");c=((i=u.providers.find(N=>N.slug===s.slug.trim().toLowerCase()))==null?void 0:i.id)||"",P(u.providers)}if(!c)throw new Error("Web \u6E20\u9053\u521B\u5EFA\u5931\u8D25");p(s.credential.trim()?"Web \u6E20\u9053\u51ED\u636E\u5DF2\u52A0\u5BC6\u5165\u5E93":"Web \u6E20\u9053\u5DF2\u63A5\u5165\uFF08\u533F\u540D\u6A21\u5F0F\uFF0C\u65E0\u51ED\u636E\uFF09"),n(null),Y(),w({providerId:c,providerName:s.name,models:[],picked:new Set,loading:!0}),await le(c,s.name,s.baseUrl,"")}catch(c){p(c.message,"err"),n(u=>u&&{...u,saving:!1})}finally{K.current=!1}},cs=s=>(f??[]).find(t=>t.slug===s.slug||t.kind===`web:${s.type}`),D=(s=>s?He.find(t=>t.slug===s.slug||s.kind===`web:${t.type}`):void 0)(r);return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["direct","API \u76F4\u8FDE"],["oauth","OAuth \u6388\u6743"],["web","Web \u53CD\u4EE3"],["subs","\u7528\u6237\u63D0\u4EA4"]].map(([s,t])=>e.jsx("button",{role:"tab","aria-selected":R===s,onClick:()=>fe(s),className:A("rounded-md px-4 py-1.5 text-xs font-medium transition-colors",R===s?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:t},s))}),R==="subs"&&e.jsx(bs,{}),R==="direct"&&e.jsxs(e.Fragment,{children:[e.jsx("div",{className:"flex justify-end",children:e.jsxs(o,{onClick:ze,children:[e.jsx(we,{size:14}),"\u6DFB\u52A0\u4F9B\u5E94\u5546"]})}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(8)].map((s,t)=>e.jsx("div",{className:"skeleton h-36 rounded-xl2"},t))}):f.filter(s=>!_(s)&&!S(s)).length===0?e.jsx(Z,{children:e.jsx(Ze,{icon:e.jsx(ms,{size:32}),title:"\u8FD8\u6CA1\u6709\u4E0A\u6E38\u4F9B\u5E94\u5546",hint:"\u6DFB\u52A0\u4F60\u6301\u6709\u6388\u6743\u7684\u4F9B\u5E94\u5546\u5E76\u5F55\u5165\u5BC6\u94A5\uFF0C\u5373\u53EF\u4E00\u952E\u5BFC\u5165\u6A21\u578B\u5217\u8868\u3002",action:e.jsx(o,{className:"mt-2",onClick:ze,children:"\u6DFB\u52A0\u4F9B\u5E94\u5546"})})}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:f.filter(s=>!_(s)&&!S(s)).map(s=>{var t;return e.jsxs(Z,{className:A("p-4 flex flex-col justify-between transition-all",s.status==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-sm font-bold text-brand",children:s.name[0]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"flex items-center gap-1.5 mt-0.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:"text-[9px] rounded bg-line px-1 text-muted",children:s.slug==="anthropic"||s.kind==="anthropic"?"Anthropic \u539F\u751F":te(s.slug)?"\u514D Key":"OpenAI \u517C\u5BB9"})]})]})]}),e.jsx("button",{type:"button",onClick:()=>X(s),title:`\u70B9\u51FB${s.status==="active"?"\u505C\u7528":"\u542F\u7528"}\u8BE5\u6E20\u9053\uFF08\u505C\u7528\u540E\u76F8\u5E94\u6A21\u578B\u5728\u6A21\u578B\u6C60\u4E0E\u5B9A\u4EF7\u4E2D\u9690\u85CF\uFF09`,className:"cursor-pointer transition-transform hover:scale-105 shrink-0",children:e.jsx(ke,{value:s.status})})]}),e.jsxs("dl",{className:"mt-3 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0 text-muted",children:"\u7AEF\u70B9"}),e.jsx("code",{className:"truncate text-ink max-w-[140px]",title:s.base_url,children:s.base_url})]}),e.jsxs("div",{className:"flex justify-between items-center",children:[e.jsx("span",{children:"\u5BC6\u94A5"}),e.jsx("span",{className:"text-ink truncate",children:te(s.slug)?e.jsx("span",{className:"text-emerald-500 font-medium",children:"\u514D Key"}):e.jsxs("span",{className:"inline-flex items-center gap-1",children:[s.key_count," \u4E2A",s.key_count===0?e.jsx("span",{className:"text-warn",children:"\uFF08\u672A\u5F55\uFF09"}):(t=s.keys)!=null&&t.some(l=>l.health_status==="demoted")?e.jsx("span",{className:"text-err font-medium text-[10px]",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-emerald-500 font-medium text-[10px]",children:"\u5C31\u7EEA"})]})})]}),s.authorization_expires_at&&e.jsxs("div",{className:"flex justify-between",children:[e.jsx("span",{children:"\u6388\u6743\u5230\u671F"}),e.jsx("span",{className:"text-ink",children:new Date(s.authorization_expires_at*1e3).toLocaleDateString("zh-CN")})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>de(s.id,s.name),title:"\u4ECE\u4E0A\u6E38\u5BFC\u5165\u6216\u624B\u52A8\u6DFB\u52A0\u6A21\u578B","aria-label":"\u5BFC\u5165\u6A21\u578B",children:e.jsx(I,{size:13})}),e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>Xe(s.id,s.name),title:"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B","aria-label":"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B",children:e.jsx(we,{size:13})}),!te(s.slug)&&e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{U(s),G(""),q("prod")},title:`\u7BA1\u7406\u591A Key \u8F6E\u6362\u6C60\uFF08\u5F53\u524D ${s.key_count} \u4E2A\uFF09`,"aria-label":"\u5BC6\u94A5\u6C60",children:e.jsx(pe,{size:13})}),e.jsx(o,{variant:"ghost",className:A("!h-7 !w-7 !px-0",s.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>X(s),title:`\u5207\u6362\u6E20\u9053\u542F\u7528/\u505C\u7528\u72B6\u6001\uFF08\u5F53\u524D${s.status==="active"?"\u542F\u7528":"\u505C\u7528"}\uFF09`,"aria-label":s.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(_e,{size:13})}),e.jsx(o,{variant:"ghost",className:"!h-7 !w-7 !px-0",onClick:()=>Ve(s),title:"\u7F16\u8F91\u4F9B\u5E94\u5546","aria-label":"\u7F16\u8F91\u4F9B\u5E94\u5546",children:e.jsx(js,{size:13})}),e.jsx(o,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>je(s),title:"\u5220\u9664\u4F9B\u5E94\u5546","aria-label":`\u5220\u9664 ${s.name}`,children:e.jsx(ue,{size:13})})]})]},s.id)})})]}),R==="oauth"&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:"OAuth \u6E20\u9053\u901A\u8FC7\u8D26\u53F7\u6388\u6743\u63A5\u5165\uFF08\u5B9E\u73B0\u79FB\u690D\u81EA CLIProxyAPI\uFF09\uFF1Arefresh_token \u7ECF AES-256-GCM \u52A0\u5BC6\u540E\u5B58\u5165\u6E20\u9053\u51ED\u636E\u6C60\uFF0C access_token \u81EA\u52A8\u5237\u65B0\uFF1B\u540C\u4E00\u6E20\u9053\u53EF\u6388\u6743\u591A\u4E2A\u8D26\u53F7\uFF0C\u81EA\u52A8\u8F6E\u6362\u3001\u9047 429/401 \u81EA\u52A8\u7194\u65AD\u51B7\u5374\u3002"}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(8)].map((s,t)=>e.jsx("div",{className:"skeleton h-40 rounded-xl2"},t))}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:We.map(s=>{const t=new Set(as(s)),l=(f??[]).filter(b=>t.has(b.slug)),i=l.find(b=>(b.key_count??0)>0)??l[0]??null,c=Math.max(0,l.length-1),u=l.reduce((b,g)=>b+(g.key_count??0),0),N=l.some(b=>{var g;return(g=b.keys)==null?void 0:g.some(ee=>ee.health_status==="demoted")}),h=b=>{const g=xe(s,b.base_url);return g?g.name:b.name};return e.jsxs(Z,{className:A("p-4 flex flex-col justify-between transition-all",(i==null?void 0:i.status)==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(us,{size:16})}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"mt-0.5 flex items-center gap-1.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:(i==null?void 0:i.slug)??s.slug}),e.jsx("span",{className:"rounded bg-brand/10 px-1 text-[9px] font-medium text-brand",children:"OAuth"}),c>0&&e.jsxs("span",{className:"rounded bg-line px-1 text-[9px] text-muted",title:`${s.name} \u8FD8\u6709 ${c} \u4E2A\u5176\u4ED6\u533A\u57DF\u7684\u6E20\u9053\uFF0C\u53EF\u5728\u300C\u8D26\u53F7\u6C60\u300D\u4E2D\u67E5\u770B`,children:["+",c," \u533A\u57DF"]})]})]})]}),i?e.jsx("button",{type:"button",onClick:()=>X(i),title:"\u70B9\u51FB\u5207\u6362\u542F\u7528/\u505C\u7528",className:"shrink-0 cursor-pointer transition-transform hover:scale-105",children:e.jsx(ke,{value:i.status})}):e.jsx("span",{className:"shrink-0 rounded bg-line px-1.5 py-0.5 text-[10px] text-muted",children:"\u672A\u63A5\u5165"})]}),e.jsx("p",{className:"mt-2.5 text-[11px] leading-relaxed text-muted",children:s.desc}),e.jsxs("dl",{className:"mt-2.5 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u6388\u6743\u65B9\u5F0F"}),e.jsx("span",{className:"text-ink",children:s.mode==="device"?"\u8BBE\u5907\u7801\u8F6E\u8BE2":s.mode==="redirect-poll"?"\u6388\u6743\u94FE\u63A5 + \u8F6E\u8BE2":"PKCE \u6388\u6743\u94FE\u63A5"})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u8D26\u53F7"}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(Re,{size:11,className:"text-muted"}),l.length?`${u} \u4E2A`:"\u2014",u>0&&(N?e.jsx("span",{className:"text-[10px] font-medium text-err",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-[10px] font-medium text-emerald-500",children:"\u5C31\u7EEA"}))]})]}),l.length>1&&e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u533A\u57DF"}),e.jsx("span",{className:"truncate text-ink",title:l.map(b=>`${h(b)}\uFF08${b.key_count} \u4E2A\u8D26\u53F7${b.status==="disabled"?" \xB7 \u505C\u7528":""}\uFF09`).join("\uFF1B"),children:l.map(b=>`${h(b)} ${b.key_count}`).join(" / ")})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u5019\u9009\u6A21\u578B"}),e.jsxs("code",{className:"truncate text-ink max-w-[170px]",title:s.models.join(", "),children:[s.models[0]," \u7B49 ",s.models.length," \u4E2A"]})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsxs(o,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>be(s,i),children:[e.jsx(Ge,{size:12}),i?"\u6388\u6743\u65B0\u8D26\u53F7":"\u6388\u6743\u5E76\u6DFB\u52A0"]}),i&&e.jsxs(e.Fragment,{children:[e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>de(i.id,i.name),title:"\u62C9\u53D6/\u5BFC\u5165\u6A21\u578B","aria-label":"\u6A21\u578B\u7BA1\u7406",children:e.jsx(I,{size:13})}),e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{U(i),G(""),q(`account-${i.key_count+1}`)},title:"\u7BA1\u7406\u6388\u6743\u8D26\u53F7","aria-label":"\u8D26\u53F7\u7BA1\u7406",children:e.jsx(pe,{size:13})}),e.jsx(o,{variant:"ghost",className:A("!h-7 !w-7 !px-0 ml-auto",i.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>X(i),title:i.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053","aria-label":i.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(_e,{size:13})}),e.jsx(o,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>je(i),title:"\u5220\u9664\u6E20\u9053","aria-label":"\u5220\u9664\u6E20\u9053",children:e.jsx(ue,{size:13})})]})]})]},s.slug)})})]}),R==="web"&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:"Web \u53CD\u4EE3\u6E20\u9053\u4F7F\u7528\u6D4F\u89C8\u5668\u7F51\u9875\u4F1A\u8BDD\u51ED\u636E\uFF08Cookie / userToken / refresh_token\uFF09\uFF0C\u65E0\u9700\u5B98\u65B9 API Key\uFF1B \u51ED\u636E\u7ECF AES-256-GCM \u52A0\u5BC6\u540E\u5B58\u5165\u6E20\u9053\u51ED\u636E\u6C60\uFF0C\u591A\u8D26\u53F7\u81EA\u52A8\u8F6E\u6362\uFF0C\u9047 401/429 \u81EA\u52A8\u7194\u65AD\u3002"}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(6)].map((s,t)=>e.jsx("div",{className:"skeleton h-40 rounded-xl2"},t))}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:He.map(s=>{var l;const t=cs(s);return e.jsxs(Z,{className:A("p-4 flex flex-col justify-between transition-all",(t==null?void 0:t.status)==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(ps,{size:16})}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"mt-0.5 flex items-center gap-1.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:"rounded bg-amber-500/10 px-1 text-[9px] font-medium text-amber-500",children:"Web"})]})]})]}),t?e.jsx("button",{type:"button",onClick:()=>X(t),title:"\u70B9\u51FB\u5207\u6362\u542F\u7528/\u505C\u7528",className:"shrink-0 cursor-pointer transition-transform hover:scale-105",children:e.jsx(ke,{value:t.status})}):e.jsx("span",{className:"shrink-0 rounded bg-line px-1.5 py-0.5 text-[10px] text-muted",children:"\u672A\u63A5\u5165"})]}),e.jsx("p",{className:"mt-2.5 text-[11px] leading-relaxed text-muted",children:s.desc}),e.jsxs("dl",{className:"mt-2.5 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u51ED\u636E"}),e.jsx("code",{className:"truncate text-ink max-w-[190px]",title:s.credHint,children:s.credHint})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u8D26\u53F7"}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(Re,{size:11,className:"text-muted"}),t?`${t.key_count} \u4E2A`:"\u2014",t&&t.key_count>0&&((l=t.keys)!=null&&l.some(i=>i.health_status==="demoted")?e.jsx("span",{className:"text-[10px] font-medium text-err",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-[10px] font-medium text-emerald-500",children:"\u5C31\u7EEA"}))]})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u5019\u9009\u6A21\u578B"}),e.jsxs("code",{className:"truncate text-ink max-w-[170px]",title:s.models.join(", "),children:[s.models[0]," \u7B49 ",s.models.length," \u4E2A"]})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsxs(o,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>ls(s,t),children:[e.jsx(we,{size:12}),t?"\u6DFB\u52A0\u8D26\u53F7":"\u63A5\u5165\u5E76\u6DFB\u52A0"]}),t&&e.jsxs(e.Fragment,{children:[e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>de(t.id,t.name),title:"\u62C9\u53D6/\u5BFC\u5165\u6A21\u578B","aria-label":"\u6A21\u578B\u7BA1\u7406",children:e.jsx(I,{size:13})}),e.jsx(o,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{U(t),G(""),q(`account-${t.key_count+1}`)},title:"\u7BA1\u7406\u8D26\u53F7\u51ED\u636E","aria-label":"\u8D26\u53F7\u7BA1\u7406",children:e.jsx(pe,{size:13})}),e.jsx(o,{variant:"ghost",className:A("!h-7 !w-7 !px-0 ml-auto",t.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>X(t),title:t.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053","aria-label":t.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(_e,{size:13})}),e.jsx(o,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>je(t),title:"\u5220\u9664\u6E20\u9053","aria-label":"\u5220\u9664\u6E20\u9053",children:e.jsx(ue,{size:13})})]})]})]},s.slug)})})]}),e.jsx(Q,{open:ge,onClose:()=>L(!1),title:m.id?"\u7F16\u8F91\u4F9B\u5E94\u5546":"\u6DFB\u52A0\u4F9B\u5E94\u5546",width:560,children:e.jsxs("div",{className:"space-y-3.5",children:[!m.id&&e.jsx(O,{label:"\u5FEB\u901F\u8F7D\u5165\u9884\u8BBE\u6A21\u677F\uFF08\u53EF\u9009\uFF0C\u70B9\u51FB\u5FEB\u901F\u586B\u5165\uFF09",children:e.jsxs(Le,{onChange:s=>Je(s.target.value),defaultValue:"",children:[e.jsx("option",{value:"",children:"\u81EA\u5B9A\u4E49\u6216\u9009\u62E9\u5E38\u89C1\u9884\u8BBE..."}),Object.entries(Be).map(([s,t])=>e.jsxs("option",{value:s,children:[t.name,"\uFF08",t.kind==="anthropic"?"Anthropic \u5B98\u65B9":"OpenAI \u517C\u5BB9","\uFF09"]},s))]})}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(O,{label:"\u4F9B\u5E94\u5546\u540D\u79F0",children:e.jsx(M,{value:m.name,onChange:s=>$({...m,name:s.target.value}),placeholder:"\u4F8B\u5982: DeepSeek \u6216 OpenAI"})}),e.jsx(O,{label:"\u6E20\u9053\u6807\u8BC6 (Slug)",children:e.jsx(M,{value:m.slug,onChange:s=>$({...m,slug:s.target.value}),placeholder:"\u4F8B\u5982: deepseek"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(O,{label:"\u63A5\u53E3\u534F\u8BAE\u7C7B\u578B (Protocol)",children:e.jsxs(Le,{value:m.kind,onChange:s=>{const t=s.target.value;$({...m,kind:t,url:t==="anthropic"?"https://api.anthropic.com":m.url})},children:[e.jsx("option",{value:"openai_compat",children:"OpenAI \u517C\u5BB9\u534F\u8BAE (OpenAI / DeepSeek / Kilo / OpenCode / Google \u7B49)"}),e.jsx("option",{value:"anthropic",children:"Anthropic \u5B98\u65B9\u534F\u8BAE (Claude \u539F\u751F Messages)"})]})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(O,{label:m.kind==="anthropic"?"Base URL\uFF08Anthropic \u5B98\u65B9\u7AEF\u70B9\uFF09":"Base URL\uFF08OpenAI \u517C\u5BB9\u7AEF\u70B9\uFF09",children:e.jsx(M,{value:m.url,onChange:s=>$({...m,url:s.target.value}),placeholder:m.kind==="anthropic"?"https://api.anthropic.com":"https://api.openai.com"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(O,{label:te(m.slug)?"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u514D Key \u6E20\u9053\uFF0C\u65E0\u9700\u586B\u5199\uFF09":m.id?"\u8FFD\u52A0\u65B0\u5BC6\u94A5\uFF08\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF0C\u652F\u6301\u591A\u884C\u6279\u91CF\u5F55\u5165\uFF09":"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u5FC5\u586B\uFF0C\u652F\u6301\u7C98\u8D34\u591A\u4E2A\u4E00\u884C\u4E00\u4E2A\uFF09",children:e.jsx("textarea",{value:m.key,onChange:s=>$({...m,key:s.target.value}),placeholder:te(m.slug)?"\u8BE5\u6E20\u9053\u5B8C\u5168\u514D\u8D39\u514D Key\uFF0C\u76F4\u63A5\u4FDD\u5B58\u5373\u53EF":`sk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy (\u652F\u6301\u7C98\u8D34\u591A\u4E2AKey\u4E00\u884C\u4E00\u4E2A\uFF0C\u81EA\u52A8\u8FDB\u5165\u591AKey\u8F6E\u6362\u6C60)`,rows:2,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(o,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>L(!1),children:"\u53D6\u6D88"}),e.jsx(o,{className:"flex-1 sm:flex-initial",disabled:k,onClick:Ye,children:k?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u5E76\u83B7\u53D6\u6A21\u578B\u5217\u8868"})]})]})}),e.jsx(Q,{open:!!x,onClose:()=>w(null),title:`\u6E20\u9053\u6A21\u578B\u7BA1\u7406 \u2014 ${(x==null?void 0:x.providerName)??""}`,width:540,children:x!=null&&x.loading?e.jsxs("div",{className:"flex items-center justify-center gap-2 py-10 text-sm text-muted",children:[e.jsx(I,{size:16,className:"animate-spin"}),"\u6B63\u5728\u4ECE\u4E0A\u6E38\u62C9\u53D6\u6A21\u578B\u5217\u8868\u2026"]}):x!=null&&x.error?e.jsxs("div",{className:"py-4",children:[e.jsx("p",{className:"text-[13px] text-err mb-3",children:x.error}),e.jsxs("div",{className:"rounded-lg border border-dashed border-line p-3 bg-surface2/30 mb-4",children:[e.jsx("div",{className:"text-xs font-semibold text-ink mb-1.5",children:"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B\uFF08\u8DF3\u8FC7\u81EA\u52A8\u53D1\u73B0\uFF09"}),e.jsxs("div",{className:"flex gap-2",children:[e.jsx(M,{className:"!py-1 text-xs",value:W,onChange:s=>J(s.target.value),placeholder:"\u5982: deepseek-chat, deepseek-reasoner"}),e.jsx(o,{variant:"soft",className:"!h-[34px] !px-3 shrink-0 text-xs",onClick:Ae,children:"\u52A0\u5165"})]})]}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(o,{variant:"ghost",onClick:()=>w(null),children:"\u5173\u95ED"}),e.jsxs(o,{onClick:()=>de(x.providerId,x.providerName),children:[e.jsx(I,{size:14}),"\u91CD\u8BD5\u4E0A\u6E38\u53D1\u73B0"]}),x.picked.size>0&&e.jsxs(o,{onClick:Ue,children:["\u5BFC\u5165\u5DF2\u52A0\u6A21\u578B (",x.picked.size,")"]})]})]}):e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"mb-2 flex items-center justify-between gap-2",children:[e.jsxs("span",{className:"text-xs text-muted",children:["\u5019\u9009\u6A21\u578B\u6E05\u5355\uFF08\u5DF2\u52FE\u9009 ",(x==null?void 0:x.picked.size)??0," \u4E2A\uFF09\uFF1A"]}),e.jsxs("div",{className:"flex shrink-0 items-center gap-2",children:[e.jsx("button",{className:"text-xs text-brand hover:underline",onClick:()=>x&&w({...x,picked:new Set(x.models)}),children:"\u5168\u9009"}),e.jsxs(o,{variant:"ghost",className:"!h-6 !px-2 text-xs",title:"\u91CD\u65B0\u4ECE\u4E0A\u6E38\u62C9\u53D6\u6A21\u578B\u5217\u8868",onClick:()=>x&&de(x.providerId,x.providerName),children:[e.jsx(I,{size:12}),"\u91CD\u65B0\u62C9\u53D6\u6A21\u578B"]})]})]}),(x==null?void 0:x.note)&&e.jsx("p",{className:"mb-2 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-600",children:x.note}),e.jsxs("div",{className:"max-h-60 space-y-1 overflow-y-auto rounded-lg border border-line p-2",children:[(x==null?void 0:x.models.length)===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u672A\u53D1\u73B0\u4E0A\u6E38\u6A21\u578B\uFF0C\u53EF\u5728\u4E0B\u65B9\u624B\u52A8\u8F93\u5165\u6A21\u578B\u540D\u79F0\u6DFB\u52A0"}),x==null?void 0:x.models.map(s=>e.jsxs("label",{className:A("flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-colors",x.picked.has(s)?"bg-brand/10 text-ink":"hover:bg-surface2"),children:[e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:x.picked.has(s),onChange:()=>{const t=new Set(x.picked);t.has(s)?t.delete(s):t.add(s),w({...x,picked:t})}}),e.jsx("code",{className:"font-mono",children:s})]},s))]}),e.jsxs("div",{className:"mt-2.5 rounded-lg border border-dashed border-line p-2.5 bg-surface2/30",children:[e.jsx("div",{className:"text-[11px] font-semibold text-ink mb-1",children:"\u624B\u52A8\u8F93\u5165\u6A21\u578B\u540D\uFF08\u5982\u4E0A\u6E38\u672A\u8FD4\u56DE\uFF0C\u6216\u81EA\u5B9A\u4E49\u6A21\u578B\uFF09"}),e.jsxs("div",{className:"flex gap-2",children:[e.jsx(M,{className:"!py-1 text-xs",value:W,onChange:s=>J(s.target.value),placeholder:"\u4F8B\u5982: deepseek-chat \u6216 gpt-5 (\u652F\u6301\u9017\u53F7/\u6362\u884C\u8F93\u5165\u591A\u4E2A)"}),e.jsx(o,{variant:"soft",className:"!h-[34px] !px-3 shrink-0 text-xs",onClick:Ae,children:"\u52A0\u5165\u6E05\u5355"})]})]}),e.jsx("p",{className:"mt-2.5 text-[11px] text-muted",children:"\u5BFC\u5165\u540E\u6A21\u578B\u5373\u523B\u4E0A\u67B6\uFF1B\u5BF9\u5916\u6A21\u578B\u540D\u9ED8\u8BA4\u4E0E\u4E0A\u6E38\u4E00\u81F4\uFF0C\u53EF\u5728\u300C\u6A21\u578B\u4E0E\u5B9A\u4EF7\u300D\u4FEE\u6539\u6216\u914D\u7F6E\u81EA\u5B9A\u4E49\u522B\u540D\u3002"}),e.jsxs("div",{className:"mt-3.5 flex justify-end gap-2",children:[e.jsx(o,{variant:"ghost",onClick:()=>w(null),children:"\u53D6\u6D88"}),e.jsxs(o,{onClick:Ue,disabled:!(x!=null&&x.picked.size),children:["\u5BFC\u5165\u6240\u9009\u6A21\u578B (",(x==null?void 0:x.picked.size)??0,")"]})]})]})}),e.jsx(Q,{open:!!r,onClose:()=>U(null),title:`${_(r)?"\u6388\u6743\u8D26\u53F7\u7BA1\u7406":S(r)?"Web \u8D26\u53F7\u51ED\u636E\u7BA1\u7406":"\u5BC6\u94A5\u6C60\u7BA1\u7406"} \u2014 ${(r==null?void 0:r.name)??""}`,width:560,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:_(r)?"\u6BCF\u4E2A\u8D26\u53F7\u5BF9\u5E94\u4E00\u6761 refresh_token\uFF08AES-256-GCM \u52A0\u5BC6\u5B58\u50A8\uFF09\uFF0C\u7F51\u5173\u81EA\u52A8\u5237\u65B0 access_token \u5E76\u968F\u673A\u8F6E\u6362\uFF1B\u9047 429/401 \u81EA\u52A8\u964D\u6743\u51B7\u5374\uFF0C\u5230\u671F\u81EA\u52A8\u6062\u590D\u3002":S(r)?`${(D==null?void 0:D.credHint)??"\u7F51\u9875\u4F1A\u8BDD\u51ED\u636E"}\u3002\u6BCF\u4E2A\u8D26\u53F7\u4E00\u6761\u51ED\u636E\uFF08AES-256-GCM \u52A0\u5BC6\u5B58\u50A8\uFF09\uFF0C\u968F\u673A\u8F6E\u6362\uFF1B\u9047 401/429 \u81EA\u52A8\u7194\u65AD\u51B7\u5374\u3002`:"\u5DF2\u5F00\u542F\u591A Key \u8D1F\u8F7D\u5747\u8861\u4E0E\u5065\u5EB7\u7194\u65AD\u3002\u7F51\u5173\u4F7F\u7528 Fisher-Yates \u968F\u673A\u6253\u6563\u5B9E\u73B0\u5747\u5300\u8F6E\u6362\u5206\u6D41\uFF1B\u9047 429 \u81EA\u52A8\u964D\u6743\u8DF3\u8FC7\u5E76\u8F6E\u6362\u4E0B\u4E00\u4E2A Key\uFF0C60 \u79D2\u540E\u81EA\u52A8\u8BD5\u7528\u81EA\u6108\u3002"}),_(r)&&e.jsxs(o,{className:"w-full",variant:"soft",onClick:()=>{const s=r,t=We.find(l=>l.slug===(s==null?void 0:s.slug));!s||!t||(U(null),be(t,s))},children:[e.jsx(Ge,{size:13}),"\u6388\u6743\u65B0\u8D26\u53F7"]}),e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"text-xs font-semibold text-ink flex items-center justify-between",children:[e.jsxs("span",{className:"flex items-center gap-1.5",children:[e.jsx(pe,{size:13,className:"text-brand"}),_(r)?`\u5DF2\u6388\u6743\u8D26\u53F7\uFF08${(r==null?void 0:r.key_count)??((Ke=r==null?void 0:r.keys)==null?void 0:Ke.length)??0} \u4E2A\uFF09`:S(r)?`\u5DF2\u63A5\u5165\u8D26\u53F7\uFF08${(r==null?void 0:r.key_count)??((Oe=r==null?void 0:r.keys)==null?void 0:Oe.length)??0} \u4E2A\uFF09`:`\u5F53\u524D\u8F6E\u6362 Key \u5217\u8868\uFF08${(r==null?void 0:r.key_count)??((Me=r==null?void 0:r.keys)==null?void 0:Me.length)??0} \u4E2A\uFF09`]}),e.jsx("span",{className:"text-[11px] text-muted",children:r!=null&&r.keys_truncated?`\u4EC5\u5C55\u793A\u524D ${((Te=r==null?void 0:r.keys)==null?void 0:Te.length)??0} \u4E2A\uFF0C\u5171 ${(r==null?void 0:r.key_count)??0} \u4E2A`:_(r)||S(r)?"\u652F\u6301\u591A\u8D26\u53F7\u81EA\u52A8\u8F6E\u6362":"\u652F\u6301\u65E0\u7F1D\u6302\u8F7D\u4EFB\u610F\u591A\u4E2A Key"})]}),!(r!=null&&r.keys)||r.keys.length===0?e.jsx("div",{className:"rounded-lg border border-line p-3 text-center text-xs text-muted",children:_(r)?"\u6682\u65E0\u5DF2\u6388\u6743\u8D26\u53F7\uFF0C\u8BF7\u70B9\u51FB\u4E0A\u65B9\u300C\u6388\u6743\u65B0\u8D26\u53F7\u300D":S(r)?"\u6682\u65E0\u8D26\u53F7\u51ED\u636E\uFF0C\u8BF7\u5728\u4E0B\u65B9\u7C98\u8D34":"\u6682\u65E0\u5BC6\u94A5\uFF0C\u8BF7\u5728\u4E0B\u65B9\u5F55\u5165\u6216\u6279\u91CF\u7C98\u8D34 Key"}):e.jsx("div",{className:"max-h-52 space-y-1.5 overflow-y-auto rounded-lg border border-line p-2",children:r.keys.map(s=>e.jsxs("div",{className:"flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 rounded-lg bg-surface2/60 p-2 sm:px-2.5 sm:py-1.5 text-xs",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-1.5 min-w-0",children:[e.jsxs("code",{className:"text-ink font-mono font-medium truncate max-w-[120px] sm:max-w-[140px]",children:[s.fingerprint,"..."]}),e.jsx("span",{className:"rounded bg-line px-1 py-0.5 text-[10px] text-muted",children:s.label||"prod"}),s.status==="disabled"?e.jsx("span",{className:"rounded bg-zinc-500/10 px-1 py-0.5 text-[10px] text-zinc-400",children:"\u5DF2\u505C\u7528"}):s.health_status==="demoted"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-red-500/10 px-1 py-0.5 text-[10px] font-medium text-red-500",children:[e.jsx(hs,{size:10})," \u7194\u65AD\u51B7\u5374"]}):s.health_status==="unhealthy"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-amber-500/10 px-1 py-0.5 text-[10px] font-medium text-amber-500",children:[e.jsx(fs,{size:10})," \u5F02\u5E38(",s.failures,"\u6B21)"]}):e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-emerald-500/10 px-1 py-0.5 text-[10px] font-medium text-emerald-500",children:[e.jsx(gs,{size:10})," ",_(r)||S(r)?"\u8D26\u53F7\u5C31\u7EEA":"\u8F6E\u6362\u5C31\u7EEA"]})]}),e.jsxs("div",{className:"flex items-center justify-end gap-1 shrink-0 self-end sm:self-auto pt-0.5 sm:pt-0",children:[e.jsx(o,{variant:"ghost",className:"!h-6 !px-2 text-[11px]",onClick:()=>ss(r.id,s.id,s.status),children:s.status==="active"?"\u505C\u7528":"\u542F\u7528"}),e.jsxs(o,{variant:"ghost",className:"!h-6 !px-2 text-[11px] !text-err",onClick:()=>es(r.id,s.id),children:[e.jsx(ue,{size:11,className:"mr-0.5"}),"\u5220\u9664"]})]})]},s.id))})]}),e.jsxs("div",{className:"rounded-lg border border-dashed border-line p-3 space-y-2.5 bg-surface/50",children:[e.jsx("div",{className:"text-xs font-semibold text-ink",children:_(r)?"\u624B\u52A8\u8FFD\u52A0 refresh_token":S(r)?"\u8FFD\u52A0\u8D26\u53F7\u51ED\u636E":"\u6279\u91CF\u8FFD\u52A0\u65B0\u5BC6\u94A5"}),e.jsx("div",{className:"space-y-1",children:e.jsx("textarea",{value:T,onChange:s=>G(s.target.value),placeholder:_(r)?`\u7C98\u8D34 refresh_token\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF0C\u4F8B\u5982\uFF1A\nrt_xxxxxxxxxxxxxxxx\nrt_yyyyyyyyyyyyyyyy`:S(r)?`\u6BCF\u884C\u4E00\u4E2A\u8D26\u53F7\u51ED\u636E\uFF0C\u683C\u5F0F\uFF1A\n${(D==null?void 0:D.credHint)??""}`:`\u652F\u6301\u5355\u4E2A\u6216\u6279\u91CF\u7C98\u8D34\u591A\u4E2A Key\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF0C\u4F8B\u5982\uFF1A\nsk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy`,rows:3,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),e.jsxs("div",{className:"flex flex-col sm:flex-row sm:items-center justify-between gap-2.5",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-[11px] text-muted shrink-0",children:"\u6807\u7B7E"}),e.jsx(M,{className:"!py-1 flex-1 sm:!w-28 text-xs",value:ae,onChange:s=>q(s.target.value),placeholder:_(r)?"\u5982 account-2":"\u5982 prod-2"})]}),e.jsxs("div",{className:"flex items-center justify-end gap-2",children:[e.jsx(o,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>U(null),children:"\u5173\u95ED"}),e.jsx(o,{className:"flex-1 sm:flex-initial",onClick:De,disabled:!T.trim()||V,children:V?"\u4FDD\u5B58\u4E2D\u2026":_(r)||S(r)?"\u4FDD\u5B58\u8D26\u53F7\u51ED\u636E":"\u4FDD\u5B58\u5E76\u8FFD\u52A0\u81F3\u6C60"})]})]})]})]})}),e.jsx(Q,{open:!!d,onClose:()=>n(null),title:`${d!=null&&d.provider?"\u6DFB\u52A0\u8D26\u53F7":"\u63A5\u5165 Web \u53CD\u4EE3"} \u2014 ${(d==null?void 0:d.meta.name)??""}`,width:560,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"rounded-lg border border-line bg-surface2/50 p-3 text-[11px] text-muted leading-relaxed",children:["\u51ED\u636E\u4ECE\u6D4F\u89C8\u5668\u7F51\u9875\u4F1A\u8BDD\u83B7\u53D6\uFF1A",e.jsx("span",{className:"text-ink",children:d==null?void 0:d.meta.credHint}),e.jsx("br",{}),"\u6BCF\u884C\u4E00\u4E2A\u8D26\u53F7\uFF0C\u7C98\u8D34\u591A\u4E2A\u4F1A\u81EA\u52A8\u8FDB\u5165\u8F6E\u6362\u6C60\uFF1B\u51ED\u636E\u4EC5\u52A0\u5BC6\u5B58\u50A8\uFF0C\u4E0D\u4F1A\u56DE\u663E\u3002"]}),!(d!=null&&d.provider)&&e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(O,{label:"\u6E20\u9053\u540D\u79F0",children:e.jsx(M,{value:(d==null?void 0:d.name)??"",onChange:s=>d&&n({...d,name:s.target.value})})}),e.jsx(O,{label:"\u6E20\u9053 Slug",children:e.jsx(M,{value:(d==null?void 0:d.slug)??"",onChange:s=>d&&n({...d,slug:s.target.value})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(O,{label:"Base URL",children:e.jsx(M,{value:(d==null?void 0:d.baseUrl)??"",onChange:s=>d&&n({...d,baseUrl:s.target.value})})})})]}),e.jsx(O,{label:d!=null&&d.provider?"\u8FFD\u52A0\u8D26\u53F7\u51ED\u636E\uFF08\u4E00\u884C\u4E00\u4E2A\uFF09":d!=null&&d.meta.anonymous?"\u8D26\u53F7\u51ED\u636E\uFF08\u53EF\u9009\uFF0C\u7559\u7A7A\u8D70\u533F\u540D\u6A21\u5F0F\uFF09":"\u8D26\u53F7\u51ED\u636E\uFF08\u5FC5\u586B\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF09",children:e.jsx("textarea",{value:(d==null?void 0:d.credential)??"",onChange:s=>d&&n({...d,credential:s.target.value}),rows:4,placeholder:d==null?void 0:d.meta.credHint,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(o,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>n(null),children:"\u53D6\u6D88"}),e.jsx(o,{className:"flex-1 sm:flex-initial",onClick:ds,disabled:!!(d!=null&&d.saving)||!(d!=null&&d.credential.trim())&&!(d!=null&&d.meta.anonymous&&!(d!=null&&d.provider)),children:d!=null&&d.saving?"\u4FDD\u5B58\u4E2D\u2026":d!=null&&d.provider?"\u4FDD\u5B58\u5E76\u8FFD\u52A0":d!=null&&d.credential.trim()?"\u4FDD\u5B58\u5E76\u63A5\u5165":"\u533F\u540D\u63A5\u5165"})]})]})}),e.jsx(Q,{open:!!a,onClose:oe,title:`OAuth \u6388\u6743 \u2014 ${(a==null?void 0:a.meta.name)??""}`,width:560,children:(a==null?void 0:a.step)==="region"?e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx("p",{className:"text-xs leading-relaxed text-muted",children:"\u8BE5\u6E20\u9053\u56FD\u5185\u7248\u4E0E\u56FD\u9645\u7248\u8D26\u53F7\u4F53\u7CFB\u5B8C\u5168\u72EC\u7ACB\uFF0C\u8BF7\u9009\u62E9\u8981\u6388\u6743\u7684\u533A\u57DF\u3002\u9009\u9519\u533A\u57DF\u4F1A\u5BFC\u81F4\u6388\u6743\u6210\u529F\u4F46\u65E0\u6CD5\u8C03\u7528\u3002"}),(a.meta.regions||[]).map(s=>{const t=xe(a.meta,s.baseUrl),l=t?(f??[]).find(i=>i.slug===t.slug)??null:null;return e.jsxs("button",{onClick:()=>void $e(a.meta,l,s.baseUrl),className:"flex flex-col gap-1 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 text-left transition-colors hover:border-brand/40 hover:bg-brand/5",children:[e.jsxs("span",{className:"flex items-center gap-2 text-sm font-semibold text-ink",children:[s.label,l&&e.jsx("span",{className:"rounded bg-brand/10 px-1 text-[10px] font-medium text-brand",children:"\u590D\u7528\u5DF2\u6709\u6E20\u9053"})]}),e.jsx("span",{className:"text-[11px] text-muted",children:s.desc})]},s.baseUrl)})]}):(a==null?void 0:a.step)==="loading"?e.jsxs("div",{className:"flex items-center justify-center gap-2 py-10 text-sm text-muted",children:[e.jsx(I,{size:16,className:"animate-spin"}),"\u6B63\u5728\u5411 ",a.meta.name," \u53D1\u8D77\u6388\u6743\u8BF7\u6C42\u2026"]}):(a==null?void 0:a.step)==="error"?e.jsxs("div",{className:"space-y-4",children:[e.jsx("div",{className:"rounded-lg border border-err/30 bg-err/5 p-3 text-xs text-err leading-relaxed",children:a.message}),e.jsx("p",{className:"text-[11px] text-muted",children:"\u63D0\u793A\uFF1A\u6388\u6743\u94FE\u63A5\u6709\u6548\u671F\u7EA6 10 \u5206\u949F\uFF1B\u82E5\u4F7F\u7528\u4E86\u4EE3\u7406/\u65E0\u75D5\u7A97\u53E3\uFF0C\u8BF7\u4FDD\u6301\u540C\u4E00\u6D4F\u89C8\u5668\u5B8C\u6210\u6388\u6743\u3002\u4E5F\u53EF\u5728\u4E0B\u65B9\u624B\u52A8\u7C98\u8D34 refresh_token\u3002"}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(o,{variant:"ghost",onClick:oe,children:"\u5173\u95ED"}),e.jsxs(o,{onClick:is,children:[e.jsx(I,{size:14}),"\u91CD\u65B0\u53D1\u8D77\u6388\u6743"]})]})]}):(a==null?void 0:a.mode)==="redirect-poll"?e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs leading-relaxed text-muted",children:["\u8BF7\u5728\u6D4F\u89C8\u5668\u4E2D\u6253\u5F00\u4E0B\u65B9\u6388\u6743\u9875\uFF0C\u767B\u5F55 ",a.meta.name," \u8D26\u53F7\u5E76\u786E\u8BA4\u6388\u6743\u3002\u5B8C\u6210\u540E\u672C\u5F39\u7A97\u4F1A\u81EA\u52A8\u83B7\u53D6\u5E76\u4FDD\u5B58\u51ED\u636E\u3002"]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx(M,{readOnly:!0,value:a.url,className:"!py-1 flex-1 text-[11px] font-mono"}),e.jsx(o,{variant:"soft",className:"!h-[34px] !px-2.5 shrink-0",onClick:()=>ve(a.url),title:"\u590D\u5236\u6388\u6743\u94FE\u63A5",children:e.jsx(Ne,{size:12})}),e.jsxs(o,{className:"!h-[34px] !px-3 shrink-0",onClick:()=>window.open(a.url,"_blank","noopener,noreferrer"),children:[e.jsx(Ce,{size:12}),"\u6253\u5F00\u6388\u6743\u9875"]})]}),e.jsxs("div",{className:"flex items-center gap-2 rounded-lg border border-line bg-surface p-3 text-xs text-muted",children:[e.jsx(I,{size:13,className:"animate-spin text-brand"}),e.jsx("span",{children:a.message||"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u5B8C\u6210\u767B\u5F55\u2026"}),e.jsxs("span",{className:"ml-auto text-[10px]",children:["\u6BCF ",a.interval||5,"s \u8F6E\u8BE2"]})]}),e.jsxs("p",{className:"text-[11px] text-muted",children:["\u6388\u6743\u94FE\u63A5\u7531 ",a.meta.name," \u5B98\u65B9\u7B7E\u53D1\uFF0C\u6709\u6548\u671F\u7EA6 1 \u5C0F\u65F6\u3002\u5982\u9700\u4E3A\u540C\u4E00\u6E20\u9053\u6DFB\u52A0\u7B2C\u4E8C\u4E2A\u8D26\u53F7\uFF0C\u5EFA\u8BAE\u4F7F\u7528\u65E0\u75D5\u7A97\u53E3\u6253\u5F00\u6388\u6743\u9875\u3002"]}),e.jsx("div",{className:"flex justify-end",children:e.jsx(o,{variant:"ghost",onClick:oe,children:"\u53D6\u6D88\u6388\u6743"})})]}):(a==null?void 0:a.mode)==="device"?e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs text-muted leading-relaxed",children:["\u8BF7\u5728\u6D4F\u89C8\u5668\u4E2D\u6253\u5F00\u4E0B\u65B9\u6388\u6743\u9875\uFF0C\u767B\u5F55 ",a.meta.name," \u8D26\u53F7\u5E76\u786E\u8BA4\u8BBE\u5907\u7801\uFF1A"]}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/60 p-3 text-center",children:[e.jsx("div",{className:"text-[11px] text-muted",children:"\u8BBE\u5907\u7801 / User Code"}),e.jsx("div",{className:"mt-1 font-mono text-2xl font-bold tracking-widest text-brand",children:a.userCode||"\u2014"}),e.jsxs("div",{className:"mt-2 flex flex-wrap items-center justify-center gap-2",children:[e.jsxs(o,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>ve(a.userCode||""),children:[e.jsx(Ne,{size:11}),"\u590D\u5236\u8BBE\u5907\u7801"]}),e.jsxs(o,{className:"!h-7 !px-2.5 text-[11px]",onClick:()=>window.open(a.verificationUriComplete||a.verificationUri||a.url,"_blank","noopener,noreferrer"),children:[e.jsx(Ce,{size:11}),"\u6253\u5F00\u6388\u6743\u9875"]})]}),(a.verificationUriComplete||a.verificationUri)&&e.jsx("div",{className:"mt-2 truncate text-[10px] text-muted",title:a.verificationUriComplete||a.verificationUri,children:a.verificationUriComplete||a.verificationUri})]}),e.jsxs("div",{className:"flex items-center gap-2 rounded-lg border border-line bg-surface p-3 text-xs text-muted",children:[e.jsx(I,{size:13,className:"animate-spin text-brand"}),e.jsx("span",{children:a.message||"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026"}),a.interval?e.jsxs("span",{className:"ml-auto text-[10px]",children:["\u6BCF ",a.interval,"s \u8F6E\u8BE2"]}):null]}),e.jsx("p",{className:"text-[11px] text-muted",children:"\u5982\u9700\u4E3A\u540C\u4E00\u6E20\u9053\u6DFB\u52A0\u7B2C\u4E8C\u4E2A\u8D26\u53F7\uFF0C\u8BF7\u4F7F\u7528\u65E0\u75D5\u7A97\u53E3\u6253\u5F00\u6388\u6743\u9875\uFF0C\u907F\u514D\u6D4F\u89C8\u5668\u590D\u7528\u5DF2\u767B\u5F55\u4F1A\u8BDD\u3002"}),e.jsx("div",{className:"flex justify-end",children:e.jsx(o,{variant:"ghost",onClick:oe,children:"\u53D6\u6D88\u6388\u6743"})})]}):e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs leading-relaxed text-muted",children:["1. \u70B9\u51FB\u4E0B\u65B9\u6309\u94AE\u6253\u5F00 ",a==null?void 0:a.meta.name," \u6388\u6743\u9875\u5E76\u767B\u5F55\uFF1B",e.jsx("br",{}),"2. \u6388\u6743\u540E\u6D4F\u89C8\u5668\u4F1A\u8DF3\u8F6C\u5230 ",e.jsx("code",{className:"rounded bg-line px-1",children:"127.0.0.1"})," \u56DE\u8C03\u5730\u5740\uFF08\u9875\u9762\u6253\u4E0D\u5F00\u5C5E\u6B63\u5E38\u73B0\u8C61\uFF09\uFF1B",e.jsx("br",{}),"3. ",(a==null?void 0:a.meta.type)==="trae"?"\u76F4\u63A5\u590D\u5236\u5730\u5740\u680F\u7684\u6574\u6BB5\u56DE\u8C03 URL\uFF08\u5FC5\u987B\u542B refreshToken / authCode\uFF09\u7C98\u8D34\u5230\u4E0B\u65B9\u3002":e.jsxs(e.Fragment,{children:["\u590D\u5236\u5730\u5740\u680F ",e.jsx("code",{className:"rounded bg-line px-1",children:"code="})," \u540E\u7684\u6574\u6BB5\u5185\u5BB9\uFF08\u6216\u6574\u6BB5\u56DE\u8C03 URL\uFF09\u7C98\u8D34\u5230\u4E0B\u65B9\u3002"]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx(M,{readOnly:!0,value:(a==null?void 0:a.url)??"",className:"!py-1 flex-1 text-[11px] font-mono"}),e.jsx(o,{variant:"soft",className:"!h-[34px] !px-2.5 shrink-0",onClick:()=>ve((a==null?void 0:a.url)??""),title:"\u590D\u5236\u6388\u6743\u94FE\u63A5",children:e.jsx(Ne,{size:12})}),e.jsxs(o,{className:"!h-[34px] !px-3 shrink-0",onClick:()=>window.open((a==null?void 0:a.url)??"","_blank","noopener,noreferrer"),children:[e.jsx(Ce,{size:12}),"\u6253\u5F00"]})]}),e.jsx(O,{label:"\u6388\u6743 code \u6216\u6574\u6BB5\u56DE\u8C03\u5730\u5740",children:e.jsx("textarea",{value:(a==null?void 0:a.codeInput)??"",onChange:s=>a&&C({...a,codeInput:s.target.value}),rows:3,placeholder:"\u7C98\u8D34 code \u6216 http://localhost:xxxxx/callback?code=...",className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),(a==null?void 0:a.message)&&e.jsx("div",{className:"text-[11px] text-muted",children:a.message}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(o,{variant:"ghost",onClick:oe,children:"\u53D6\u6D88"}),e.jsx(o,{onClick:ns,disabled:(a==null?void 0:a.busy)||!(a!=null&&a.codeInput.trim()),children:a!=null&&a.busy?"\u6B63\u5728\u9A8C\u8BC1\u2026":"\u5B8C\u6210\u6388\u6743"})]})]})}),z]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/ScheduledTasks-BoejvN0o.js": {
-              content: 'import{c as S,u as M,j as e,d as b,B as $,m as w,E as B,n as N}from"./index-C1Wgc1sf.js";import{r as h}from"./vendor-BbQ_LiY-.js";import A from"./VideoTasks-DMvfj55o.js";import{R as P}from"./refresh-cw-g67Iczt4.js";import"./external-link-BXEONH_n.js";import"./trash-2-Hgm_5qDX.js";import"./clock-Bek_ctNZ.js";import"./circle-check-DY1J2Ix2.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const C=S("CalendarCheck",[["path",{d:"M8 2v4",key:"1cmpym"}],["path",{d:"M16 2v4",key:"4m81vk"}],["rect",{width:"18",height:"18",x:"3",y:"4",rx:"2",key:"1hopcy"}],["path",{d:"M3 10h18",key:"8toen8"}],["path",{d:"m9 16 2 2 4-4",key:"19s6y9"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const R=S("Play",[["polygon",{points:"6 3 20 12 6 21 6 3",key:"1oa8hb"}]]);function _(){const[u,f]=h.useState(null),[x,k]=h.useState([]),[p,c]=h.useState(""),[j,v]=h.useState(!1),i=M(),y=async(s=!1)=>{s||v(!0);try{const t=await N("checkin_status"),a=(t.result??t)||{channels:[],providers:[]};k(a.channels||[]),f(a.providers||[])}catch(t){s||i(t.message,"err"),f([])}finally{s||v(!1)}};h.useEffect(()=>{y()},[]);const z=async(s,t,a)=>{c(`toggle-${s}`);try{await N("set_checkin",{type:s,enabled:t}),i(`${t?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"}${a}\u81EA\u52A8\u4EFB\u52A1`,"ok"),await y(!0)}catch(l){i(l.message,"err")}finally{c("")}},T=async(s,t,a)=>{var l,m;c(`run-${s}`);try{const r=(((l=(await N("codebuddy_checkin",{type:s})).result)==null?void 0:l.channels)||[]).flatMap(n=>n.accounts||[]),d=r.filter(n=>n.ok).length;r.length===0?i(`${t}\uFF1A\u6682\u65E0\u53EF\u6267\u884C${a}\u7684\u8D26\u53F7`,"err"):d===r.length?i(`${t} ${a}\uFF1A${d}/${r.length} \u5168\u90E8\u6210\u529F`,"ok"):i(`${t} ${a}\uFF1A\u6210\u529F ${d}/${r.length}\uFF0C${((m=r.find(n=>!n.ok))==null?void 0:m.message)||"\u5B58\u5728\u5931\u8D25"}`,d>0?"ok":"err")}catch(o){i(o.message,"err")}finally{c("")}},g=new Map;for(const s of u||[]){const t=g.get(s.type)||[];t.push(s),g.set(s.type,t)}return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx(b,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(C,{size:18})}),e.jsxs("div",{children:[e.jsx("h2",{className:"text-base font-bold text-ink",children:"\u7B7E\u5230\u4EFB\u52A1"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u6BCF\u65E5 09:00 \u540E\u5168\u7AD9\u9996\u6B21\u8BBF\u95EE\u65F6\u81EA\u52A8\u6267\u884C\u4E00\u6B21\uFF08\u5F53\u65E5\u53BB\u91CD\uFF09\uFF1B\u4E5F\u53EF\u5728\u6B64\u624B\u52A8\u7ACB\u5373\u6267\u884C\u3002\u5F00\u5173\u6309\u6E20\u9053\u7C7B\u578B\u5168\u5C40\u751F\u6548\u3002"})]})]}),e.jsxs($,{variant:"soft",className:"h-9",onClick:()=>y(),disabled:j,children:[e.jsx(P,{size:14,className:w(j&&"animate-spin")}),j?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]})]})}),u===null?e.jsx(b,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):g.size===0?e.jsx(b,{children:e.jsx(B,{icon:e.jsx(C,{size:30}),title:"\u6682\u65E0\u652F\u6301\u7B7E\u5230\u7684\u6E20\u9053",hint:"\u63A5\u5165 CodeBuddy / ZCode / Qoder \u7B49 OAuth \u6E20\u9053\u540E\uFF0C\u8FD9\u91CC\u4F1A\u51FA\u73B0\u5BF9\u5E94\u7684\u5B9A\u65F6\u7B7E\u5230\u4EFB\u52A1\u3002"})}):[...g.entries()].map(([s,t])=>{var d;const a=x.find(n=>n.type===s),l=((d=t[0])==null?void 0:d.enabled)??!0,m=(a==null?void 0:a.label)||s,o=(a==null?void 0:a.action)||"\u7B7E\u5230",r=t.reduce((n,E)=>n+E.accounts,0);return e.jsx(b,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs("h3",{className:"text-sm font-semibold text-ink",children:[m,"\u6BCF\u65E5",o]}),e.jsx("span",{className:w("rounded px-1.5 py-0.5 text-[10px] font-medium",l?"bg-emerald-500/10 text-emerald-500":"bg-zinc-500/10 text-zinc-400"),children:l?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"})]}),e.jsxs("p",{className:"mt-1 text-xs text-muted",children:[t.map(n=>`${n.name}\uFF08${n.accounts} \u4E2A\u8D26\u53F7${n.status==="disabled"?" \xB7 \u6E20\u9053\u505C\u7528":""}\uFF09`).join("\u3001")||"\u65E0\u8D26\u53F7",r===0&&" \u2014\u2014 \u5148\u5230\u300C\u4F9B\u5E94\u5546\u300D\u9875\u7ED9\u6E20\u9053\u6388\u6743\u8D26\u53F7"]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs("label",{className:"inline-flex cursor-pointer items-center gap-2 text-xs text-muted",children:[e.jsx("input",{type:"checkbox",className:"h-3.5 w-3.5 cursor-pointer accent-[var(--brand)]",checked:l,disabled:p===`toggle-${s}`,onChange:n=>z(s,n.target.checked,m)}),"\u81EA\u52A8\u6267\u884C"]}),e.jsxs($,{variant:"soft",className:"h-8",disabled:p===`run-${s}`,onClick:()=>T(s,m,o),children:[e.jsx(R,{size:12}),p===`run-${s}`?`${o}\u4E2D\u2026`:`\u7ACB\u5373${o}`]})]})]})},s)})]})}function F({me:u}){const f=u.user.role==="superadmin",[x,k]=h.useState("videos"),p=[["videos","\u89C6\u9891\u4EFB\u52A1"],...f?[["checkin","\u7B7E\u5230\u4EFB\u52A1"]]:[]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:p.map(([c,j])=>e.jsx("button",{role:"tab","aria-selected":x===c,onClick:()=>k(c),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${x===c?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:j},c))}),x==="videos"&&e.jsx(A,{me:u}),x==="checkin"&&f&&e.jsx(_,{})]})}\n',
+            "/assets/ScheduledTasks-2VckwwYM.js": {
+              content: 'import{c as S,u as M,j as e,d as b,B as $,m as w,E as B,n as N}from"./index-KwMGOJkp.js";import{r as h}from"./vendor-BbQ_LiY-.js";import A from"./VideoTasks-Lc8uBADw.js";import{R as P}from"./refresh-cw-BrzRfQC6.js";import"./external-link-3zVIAjg3.js";import"./trash-2-BF158Quc.js";import"./clock-BJH_AWv4.js";import"./circle-check-B2pLGJPh.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const C=S("CalendarCheck",[["path",{d:"M8 2v4",key:"1cmpym"}],["path",{d:"M16 2v4",key:"4m81vk"}],["rect",{width:"18",height:"18",x:"3",y:"4",rx:"2",key:"1hopcy"}],["path",{d:"M3 10h18",key:"8toen8"}],["path",{d:"m9 16 2 2 4-4",key:"19s6y9"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const R=S("Play",[["polygon",{points:"6 3 20 12 6 21 6 3",key:"1oa8hb"}]]);function _(){const[u,f]=h.useState(null),[x,k]=h.useState([]),[p,c]=h.useState(""),[j,v]=h.useState(!1),i=M(),y=async(s=!1)=>{s||v(!0);try{const t=await N("checkin_status"),a=(t.result??t)||{channels:[],providers:[]};k(a.channels||[]),f(a.providers||[])}catch(t){s||i(t.message,"err"),f([])}finally{s||v(!1)}};h.useEffect(()=>{y()},[]);const z=async(s,t,a)=>{c(`toggle-${s}`);try{await N("set_checkin",{type:s,enabled:t}),i(`${t?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"}${a}\u81EA\u52A8\u4EFB\u52A1`,"ok"),await y(!0)}catch(l){i(l.message,"err")}finally{c("")}},T=async(s,t,a)=>{var l,m;c(`run-${s}`);try{const r=(((l=(await N("codebuddy_checkin",{type:s})).result)==null?void 0:l.channels)||[]).flatMap(n=>n.accounts||[]),d=r.filter(n=>n.ok).length;r.length===0?i(`${t}\uFF1A\u6682\u65E0\u53EF\u6267\u884C${a}\u7684\u8D26\u53F7`,"err"):d===r.length?i(`${t} ${a}\uFF1A${d}/${r.length} \u5168\u90E8\u6210\u529F`,"ok"):i(`${t} ${a}\uFF1A\u6210\u529F ${d}/${r.length}\uFF0C${((m=r.find(n=>!n.ok))==null?void 0:m.message)||"\u5B58\u5728\u5931\u8D25"}`,d>0?"ok":"err")}catch(o){i(o.message,"err")}finally{c("")}},g=new Map;for(const s of u||[]){const t=g.get(s.type)||[];t.push(s),g.set(s.type,t)}return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx(b,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(C,{size:18})}),e.jsxs("div",{children:[e.jsx("h2",{className:"text-base font-bold text-ink",children:"\u7B7E\u5230\u4EFB\u52A1"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u6BCF\u65E5 09:00 \u540E\u5168\u7AD9\u9996\u6B21\u8BBF\u95EE\u65F6\u81EA\u52A8\u6267\u884C\u4E00\u6B21\uFF08\u5F53\u65E5\u53BB\u91CD\uFF09\uFF1B\u4E5F\u53EF\u5728\u6B64\u624B\u52A8\u7ACB\u5373\u6267\u884C\u3002\u5F00\u5173\u6309\u6E20\u9053\u7C7B\u578B\u5168\u5C40\u751F\u6548\u3002"})]})]}),e.jsxs($,{variant:"soft",className:"h-9",onClick:()=>y(),disabled:j,children:[e.jsx(P,{size:14,className:w(j&&"animate-spin")}),j?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]})]})}),u===null?e.jsx(b,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):g.size===0?e.jsx(b,{children:e.jsx(B,{icon:e.jsx(C,{size:30}),title:"\u6682\u65E0\u652F\u6301\u7B7E\u5230\u7684\u6E20\u9053",hint:"\u63A5\u5165 CodeBuddy / ZCode / Qoder \u7B49 OAuth \u6E20\u9053\u540E\uFF0C\u8FD9\u91CC\u4F1A\u51FA\u73B0\u5BF9\u5E94\u7684\u5B9A\u65F6\u7B7E\u5230\u4EFB\u52A1\u3002"})}):[...g.entries()].map(([s,t])=>{var d;const a=x.find(n=>n.type===s),l=((d=t[0])==null?void 0:d.enabled)??!0,m=(a==null?void 0:a.label)||s,o=(a==null?void 0:a.action)||"\u7B7E\u5230",r=t.reduce((n,E)=>n+E.accounts,0);return e.jsx(b,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs("h3",{className:"text-sm font-semibold text-ink",children:[m,"\u6BCF\u65E5",o]}),e.jsx("span",{className:w("rounded px-1.5 py-0.5 text-[10px] font-medium",l?"bg-emerald-500/10 text-emerald-500":"bg-zinc-500/10 text-zinc-400"),children:l?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"})]}),e.jsxs("p",{className:"mt-1 text-xs text-muted",children:[t.map(n=>`${n.name}\uFF08${n.accounts} \u4E2A\u8D26\u53F7${n.status==="disabled"?" \xB7 \u6E20\u9053\u505C\u7528":""}\uFF09`).join("\u3001")||"\u65E0\u8D26\u53F7",r===0&&" \u2014\u2014 \u5148\u5230\u300C\u4F9B\u5E94\u5546\u300D\u9875\u7ED9\u6E20\u9053\u6388\u6743\u8D26\u53F7"]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs("label",{className:"inline-flex cursor-pointer items-center gap-2 text-xs text-muted",children:[e.jsx("input",{type:"checkbox",className:"h-3.5 w-3.5 cursor-pointer accent-[var(--brand)]",checked:l,disabled:p===`toggle-${s}`,onChange:n=>z(s,n.target.checked,m)}),"\u81EA\u52A8\u6267\u884C"]}),e.jsxs($,{variant:"soft",className:"h-8",disabled:p===`run-${s}`,onClick:()=>T(s,m,o),children:[e.jsx(R,{size:12}),p===`run-${s}`?`${o}\u4E2D\u2026`:`\u7ACB\u5373${o}`]})]})]})},s)})]})}function F({me:u}){const f=u.user.role==="superadmin",[x,k]=h.useState("videos"),p=[["videos","\u89C6\u9891\u4EFB\u52A1"],...f?[["checkin","\u7B7E\u5230\u4EFB\u52A1"]]:[]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:p.map(([c,j])=>e.jsx("button",{role:"tab","aria-selected":x===c,onClick:()=>k(c),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${x===c?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:j},c))}),x==="videos"&&e.jsx(A,{me:u}),x==="checkin"&&f&&e.jsx(_,{})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Settings-B-g0O-WH.js": {
-              content: 'import{i as H,u as M,j as e,B as p,d as f,h as B,g as K,e as G,F as a,I as c,n as u,t as q}from"./index-C1Wgc1sf.js";import{r as h}from"./vendor-BbQ_LiY-.js";import{P as $}from"./plus-sJaeYLjc.js";import{T as W}from"./trash-2-Hgm_5qDX.js";function X(){const[s,S]=h.useState(null),[k,N]=h.useState(!1),[l,x]=h.useState({id:"",title:"",content:"",popup:!1,enabled:!0}),{confirm:C,confirmEl:A}=H(),o=M(),v=()=>u("list_announcements").then(n=>S(n.announcements)).catch(n=>o(n.message,"err"));h.useEffect(()=>{v()},[]);const j=async()=>{if(!l.title.trim()||!l.content.trim())return o("\u6807\u9898\u4E0E\u5185\u5BB9\u4E0D\u80FD\u4E3A\u7A7A","err");try{await u(l.id?"update_announcement":"create_announcement",l),o(l.id?"\u516C\u544A\u5DF2\u66F4\u65B0":"\u516C\u544A\u5DF2\u53D1\u5E03"),N(!1),v()}catch(n){o(n.message,"err")}},T=async n=>{await C(`\u5220\u9664\u516C\u544A\u300C${n.title}\u300D\uFF1F`)&&(await u("delete_announcement",{id:n.id}),o("\u5DF2\u5220\u9664"),v())};return e.jsxs("div",{className:"flex max-w-3xl flex-col gap-4",children:[e.jsx("div",{className:"flex justify-end",children:e.jsxs(p,{onClick:()=>{x({id:"",title:"",content:"",popup:!1,enabled:!0}),N(!0)},children:[e.jsx($,{size:14}),"\u53D1\u5E03\u516C\u544A"]})}),e.jsx(f,{className:"p-4",children:s===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(3)].map((n,I)=>e.jsx("div",{className:"skeleton h-12"},I))}):s.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u8FD8\u6CA1\u6709\u516C\u544A"}):s.map(n=>e.jsxs("div",{className:"border-b border-line/60 py-3 last:border-0",children:[e.jsxs("div",{className:"flex items-center justify-between gap-3",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2",children:[e.jsx("span",{className:"truncate text-sm font-medium",children:n.title}),n.popup?e.jsx("span",{className:"shrink-0 whitespace-nowrap rounded-full bg-brand/10 px-2 py-0.5 text-[11px] text-brand",children:"\u5F39\u7A97"}):null,e.jsx(B,{value:n.enabled?"active":"pending"})]}),e.jsxs("div",{className:"flex shrink-0 items-center gap-1.5",children:[e.jsx(p,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:()=>{x({id:n.id,title:n.title,content:n.content,popup:!!n.popup,enabled:!!n.enabled}),N(!0)},children:"\u7F16\u8F91"}),e.jsx(p,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:()=>T(n),children:e.jsx(W,{size:12})})]})]}),e.jsx("p",{className:"mt-1 line-clamp-2 pl-6 text-xs text-muted",children:n.content}),e.jsx("div",{className:"mt-1.5 pr-1 text-right text-[11px] text-muted",children:K(n.created_at)})]},n.id))}),e.jsxs(G,{open:k,onClose:()=>N(!1),title:l.id?"\u7F16\u8F91\u516C\u544A":"\u53D1\u5E03\u516C\u544A",width:560,children:[e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx(a,{label:"\u6807\u9898",children:e.jsx(c,{value:l.title,onChange:n=>x({...l,title:n.target.value})})}),e.jsx(a,{label:"\u5185\u5BB9",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:5,value:l.content,onChange:n=>x({...l,content:n.target.value})})}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u8FDB\u5165\u7F51\u7AD9\u65F6\u5F39\u7A97\u5C55\u793A",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:l.popup,onChange:n=>x({...l,popup:n.target.checked})})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u542F\u7528\uFF08\u5173\u95ED\u540E\u4EC5\u4FDD\u7559\u8BB0\u5F55\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:l.enabled,onChange:n=>x({...l,enabled:n.target.checked})})]})]}),e.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[e.jsx(p,{variant:"ghost",onClick:()=>N(!1),children:"\u53D6\u6D88"}),e.jsx(p,{onClick:j,children:l.id?"\u4FDD\u5B58\u4FEE\u6539":"\u53D1\u5E03"})]})]}),A]})}const z=[{key:"alipay",label:"\u652F\u4ED8\u5B9D"},{key:"wxpay",label:"\u5FAE\u4FE1\u652F\u4ED8"},{key:"qqpay",label:"QQ \u94B1\u5305"},{key:"usdt",label:"USDT"}];function Z(){const[s,S]=h.useState(null),[k,N]=h.useState(null),[l,x]=h.useState(null),[C,A]=h.useState(""),[o,v]=h.useState(null),[j,T]=h.useState({gh:"",gg:""}),[n,I]=h.useState(""),[i,b]=h.useState(null),[U,_]=h.useState(""),[g,O]=h.useState("billing"),m=M();h.useEffect(()=>{u("get_settings").then(t=>S(t.settings)).catch(t=>m(t.message,"err")),u("get_smtp").then(t=>x(t.smtp)).catch(()=>x(null)),u("get_oauth").then(t=>v(t.oauth)).catch(()=>v(null)),u("get_epay").then(t=>b(t.epay)).catch(()=>b(null)),fetch("/api/site").then(t=>t.json()).then(N).catch(()=>{})},[]);const R=async()=>{if(s)try{await u("set_settings",s),m("\u8BBE\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5DF2\u5199\u5165\u5BA1\u8BA1\u65E5\u5FD7\uFF09")}catch(t){m(t.message,"err")}},r=(t,d)=>S({...s,[t]:d});return s?e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["billing","\u8BA1\u8D39\u4E0E\u9650\u6D41"],["moderation","\u5185\u5BB9\u5B89\u5168"],["compliance","\u6CE8\u518C\u4E0E\u5408\u89C4"],["webhook","Webhook \u4E0E\u5B89\u5168"],["site","\u7AD9\u70B9\u4FE1\u606F"],["smtp","\u53D1\u4EF6\u914D\u7F6E"],["oauth","\u7B2C\u4E09\u65B9\u767B\u5F55"],["epay","\u652F\u4ED8\u914D\u7F6E"],["announcements","\u516C\u544A"]].map(([t,d])=>e.jsx("button",{role:"tab","aria-selected":g===t,onClick:()=>O(t),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${g===t?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:d},t))}),g==="billing"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u8BA1\u8D39\u4E0E\u9650\u6D41"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(a,{label:"\u9ED8\u8BA4 RPM\uFF08\u6BCF Key\uFF09",hint:"\u586B 0 \u4E3A\u5B8C\u5168\u4E0D\u9650",children:e.jsx(c,{type:"number",value:String(s.defaultRpm??60),onChange:t=>r("defaultRpm",+t.target.value),placeholder:"0 \u4E3A\u4E0D\u9650"})}),e.jsx(a,{label:"\u9ED8\u8BA4 TPM\uFF08\u6BCF Key\uFF09",hint:"\u586B 0 \u4E3A\u5B8C\u5168\u4E0D\u9650",children:e.jsx(c,{type:"number",value:String(s.defaultTpm??1e5),onChange:t=>r("defaultTpm",+t.target.value),placeholder:"0 \u4E3A\u4E0D\u9650"})})]}),e.jsx("p",{className:"mt-3 text-xs text-muted",children:"\u8D85\u51FA\u9650\u5236\u8FD4\u56DE HTTP 429 \u4E0E Retry-After\u3002\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF1B\u53EF\u5728\u300C\u5B9A\u4EF7\u300D\u9875\u9762\u4E3A\u6BCF\u4E2A\u5927\u6A21\u578B\u5355\u72EC\u8BBE\u7F6E\u72EC\u7ACB RPM \u9650\u6D41\u3002"})]}),g==="moderation"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u5185\u5BB9\u5B89\u5168"}),e.jsxs("label",{className:"mb-3 flex items-center justify-between text-[13px]",children:["\u542F\u7528\u5185\u5BB9\u5B89\u5168\u5BA1\u6838",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.contentModerationEnabled,onChange:t=>r("contentModerationEnabled",t.target.checked)})]}),e.jsxs("label",{className:"mb-3 flex items-center justify-between text-[13px]",children:["\u8BB0\u5F55\u8131\u654F\u5185\u5BB9\u7247\u6BB5\uFF08\u9ED8\u8BA4\u5173\u95ED\uFF0C\u4EC5\u5B58\u6458\u8981\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.logContentEnabled,onChange:t=>r("logContentEnabled",t.target.checked)})]}),e.jsx(a,{label:"\u5916\u90E8\u5BA1\u6838 API\uFF08\u53EF\u9009\uFF0CPOST {input} \u2192 {flagged}\uFF09",children:e.jsx(c,{value:String(s.MODERATION_API_URL??""),onChange:t=>r("MODERATION_API_URL",t.target.value),placeholder:"https://..."})})]}),g==="compliance"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6CE8\u518C\u4E0E\u5408\u89C4\u6587\u672C"}),e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u5F00\u653E\u6CE8\u518C",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.signupsEnabled,onChange:t=>r("signupsEnabled",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u6CE8\u518C\u5F3A\u5236\u90AE\u7BB1\u9A8C\u8BC1\u7801",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:s.requireEmailVerification!==!1,onChange:t=>r("requireEmailVerification",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u6CE8\u518C\u5F3A\u5236\u786E\u8BA4\u6761\u6B3E/\u9690\u79C1",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.requireTosAcceptance,onChange:t=>r("requireTosAcceptance",t.target.checked)})]}),e.jsx(a,{label:"\u670D\u52A1\u6761\u6B3E URL",children:e.jsx(c,{value:String(s.termsOfServiceUrl??""),onChange:t=>r("termsOfServiceUrl",t.target.value)})}),e.jsx(a,{label:"\u9690\u79C1\u653F\u7B56 URL",children:e.jsx(c,{value:String(s.privacyPolicyUrl??""),onChange:t=>r("privacyPolicyUrl",t.target.value)})}),e.jsx(a,{label:"\u5BA1\u8BA1\u65E5\u5FD7\u4FDD\u7559\u5929\u6570\uFF0830\u2013180\uFF0C\u9ED8\u8BA4 30\uFF09",hint:"\u6700\u77ED 30 \u5929\uFF0C\u6700\u957F 180 \u5929",children:e.jsx(c,{type:"number",min:30,max:180,step:1,value:String(s.auditLogRetentionDays??30),onChange:t=>r("auditLogRetentionDays",+t.target.value),onBlur:t=>r("auditLogRetentionDays",Math.min(180,Math.max(30,Math.round(+t.target.value)||30)))})})]})]}),["billing","moderation","compliance"].includes(g)&&e.jsx("div",{className:"flex justify-end",children:e.jsx(p,{onClick:R,children:"\u4FDD\u5B58\u5408\u89C4\u4E0E\u9650\u6D41\u8BBE\u7F6E"})}),g==="webhook"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"Webhook \u4E0E\u5B89\u5168"}),e.jsx(a,{label:"\u4E0A\u6E38\u4E8B\u4EF6 Webhook \u5730\u5740",children:e.jsx(c,{value:n,onChange:t=>I(t.target.value),placeholder:"https://api.obitw.cn/api/webhooks/upstream\uFF08X-Webhook-Secret \u6821\u9A8C\uFF09"})}),e.jsxs("div",{className:"mt-4 flex flex-col gap-3 border-t border-line pt-4",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u5173\u95ED\u4E8C\u6B21\u9A8C\u8BC1\uFF08\u7BA1\u7406\u64CD\u4F5C\u4EC5\u9700\u7BA1\u7406\u5458\u89D2\u8272\uFF0C\u4E0D\u518D\u8981\u6C42\u91CD\u65B0\u8F93\u5165\u5BC6\u7801\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.stepUpDisabled,onChange:t=>r("stepUpDisabled",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u4FDD\u6301\u767B\u5F55\u72B6\u6001\uFF08\u4F1A\u8BDD 10 \u5E74\u6709\u6548\uFF0C\u4E0D\u518D 7 \u5929\u8FC7\u671F\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.persistentSession,onChange:t=>r("persistentSession",t.target.checked)})]}),e.jsx("p",{className:"text-xs text-muted",children:"\u26A0\uFE0F \u5173\u95ED\u4E8C\u6B21\u9A8C\u8BC1\u4F1A\u964D\u4F4E\u7BA1\u7406\u63A5\u53E3\u5B89\u5168\u6027\uFF0C\u5EFA\u8BAE\u4EC5\u5728\u4E2A\u4EBA/\u5185\u7F51\u73AF\u5883\u4F7F\u7528\u3002\u300C\u4FDD\u6301\u767B\u5F55\u72B6\u6001\u300D\u5BF9\u4E4B\u540E\u7684\u65B0\u767B\u5F55\u751F\u6548\uFF0C\u5DF2\u6709\u4F1A\u8BDD\u9700\u91CD\u65B0\u767B\u5F55\u4E00\u6B21\u3002"}),e.jsx("div",{children:e.jsx(p,{onClick:async()=>{try{await u("set_settings",{stepUpDisabled:!!s.stepUpDisabled,persistentSession:!!s.persistentSession}),m("\u5B89\u5168\u9009\u9879\u5DF2\u4FDD\u5B58")}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58\u5B89\u5168\u8BBE\u7F6E"})})]}),e.jsxs("ul",{className:"mt-3 list-disc space-y-1 pl-4 text-xs text-muted",children:[e.jsx("li",{children:"API Key \u652F\u6301\u5F3A\u5236\u7B7E\u540D\uFF1AX-Timestamp + X-Signature\uFF08HMAC-SHA256\uFF09\uFF0C\xB1300s \u9632\u91CD\u653E\u7A97\u53E3"}),e.jsx("li",{children:"\u5BA1\u8BA1\u65E5\u5FD7\u54C8\u5E0C\u94FE\u9632\u7BE1\u6539\uFF0C\u5EFA\u8BAE\u6BCF\u65E5\u8FD0\u884C\u300C\u6821\u9A8C\u94FE\u5B8C\u6574\u6027\u300D"})]})]}),g==="site"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u7AD9\u70B9\u4FE1\u606F"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u7528\u4E8E\u5404\u9875\u9762 SEO \u4E0E\u63A7\u5236\u53F0\u54C1\u724C\uFF1B\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\u3002"}),e.jsxs("div",{className:"grid gap-3 md:grid-cols-2",children:[e.jsx(a,{label:"\u7AD9\u70B9\u540D\u79F0",children:e.jsx(c,{value:String(s.siteName??""),onChange:t=>r("siteName",t.target.value)})}),e.jsx(a,{label:"\u7AD9\u70B9\u4E3B\u9875\uFF08\u53EF\u9009\uFF0C\u7528\u4E8E Logo \u8DF3\u8F6C\uFF09",children:e.jsx(c,{value:String(s.siteHomepage??""),onChange:t=>r("siteHomepage",t.target.value),placeholder:"https://..."})}),e.jsx(a,{label:"\u9996\u9875\u5FBD\u7AE0\u6807\u7B7E\uFF08Hero Badge\uFF09",children:e.jsx(c,{value:String(s.heroBadge??"\u8DD1\u5728 EdgeOne \u5168\u7403\u8FB9\u7F18\u8282\u70B9"),onChange:t=>r("heroBadge",t.target.value)})}),e.jsx(a,{label:"\u5E95\u90E8\u6280\u672F\u652F\u6301\u90AE\u7BB1",children:e.jsx(c,{value:String(s.supportEmail??"hackerxiaow@gmail.com"),onChange:t=>r("supportEmail",t.target.value)})}),e.jsx(a,{label:"\u804A\u5929\u5BA4\u673A\u5668\u4EBA\u6A21\u578B",hint:"\u804A\u5929\u5BA4\u5185 @ \u673A\u5668\u4EBA\u89E6\u53D1\u56DE\u590D\u65F6\u4F7F\u7528\u7684\u6A21\u578B\uFF08\u9ED8\u8BA4 agnes-3.0-flash\uFF09",children:e.jsx(c,{value:String(s.chatBotModel??"agnes-3.0-flash"),onChange:t=>r("chatBotModel",t.target.value),placeholder:"agnes-3.0-flash"})}),e.jsx(a,{label:"\u5907\u6848\u53F7\uFF08ICP\uFF09",children:e.jsx(c,{value:String(s.icpNumber??""),onChange:t=>r("icpNumber",t.target.value),placeholder:"\u5982\uFF1A\u4EACICP\u59072024000000\u53F7-1\uFF1B\u7559\u7A7A\u5219\u4E0D\u663E\u793A"})}),e.jsx(a,{label:"\u7248\u6743\u6587\u6848",children:e.jsx(c,{value:String(s.copyrightText??""),onChange:t=>r("copyrightText",t.target.value),placeholder:"\u7559\u7A7A\u81EA\u52A8\u4F7F\u7528 \xA9 \u5E74\u4EFD \u7AD9\u70B9\u540D"})}),e.jsx(a,{label:"GitHub \u94FE\u63A5",children:e.jsx(c,{value:String(s.githubUrl??""),onChange:t=>r("githubUrl",t.target.value),placeholder:"https://github.com/...\uFF1B\u7559\u7A7A\u5219\u9690\u85CF\u56FE\u6807"})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(a,{label:"\u9996\u9875\u4E3B\u6807\u8BED\uFF08Hero \u6807\u9898\uFF09",children:e.jsx(c,{value:String(s.heroTitle??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"),onChange:t=>r("heroTitle",t.target.value)})})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(a,{label:"\u9996\u9875\u526F\u6807\u8BED\u4ECB\u7ECD",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:2,value:String(s.heroSubtitle??"\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\uFF0C\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6CBB\u7406\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002\u5408\u6CD5\u6388\u6743\u4E0A\u6E38\u3001\u900F\u660E\u8BA1\u8D39\u3001\u54C8\u5E0C\u94FE\u5BA1\u8BA1\u2014\u2014\u9762\u5411\u5F00\u53D1\u8005\u4E0E\u4F01\u4E1A\u7684\u6B63\u89C4\u805A\u5408\u5206\u53D1\u5E73\u53F0\u3002"),onChange:t=>r("heroSubtitle",t.target.value)})})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(a,{label:"\u7AD9\u70B9\u63CF\u8FF0\uFF08meta description / og:description\uFF09",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:2,value:String(s.siteDescription??""),onChange:t=>r("siteDescription",t.target.value)})})}),e.jsxs("div",{className:"flex items-center gap-4",children:[(k==null?void 0:k.siteLogoUrl)&&e.jsx("img",{src:k.siteLogoUrl,alt:"\u5F53\u524D Logo",className:"h-12 w-12 rounded-lg border border-line object-contain"}),e.jsxs("label",{className:"cursor-pointer rounded-lg border border-line bg-surface px-3 py-2 text-[13px] hover:bg-surface2",children:["\u4E0A\u4F20\u65B0 Logo\uFF08\u81EA\u52A8\u538B\u7F29\uFF09",e.jsx("input",{type:"file",accept:"image/png,image/jpeg,image/webp,image/svg+xml",className:"hidden",onChange:async t=>{var E;const d=(E=t.target.files)==null?void 0:E[0];if(d)try{const P=URL.createObjectURL(d),y=new Image;await new Promise((D,F)=>{y.onload=D,y.onerror=()=>F(new Error("\u65E0\u6CD5\u8BFB\u53D6\u8BE5\u56FE\u7247")),y.src=P}),URL.revokeObjectURL(P);const L=Math.min(1,256/Math.max(y.width,y.height)),w=document.createElement("canvas");w.width=Math.round(y.width*L),w.height=Math.round(y.height*L),w.getContext("2d").drawImage(y,0,0,w.width,w.height),await u("upsert_site_logo",{dataBase64:w.toDataURL("image/png")}),m("Logo \u5DF2\u66F4\u65B0\uFF08R2 \u5B58\u50A8\uFF09"),location.reload()}catch(P){m(P.message,"err")}}})]}),e.jsxs("span",{className:"text-xs text-muted",children:["\u5F53\u524D\uFF1A",String(s.siteLogoUrl??"/logo.png")]})]})]}),e.jsx("div",{className:"mt-4",children:e.jsx(p,{onClick:R,children:"\u4FDD\u5B58\u7AD9\u70B9\u4FE1\u606F"})})]}),g==="smtp"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"SMTP \u90AE\u4EF6\uFF08\u5BC6\u7801\u91CD\u7F6E\u9A8C\u8BC1\u7801\uFF09"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\uFF0C\u4E0E\u300C\u5408\u89C4\u4E0E\u9650\u6D41\u300D\u4E92\u4E0D\u5F71\u54CD\u3002"}),l===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u542F\u7528 SMTP",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:l.enabled,onChange:t=>x({...l,enabled:t.target.checked})})]}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(a,{label:"SMTP \u4E3B\u673A",children:e.jsx(c,{value:l.host,onChange:t=>x({...l,host:t.target.value}),placeholder:"smtp.example.com"})}),e.jsx(a,{label:"\u7AEF\u53E3\uFF08465=TLS / 587=STARTTLS\uFF09",children:e.jsx(c,{type:"number",value:String(l.port),onChange:t=>x({...l,port:+t.target.value||465}),placeholder:"\u63A8\u8350 587"})}),e.jsx(a,{label:"\u7528\u6237\u540D\uFF08\u5B8C\u6574\u90AE\u7BB1\u5730\u5740\uFF09",children:e.jsx(c,{value:l.username,onChange:t=>x({...l,username:t.target.value}),placeholder:"mail@collegehub.cn"})}),e.jsx(a,{label:`\u5BC6\u7801${l.passwordSet?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,children:e.jsx(c,{type:"password",value:C,onChange:t=>A(t.target.value)})})]}),e.jsx(a,{label:"\u53D1\u4EF6\u4EBA\u5730\u5740\uFF08From\uFF09",children:e.jsx(c,{value:l.from,onChange:t=>x({...l,from:t.target.value}),placeholder:"noreply@example.com"})}),e.jsx("div",{children:e.jsx(p,{onClick:async()=>{try{await u("set_smtp",{enabled:l.enabled,host:l.host,port:l.port,username:l.username,from:l.from,...C?{password:C}:{}}),m("SMTP \u914D\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5BC6\u7801\u52A0\u5BC6\u5B58\u50A8\uFF09"),A("")}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58 SMTP \u914D\u7F6E"})})]})]}),g==="oauth"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"OAuth \u767B\u5F55\uFF08GitHub / Google\uFF09"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\uFF1B\u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\u3002\u4FDD\u5B58\u540E\u4E0D\u4F1A\u88AB\u5176\u4ED6\u5361\u7247\u7684\u4FDD\u5B58\u64CD\u4F5C\u8986\u76D6\u3002"}),o===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-4",children:[["github","google"].map(t=>e.jsxs("div",{className:"rounded-lg border border-line p-3",children:[e.jsxs("label",{className:"mb-2 flex items-center justify-between text-[13px] font-medium",children:["\u542F\u7528 ",t==="github"?"GitHub":"Google"," \u767B\u5F55",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:o[t].enabled,onChange:d=>v({...o,[t]:{...o[t],enabled:d.target.checked}})})]}),e.jsxs("div",{className:"grid gap-2.5",children:[e.jsx(a,{label:"Client ID",children:e.jsx(c,{value:o[t].clientId,onChange:d=>v({...o,[t]:{...o[t],clientId:d.target.value}})})}),e.jsx(a,{label:`Client Secret${o[t].secretSet?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,children:e.jsx(c,{type:"password",value:t==="github"?j.gh:j.gg,onChange:d=>T({...j,[t==="github"?"gh":"gg"]:d.target.value})})})]})]},t)),e.jsxs("p",{className:"text-xs text-muted",children:["\u56DE\u8C03\u5730\u5740\uFF08\u5728 GitHub/Google OAuth \u5E94\u7528\u4E2D\u914D\u7F6E\uFF09\uFF1A",e.jsxs("code",{children:[location.origin,"/api/auth/oauth?provider=github|google&callback=1"]})," \xB7 \u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\uFF0C\u4EC5\u767B\u5F55\u6D41\u7A0B\u5185\u5B58\u89E3\u5BC6\u3002"]}),e.jsx("div",{children:e.jsx(p,{onClick:async()=>{try{await u("set_oauth",{githubEnabled:o.github.enabled,googleEnabled:o.google.enabled,githubClientId:o.github.clientId,googleClientId:o.google.clientId,...j.gh?{githubClientSecret:j.gh}:{},...j.gg?{googleClientSecret:j.gg}:{}}),m("OAuth \u914D\u7F6E\u5DF2\u4FDD\u5B58"),T({gh:"",gg:""})}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58 OAuth \u914D\u7F6E"})})]})]}),g==="epay"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u5728\u7EBF\u652F\u4ED8\uFF08\u6613\u652F\u4ED8\u534F\u8BAE\uFF09"}),e.jsxs("p",{className:"mb-4 text-xs text-muted",children:["\u517C\u5BB9\u5F69\u8679\u6613\u652F\u4ED8 ",e.jsx("code",{children:"mapi.php"})," / ",e.jsx("code",{children:"submit.php"})," \u534F\u8BAE\uFF0C\u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\u3002\u542F\u7528\u540E\u7528\u6237\u53EF\u5728\u4F59\u989D\u9875\u81EA\u52A9\u5145\u503C\uFF0C\u5230\u8D26\u7531\u5E73\u53F0\u5F02\u6B65\u56DE\u8C03\u9A71\u52A8\u3002"]}),i===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs("label",{className:"flex items-center justify-between rounded-lg border border-line px-3 py-2 text-[13px] font-medium",children:["\u542F\u7528\u5728\u7EBF\u652F\u4ED8",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:i.enabled,onChange:t=>b({...i,enabled:t.target.checked})})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-3 sm:grid-cols-2",children:[e.jsx(a,{label:"\u7F51\u5173\u5730\u5740",hint:"\u6613\u652F\u4ED8\u7AD9\u70B9\u6839\u5730\u5740\uFF0C\u4E0D\u8981\u5E26 /submit.php",children:e.jsx(c,{value:i.gateway,onChange:t=>b({...i,gateway:t.target.value}),placeholder:"https://epay-pages.pages.dev"})}),e.jsx(a,{label:"\u5546\u6237 PID",hint:"\u5546\u6237\u4E2D\u5FC3\u663E\u793A\u7684\u5546\u6237\u7F16\u53F7",children:e.jsx(c,{value:i.pid,onChange:t=>b({...i,pid:t.target.value}),placeholder:"\u5982 1001"})}),e.jsx(a,{label:`\u5546\u6237\u5BC6\u94A5 KEY${i.hasKey?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,hint:"32 \u4F4D\u901A\u4FE1\u79C1\u94A5\uFF0C\u4EC5\u52A0\u5BC6\u5B58\u50A8\u3001\u4E0D\u56DE\u663E",children:e.jsx(c,{type:"password",value:U,onChange:t=>_(t.target.value),placeholder:i.hasKey?"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022":"\u7C98\u8D34\u5546\u6237\u5BC6\u94A5"})}),e.jsx(a,{label:"\u5546\u54C1\u540D\u79F0",hint:"\u4E0B\u5355\u65F6\u5C55\u793A\u7ED9\u4ED8\u6B3E\u4EBA",children:e.jsx(c,{value:i.productName,onChange:t=>b({...i,productName:t.target.value}),placeholder:"API \u989D\u5EA6\u5145\u503C"})}),e.jsx(a,{label:"\u5355\u7B14\u6700\u4F4E\u91D1\u989D\uFF08\u5143\uFF09",children:e.jsx(c,{type:"number",value:String(i.minAmount),onChange:t=>b({...i,minAmount:+t.target.value||0})})}),e.jsx(a,{label:"\u5355\u7B14\u6700\u9AD8\u91D1\u989D\uFF08\u5143\uFF09",children:e.jsx(c,{type:"number",value:String(i.maxAmount),onChange:t=>b({...i,maxAmount:+t.target.value||0})})})]}),e.jsx(a,{label:"\u542F\u7528\u7684\u652F\u4ED8\u65B9\u5F0F",hint:"\u7528\u6237\u5145\u503C\u65F6\u53EF\u9009\u7684\u6E20\u9053",children:e.jsx("div",{className:"flex flex-wrap gap-2 pt-1",children:z.map(t=>{const d=i.channels.includes(t.key);return e.jsx("button",{type:"button",onClick:()=>b({...i,channels:d?i.channels.filter(E=>E!==t.key):[...i.channels,t.key]}),className:`cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${d?"border-brand/40 bg-brand/10 text-brand":"border-line text-muted hover:text-ink"}`,children:t.label},t.key)})})}),e.jsxs("p",{className:"text-xs text-muted",children:["\u5F02\u6B65\u56DE\u8C03\u5730\u5740\uFF08\u5728\u6613\u652F\u4ED8\u5546\u6237\u540E\u53F0\u786E\u8BA4\u8BE5\u5730\u5740\u53EF\u516C\u7F51\u8BBF\u95EE\uFF09\uFF1A",e.jsxs("code",{className:"ml-1",children:[location.origin,"/api/pay/epay/notify"]})]}),e.jsx("div",{children:e.jsx(p,{onClick:async()=>{try{await q("set_epay",{enabled:i.enabled,gateway:i.gateway,pid:i.pid,channels:i.channels,minAmount:i.minAmount,maxAmount:i.maxAmount,productName:i.productName,...U?{key:U}:{}}),m("\u652F\u4ED8\u914D\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5BC6\u94A5\u5DF2\u52A0\u5BC6\u5B58\u50A8\uFF09"),_(""),u("get_epay").then(t=>b(t.epay)).catch(()=>{})}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58\u652F\u4ED8\u914D\u7F6E"})})]})]}),g==="announcements"&&e.jsx(X,{})]}):e.jsx("div",{className:"grid gap-4 md:grid-cols-2",children:[...Array(4)].map((t,d)=>e.jsx("div",{className:"skeleton h-44"},d))})}\n',
+            "/assets/Settings-D1bvfg6b.js": {
+              content: 'import{i as H,u as M,j as e,B as p,d as f,h as B,g as K,e as G,F as a,I as c,n as u,t as q}from"./index-KwMGOJkp.js";import{r as h}from"./vendor-BbQ_LiY-.js";import{P as $}from"./plus-DVAh7yAY.js";import{T as W}from"./trash-2-BF158Quc.js";function X(){const[s,S]=h.useState(null),[k,N]=h.useState(!1),[l,x]=h.useState({id:"",title:"",content:"",popup:!1,enabled:!0}),{confirm:C,confirmEl:A}=H(),o=M(),v=()=>u("list_announcements").then(n=>S(n.announcements)).catch(n=>o(n.message,"err"));h.useEffect(()=>{v()},[]);const j=async()=>{if(!l.title.trim()||!l.content.trim())return o("\u6807\u9898\u4E0E\u5185\u5BB9\u4E0D\u80FD\u4E3A\u7A7A","err");try{await u(l.id?"update_announcement":"create_announcement",l),o(l.id?"\u516C\u544A\u5DF2\u66F4\u65B0":"\u516C\u544A\u5DF2\u53D1\u5E03"),N(!1),v()}catch(n){o(n.message,"err")}},T=async n=>{await C(`\u5220\u9664\u516C\u544A\u300C${n.title}\u300D\uFF1F`)&&(await u("delete_announcement",{id:n.id}),o("\u5DF2\u5220\u9664"),v())};return e.jsxs("div",{className:"flex max-w-3xl flex-col gap-4",children:[e.jsx("div",{className:"flex justify-end",children:e.jsxs(p,{onClick:()=>{x({id:"",title:"",content:"",popup:!1,enabled:!0}),N(!0)},children:[e.jsx($,{size:14}),"\u53D1\u5E03\u516C\u544A"]})}),e.jsx(f,{className:"p-4",children:s===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(3)].map((n,I)=>e.jsx("div",{className:"skeleton h-12"},I))}):s.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u8FD8\u6CA1\u6709\u516C\u544A"}):s.map(n=>e.jsxs("div",{className:"border-b border-line/60 py-3 last:border-0",children:[e.jsxs("div",{className:"flex items-center justify-between gap-3",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2",children:[e.jsx("span",{className:"truncate text-sm font-medium",children:n.title}),n.popup?e.jsx("span",{className:"shrink-0 whitespace-nowrap rounded-full bg-brand/10 px-2 py-0.5 text-[11px] text-brand",children:"\u5F39\u7A97"}):null,e.jsx(B,{value:n.enabled?"active":"pending"})]}),e.jsxs("div",{className:"flex shrink-0 items-center gap-1.5",children:[e.jsx(p,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:()=>{x({id:n.id,title:n.title,content:n.content,popup:!!n.popup,enabled:!!n.enabled}),N(!0)},children:"\u7F16\u8F91"}),e.jsx(p,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:()=>T(n),children:e.jsx(W,{size:12})})]})]}),e.jsx("p",{className:"mt-1 line-clamp-2 pl-6 text-xs text-muted",children:n.content}),e.jsx("div",{className:"mt-1.5 pr-1 text-right text-[11px] text-muted",children:K(n.created_at)})]},n.id))}),e.jsxs(G,{open:k,onClose:()=>N(!1),title:l.id?"\u7F16\u8F91\u516C\u544A":"\u53D1\u5E03\u516C\u544A",width:560,children:[e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx(a,{label:"\u6807\u9898",children:e.jsx(c,{value:l.title,onChange:n=>x({...l,title:n.target.value})})}),e.jsx(a,{label:"\u5185\u5BB9",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:5,value:l.content,onChange:n=>x({...l,content:n.target.value})})}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u8FDB\u5165\u7F51\u7AD9\u65F6\u5F39\u7A97\u5C55\u793A",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:l.popup,onChange:n=>x({...l,popup:n.target.checked})})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u542F\u7528\uFF08\u5173\u95ED\u540E\u4EC5\u4FDD\u7559\u8BB0\u5F55\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:l.enabled,onChange:n=>x({...l,enabled:n.target.checked})})]})]}),e.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[e.jsx(p,{variant:"ghost",onClick:()=>N(!1),children:"\u53D6\u6D88"}),e.jsx(p,{onClick:j,children:l.id?"\u4FDD\u5B58\u4FEE\u6539":"\u53D1\u5E03"})]})]}),A]})}const z=[{key:"alipay",label:"\u652F\u4ED8\u5B9D"},{key:"wxpay",label:"\u5FAE\u4FE1\u652F\u4ED8"},{key:"qqpay",label:"QQ \u94B1\u5305"},{key:"usdt",label:"USDT"}];function Z(){const[s,S]=h.useState(null),[k,N]=h.useState(null),[l,x]=h.useState(null),[C,A]=h.useState(""),[o,v]=h.useState(null),[j,T]=h.useState({gh:"",gg:""}),[n,I]=h.useState(""),[i,b]=h.useState(null),[U,_]=h.useState(""),[g,O]=h.useState("billing"),m=M();h.useEffect(()=>{u("get_settings").then(t=>S(t.settings)).catch(t=>m(t.message,"err")),u("get_smtp").then(t=>x(t.smtp)).catch(()=>x(null)),u("get_oauth").then(t=>v(t.oauth)).catch(()=>v(null)),u("get_epay").then(t=>b(t.epay)).catch(()=>b(null)),fetch("/api/site").then(t=>t.json()).then(N).catch(()=>{})},[]);const R=async()=>{if(s)try{await u("set_settings",s),m("\u8BBE\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5DF2\u5199\u5165\u5BA1\u8BA1\u65E5\u5FD7\uFF09")}catch(t){m(t.message,"err")}},r=(t,d)=>S({...s,[t]:d});return s?e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["billing","\u8BA1\u8D39\u4E0E\u9650\u6D41"],["moderation","\u5185\u5BB9\u5B89\u5168"],["compliance","\u6CE8\u518C\u4E0E\u5408\u89C4"],["webhook","Webhook \u4E0E\u5B89\u5168"],["site","\u7AD9\u70B9\u4FE1\u606F"],["smtp","\u53D1\u4EF6\u914D\u7F6E"],["oauth","\u7B2C\u4E09\u65B9\u767B\u5F55"],["epay","\u652F\u4ED8\u914D\u7F6E"],["announcements","\u516C\u544A"]].map(([t,d])=>e.jsx("button",{role:"tab","aria-selected":g===t,onClick:()=>O(t),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${g===t?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:d},t))}),g==="billing"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u8BA1\u8D39\u4E0E\u9650\u6D41"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(a,{label:"\u9ED8\u8BA4 RPM\uFF08\u6BCF Key\uFF09",hint:"\u586B 0 \u4E3A\u5B8C\u5168\u4E0D\u9650",children:e.jsx(c,{type:"number",value:String(s.defaultRpm??60),onChange:t=>r("defaultRpm",+t.target.value),placeholder:"0 \u4E3A\u4E0D\u9650"})}),e.jsx(a,{label:"\u9ED8\u8BA4 TPM\uFF08\u6BCF Key\uFF09",hint:"\u586B 0 \u4E3A\u5B8C\u5168\u4E0D\u9650",children:e.jsx(c,{type:"number",value:String(s.defaultTpm??1e5),onChange:t=>r("defaultTpm",+t.target.value),placeholder:"0 \u4E3A\u4E0D\u9650"})})]}),e.jsx("p",{className:"mt-3 text-xs text-muted",children:"\u8D85\u51FA\u9650\u5236\u8FD4\u56DE HTTP 429 \u4E0E Retry-After\u3002\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF1B\u53EF\u5728\u300C\u5B9A\u4EF7\u300D\u9875\u9762\u4E3A\u6BCF\u4E2A\u5927\u6A21\u578B\u5355\u72EC\u8BBE\u7F6E\u72EC\u7ACB RPM \u9650\u6D41\u3002"})]}),g==="moderation"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u5185\u5BB9\u5B89\u5168"}),e.jsxs("label",{className:"mb-3 flex items-center justify-between text-[13px]",children:["\u542F\u7528\u5185\u5BB9\u5B89\u5168\u5BA1\u6838",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.contentModerationEnabled,onChange:t=>r("contentModerationEnabled",t.target.checked)})]}),e.jsxs("label",{className:"mb-3 flex items-center justify-between text-[13px]",children:["\u8BB0\u5F55\u8131\u654F\u5185\u5BB9\u7247\u6BB5\uFF08\u9ED8\u8BA4\u5173\u95ED\uFF0C\u4EC5\u5B58\u6458\u8981\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.logContentEnabled,onChange:t=>r("logContentEnabled",t.target.checked)})]}),e.jsx(a,{label:"\u5916\u90E8\u5BA1\u6838 API\uFF08\u53EF\u9009\uFF0CPOST {input} \u2192 {flagged}\uFF09",children:e.jsx(c,{value:String(s.MODERATION_API_URL??""),onChange:t=>r("MODERATION_API_URL",t.target.value),placeholder:"https://..."})})]}),g==="compliance"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6CE8\u518C\u4E0E\u5408\u89C4\u6587\u672C"}),e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u5F00\u653E\u6CE8\u518C",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.signupsEnabled,onChange:t=>r("signupsEnabled",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u6CE8\u518C\u5F3A\u5236\u90AE\u7BB1\u9A8C\u8BC1\u7801",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:s.requireEmailVerification!==!1,onChange:t=>r("requireEmailVerification",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u6CE8\u518C\u5F3A\u5236\u786E\u8BA4\u6761\u6B3E/\u9690\u79C1",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.requireTosAcceptance,onChange:t=>r("requireTosAcceptance",t.target.checked)})]}),e.jsx(a,{label:"\u670D\u52A1\u6761\u6B3E URL",children:e.jsx(c,{value:String(s.termsOfServiceUrl??""),onChange:t=>r("termsOfServiceUrl",t.target.value)})}),e.jsx(a,{label:"\u9690\u79C1\u653F\u7B56 URL",children:e.jsx(c,{value:String(s.privacyPolicyUrl??""),onChange:t=>r("privacyPolicyUrl",t.target.value)})}),e.jsx(a,{label:"\u5BA1\u8BA1\u65E5\u5FD7\u4FDD\u7559\u5929\u6570\uFF0830\u2013180\uFF0C\u9ED8\u8BA4 30\uFF09",hint:"\u6700\u77ED 30 \u5929\uFF0C\u6700\u957F 180 \u5929",children:e.jsx(c,{type:"number",min:30,max:180,step:1,value:String(s.auditLogRetentionDays??30),onChange:t=>r("auditLogRetentionDays",+t.target.value),onBlur:t=>r("auditLogRetentionDays",Math.min(180,Math.max(30,Math.round(+t.target.value)||30)))})})]})]}),["billing","moderation","compliance"].includes(g)&&e.jsx("div",{className:"flex justify-end",children:e.jsx(p,{onClick:R,children:"\u4FDD\u5B58\u5408\u89C4\u4E0E\u9650\u6D41\u8BBE\u7F6E"})}),g==="webhook"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"Webhook \u4E0E\u5B89\u5168"}),e.jsx(a,{label:"\u4E0A\u6E38\u4E8B\u4EF6 Webhook \u5730\u5740",children:e.jsx(c,{value:n,onChange:t=>I(t.target.value),placeholder:"https://api.obitw.cn/api/webhooks/upstream\uFF08X-Webhook-Secret \u6821\u9A8C\uFF09"})}),e.jsxs("div",{className:"mt-4 flex flex-col gap-3 border-t border-line pt-4",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u5173\u95ED\u4E8C\u6B21\u9A8C\u8BC1\uFF08\u7BA1\u7406\u64CD\u4F5C\u4EC5\u9700\u7BA1\u7406\u5458\u89D2\u8272\uFF0C\u4E0D\u518D\u8981\u6C42\u91CD\u65B0\u8F93\u5165\u5BC6\u7801\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.stepUpDisabled,onChange:t=>r("stepUpDisabled",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u4FDD\u6301\u767B\u5F55\u72B6\u6001\uFF08\u4F1A\u8BDD 10 \u5E74\u6709\u6548\uFF0C\u4E0D\u518D 7 \u5929\u8FC7\u671F\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.persistentSession,onChange:t=>r("persistentSession",t.target.checked)})]}),e.jsx("p",{className:"text-xs text-muted",children:"\u26A0\uFE0F \u5173\u95ED\u4E8C\u6B21\u9A8C\u8BC1\u4F1A\u964D\u4F4E\u7BA1\u7406\u63A5\u53E3\u5B89\u5168\u6027\uFF0C\u5EFA\u8BAE\u4EC5\u5728\u4E2A\u4EBA/\u5185\u7F51\u73AF\u5883\u4F7F\u7528\u3002\u300C\u4FDD\u6301\u767B\u5F55\u72B6\u6001\u300D\u5BF9\u4E4B\u540E\u7684\u65B0\u767B\u5F55\u751F\u6548\uFF0C\u5DF2\u6709\u4F1A\u8BDD\u9700\u91CD\u65B0\u767B\u5F55\u4E00\u6B21\u3002"}),e.jsx("div",{children:e.jsx(p,{onClick:async()=>{try{await u("set_settings",{stepUpDisabled:!!s.stepUpDisabled,persistentSession:!!s.persistentSession}),m("\u5B89\u5168\u9009\u9879\u5DF2\u4FDD\u5B58")}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58\u5B89\u5168\u8BBE\u7F6E"})})]}),e.jsxs("ul",{className:"mt-3 list-disc space-y-1 pl-4 text-xs text-muted",children:[e.jsx("li",{children:"API Key \u652F\u6301\u5F3A\u5236\u7B7E\u540D\uFF1AX-Timestamp + X-Signature\uFF08HMAC-SHA256\uFF09\uFF0C\xB1300s \u9632\u91CD\u653E\u7A97\u53E3"}),e.jsx("li",{children:"\u5BA1\u8BA1\u65E5\u5FD7\u54C8\u5E0C\u94FE\u9632\u7BE1\u6539\uFF0C\u5EFA\u8BAE\u6BCF\u65E5\u8FD0\u884C\u300C\u6821\u9A8C\u94FE\u5B8C\u6574\u6027\u300D"})]})]}),g==="site"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u7AD9\u70B9\u4FE1\u606F"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u7528\u4E8E\u5404\u9875\u9762 SEO \u4E0E\u63A7\u5236\u53F0\u54C1\u724C\uFF1B\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\u3002"}),e.jsxs("div",{className:"grid gap-3 md:grid-cols-2",children:[e.jsx(a,{label:"\u7AD9\u70B9\u540D\u79F0",children:e.jsx(c,{value:String(s.siteName??""),onChange:t=>r("siteName",t.target.value)})}),e.jsx(a,{label:"\u7AD9\u70B9\u4E3B\u9875\uFF08\u53EF\u9009\uFF0C\u7528\u4E8E Logo \u8DF3\u8F6C\uFF09",children:e.jsx(c,{value:String(s.siteHomepage??""),onChange:t=>r("siteHomepage",t.target.value),placeholder:"https://..."})}),e.jsx(a,{label:"\u9996\u9875\u5FBD\u7AE0\u6807\u7B7E\uFF08Hero Badge\uFF09",children:e.jsx(c,{value:String(s.heroBadge??"\u8DD1\u5728 EdgeOne \u5168\u7403\u8FB9\u7F18\u8282\u70B9"),onChange:t=>r("heroBadge",t.target.value)})}),e.jsx(a,{label:"\u5E95\u90E8\u6280\u672F\u652F\u6301\u90AE\u7BB1",children:e.jsx(c,{value:String(s.supportEmail??"hackerxiaow@gmail.com"),onChange:t=>r("supportEmail",t.target.value)})}),e.jsx(a,{label:"\u804A\u5929\u5BA4\u673A\u5668\u4EBA\u6A21\u578B",hint:"\u804A\u5929\u5BA4\u5185 @ \u673A\u5668\u4EBA\u89E6\u53D1\u56DE\u590D\u65F6\u4F7F\u7528\u7684\u6A21\u578B\uFF08\u9ED8\u8BA4 agnes-3.0-flash\uFF09",children:e.jsx(c,{value:String(s.chatBotModel??"agnes-3.0-flash"),onChange:t=>r("chatBotModel",t.target.value),placeholder:"agnes-3.0-flash"})}),e.jsx(a,{label:"\u5907\u6848\u53F7\uFF08ICP\uFF09",children:e.jsx(c,{value:String(s.icpNumber??""),onChange:t=>r("icpNumber",t.target.value),placeholder:"\u5982\uFF1A\u4EACICP\u59072024000000\u53F7-1\uFF1B\u7559\u7A7A\u5219\u4E0D\u663E\u793A"})}),e.jsx(a,{label:"\u7248\u6743\u6587\u6848",children:e.jsx(c,{value:String(s.copyrightText??""),onChange:t=>r("copyrightText",t.target.value),placeholder:"\u7559\u7A7A\u81EA\u52A8\u4F7F\u7528 \xA9 \u5E74\u4EFD \u7AD9\u70B9\u540D"})}),e.jsx(a,{label:"GitHub \u94FE\u63A5",children:e.jsx(c,{value:String(s.githubUrl??""),onChange:t=>r("githubUrl",t.target.value),placeholder:"https://github.com/...\uFF1B\u7559\u7A7A\u5219\u9690\u85CF\u56FE\u6807"})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(a,{label:"\u9996\u9875\u4E3B\u6807\u8BED\uFF08Hero \u6807\u9898\uFF09",children:e.jsx(c,{value:String(s.heroTitle??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"),onChange:t=>r("heroTitle",t.target.value)})})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(a,{label:"\u9996\u9875\u526F\u6807\u8BED\u4ECB\u7ECD",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:2,value:String(s.heroSubtitle??"\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\uFF0C\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6CBB\u7406\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002\u5408\u6CD5\u6388\u6743\u4E0A\u6E38\u3001\u900F\u660E\u8BA1\u8D39\u3001\u54C8\u5E0C\u94FE\u5BA1\u8BA1\u2014\u2014\u9762\u5411\u5F00\u53D1\u8005\u4E0E\u4F01\u4E1A\u7684\u6B63\u89C4\u805A\u5408\u5206\u53D1\u5E73\u53F0\u3002"),onChange:t=>r("heroSubtitle",t.target.value)})})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(a,{label:"\u7AD9\u70B9\u63CF\u8FF0\uFF08meta description / og:description\uFF09",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:2,value:String(s.siteDescription??""),onChange:t=>r("siteDescription",t.target.value)})})}),e.jsxs("div",{className:"flex items-center gap-4",children:[(k==null?void 0:k.siteLogoUrl)&&e.jsx("img",{src:k.siteLogoUrl,alt:"\u5F53\u524D Logo",className:"h-12 w-12 rounded-lg border border-line object-contain"}),e.jsxs("label",{className:"cursor-pointer rounded-lg border border-line bg-surface px-3 py-2 text-[13px] hover:bg-surface2",children:["\u4E0A\u4F20\u65B0 Logo\uFF08\u81EA\u52A8\u538B\u7F29\uFF09",e.jsx("input",{type:"file",accept:"image/png,image/jpeg,image/webp,image/svg+xml",className:"hidden",onChange:async t=>{var E;const d=(E=t.target.files)==null?void 0:E[0];if(d)try{const P=URL.createObjectURL(d),y=new Image;await new Promise((D,F)=>{y.onload=D,y.onerror=()=>F(new Error("\u65E0\u6CD5\u8BFB\u53D6\u8BE5\u56FE\u7247")),y.src=P}),URL.revokeObjectURL(P);const L=Math.min(1,256/Math.max(y.width,y.height)),w=document.createElement("canvas");w.width=Math.round(y.width*L),w.height=Math.round(y.height*L),w.getContext("2d").drawImage(y,0,0,w.width,w.height),await u("upsert_site_logo",{dataBase64:w.toDataURL("image/png")}),m("Logo \u5DF2\u66F4\u65B0\uFF08R2 \u5B58\u50A8\uFF09"),location.reload()}catch(P){m(P.message,"err")}}})]}),e.jsxs("span",{className:"text-xs text-muted",children:["\u5F53\u524D\uFF1A",String(s.siteLogoUrl??"/logo.png")]})]})]}),e.jsx("div",{className:"mt-4",children:e.jsx(p,{onClick:R,children:"\u4FDD\u5B58\u7AD9\u70B9\u4FE1\u606F"})})]}),g==="smtp"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"SMTP \u90AE\u4EF6\uFF08\u5BC6\u7801\u91CD\u7F6E\u9A8C\u8BC1\u7801\uFF09"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\uFF0C\u4E0E\u300C\u5408\u89C4\u4E0E\u9650\u6D41\u300D\u4E92\u4E0D\u5F71\u54CD\u3002"}),l===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u542F\u7528 SMTP",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:l.enabled,onChange:t=>x({...l,enabled:t.target.checked})})]}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(a,{label:"SMTP \u4E3B\u673A",children:e.jsx(c,{value:l.host,onChange:t=>x({...l,host:t.target.value}),placeholder:"smtp.example.com"})}),e.jsx(a,{label:"\u7AEF\u53E3\uFF08465=TLS / 587=STARTTLS\uFF09",children:e.jsx(c,{type:"number",value:String(l.port),onChange:t=>x({...l,port:+t.target.value||465}),placeholder:"\u63A8\u8350 587"})}),e.jsx(a,{label:"\u7528\u6237\u540D\uFF08\u5B8C\u6574\u90AE\u7BB1\u5730\u5740\uFF09",children:e.jsx(c,{value:l.username,onChange:t=>x({...l,username:t.target.value}),placeholder:"mail@collegehub.cn"})}),e.jsx(a,{label:`\u5BC6\u7801${l.passwordSet?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,children:e.jsx(c,{type:"password",value:C,onChange:t=>A(t.target.value)})})]}),e.jsx(a,{label:"\u53D1\u4EF6\u4EBA\u5730\u5740\uFF08From\uFF09",children:e.jsx(c,{value:l.from,onChange:t=>x({...l,from:t.target.value}),placeholder:"noreply@example.com"})}),e.jsx("div",{children:e.jsx(p,{onClick:async()=>{try{await u("set_smtp",{enabled:l.enabled,host:l.host,port:l.port,username:l.username,from:l.from,...C?{password:C}:{}}),m("SMTP \u914D\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5BC6\u7801\u52A0\u5BC6\u5B58\u50A8\uFF09"),A("")}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58 SMTP \u914D\u7F6E"})})]})]}),g==="oauth"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"OAuth \u767B\u5F55\uFF08GitHub / Google\uFF09"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\uFF1B\u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\u3002\u4FDD\u5B58\u540E\u4E0D\u4F1A\u88AB\u5176\u4ED6\u5361\u7247\u7684\u4FDD\u5B58\u64CD\u4F5C\u8986\u76D6\u3002"}),o===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-4",children:[["github","google"].map(t=>e.jsxs("div",{className:"rounded-lg border border-line p-3",children:[e.jsxs("label",{className:"mb-2 flex items-center justify-between text-[13px] font-medium",children:["\u542F\u7528 ",t==="github"?"GitHub":"Google"," \u767B\u5F55",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:o[t].enabled,onChange:d=>v({...o,[t]:{...o[t],enabled:d.target.checked}})})]}),e.jsxs("div",{className:"grid gap-2.5",children:[e.jsx(a,{label:"Client ID",children:e.jsx(c,{value:o[t].clientId,onChange:d=>v({...o,[t]:{...o[t],clientId:d.target.value}})})}),e.jsx(a,{label:`Client Secret${o[t].secretSet?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,children:e.jsx(c,{type:"password",value:t==="github"?j.gh:j.gg,onChange:d=>T({...j,[t==="github"?"gh":"gg"]:d.target.value})})})]})]},t)),e.jsxs("p",{className:"text-xs text-muted",children:["\u56DE\u8C03\u5730\u5740\uFF08\u5728 GitHub/Google OAuth \u5E94\u7528\u4E2D\u914D\u7F6E\uFF09\uFF1A",e.jsxs("code",{children:[location.origin,"/api/auth/oauth?provider=github|google&callback=1"]})," \xB7 \u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\uFF0C\u4EC5\u767B\u5F55\u6D41\u7A0B\u5185\u5B58\u89E3\u5BC6\u3002"]}),e.jsx("div",{children:e.jsx(p,{onClick:async()=>{try{await u("set_oauth",{githubEnabled:o.github.enabled,googleEnabled:o.google.enabled,githubClientId:o.github.clientId,googleClientId:o.google.clientId,...j.gh?{githubClientSecret:j.gh}:{},...j.gg?{googleClientSecret:j.gg}:{}}),m("OAuth \u914D\u7F6E\u5DF2\u4FDD\u5B58"),T({gh:"",gg:""})}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58 OAuth \u914D\u7F6E"})})]})]}),g==="epay"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u5728\u7EBF\u652F\u4ED8\uFF08\u6613\u652F\u4ED8\u534F\u8BAE\uFF09"}),e.jsxs("p",{className:"mb-4 text-xs text-muted",children:["\u517C\u5BB9\u5F69\u8679\u6613\u652F\u4ED8 ",e.jsx("code",{children:"mapi.php"})," / ",e.jsx("code",{children:"submit.php"})," \u534F\u8BAE\uFF0C\u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\u3002\u542F\u7528\u540E\u7528\u6237\u53EF\u5728\u4F59\u989D\u9875\u81EA\u52A9\u5145\u503C\uFF0C\u5230\u8D26\u7531\u5E73\u53F0\u5F02\u6B65\u56DE\u8C03\u9A71\u52A8\u3002"]}),i===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs("label",{className:"flex items-center justify-between rounded-lg border border-line px-3 py-2 text-[13px] font-medium",children:["\u542F\u7528\u5728\u7EBF\u652F\u4ED8",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:i.enabled,onChange:t=>b({...i,enabled:t.target.checked})})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-3 sm:grid-cols-2",children:[e.jsx(a,{label:"\u7F51\u5173\u5730\u5740",hint:"\u6613\u652F\u4ED8\u7AD9\u70B9\u6839\u5730\u5740\uFF0C\u4E0D\u8981\u5E26 /submit.php",children:e.jsx(c,{value:i.gateway,onChange:t=>b({...i,gateway:t.target.value}),placeholder:"https://epay-pages.pages.dev"})}),e.jsx(a,{label:"\u5546\u6237 PID",hint:"\u5546\u6237\u4E2D\u5FC3\u663E\u793A\u7684\u5546\u6237\u7F16\u53F7",children:e.jsx(c,{value:i.pid,onChange:t=>b({...i,pid:t.target.value}),placeholder:"\u5982 1001"})}),e.jsx(a,{label:`\u5546\u6237\u5BC6\u94A5 KEY${i.hasKey?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,hint:"32 \u4F4D\u901A\u4FE1\u79C1\u94A5\uFF0C\u4EC5\u52A0\u5BC6\u5B58\u50A8\u3001\u4E0D\u56DE\u663E",children:e.jsx(c,{type:"password",value:U,onChange:t=>_(t.target.value),placeholder:i.hasKey?"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022":"\u7C98\u8D34\u5546\u6237\u5BC6\u94A5"})}),e.jsx(a,{label:"\u5546\u54C1\u540D\u79F0",hint:"\u4E0B\u5355\u65F6\u5C55\u793A\u7ED9\u4ED8\u6B3E\u4EBA",children:e.jsx(c,{value:i.productName,onChange:t=>b({...i,productName:t.target.value}),placeholder:"API \u989D\u5EA6\u5145\u503C"})}),e.jsx(a,{label:"\u5355\u7B14\u6700\u4F4E\u91D1\u989D\uFF08\u5143\uFF09",children:e.jsx(c,{type:"number",value:String(i.minAmount),onChange:t=>b({...i,minAmount:+t.target.value||0})})}),e.jsx(a,{label:"\u5355\u7B14\u6700\u9AD8\u91D1\u989D\uFF08\u5143\uFF09",children:e.jsx(c,{type:"number",value:String(i.maxAmount),onChange:t=>b({...i,maxAmount:+t.target.value||0})})})]}),e.jsx(a,{label:"\u542F\u7528\u7684\u652F\u4ED8\u65B9\u5F0F",hint:"\u7528\u6237\u5145\u503C\u65F6\u53EF\u9009\u7684\u6E20\u9053",children:e.jsx("div",{className:"flex flex-wrap gap-2 pt-1",children:z.map(t=>{const d=i.channels.includes(t.key);return e.jsx("button",{type:"button",onClick:()=>b({...i,channels:d?i.channels.filter(E=>E!==t.key):[...i.channels,t.key]}),className:`cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${d?"border-brand/40 bg-brand/10 text-brand":"border-line text-muted hover:text-ink"}`,children:t.label},t.key)})})}),e.jsxs("p",{className:"text-xs text-muted",children:["\u5F02\u6B65\u56DE\u8C03\u5730\u5740\uFF08\u5728\u6613\u652F\u4ED8\u5546\u6237\u540E\u53F0\u786E\u8BA4\u8BE5\u5730\u5740\u53EF\u516C\u7F51\u8BBF\u95EE\uFF09\uFF1A",e.jsxs("code",{className:"ml-1",children:[location.origin,"/api/pay/epay/notify"]})]}),e.jsx("div",{children:e.jsx(p,{onClick:async()=>{try{await q("set_epay",{enabled:i.enabled,gateway:i.gateway,pid:i.pid,channels:i.channels,minAmount:i.minAmount,maxAmount:i.maxAmount,productName:i.productName,...U?{key:U}:{}}),m("\u652F\u4ED8\u914D\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5BC6\u94A5\u5DF2\u52A0\u5BC6\u5B58\u50A8\uFF09"),_(""),u("get_epay").then(t=>b(t.epay)).catch(()=>{})}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58\u652F\u4ED8\u914D\u7F6E"})})]})]}),g==="announcements"&&e.jsx(X,{})]}):e.jsx("div",{className:"grid gap-4 md:grid-cols-2",children:[...Array(4)].map((t,d)=>e.jsx("div",{className:"skeleton h-44"},d))})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Users-w9V59wdx.js": {
-              content: 'import{i as be,u as ge,j as e,d as j,b as ve,B as n,D as T,h as q,n as d,g as z,e as S,F as p,I as g,k as Ne,C as ye,q as ke,o as we}from"./index-C1Wgc1sf.js";import{h as Ce,r as c}from"./vendor-BbQ_LiY-.js";import Ie from"./Invite-C63C__Ob.js";import{P as le}from"./plus-sJaeYLjc.js";import{T as ae}from"./trash-2-Hgm_5qDX.js";import"./download-74qsMNMY.js";const h={superadmin:{label:"\u8D85\u7EA7\u7BA1\u7406\u5458",color:"bg-red-500/10 text-red-500 font-bold border border-red-500/30",desc:"\u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u5168\u7AD9\u7BA1\u7406\uFF0C\u989D\u5EA6\u65E0\u9650\u771F\u5B9E\u6263\u8D39",lvl:100},admin:{label:"\u7BA1\u7406\u5458",color:"bg-brand/10 text-brand font-semibold border border-brand/20",desc:"\u53EF\u8C03\u7528\u5168\u91CF\u6A21\u578B\uFF0C\u53EF\u7BA1\u7406\u4E0B\u7EA7\u7528\u6237\u5E76\u8F6C\u8D26\u5145\u503C",lvl:50},finance:{label:"\u8D22\u52A1\u4EBA\u5458",color:"bg-purple-500/10 text-purple-400 border border-purple-500/20",desc:"\u8D22\u52A1\u4E0E\u8D26\u5355\u6838\u5BF9\u6743\u9650",lvl:30},auditor:{label:"\u5BA1\u8BA1\u5458",color:"bg-blue-500/10 text-blue-400 border border-blue-500/20",desc:"\u5BA1\u8BA1\u65E5\u5FD7\u53EA\u8BFB\u6743\u9650",lvl:20},vip:{label:"VIP \u8D26\u53F7",color:"bg-amber-500/10 text-amber-500 font-semibold border border-amber-500/20",desc:"\u4F59\u989D\u5927\u4E8E 0 \u81EA\u52A8\u83B7\u5F97\uFF0C\u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u6A21\u578B\u5E76\u6309\u91CF\u6263\u8D39",lvl:10},user:{label:"\u666E\u901A\u7528\u6237",color:"bg-zinc-500/10 text-zinc-400 border border-zinc-500/20",desc:"\u4F59\u989D\u5F52\u96F6\u72B6\u6001\uFF0C\u4EC5\u9650\u514D\u8D39\u6A21\u578B\u6C60\uFF0C\u514D\u5145\u503C\u4E0D\u6263\u8D39",lvl:1}};function ze(){var J,Q,W,X,Z,ee,se,te;const{me:t}=Ce(),x=(t==null?void 0:t.user.role)==="superadmin",F=x||(t==null?void 0:t.user.role)==="admin",[f,ne]=c.useState(F?"users":"mygroup"),[C,re]=c.useState(null),[o,K]=c.useState(null),[A,G]=c.useState(null),[D,Y]=c.useState(null),[y,I]=c.useState({open:!1,email:"",role:"member"}),[m,k]=c.useState({open:!1,user:null,role:"user"}),[r,v]=c.useState({open:!1,user:null,amount:"50",memo:"\u7BA1\u7406\u5458\u8F6C\u8D26\u5145\u503C",password:""}),[i,b]=c.useState({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),[w,E]=c.useState(null),[oe,H]=c.useState(null),{confirm:B,confirmEl:ie}=be(),a=ge(),N=()=>d("list_users").then(s=>re(s.users)).catch(s=>a(s.message,"err")),M=()=>d("list_redeem_codes").then(s=>K(s.codes)).catch(()=>K([])),L=()=>d("flags_queue").then(s=>G(s.flags)).catch(()=>G([])),R=()=>d("appeals_list").then(s=>Y(s.appeals)).catch(()=>Y([]));c.useEffect(()=>{F&&N()},[]);const de=async()=>{var s;if(m.user)try{await d("set_role",{userId:m.user.id,role:m.role}),a(`\u5DF2\u5C06\u300C${m.user.email}\u300D\u89D2\u8272\u66F4\u65B0\u4E3A ${((s=h[m.role])==null?void 0:s.label)||m.role}`),k({open:!1,user:null,role:"user"}),N()}catch(l){a(l.message,"err")}},ce=s=>{v({open:!0,user:s,amount:"50",memo:"\u7BA1\u7406\u5458\u8F6C\u8D26\u5145\u503C",password:""})},xe=async()=>{if(!r.user)return;const s=parseFloat(r.amount);if(isNaN(s)||s<=0)return a("\u8BF7\u8F93\u5165\u5927\u4E8E 0 \u7684\u5145\u503C\u91D1\u989D","err");if(!r.password.trim())return a("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u5145\u503C\u64CD\u4F5C","err");try{await d("topup",{scope:`user:${r.user.id}`,amount:s,memo:r.memo.trim()||void 0,password:r.password.trim()}),a(`\u8F6C\u8D26\u5145\u503C\u6210\u529F\uFF01\u5DF2\u4E3A\u300C${r.user.email}\u300D\u5145\u503C \xA5${s.toFixed(2)}${x?"":"\uFF08\u5DF2\u6263\u9664\u60A8\u7B49\u989D\u4F59\u989D\uFF09"}`),v({open:!1,user:null,amount:"50",memo:"",password:""}),N()}catch(l){a(l.message,"err")}},me=async s=>{if(await B(`\u5371\u9669\u64CD\u4F5C\uFF1A\u786E\u8BA4\u6C38\u4E45\u5220\u9664\u7528\u6237\u300C${s.email}\u300D\uFF1F\u8BE5\u7528\u6237\u7684\u4E2A\u4EBA\u8D26\u6237\u3001\u6570\u636E\u4E0E\u5168\u90E8 API Key \u5C06\u88AB\u7269\u7406\u9500\u6BC1\u4E14\u65E0\u6CD5\u6062\u590D\uFF01`))try{await d("delete_user",{userId:s.id}),a(`\u5DF2\u5F7B\u5E95\u5220\u9664\u7528\u6237\u300C${s.email}\u300D`),N()}catch(l){a(l.message,"err")}},O=async(s,l)=>{try{await navigator.clipboard.writeText(s),H(s),a(`\u5DF2\u590D\u5236 ${l}`),setTimeout(()=>H(null),1800)}catch{a("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u590D\u5236","err")}},ue=async()=>{const s=parseFloat(i.amount),l=parseInt(i.count,10);if(isNaN(s)||s<=0)return a("\u5361\u5BC6\u9762\u989D\u5FC5\u987B\u5927\u4E8E 0","err");if(isNaN(l)||l<=0||l>100)return a("\u6BCF\u6B21\u751F\u6210\u6570\u91CF\u9700\u5728 1 \u5230 100 \u5F20\u4E4B\u95F4","err");if(!i.password.trim())return a("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u64CD\u4F5C","err");try{const u=await d("generate_redeem_codes",{amount:s,count:l,autoVip:i.autoVip,note:i.note.trim()||void 0,password:i.password.trim()});a(`\u5DF2\u6210\u529F\u751F\u6210 ${u.count||l} \u5F20\u5361\u5BC6\uFF01`),E((u.codes||[]).map(V=>V.code)),b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),M()}catch(u){a(u.message,"err")}},pe=async s=>{if(await B(`\u786E\u8BA4\u5220\u9664/\u4F5C\u5E9F\u5361\u5BC6\u300C${s.code}\u300D\uFF1F`))try{await d("delete_redeem_code",{codeId:s.id}),a("\u5361\u5BC6\u5DF2\u5220\u9664"),M()}catch(l){a(l.message,"err")}},he=[{key:"email",label:"\u90AE\u7BB1",sortVal:s=>s.email,render:s=>e.jsx("span",{className:"font-medium text-ink",children:s.email})},{key:"id",label:"\u7528\u6237 ID",render:s=>e.jsxs("code",{className:"text-xs text-muted font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"role",label:"\u8D26\u53F7\u7B49\u7EA7",render:s=>{var P,$;const l=h[s.role]||{label:s.role,color:"bg-surface2 text-muted"},u=((P=h[(t==null?void 0:t.user.role)??"user"])==null?void 0:P.lvl)??1,V=(($=h[s.role])==null?void 0:$.lvl)??1,_=x||u>V&&s.id!==(t==null?void 0:t.user.id);return e.jsx("button",{type:"button",disabled:!_,onClick:()=>_&&k({open:!0,user:s,role:s.role}),className:`rounded-full px-2.5 py-0.5 text-[11px] transition-all ${_?"hover:scale-105 cursor-pointer":"cursor-default opacity-85"} ${l.color}`,title:_?"\u70B9\u51FB\u4FEE\u6539\u7528\u6237\u89D2\u8272\u7B49\u7EA7\u4E0E\u6743\u9650":"\u540C\u7EA7\u6216\u9AD8\u6743\u9650\u8D26\u53F7\u4E0D\u53EF\u76F4\u63A5\u4FEE\u6539\u89D2\u8272",children:l.label})}},{key:"balance",label:"\u53EF\u7528\u4F59\u989D",sortVal:s=>s.unlimited?Number.POSITIVE_INFINITY:s.balance??0,render:s=>s.unlimited?e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 font-mono text-xs font-semibold text-brand whitespace-nowrap",title:"\u8D85\u7EA7\u7BA1\u7406\u5458\u4E3A\u94F8\u5E01\u65B9\uFF0C\u989D\u5EA6\u65E0\u4E0A\u9650",children:"\u221E \u65E0\u9650"}):e.jsxs("span",{className:"font-mono text-xs font-semibold text-emerald-500",children:["\xA5",(s.balance??0).toFixed(2)]})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"created",label:"\u6CE8\u518C\u65F6\u95F4",sortVal:s=>s.created_at,render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.created_at)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>{var P,$;const l=((P=h[(t==null?void 0:t.user.role)??"user"])==null?void 0:P.lvl)??1,u=(($=h[s.role])==null?void 0:$.lvl)??1,V=s.id===(t==null?void 0:t.user.id);return x||l>u&&!V?e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsxs(n,{variant:"soft",className:"!h-7 !px-2 text-xs !text-emerald-500 font-medium",onClick:()=>ce(s),children:[e.jsx(ye,{size:12,className:"mr-0.5"}),"\u5145\u503C"]}),e.jsx(n,{variant:"soft",className:"!h-7 !px-2 text-xs",onClick:()=>k({open:!0,user:s,role:s.role}),children:"\u8C03\u6574\u89D2\u8272"}),s.status==="active"?e.jsx(n,{variant:"ghost",className:"!h-7 !px-2 text-xs !text-err",onClick:async U=>{U.stopPropagation(),await B(`\u5C01\u7981 ${s.email}\uFF1F\u5C06\u540C\u65F6\u64A4\u9500\u5176\u5168\u90E8 Key \u5E76\u5F3A\u5236\u4E0B\u7EBF\u3002`)&&(await d("ban_user",{userId:s.id}),a("\u5DF2\u5C01\u7981"),N())},children:"\u5C01\u7981"}):e.jsx(n,{variant:"ghost",className:"!h-7 !px-2 text-xs",onClick:async U=>{U.stopPropagation(),await d("unban_user",{userId:s.id}),a("\u5DF2\u89E3\u5C01"),N()},children:"\u89E3\u5C01"}),e.jsx(n,{variant:"ghost",className:"!h-7 !px-1.5 text-xs !text-err",onClick:()=>me(s),title:"\u7269\u7406\u5220\u9664\u8BE5\u7528\u6237",children:e.jsx(ae,{size:12})})]}):e.jsx("span",{className:"text-xs text-muted/60",children:"\u2014"})}}],je=[{key:"code",label:"\u5361\u5BC6\u4EE3\u7801",render:s=>e.jsxs("button",{type:"button",onClick:()=>O(s.code,"\u5361\u5BC6\u4EE3\u7801"),className:"flex items-center gap-1.5 font-mono text-xs font-bold text-ink hover:text-brand transition-colors",title:"\u70B9\u51FB\u4E00\u952E\u590D\u5236\u5361\u5BC6",children:[e.jsx("span",{children:s.code}),oe===s.code?e.jsx(ke,{size:12,className:"text-emerald-500"}):e.jsx(we,{size:12,className:"text-muted/60"})]})},{key:"amount",label:"\u5145\u503C\u9762\u989D",sortVal:s=>s.amount,render:s=>e.jsxs("span",{className:"font-mono text-xs font-bold text-emerald-500",children:["\xA5",s.amount.toFixed(2)]})},{key:"autoVip",label:"\u6743\u76CA\u5C5E\u6027",render:s=>e.jsx("span",{className:"rounded bg-amber-500/10 text-amber-500 text-[10px] font-semibold px-2 py-0.5",children:"\u4F59\u989D\u5927\u4E8E0\u81EA\u52A8VIP"})},{key:"status",label:"\u72B6\u6001",render:s=>s.status==="unused"?e.jsx("span",{className:"rounded bg-emerald-500/10 text-emerald-500 text-[11px] font-semibold px-2 py-0.5",children:"\u672A\u5151\u6362"}):s.status==="used"?e.jsx("span",{className:"rounded bg-zinc-500/10 text-zinc-400 text-[11px] px-2 py-0.5",children:"\u5DF2\u4F7F\u7528"}):e.jsx("span",{className:"rounded bg-red-500/10 text-red-500 text-[11px] px-2 py-0.5",children:"\u5DF2\u4F5C\u5E9F"})},{key:"usedBy",label:"\u5151\u6362\u8BB0\u5F55",render:s=>s.usedByEmail?e.jsxs("div",{className:"flex flex-col text-[11px]",children:[e.jsx("span",{className:"text-ink font-medium",children:s.usedByEmail}),e.jsx("span",{className:"text-muted",children:s.usedAt?z(s.usedAt):""})]}):e.jsx("span",{className:"text-xs text-muted",children:"\u2014"})},{key:"note",label:"\u751F\u6210\u5907\u6CE8",render:s=>e.jsx("span",{className:"text-xs text-muted truncate max-w-[140px]",children:s.note||"\u2014"})},{key:"created",label:"\u751F\u6210\u65F6\u95F4",sortVal:s=>s.createdAt,render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.createdAt)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsx(n,{variant:"soft",className:"!h-7 !px-2 text-xs",onClick:()=>O(s.code,"\u5361\u5BC6\u4EE3\u7801"),children:"\u590D\u5236"}),e.jsx(n,{variant:"ghost",className:"!h-7 !px-1.5 text-xs !text-err",onClick:()=>pe(s),title:"\u5220\u9664/\u4F5C\u5E9F\u5361\u5BC6",children:e.jsx(ae,{size:12})})]})}],fe=x?[["users","\u7528\u6237\u4E0E\u6743\u9650"],["invite","\u9080\u8BF7"],["codes","\u5361\u5BC6\u7BA1\u7406"],["flags","\u5185\u5BB9\u590D\u6838\u961F\u5217"],["appeals","\u7533\u8BC9"]]:F?[["users","\u7528\u6237\u4E0E\u6743\u9650"],["invite","\u9080\u8BF7"]]:[["mygroup","\u6211\u7684\u7528\u6237\u7EC4"],["invite","\u9080\u8BF7"]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:fe.map(([s,l])=>e.jsx("button",{role:"tab","aria-selected":f===s,onClick:()=>{var u;ne(s),(u=s==="invite"||s==="mygroup"?void 0:s==="flags"?L:s==="appeals"?R:s==="codes"?M:N)==null||u()},className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${f===s?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:l},s))}),f==="mygroup"&&e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{children:[e.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u6211\u7684\u7528\u6237\u7EC4"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u5F53\u524D\u8D26\u53F7\u6240\u5C5E\u7684\u7528\u6237\u7EC4\u4E0E\u6743\u9650\u7EA7\u522B\uFF1B\u5982\u9700\u8C03\u6574\u7528\u6237\u7EC4\u6216\u989D\u5EA6\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458\u3002"})]}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-4",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2",children:[e.jsx("span",{className:`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${((J=h[t.user.role])==null?void 0:J.color)??""}`,children:((Q=h[t.user.role])==null?void 0:Q.label)??t.user.role}),e.jsxs("span",{className:"text-xs text-muted",children:["\u6743\u9650\u7B49\u7EA7 ",((W=h[t.user.role])==null?void 0:W.lvl)??0]})]}),e.jsx("p",{className:"mt-2 text-xs leading-relaxed text-muted",children:((X=h[t.user.role])==null?void 0:X.desc)??"\u2014"}),e.jsxs("div",{className:"mt-4 grid grid-cols-1 gap-3 text-xs sm:grid-cols-3",children:[e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u8D26\u53F7\u90AE\u7BB1"}),e.jsx("div",{className:"mt-0.5 font-medium text-ink break-all",children:t.user.email})]}),e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u7528\u6237\u7EC4\u6807\u8BC6"}),e.jsx("div",{className:"mt-0.5 font-mono font-medium text-ink",children:t.user.role})]}),e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u53EF\u7528\u4F59\u989D"}),e.jsx("div",{className:"mt-0.5 font-medium text-ink",children:t.unlimited?"\u221E \u65E0\u9650\u989D\u5EA6":ve(t.balance.available,t.balance.currency)})]})]})]})]}),f==="users"&&e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted space-y-1.5",children:[e.jsx("div",{className:"font-semibold text-ink text-[13px] mb-1",children:"\u{1F451} \u6743\u9650\u7EE7\u627F\u4E0E\u52A8\u6001\u4F1A\u5458\u7B49\u7EA7\u89C4\u5219\uFF08superadmin > admin > vip > user\uFF09\uFF1A"}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-red-500/10 text-red-500 px-1.5 py-0.5 text-[10px] font-bold",children:"\u8D85\u7EA7\u7BA1\u7406\u5458 (superadmin)"}),e.jsxs("span",{children:["\u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u72EC\u5360\u5168\u7AD9\u8BBE\u7F6E\u4E0E\u6E20\u9053\u6CBB\u7406\uFF1B",e.jsx("b",{children:"\u4F59\u989D\u989D\u5EA6\u65E0\u9650\uFF08\u7167\u5E38\u6309\u91CF\u6263\u8D39\u8BB0\u8D26\uFF09"}),"\uFF1B\u53EF\u7BA1\u7406/\u5145\u503C/\u5C01\u7981/\u5220\u9664\u6240\u6709\u4E0B\u7EA7\u8D26\u53F7\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-brand/10 text-brand px-1.5 py-0.5 text-[10px] font-bold",children:"\u7BA1\u7406\u5458 (admin)"}),e.jsxs("span",{children:["\u62E5\u6709\u5168\u6A21\u578B\u8C03\u7528\u6743\u9650\uFF1B\u53EF\u5728\u6743\u9650\u8303\u56F4\u5185\u7BA1\u7406\u4E0B\u7EA7\u5E76",e.jsx("b",{children:"\u5B9E\u6253\u5B9E\u6263\u9664\u81EA\u8EAB\u4F59\u989D\u4E3A\u4E0B\u7EA7\u8F6C\u8D26\u5145\u503C"}),"\uFF1B\u4EC5\u9650\u8D85\u7EA7\u7BA1\u7406\u5458\u540E\u53F0\u4EFB\u547D\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-amber-500/10 text-amber-500 px-1.5 py-0.5 text-[10px] font-bold",children:"VIP \u8D26\u53F7 (vip)"}),e.jsxs("span",{children:[e.jsx("b",{children:"\u53EA\u8981\u53EF\u7528\u4F59\u989D > 0 \u81EA\u52A8\u664B\u5347\u4E3A VIP"}),"\uFF1B\u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u5927\u6A21\u578B\u5E76\u6309\u771F\u5B9E Token \u6263\u9664\u8D26\u6237\u4F59\u989D\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-zinc-500/10 text-zinc-400 px-1.5 py-0.5 text-[10px] font-bold",children:"\u666E\u901A\u7528\u6237 (user)"}),e.jsxs("span",{children:[e.jsx("b",{children:"\u53EA\u8981\u53EF\u7528\u4F59\u989D\u7B49\u4E8E 0 \u81EA\u52A8\u964D\u7EA7\u4E3A\u666E\u901A\u7528\u6237"}),"\uFF1B\u4EC5\u53EF\u514D\u8D39\u4F7F\u7528 0 \u5143\u6A21\u578B\u6C60\uFF08\u514D\u5145\u503C\u514D\u6263\u8D39\uFF09\uFF0C\u4ED8\u8D39\u6A21\u578B\u62E6\u622A\u5F15\u5BFC\u5145\u503C\u3002"]})]})]}),e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsxs("span",{className:"text-xs text-muted",children:["\u5171\u8BA1 ",(C==null?void 0:C.length)??0," \u4F4D\u6CE8\u518C\u7528\u6237"]}),e.jsxs(n,{onClick:()=>I({open:!0,email:"",role:"member"}),children:[e.jsx(le,{size:14}),"\u9080\u8BF7\u6210\u5458"]})]}),C===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,l)=>e.jsx("div",{className:"skeleton h-9"},l))}):e.jsx(T,{cols:he,rows:C})]}),f==="invite"&&e.jsx(Ie,{me:t}),f==="codes"&&x&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs("div",{className:"grid grid-cols-2 sm:grid-cols-4 gap-3",children:[e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u751F\u6210\u5361\u5BC6\u603B\u8BA1"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-ink mt-1",children:[(o==null?void 0:o.length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u672A\u5151\u6362\u6709\u6548\u5361\u5BC6"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-emerald-500 mt-1",children:[(o==null?void 0:o.filter(s=>s.status==="unused").length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u5DF2\u6838\u9500\u5151\u6362"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-muted mt-1",children:[(o==null?void 0:o.filter(s=>s.status==="used").length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u603B\u5361\u5BC6\u52A0\u6B3E\u9762\u989D"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-amber-500 mt-1",children:["\xA5",((o==null?void 0:o.reduce((s,l)=>s+l.amount,0))??0).toFixed(2)]})]})]}),e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsxs("div",{children:[e.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u5361\u5BC6\u5217\u8868"}),e.jsx("p",{className:"text-xs text-muted mt-0.5",children:"\u652F\u6301\u6279\u91CF\u751F\u6210\u5151\u6362\u5361\u5BC6\uFF0C\u7528\u6237\u53EF\u5728\u524D\u53F0\u81EA\u52A9\u624B\u586B\u5361\u5BC6\u52A0\u6B3E\u5E76\u81EA\u52A8\u5347\u7EA7 VIP\u3002"})]}),e.jsxs(n,{onClick:()=>b({open:!0,amount:"50",count:"10",autoVip:!0,note:"",password:""}),children:[e.jsx(le,{size:14}),"\u6279\u91CF\u751F\u6210\u5361\u5BC6"]})]}),o===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,l)=>e.jsx("div",{className:"skeleton h-9"},l))}):o.length===0?e.jsx("div",{className:"py-12 text-center text-xs text-muted",children:"\u6682\u65E0\u5361\u5BC6\uFF0C\u8BF7\u70B9\u51FB\u53F3\u4E0A\u89D2\u300C\u6279\u91CF\u751F\u6210\u5361\u5BC6\u300D\u5F00\u59CB\u521B\u5EFA\u3002"}):e.jsx(T,{cols:je,rows:o})]})]}),f==="flags"&&e.jsx(j,{className:"p-4",children:A===null?e.jsx("div",{className:"skeleton h-40"}):A.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u2713 \u590D\u6838\u961F\u5217\u4E3A\u7A7A\u3002\u5F00\u542F\u5185\u5BB9\u5BA1\u6838\u540E\uFF0C\u547D\u4E2D\u89C4\u5219\u7684\u8BF7\u6C42\u4F1A\u8FDB\u5165\u8FD9\u91CC\u3002"}):e.jsx(T,{cols:[{key:"id",label:"ID",render:s=>e.jsxs("code",{className:"text-xs font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"model",label:"\u6A21\u578B",render:s=>s.public_model??"\u2014"},{key:"rule",label:"\u547D\u4E2D\u89C4\u5219",render:s=>e.jsx("code",{className:"text-xs",children:s.rule})},{key:"hash",label:"\u5185\u5BB9\u6458\u8981",render:s=>e.jsxs("code",{className:"text-xs text-muted font-mono",children:[(s.excerpt_hash??"").slice(0,16),"\u2026"]})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex gap-1.5",children:[e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:async()=>{await d("resolve_flag",{flagId:s.id,decision:"cleared",note:""}),a("\u5DF2\u653E\u884C"),L()},children:"\u653E\u884C"}),e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async()=>{await d("resolve_flag",{flagId:s.id,decision:"confirmed",note:""}),a("\u5DF2\u786E\u8BA4\u8FDD\u89C4"),L()},children:"\u786E\u8BA4\u8FDD\u89C4"})]})}],rows:A})}),f==="appeals"&&e.jsx(j,{className:"p-4",children:D===null?e.jsx("div",{className:"skeleton h-40"}):D.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u6682\u65E0\u5F85\u5904\u7406\u7533\u8BC9"}):e.jsx(T,{cols:[{key:"id",label:"ID",render:s=>e.jsxs("code",{className:"text-xs font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"type",label:"\u7C7B\u578B",render:s=>s.target_type},{key:"reason",label:"\u7533\u8BC9\u7406\u7531",render:s=>e.jsx("span",{className:"line-clamp-1 max-w-md",children:s.reason})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"time",label:"\u65F6\u95F4",render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.created_at)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex gap-1.5",children:[e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:async()=>{await d("resolve_appeal",{appealId:s.id,decision:"accepted",note:""}),a("\u5DF2\u53D7\u7406"),R()},children:"\u53D7\u7406"}),e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async()=>{await d("resolve_appeal",{appealId:s.id,decision:"rejected",note:""}),a("\u5DF2\u9A73\u56DE"),R()},children:"\u9A73\u56DE"})]})}],rows:D})}),e.jsx(S,{open:r.open,onClose:()=>v({open:!1,user:null,amount:"50",memo:"",password:""}),title:`\u4E3A\u7528\u6237\u5145\u503C\u52A0\u6B3E \u2014 ${((Z=r.user)==null?void 0:Z.email)??""}`,width:460,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u76EE\u6807\u7528\u6237\u5F53\u524D\u4F59\u989D"}),e.jsxs("span",{className:"font-mono text-sm font-bold text-emerald-500",children:["\xA5",(((ee=r.user)==null?void 0:ee.balance)??0).toFixed(2)]})]}),e.jsx(p,{label:"\u5145\u503C\u52A0\u6B3E\u91D1\u989D (\u5143)",children:e.jsx(g,{type:"number",min:"0.01",step:"0.01",value:r.amount,onChange:s=>v({...r,amount:s.target.value}),placeholder:"50"})}),e.jsxs("div",{className:"rounded-lg border border-amber-500/20 bg-amber-500/10 p-2.5 text-xs text-amber-600 dark:text-amber-400 space-y-1",children:[e.jsx("div",{className:"font-semibold",children:"\u{1F4A1} \u8F6C\u8D26\u6263\u6B3E\u4E0E\u81EA\u52A8 VIP \u664B\u5347\u673A\u5236\uFF1A"}),e.jsx("div",{children:x?"\u8D85\u7EA7\u7BA1\u7406\u5458\u62E5\u6709\u65E0\u9650\u8C03\u7528\u989D\u5EA6\uFF0C\u4E3A\u4E0B\u7EA7\u5145\u503C\u5C06\u7167\u5E38\u8BB0\u5165\u7CFB\u7EDF\u8F6C\u8D26\u6263\u51CF\u6D41\u6C34\u3002":`\u672C\u6B21\u5145\u503C\u5C06\u4ECE\u60A8\u7684\u8D26\u6237\u4F59\u989D\u4E2D\u5B9E\u6253\u5B9E\u6263\u9664 \xA5${r.amount||"0"}\uFF08\u60A8\u5F53\u524D\u53EF\u7528\u4F59\u989D\u4E3A \xA5${((t==null?void 0:t.balance.available)??0).toFixed(2)}\uFF09\u3002`}),e.jsx("div",{children:"\u7528\u6237\u5145\u503C\u540E\u53EA\u8981\u53EF\u7528\u4F59\u989D\u5927\u4E8E 0\uFF0C\u7CFB\u7EDF\u5C06\u81EA\u52A8\u664B\u5347\u5176\u4E3A VIP \u8D26\u53F7\uFF01"})]}),e.jsx(p,{label:"\u5145\u503C\u5907\u6CE8 (\u53EF\u9009)",children:e.jsx(g,{value:r.memo,onChange:s=>v({...r,memo:s.target.value}),placeholder:"\u7BA1\u7406\u5458\u624B\u52A8\u8F6C\u8D26\u5145\u503C"})}),e.jsx(p,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u8D26\u6237\u52A0\u6B3E\u5C5E\u4E8E\u9AD8\u5371\u8D22\u52A1\u64CD\u4F5C\uFF0C\u9700\u6838\u9A8C\u5BC6\u7801",children:e.jsx(g,{type:"password",value:r.password,onChange:s=>v({...r,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u64CD\u4F5C\u8005\u7684\u5BC6\u7801",autoComplete:"current-password"})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>v({open:!1,user:null,amount:"50",memo:"",password:""}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:xe,children:"\u786E\u8BA4\u8F6C\u8D26\u5145\u503C"})]})]})}),e.jsx(S,{open:i.open,onClose:()=>b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),title:"\u6279\u91CF\u751F\u6210\u5145\u503C\u5361\u5BC6",width:480,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(p,{label:"\u5361\u5BC6\u9762\u503C (\u5143)",children:e.jsx(g,{type:"number",step:"0.01",value:i.amount,onChange:s=>b({...i,amount:s.target.value}),placeholder:"50"})}),e.jsx(p,{label:"\u751F\u6210\u6570\u91CF (\u5F20)",hint:"\u5355\u6B21\u6700\u591A 100 \u5F20",children:e.jsx(g,{type:"number",min:"1",max:"100",value:i.count,onChange:s=>b({...i,count:s.target.value}),placeholder:"10"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(p,{label:"\u5361\u5BC6\u6279\u6B21\u5907\u6CE8 (\u53EF\u9009)",children:e.jsx(g,{value:i.note,onChange:s=>b({...i,note:s.target.value}),placeholder:"\u4F8B\u5982: \u5BA2\u6237\u6279\u91CF\u91C7\u8D2D\u3001\u65B0\u7528\u6237\u798F\u5229\u5361"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx("p",{className:"text-xs text-muted",children:"\u{1F4A1} \u7528\u6237\u5151\u6362\u540E\u8D26\u6237\u4F59\u989D > 0 \u5C06\u81EA\u52A8\u83B7\u5F97 VIP \u8EAB\u4EFD\uFF1B\u8D85\u7EA7\u7BA1\u7406\u5458\u751F\u6210\u7684\u5361\u5BC6\u4E3A\u7CFB\u7EDF\u94F8\u5E01\u52A0\u6B3E\u3002"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(p,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u751F\u6210\u6709\u6548\u8D27\u5E01\u5361\u5BC6\u5C5E\u4E8E\u8D22\u52A1\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u6838\u9A8C\u7BA1\u7406\u5458\u5BC6\u7801",children:e.jsx(g,{type:"password",value:i.password,onChange:s=>b({...i,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:ue,children:"\u786E\u8BA4\u6279\u91CF\u751F\u6210"})]})]})}),e.jsx(S,{open:!!w,onClose:()=>E(null),title:"\u5361\u5BC6\u751F\u6210\u6210\u529F",width:480,children:e.jsxs("div",{className:"space-y-3",children:[e.jsxs("p",{className:"text-xs text-muted",children:["\u5DF2\u6210\u529F\u751F\u6210 ",(w==null?void 0:w.length)??0," \u5F20\u5361\u5BC6\u3002\u60A8\u53EF\u4EE5\u4E00\u952E\u590D\u5236\u5E76\u76F4\u63A5\u53D1\u7ED9\u5BA2\u6237\u6216\u5BFC\u5165\u53D1\u5361\u7CFB\u7EDF\uFF1A"]}),e.jsx("textarea",{readOnly:!0,value:(w||[]).join(`\n`),rows:6,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink focus:outline-none"}),e.jsxs("div",{className:"flex justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",onClick:()=>E(null),children:"\u5173\u95ED"}),e.jsx(n,{onClick:()=>O((w||[]).join(`\n`),"\u5168\u90E8\u5361\u5BC6"),children:"\u4E00\u952E\u590D\u5236\u5168\u90E8\u5361\u5BC6"})]})]})}),e.jsx(S,{open:m.open,onClose:()=>k({open:!1,user:null,role:"user"}),title:`\u8C03\u6574\u8D26\u53F7\u7B49\u7EA7 \u2014 ${((se=m.user)==null?void 0:se.email)??""}`,width:500,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u76EE\u6807\u7528\u6237\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsxs("span",{className:"font-mono text-sm font-bold text-emerald-500",children:["\xA5",(((te=m.user)==null?void 0:te.balance)??0).toFixed(2)]})]}),e.jsx(p,{label:"\u8D26\u53F7\u89D2\u8272\u7B49\u7EA7",children:e.jsxs(Ne,{value:m.role,onChange:s=>k({...m,role:s.target.value}),children:[x&&e.jsx("option",{value:"superadmin",children:"\u8D85\u7EA7\u7BA1\u7406\u5458 (superadmin) \u2014 \u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u5168\u7AD9\u7BA1\u7406"}),x&&e.jsx("option",{value:"admin",children:"\u7BA1\u7406\u5458 (admin) \u2014 \u62E5\u6709\u4E0B\u7EA7\u7528\u6237\u7BA1\u7406\u4E0E\u8F6C\u8D26\u5145\u503C\u6743\u9650\uFF08\u4F59\u989D\u4E3A0\u4E0D\u5F71\u54CD\u4EFB\u547D\uFF09"}),e.jsx("option",{value:"vip",children:"VIP \u8D26\u53F7 (vip) \u2014 \u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u5927\u6A21\u578B\uFF0C\u6309\u91CF\u6263\u8D39"}),e.jsx("option",{value:"user",children:"\u666E\u901A\u7528\u6237 (user) \u2014 \u4EC5\u9650\u514D\u8D39\u6A21\u578B\u6C60\uFF0C\u514D\u5145\u503C\u4E0D\u6263\u8D39"}),x&&e.jsx("option",{value:"finance",children:"\u8D22\u52A1\u4EBA\u5458 (finance)"}),x&&e.jsx("option",{value:"auditor",children:"\u5BA1\u8BA1\u5458 (auditor)"})]})}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/60 p-3 text-xs text-muted space-y-1.5",children:[e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u7BA1\u7406\u5458 (admin)"}),"\uFF1A\u7531\u8D85\u7EA7\u7BA1\u7406\u5458\u5728\u540E\u53F0\u4EFB\u547D\u3002\u7BA1\u7406\u5458\u4F59\u989D\u53EF\u4EE5\u4E3A 0\uFF0C\u4F46\u4F59\u989D\u4E3A 0 \u65F6\u65E0\u6CD5\u5411\u4E0B\u7EA7\u8F6C\u8D26\u52A0\u6B3E\u3002"]}),e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u81EA\u52A8 VIP \u673A\u5236"}),"\uFF1A\u666E\u901A\u7528\u6237\u53EA\u8981\u4F59\u989D > 0 \u81EA\u52A8\u664B\u5347\u4E3A VIP\uFF1B\u4F59\u989D\u7B49\u4E8E 0 \u81EA\u52A8\u964D\u4E3A\u666E\u901A\u7528\u6237\u3002\u82E5\u9700\u5F00\u901A VIP\uFF0C\u76F4\u63A5\u4F7F\u7528\u300C\u5145\u503C\u300D\u52A0\u6B3E\u5373\u53EF\u3002"]}),e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u6743\u9650\u5C42\u7EA7\u7EE7\u627F"}),"\uFF1A\u53EA\u5141\u8BB8\u7BA1\u7406\u4E0E\u5145\u503C\u6743\u9650\u4E25\u683C\u4F4E\u4E8E\u81EA\u8EAB\u7684\u4E0B\u7EA7\u7528\u6237\u3002"]})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>k({open:!1,user:null,role:"user"}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:de,children:"\u786E\u8BA4\u4FEE\u6539\u89D2\u8272"})]})]})}),e.jsxs(S,{open:y.open,onClose:()=>I({...y,open:!1}),title:"\u9080\u8BF7\u7EC4\u7EC7\u6210\u5458",width:440,children:[e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx(p,{label:"\u6210\u5458\u90AE\u7BB1",children:e.jsx(g,{type:"email",value:y.email,onChange:s=>I({...y,email:s.target.value})})}),e.jsx(p,{label:"\u5907\u6CE8",children:"\u7EC4\u7EC7\u6210\u5458\u9700\u5148\u81EA\u884C\u6CE8\u518C\u8D26\u53F7\uFF0C\u7BA1\u7406\u5458\u5728\u6B64\u767B\u8BB0\u540E\u5206\u914D\u7EC4\u7EC7\u4E0E\u89D2\u8272\uFF08MVP \u9636\u6BB5\u4EE5\u7528\u6237\u89D2\u8272\u4E3A\u51C6\uFF09\u3002"})]}),e.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[e.jsx(n,{variant:"ghost",onClick:()=>I({...y,open:!1}),children:"\u53D6\u6D88"}),e.jsx(n,{onClick:()=>{a("\u5DF2\u8BB0\u5F55\u9080\u8BF7\uFF08MVP \u5360\u4F4D\uFF09"),I({...y,open:!1})},children:"\u53D1\u9001\u9080\u8BF7"})]})]}),ie]})}\n',
+            "/assets/Users-DFyFxtpd.js": {
+              content: 'import{i as be,u as ge,j as e,d as j,b as ve,B as n,D as T,h as q,n as d,g as z,e as S,F as p,I as g,k as Ne,C as ye,q as ke,o as we}from"./index-KwMGOJkp.js";import{h as Ce,r as c}from"./vendor-BbQ_LiY-.js";import Ie from"./Invite-CBHRBgyg.js";import{P as le}from"./plus-DVAh7yAY.js";import{T as ae}from"./trash-2-BF158Quc.js";import"./download-vNmvYjVK.js";const h={superadmin:{label:"\u8D85\u7EA7\u7BA1\u7406\u5458",color:"bg-red-500/10 text-red-500 font-bold border border-red-500/30",desc:"\u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u5168\u7AD9\u7BA1\u7406\uFF0C\u989D\u5EA6\u65E0\u9650\u771F\u5B9E\u6263\u8D39",lvl:100},admin:{label:"\u7BA1\u7406\u5458",color:"bg-brand/10 text-brand font-semibold border border-brand/20",desc:"\u53EF\u8C03\u7528\u5168\u91CF\u6A21\u578B\uFF0C\u53EF\u7BA1\u7406\u4E0B\u7EA7\u7528\u6237\u5E76\u8F6C\u8D26\u5145\u503C",lvl:50},finance:{label:"\u8D22\u52A1\u4EBA\u5458",color:"bg-purple-500/10 text-purple-400 border border-purple-500/20",desc:"\u8D22\u52A1\u4E0E\u8D26\u5355\u6838\u5BF9\u6743\u9650",lvl:30},auditor:{label:"\u5BA1\u8BA1\u5458",color:"bg-blue-500/10 text-blue-400 border border-blue-500/20",desc:"\u5BA1\u8BA1\u65E5\u5FD7\u53EA\u8BFB\u6743\u9650",lvl:20},vip:{label:"VIP \u8D26\u53F7",color:"bg-amber-500/10 text-amber-500 font-semibold border border-amber-500/20",desc:"\u4F59\u989D\u5927\u4E8E 0 \u81EA\u52A8\u83B7\u5F97\uFF0C\u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u6A21\u578B\u5E76\u6309\u91CF\u6263\u8D39",lvl:10},user:{label:"\u666E\u901A\u7528\u6237",color:"bg-zinc-500/10 text-zinc-400 border border-zinc-500/20",desc:"\u4F59\u989D\u5F52\u96F6\u72B6\u6001\uFF0C\u4EC5\u9650\u514D\u8D39\u6A21\u578B\u6C60\uFF0C\u514D\u5145\u503C\u4E0D\u6263\u8D39",lvl:1}};function ze(){var J,Q,W,X,Z,ee,se,te;const{me:t}=Ce(),x=(t==null?void 0:t.user.role)==="superadmin",F=x||(t==null?void 0:t.user.role)==="admin",[f,ne]=c.useState(F?"users":"mygroup"),[C,re]=c.useState(null),[o,K]=c.useState(null),[A,G]=c.useState(null),[D,Y]=c.useState(null),[y,I]=c.useState({open:!1,email:"",role:"member"}),[m,k]=c.useState({open:!1,user:null,role:"user"}),[r,v]=c.useState({open:!1,user:null,amount:"50",memo:"\u7BA1\u7406\u5458\u8F6C\u8D26\u5145\u503C",password:""}),[i,b]=c.useState({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),[w,E]=c.useState(null),[oe,H]=c.useState(null),{confirm:B,confirmEl:ie}=be(),a=ge(),N=()=>d("list_users").then(s=>re(s.users)).catch(s=>a(s.message,"err")),M=()=>d("list_redeem_codes").then(s=>K(s.codes)).catch(()=>K([])),L=()=>d("flags_queue").then(s=>G(s.flags)).catch(()=>G([])),R=()=>d("appeals_list").then(s=>Y(s.appeals)).catch(()=>Y([]));c.useEffect(()=>{F&&N()},[]);const de=async()=>{var s;if(m.user)try{await d("set_role",{userId:m.user.id,role:m.role}),a(`\u5DF2\u5C06\u300C${m.user.email}\u300D\u89D2\u8272\u66F4\u65B0\u4E3A ${((s=h[m.role])==null?void 0:s.label)||m.role}`),k({open:!1,user:null,role:"user"}),N()}catch(l){a(l.message,"err")}},ce=s=>{v({open:!0,user:s,amount:"50",memo:"\u7BA1\u7406\u5458\u8F6C\u8D26\u5145\u503C",password:""})},xe=async()=>{if(!r.user)return;const s=parseFloat(r.amount);if(isNaN(s)||s<=0)return a("\u8BF7\u8F93\u5165\u5927\u4E8E 0 \u7684\u5145\u503C\u91D1\u989D","err");if(!r.password.trim())return a("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u5145\u503C\u64CD\u4F5C","err");try{await d("topup",{scope:`user:${r.user.id}`,amount:s,memo:r.memo.trim()||void 0,password:r.password.trim()}),a(`\u8F6C\u8D26\u5145\u503C\u6210\u529F\uFF01\u5DF2\u4E3A\u300C${r.user.email}\u300D\u5145\u503C \xA5${s.toFixed(2)}${x?"":"\uFF08\u5DF2\u6263\u9664\u60A8\u7B49\u989D\u4F59\u989D\uFF09"}`),v({open:!1,user:null,amount:"50",memo:"",password:""}),N()}catch(l){a(l.message,"err")}},me=async s=>{if(await B(`\u5371\u9669\u64CD\u4F5C\uFF1A\u786E\u8BA4\u6C38\u4E45\u5220\u9664\u7528\u6237\u300C${s.email}\u300D\uFF1F\u8BE5\u7528\u6237\u7684\u4E2A\u4EBA\u8D26\u6237\u3001\u6570\u636E\u4E0E\u5168\u90E8 API Key \u5C06\u88AB\u7269\u7406\u9500\u6BC1\u4E14\u65E0\u6CD5\u6062\u590D\uFF01`))try{await d("delete_user",{userId:s.id}),a(`\u5DF2\u5F7B\u5E95\u5220\u9664\u7528\u6237\u300C${s.email}\u300D`),N()}catch(l){a(l.message,"err")}},O=async(s,l)=>{try{await navigator.clipboard.writeText(s),H(s),a(`\u5DF2\u590D\u5236 ${l}`),setTimeout(()=>H(null),1800)}catch{a("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u590D\u5236","err")}},ue=async()=>{const s=parseFloat(i.amount),l=parseInt(i.count,10);if(isNaN(s)||s<=0)return a("\u5361\u5BC6\u9762\u989D\u5FC5\u987B\u5927\u4E8E 0","err");if(isNaN(l)||l<=0||l>100)return a("\u6BCF\u6B21\u751F\u6210\u6570\u91CF\u9700\u5728 1 \u5230 100 \u5F20\u4E4B\u95F4","err");if(!i.password.trim())return a("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u64CD\u4F5C","err");try{const u=await d("generate_redeem_codes",{amount:s,count:l,autoVip:i.autoVip,note:i.note.trim()||void 0,password:i.password.trim()});a(`\u5DF2\u6210\u529F\u751F\u6210 ${u.count||l} \u5F20\u5361\u5BC6\uFF01`),E((u.codes||[]).map(V=>V.code)),b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),M()}catch(u){a(u.message,"err")}},pe=async s=>{if(await B(`\u786E\u8BA4\u5220\u9664/\u4F5C\u5E9F\u5361\u5BC6\u300C${s.code}\u300D\uFF1F`))try{await d("delete_redeem_code",{codeId:s.id}),a("\u5361\u5BC6\u5DF2\u5220\u9664"),M()}catch(l){a(l.message,"err")}},he=[{key:"email",label:"\u90AE\u7BB1",sortVal:s=>s.email,render:s=>e.jsx("span",{className:"font-medium text-ink",children:s.email})},{key:"id",label:"\u7528\u6237 ID",render:s=>e.jsxs("code",{className:"text-xs text-muted font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"role",label:"\u8D26\u53F7\u7B49\u7EA7",render:s=>{var P,$;const l=h[s.role]||{label:s.role,color:"bg-surface2 text-muted"},u=((P=h[(t==null?void 0:t.user.role)??"user"])==null?void 0:P.lvl)??1,V=(($=h[s.role])==null?void 0:$.lvl)??1,_=x||u>V&&s.id!==(t==null?void 0:t.user.id);return e.jsx("button",{type:"button",disabled:!_,onClick:()=>_&&k({open:!0,user:s,role:s.role}),className:`rounded-full px-2.5 py-0.5 text-[11px] transition-all ${_?"hover:scale-105 cursor-pointer":"cursor-default opacity-85"} ${l.color}`,title:_?"\u70B9\u51FB\u4FEE\u6539\u7528\u6237\u89D2\u8272\u7B49\u7EA7\u4E0E\u6743\u9650":"\u540C\u7EA7\u6216\u9AD8\u6743\u9650\u8D26\u53F7\u4E0D\u53EF\u76F4\u63A5\u4FEE\u6539\u89D2\u8272",children:l.label})}},{key:"balance",label:"\u53EF\u7528\u4F59\u989D",sortVal:s=>s.unlimited?Number.POSITIVE_INFINITY:s.balance??0,render:s=>s.unlimited?e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 font-mono text-xs font-semibold text-brand whitespace-nowrap",title:"\u8D85\u7EA7\u7BA1\u7406\u5458\u4E3A\u94F8\u5E01\u65B9\uFF0C\u989D\u5EA6\u65E0\u4E0A\u9650",children:"\u221E \u65E0\u9650"}):e.jsxs("span",{className:"font-mono text-xs font-semibold text-emerald-500",children:["\xA5",(s.balance??0).toFixed(2)]})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"created",label:"\u6CE8\u518C\u65F6\u95F4",sortVal:s=>s.created_at,render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.created_at)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>{var P,$;const l=((P=h[(t==null?void 0:t.user.role)??"user"])==null?void 0:P.lvl)??1,u=(($=h[s.role])==null?void 0:$.lvl)??1,V=s.id===(t==null?void 0:t.user.id);return x||l>u&&!V?e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsxs(n,{variant:"soft",className:"!h-7 !px-2 text-xs !text-emerald-500 font-medium",onClick:()=>ce(s),children:[e.jsx(ye,{size:12,className:"mr-0.5"}),"\u5145\u503C"]}),e.jsx(n,{variant:"soft",className:"!h-7 !px-2 text-xs",onClick:()=>k({open:!0,user:s,role:s.role}),children:"\u8C03\u6574\u89D2\u8272"}),s.status==="active"?e.jsx(n,{variant:"ghost",className:"!h-7 !px-2 text-xs !text-err",onClick:async U=>{U.stopPropagation(),await B(`\u5C01\u7981 ${s.email}\uFF1F\u5C06\u540C\u65F6\u64A4\u9500\u5176\u5168\u90E8 Key \u5E76\u5F3A\u5236\u4E0B\u7EBF\u3002`)&&(await d("ban_user",{userId:s.id}),a("\u5DF2\u5C01\u7981"),N())},children:"\u5C01\u7981"}):e.jsx(n,{variant:"ghost",className:"!h-7 !px-2 text-xs",onClick:async U=>{U.stopPropagation(),await d("unban_user",{userId:s.id}),a("\u5DF2\u89E3\u5C01"),N()},children:"\u89E3\u5C01"}),e.jsx(n,{variant:"ghost",className:"!h-7 !px-1.5 text-xs !text-err",onClick:()=>me(s),title:"\u7269\u7406\u5220\u9664\u8BE5\u7528\u6237",children:e.jsx(ae,{size:12})})]}):e.jsx("span",{className:"text-xs text-muted/60",children:"\u2014"})}}],je=[{key:"code",label:"\u5361\u5BC6\u4EE3\u7801",render:s=>e.jsxs("button",{type:"button",onClick:()=>O(s.code,"\u5361\u5BC6\u4EE3\u7801"),className:"flex items-center gap-1.5 font-mono text-xs font-bold text-ink hover:text-brand transition-colors",title:"\u70B9\u51FB\u4E00\u952E\u590D\u5236\u5361\u5BC6",children:[e.jsx("span",{children:s.code}),oe===s.code?e.jsx(ke,{size:12,className:"text-emerald-500"}):e.jsx(we,{size:12,className:"text-muted/60"})]})},{key:"amount",label:"\u5145\u503C\u9762\u989D",sortVal:s=>s.amount,render:s=>e.jsxs("span",{className:"font-mono text-xs font-bold text-emerald-500",children:["\xA5",s.amount.toFixed(2)]})},{key:"autoVip",label:"\u6743\u76CA\u5C5E\u6027",render:s=>e.jsx("span",{className:"rounded bg-amber-500/10 text-amber-500 text-[10px] font-semibold px-2 py-0.5",children:"\u4F59\u989D\u5927\u4E8E0\u81EA\u52A8VIP"})},{key:"status",label:"\u72B6\u6001",render:s=>s.status==="unused"?e.jsx("span",{className:"rounded bg-emerald-500/10 text-emerald-500 text-[11px] font-semibold px-2 py-0.5",children:"\u672A\u5151\u6362"}):s.status==="used"?e.jsx("span",{className:"rounded bg-zinc-500/10 text-zinc-400 text-[11px] px-2 py-0.5",children:"\u5DF2\u4F7F\u7528"}):e.jsx("span",{className:"rounded bg-red-500/10 text-red-500 text-[11px] px-2 py-0.5",children:"\u5DF2\u4F5C\u5E9F"})},{key:"usedBy",label:"\u5151\u6362\u8BB0\u5F55",render:s=>s.usedByEmail?e.jsxs("div",{className:"flex flex-col text-[11px]",children:[e.jsx("span",{className:"text-ink font-medium",children:s.usedByEmail}),e.jsx("span",{className:"text-muted",children:s.usedAt?z(s.usedAt):""})]}):e.jsx("span",{className:"text-xs text-muted",children:"\u2014"})},{key:"note",label:"\u751F\u6210\u5907\u6CE8",render:s=>e.jsx("span",{className:"text-xs text-muted truncate max-w-[140px]",children:s.note||"\u2014"})},{key:"created",label:"\u751F\u6210\u65F6\u95F4",sortVal:s=>s.createdAt,render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.createdAt)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsx(n,{variant:"soft",className:"!h-7 !px-2 text-xs",onClick:()=>O(s.code,"\u5361\u5BC6\u4EE3\u7801"),children:"\u590D\u5236"}),e.jsx(n,{variant:"ghost",className:"!h-7 !px-1.5 text-xs !text-err",onClick:()=>pe(s),title:"\u5220\u9664/\u4F5C\u5E9F\u5361\u5BC6",children:e.jsx(ae,{size:12})})]})}],fe=x?[["users","\u7528\u6237\u4E0E\u6743\u9650"],["invite","\u9080\u8BF7"],["codes","\u5361\u5BC6\u7BA1\u7406"],["flags","\u5185\u5BB9\u590D\u6838\u961F\u5217"],["appeals","\u7533\u8BC9"]]:F?[["users","\u7528\u6237\u4E0E\u6743\u9650"],["invite","\u9080\u8BF7"]]:[["mygroup","\u6211\u7684\u7528\u6237\u7EC4"],["invite","\u9080\u8BF7"]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:fe.map(([s,l])=>e.jsx("button",{role:"tab","aria-selected":f===s,onClick:()=>{var u;ne(s),(u=s==="invite"||s==="mygroup"?void 0:s==="flags"?L:s==="appeals"?R:s==="codes"?M:N)==null||u()},className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${f===s?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:l},s))}),f==="mygroup"&&e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{children:[e.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u6211\u7684\u7528\u6237\u7EC4"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u5F53\u524D\u8D26\u53F7\u6240\u5C5E\u7684\u7528\u6237\u7EC4\u4E0E\u6743\u9650\u7EA7\u522B\uFF1B\u5982\u9700\u8C03\u6574\u7528\u6237\u7EC4\u6216\u989D\u5EA6\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458\u3002"})]}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-4",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2",children:[e.jsx("span",{className:`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${((J=h[t.user.role])==null?void 0:J.color)??""}`,children:((Q=h[t.user.role])==null?void 0:Q.label)??t.user.role}),e.jsxs("span",{className:"text-xs text-muted",children:["\u6743\u9650\u7B49\u7EA7 ",((W=h[t.user.role])==null?void 0:W.lvl)??0]})]}),e.jsx("p",{className:"mt-2 text-xs leading-relaxed text-muted",children:((X=h[t.user.role])==null?void 0:X.desc)??"\u2014"}),e.jsxs("div",{className:"mt-4 grid grid-cols-1 gap-3 text-xs sm:grid-cols-3",children:[e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u8D26\u53F7\u90AE\u7BB1"}),e.jsx("div",{className:"mt-0.5 font-medium text-ink break-all",children:t.user.email})]}),e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u7528\u6237\u7EC4\u6807\u8BC6"}),e.jsx("div",{className:"mt-0.5 font-mono font-medium text-ink",children:t.user.role})]}),e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u53EF\u7528\u4F59\u989D"}),e.jsx("div",{className:"mt-0.5 font-medium text-ink",children:t.unlimited?"\u221E \u65E0\u9650\u989D\u5EA6":ve(t.balance.available,t.balance.currency)})]})]})]})]}),f==="users"&&e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted space-y-1.5",children:[e.jsx("div",{className:"font-semibold text-ink text-[13px] mb-1",children:"\u{1F451} \u6743\u9650\u7EE7\u627F\u4E0E\u52A8\u6001\u4F1A\u5458\u7B49\u7EA7\u89C4\u5219\uFF08superadmin > admin > vip > user\uFF09\uFF1A"}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-red-500/10 text-red-500 px-1.5 py-0.5 text-[10px] font-bold",children:"\u8D85\u7EA7\u7BA1\u7406\u5458 (superadmin)"}),e.jsxs("span",{children:["\u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u72EC\u5360\u5168\u7AD9\u8BBE\u7F6E\u4E0E\u6E20\u9053\u6CBB\u7406\uFF1B",e.jsx("b",{children:"\u4F59\u989D\u989D\u5EA6\u65E0\u9650\uFF08\u7167\u5E38\u6309\u91CF\u6263\u8D39\u8BB0\u8D26\uFF09"}),"\uFF1B\u53EF\u7BA1\u7406/\u5145\u503C/\u5C01\u7981/\u5220\u9664\u6240\u6709\u4E0B\u7EA7\u8D26\u53F7\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-brand/10 text-brand px-1.5 py-0.5 text-[10px] font-bold",children:"\u7BA1\u7406\u5458 (admin)"}),e.jsxs("span",{children:["\u62E5\u6709\u5168\u6A21\u578B\u8C03\u7528\u6743\u9650\uFF1B\u53EF\u5728\u6743\u9650\u8303\u56F4\u5185\u7BA1\u7406\u4E0B\u7EA7\u5E76",e.jsx("b",{children:"\u5B9E\u6253\u5B9E\u6263\u9664\u81EA\u8EAB\u4F59\u989D\u4E3A\u4E0B\u7EA7\u8F6C\u8D26\u5145\u503C"}),"\uFF1B\u4EC5\u9650\u8D85\u7EA7\u7BA1\u7406\u5458\u540E\u53F0\u4EFB\u547D\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-amber-500/10 text-amber-500 px-1.5 py-0.5 text-[10px] font-bold",children:"VIP \u8D26\u53F7 (vip)"}),e.jsxs("span",{children:[e.jsx("b",{children:"\u53EA\u8981\u53EF\u7528\u4F59\u989D > 0 \u81EA\u52A8\u664B\u5347\u4E3A VIP"}),"\uFF1B\u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u5927\u6A21\u578B\u5E76\u6309\u771F\u5B9E Token \u6263\u9664\u8D26\u6237\u4F59\u989D\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-zinc-500/10 text-zinc-400 px-1.5 py-0.5 text-[10px] font-bold",children:"\u666E\u901A\u7528\u6237 (user)"}),e.jsxs("span",{children:[e.jsx("b",{children:"\u53EA\u8981\u53EF\u7528\u4F59\u989D\u7B49\u4E8E 0 \u81EA\u52A8\u964D\u7EA7\u4E3A\u666E\u901A\u7528\u6237"}),"\uFF1B\u4EC5\u53EF\u514D\u8D39\u4F7F\u7528 0 \u5143\u6A21\u578B\u6C60\uFF08\u514D\u5145\u503C\u514D\u6263\u8D39\uFF09\uFF0C\u4ED8\u8D39\u6A21\u578B\u62E6\u622A\u5F15\u5BFC\u5145\u503C\u3002"]})]})]}),e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsxs("span",{className:"text-xs text-muted",children:["\u5171\u8BA1 ",(C==null?void 0:C.length)??0," \u4F4D\u6CE8\u518C\u7528\u6237"]}),e.jsxs(n,{onClick:()=>I({open:!0,email:"",role:"member"}),children:[e.jsx(le,{size:14}),"\u9080\u8BF7\u6210\u5458"]})]}),C===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,l)=>e.jsx("div",{className:"skeleton h-9"},l))}):e.jsx(T,{cols:he,rows:C})]}),f==="invite"&&e.jsx(Ie,{me:t}),f==="codes"&&x&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs("div",{className:"grid grid-cols-2 sm:grid-cols-4 gap-3",children:[e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u751F\u6210\u5361\u5BC6\u603B\u8BA1"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-ink mt-1",children:[(o==null?void 0:o.length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u672A\u5151\u6362\u6709\u6548\u5361\u5BC6"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-emerald-500 mt-1",children:[(o==null?void 0:o.filter(s=>s.status==="unused").length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u5DF2\u6838\u9500\u5151\u6362"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-muted mt-1",children:[(o==null?void 0:o.filter(s=>s.status==="used").length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u603B\u5361\u5BC6\u52A0\u6B3E\u9762\u989D"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-amber-500 mt-1",children:["\xA5",((o==null?void 0:o.reduce((s,l)=>s+l.amount,0))??0).toFixed(2)]})]})]}),e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsxs("div",{children:[e.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u5361\u5BC6\u5217\u8868"}),e.jsx("p",{className:"text-xs text-muted mt-0.5",children:"\u652F\u6301\u6279\u91CF\u751F\u6210\u5151\u6362\u5361\u5BC6\uFF0C\u7528\u6237\u53EF\u5728\u524D\u53F0\u81EA\u52A9\u624B\u586B\u5361\u5BC6\u52A0\u6B3E\u5E76\u81EA\u52A8\u5347\u7EA7 VIP\u3002"})]}),e.jsxs(n,{onClick:()=>b({open:!0,amount:"50",count:"10",autoVip:!0,note:"",password:""}),children:[e.jsx(le,{size:14}),"\u6279\u91CF\u751F\u6210\u5361\u5BC6"]})]}),o===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,l)=>e.jsx("div",{className:"skeleton h-9"},l))}):o.length===0?e.jsx("div",{className:"py-12 text-center text-xs text-muted",children:"\u6682\u65E0\u5361\u5BC6\uFF0C\u8BF7\u70B9\u51FB\u53F3\u4E0A\u89D2\u300C\u6279\u91CF\u751F\u6210\u5361\u5BC6\u300D\u5F00\u59CB\u521B\u5EFA\u3002"}):e.jsx(T,{cols:je,rows:o})]})]}),f==="flags"&&e.jsx(j,{className:"p-4",children:A===null?e.jsx("div",{className:"skeleton h-40"}):A.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u2713 \u590D\u6838\u961F\u5217\u4E3A\u7A7A\u3002\u5F00\u542F\u5185\u5BB9\u5BA1\u6838\u540E\uFF0C\u547D\u4E2D\u89C4\u5219\u7684\u8BF7\u6C42\u4F1A\u8FDB\u5165\u8FD9\u91CC\u3002"}):e.jsx(T,{cols:[{key:"id",label:"ID",render:s=>e.jsxs("code",{className:"text-xs font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"model",label:"\u6A21\u578B",render:s=>s.public_model??"\u2014"},{key:"rule",label:"\u547D\u4E2D\u89C4\u5219",render:s=>e.jsx("code",{className:"text-xs",children:s.rule})},{key:"hash",label:"\u5185\u5BB9\u6458\u8981",render:s=>e.jsxs("code",{className:"text-xs text-muted font-mono",children:[(s.excerpt_hash??"").slice(0,16),"\u2026"]})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex gap-1.5",children:[e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:async()=>{await d("resolve_flag",{flagId:s.id,decision:"cleared",note:""}),a("\u5DF2\u653E\u884C"),L()},children:"\u653E\u884C"}),e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async()=>{await d("resolve_flag",{flagId:s.id,decision:"confirmed",note:""}),a("\u5DF2\u786E\u8BA4\u8FDD\u89C4"),L()},children:"\u786E\u8BA4\u8FDD\u89C4"})]})}],rows:A})}),f==="appeals"&&e.jsx(j,{className:"p-4",children:D===null?e.jsx("div",{className:"skeleton h-40"}):D.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u6682\u65E0\u5F85\u5904\u7406\u7533\u8BC9"}):e.jsx(T,{cols:[{key:"id",label:"ID",render:s=>e.jsxs("code",{className:"text-xs font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"type",label:"\u7C7B\u578B",render:s=>s.target_type},{key:"reason",label:"\u7533\u8BC9\u7406\u7531",render:s=>e.jsx("span",{className:"line-clamp-1 max-w-md",children:s.reason})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"time",label:"\u65F6\u95F4",render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.created_at)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex gap-1.5",children:[e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:async()=>{await d("resolve_appeal",{appealId:s.id,decision:"accepted",note:""}),a("\u5DF2\u53D7\u7406"),R()},children:"\u53D7\u7406"}),e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async()=>{await d("resolve_appeal",{appealId:s.id,decision:"rejected",note:""}),a("\u5DF2\u9A73\u56DE"),R()},children:"\u9A73\u56DE"})]})}],rows:D})}),e.jsx(S,{open:r.open,onClose:()=>v({open:!1,user:null,amount:"50",memo:"",password:""}),title:`\u4E3A\u7528\u6237\u5145\u503C\u52A0\u6B3E \u2014 ${((Z=r.user)==null?void 0:Z.email)??""}`,width:460,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u76EE\u6807\u7528\u6237\u5F53\u524D\u4F59\u989D"}),e.jsxs("span",{className:"font-mono text-sm font-bold text-emerald-500",children:["\xA5",(((ee=r.user)==null?void 0:ee.balance)??0).toFixed(2)]})]}),e.jsx(p,{label:"\u5145\u503C\u52A0\u6B3E\u91D1\u989D (\u5143)",children:e.jsx(g,{type:"number",min:"0.01",step:"0.01",value:r.amount,onChange:s=>v({...r,amount:s.target.value}),placeholder:"50"})}),e.jsxs("div",{className:"rounded-lg border border-amber-500/20 bg-amber-500/10 p-2.5 text-xs text-amber-600 dark:text-amber-400 space-y-1",children:[e.jsx("div",{className:"font-semibold",children:"\u{1F4A1} \u8F6C\u8D26\u6263\u6B3E\u4E0E\u81EA\u52A8 VIP \u664B\u5347\u673A\u5236\uFF1A"}),e.jsx("div",{children:x?"\u8D85\u7EA7\u7BA1\u7406\u5458\u62E5\u6709\u65E0\u9650\u8C03\u7528\u989D\u5EA6\uFF0C\u4E3A\u4E0B\u7EA7\u5145\u503C\u5C06\u7167\u5E38\u8BB0\u5165\u7CFB\u7EDF\u8F6C\u8D26\u6263\u51CF\u6D41\u6C34\u3002":`\u672C\u6B21\u5145\u503C\u5C06\u4ECE\u60A8\u7684\u8D26\u6237\u4F59\u989D\u4E2D\u5B9E\u6253\u5B9E\u6263\u9664 \xA5${r.amount||"0"}\uFF08\u60A8\u5F53\u524D\u53EF\u7528\u4F59\u989D\u4E3A \xA5${((t==null?void 0:t.balance.available)??0).toFixed(2)}\uFF09\u3002`}),e.jsx("div",{children:"\u7528\u6237\u5145\u503C\u540E\u53EA\u8981\u53EF\u7528\u4F59\u989D\u5927\u4E8E 0\uFF0C\u7CFB\u7EDF\u5C06\u81EA\u52A8\u664B\u5347\u5176\u4E3A VIP \u8D26\u53F7\uFF01"})]}),e.jsx(p,{label:"\u5145\u503C\u5907\u6CE8 (\u53EF\u9009)",children:e.jsx(g,{value:r.memo,onChange:s=>v({...r,memo:s.target.value}),placeholder:"\u7BA1\u7406\u5458\u624B\u52A8\u8F6C\u8D26\u5145\u503C"})}),e.jsx(p,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u8D26\u6237\u52A0\u6B3E\u5C5E\u4E8E\u9AD8\u5371\u8D22\u52A1\u64CD\u4F5C\uFF0C\u9700\u6838\u9A8C\u5BC6\u7801",children:e.jsx(g,{type:"password",value:r.password,onChange:s=>v({...r,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u64CD\u4F5C\u8005\u7684\u5BC6\u7801",autoComplete:"current-password"})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>v({open:!1,user:null,amount:"50",memo:"",password:""}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:xe,children:"\u786E\u8BA4\u8F6C\u8D26\u5145\u503C"})]})]})}),e.jsx(S,{open:i.open,onClose:()=>b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),title:"\u6279\u91CF\u751F\u6210\u5145\u503C\u5361\u5BC6",width:480,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(p,{label:"\u5361\u5BC6\u9762\u503C (\u5143)",children:e.jsx(g,{type:"number",step:"0.01",value:i.amount,onChange:s=>b({...i,amount:s.target.value}),placeholder:"50"})}),e.jsx(p,{label:"\u751F\u6210\u6570\u91CF (\u5F20)",hint:"\u5355\u6B21\u6700\u591A 100 \u5F20",children:e.jsx(g,{type:"number",min:"1",max:"100",value:i.count,onChange:s=>b({...i,count:s.target.value}),placeholder:"10"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(p,{label:"\u5361\u5BC6\u6279\u6B21\u5907\u6CE8 (\u53EF\u9009)",children:e.jsx(g,{value:i.note,onChange:s=>b({...i,note:s.target.value}),placeholder:"\u4F8B\u5982: \u5BA2\u6237\u6279\u91CF\u91C7\u8D2D\u3001\u65B0\u7528\u6237\u798F\u5229\u5361"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx("p",{className:"text-xs text-muted",children:"\u{1F4A1} \u7528\u6237\u5151\u6362\u540E\u8D26\u6237\u4F59\u989D > 0 \u5C06\u81EA\u52A8\u83B7\u5F97 VIP \u8EAB\u4EFD\uFF1B\u8D85\u7EA7\u7BA1\u7406\u5458\u751F\u6210\u7684\u5361\u5BC6\u4E3A\u7CFB\u7EDF\u94F8\u5E01\u52A0\u6B3E\u3002"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(p,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u751F\u6210\u6709\u6548\u8D27\u5E01\u5361\u5BC6\u5C5E\u4E8E\u8D22\u52A1\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u6838\u9A8C\u7BA1\u7406\u5458\u5BC6\u7801",children:e.jsx(g,{type:"password",value:i.password,onChange:s=>b({...i,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:ue,children:"\u786E\u8BA4\u6279\u91CF\u751F\u6210"})]})]})}),e.jsx(S,{open:!!w,onClose:()=>E(null),title:"\u5361\u5BC6\u751F\u6210\u6210\u529F",width:480,children:e.jsxs("div",{className:"space-y-3",children:[e.jsxs("p",{className:"text-xs text-muted",children:["\u5DF2\u6210\u529F\u751F\u6210 ",(w==null?void 0:w.length)??0," \u5F20\u5361\u5BC6\u3002\u60A8\u53EF\u4EE5\u4E00\u952E\u590D\u5236\u5E76\u76F4\u63A5\u53D1\u7ED9\u5BA2\u6237\u6216\u5BFC\u5165\u53D1\u5361\u7CFB\u7EDF\uFF1A"]}),e.jsx("textarea",{readOnly:!0,value:(w||[]).join(`\n`),rows:6,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink focus:outline-none"}),e.jsxs("div",{className:"flex justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",onClick:()=>E(null),children:"\u5173\u95ED"}),e.jsx(n,{onClick:()=>O((w||[]).join(`\n`),"\u5168\u90E8\u5361\u5BC6"),children:"\u4E00\u952E\u590D\u5236\u5168\u90E8\u5361\u5BC6"})]})]})}),e.jsx(S,{open:m.open,onClose:()=>k({open:!1,user:null,role:"user"}),title:`\u8C03\u6574\u8D26\u53F7\u7B49\u7EA7 \u2014 ${((se=m.user)==null?void 0:se.email)??""}`,width:500,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u76EE\u6807\u7528\u6237\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsxs("span",{className:"font-mono text-sm font-bold text-emerald-500",children:["\xA5",(((te=m.user)==null?void 0:te.balance)??0).toFixed(2)]})]}),e.jsx(p,{label:"\u8D26\u53F7\u89D2\u8272\u7B49\u7EA7",children:e.jsxs(Ne,{value:m.role,onChange:s=>k({...m,role:s.target.value}),children:[x&&e.jsx("option",{value:"superadmin",children:"\u8D85\u7EA7\u7BA1\u7406\u5458 (superadmin) \u2014 \u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u5168\u7AD9\u7BA1\u7406"}),x&&e.jsx("option",{value:"admin",children:"\u7BA1\u7406\u5458 (admin) \u2014 \u62E5\u6709\u4E0B\u7EA7\u7528\u6237\u7BA1\u7406\u4E0E\u8F6C\u8D26\u5145\u503C\u6743\u9650\uFF08\u4F59\u989D\u4E3A0\u4E0D\u5F71\u54CD\u4EFB\u547D\uFF09"}),e.jsx("option",{value:"vip",children:"VIP \u8D26\u53F7 (vip) \u2014 \u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u5927\u6A21\u578B\uFF0C\u6309\u91CF\u6263\u8D39"}),e.jsx("option",{value:"user",children:"\u666E\u901A\u7528\u6237 (user) \u2014 \u4EC5\u9650\u514D\u8D39\u6A21\u578B\u6C60\uFF0C\u514D\u5145\u503C\u4E0D\u6263\u8D39"}),x&&e.jsx("option",{value:"finance",children:"\u8D22\u52A1\u4EBA\u5458 (finance)"}),x&&e.jsx("option",{value:"auditor",children:"\u5BA1\u8BA1\u5458 (auditor)"})]})}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/60 p-3 text-xs text-muted space-y-1.5",children:[e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u7BA1\u7406\u5458 (admin)"}),"\uFF1A\u7531\u8D85\u7EA7\u7BA1\u7406\u5458\u5728\u540E\u53F0\u4EFB\u547D\u3002\u7BA1\u7406\u5458\u4F59\u989D\u53EF\u4EE5\u4E3A 0\uFF0C\u4F46\u4F59\u989D\u4E3A 0 \u65F6\u65E0\u6CD5\u5411\u4E0B\u7EA7\u8F6C\u8D26\u52A0\u6B3E\u3002"]}),e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u81EA\u52A8 VIP \u673A\u5236"}),"\uFF1A\u666E\u901A\u7528\u6237\u53EA\u8981\u4F59\u989D > 0 \u81EA\u52A8\u664B\u5347\u4E3A VIP\uFF1B\u4F59\u989D\u7B49\u4E8E 0 \u81EA\u52A8\u964D\u4E3A\u666E\u901A\u7528\u6237\u3002\u82E5\u9700\u5F00\u901A VIP\uFF0C\u76F4\u63A5\u4F7F\u7528\u300C\u5145\u503C\u300D\u52A0\u6B3E\u5373\u53EF\u3002"]}),e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u6743\u9650\u5C42\u7EA7\u7EE7\u627F"}),"\uFF1A\u53EA\u5141\u8BB8\u7BA1\u7406\u4E0E\u5145\u503C\u6743\u9650\u4E25\u683C\u4F4E\u4E8E\u81EA\u8EAB\u7684\u4E0B\u7EA7\u7528\u6237\u3002"]})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>k({open:!1,user:null,role:"user"}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:de,children:"\u786E\u8BA4\u4FEE\u6539\u89D2\u8272"})]})]})}),e.jsxs(S,{open:y.open,onClose:()=>I({...y,open:!1}),title:"\u9080\u8BF7\u7EC4\u7EC7\u6210\u5458",width:440,children:[e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx(p,{label:"\u6210\u5458\u90AE\u7BB1",children:e.jsx(g,{type:"email",value:y.email,onChange:s=>I({...y,email:s.target.value})})}),e.jsx(p,{label:"\u5907\u6CE8",children:"\u7EC4\u7EC7\u6210\u5458\u9700\u5148\u81EA\u884C\u6CE8\u518C\u8D26\u53F7\uFF0C\u7BA1\u7406\u5458\u5728\u6B64\u767B\u8BB0\u540E\u5206\u914D\u7EC4\u7EC7\u4E0E\u89D2\u8272\uFF08MVP \u9636\u6BB5\u4EE5\u7528\u6237\u89D2\u8272\u4E3A\u51C6\uFF09\u3002"})]}),e.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[e.jsx(n,{variant:"ghost",onClick:()=>I({...y,open:!1}),children:"\u53D6\u6D88"}),e.jsx(n,{onClick:()=>{a("\u5DF2\u8BB0\u5F55\u9080\u8BF7\uFF08MVP \u5360\u4F4D\uFF09"),I({...y,open:!1})},children:"\u53D1\u9001\u9080\u8BF7"})]})]}),ie]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/VideoTasks-DMvfj55o.js": {
-              content: 'import{c as I,u as G,i as H,j as e,m as i,B as h,d as g,g as b,E as J,o as K,a as M}from"./index-C1Wgc1sf.js";import{r as o}from"./vendor-BbQ_LiY-.js";import{R as q}from"./refresh-cw-g67Iczt4.js";import{E as Q}from"./external-link-BXEONH_n.js";import{T as W}from"./trash-2-Hgm_5qDX.js";import{C as $}from"./clock-Bek_ctNZ.js";import{C as Y}from"./circle-check-DY1J2Ix2.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Z=I("CircleX",[["circle",{cx:"12",cy:"12",r:"10",key:"1mglay"}],["path",{d:"m15 9-6 6",key:"1uzhvr"}],["path",{d:"m9 9 6 6",key:"z0biqf"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const j=I("Film",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",key:"afitv7"}],["path",{d:"M7 3v18",key:"bbkbws"}],["path",{d:"M3 7.5h4",key:"zfgn84"}],["path",{d:"M3 12h18",key:"1i2n21"}],["path",{d:"M3 16.5h4",key:"1230mu"}],["path",{d:"M17 3v18",key:"in4fa5"}],["path",{d:"M17 7.5h4",key:"myr1c1"}],["path",{d:"M17 16.5h4",key:"go4c1d"}]]),y=6e4,ee=[{key:"all",label:"\u5168\u90E8"},{key:"pending",label:"\u5F85\u63D0\u4EA4",hint:"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF0C\u672C\u5730\u6302\u7740\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295"},{key:"queued",label:"\u6392\u961F\u4E2D",hint:"\u5DF2\u63D0\u4EA4\u4E0A\u6E38\uFF0C\u5728\u4E0A\u6E38\u961F\u5217\u91CC\u7B49\u751F\u6210"},{key:"in_progress",label:"\u751F\u6210\u4E2D"},{key:"completed",label:"\u5DF2\u5B8C\u6210"},{key:"failed",label:"\u5931\u8D25"}];function L(t,a){return a==="all"?!0:a==="pending"?t.waiting_slot===!0:a==="queued"?t.status==="queued"&&!t.waiting_slot:a==="failed"?t.status==="failed"||t.status==="cancelled":t.status===a}const se={queued:"\u961F\u5217\u4E2D",in_progress:"\u751F\u6210\u4E2D",completed:"\u5DF2\u5B8C\u6210",failed:"\u5931\u8D25",cancelled:"\u5DF2\u53D6\u6D88"};function te({status:t}){const a=t==="completed"?"bg-emerald-500/10 text-emerald-500":t==="failed"||t==="cancelled"?"bg-red-500/10 text-red-500":t==="in_progress"?"bg-amber-500/10 text-amber-500":"bg-zinc-500/10 text-zinc-400",r=t==="completed"?Y:t==="failed"||t==="cancelled"?Z:$;return e.jsxs("span",{className:i("inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium",a),children:[e.jsx(r,{size:10}),se[t]??t]})}function ne({value:t}){const a=Math.max(0,Math.min(100,Math.round(t||0)));return e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("div",{className:"h-1.5 w-24 overflow-hidden rounded-full bg-line/70",children:e.jsx("div",{className:i("h-full rounded-full",a>=100?"bg-emerald-500":a>0?"bg-brand":"bg-muted/40"),style:{width:`${a}%`}})}),e.jsxs("span",{className:"w-9 text-right font-mono text-[10px] text-muted",children:[a,"%"]})]})}function xe({me:t,embedded:a=!1}){const[r,A]=o.useState(null),[l,f]=o.useState("own"),[x,D]=o.useState("all"),[m,N]=o.useState(!1),[v,k]=o.useState(y/1e3),p=G(),{confirm:P,confirmEl:R}=H(),w=o.useRef(null),u=async(s=!1,n=l)=>{s||N(!0);try{const c=await M(`/api/video/tasks?limit=100&scope=${n}`);A(c)}catch(c){s||p(c.message,"err")}finally{s||N(!1),k(y/1e3)}};o.useEffect(()=>{u(!1,l);const s=window.setInterval(()=>{document.hidden||k(c=>c<=1?(u(!0,l),y/1e3):c-1)},1e3),n=()=>{document.hidden||u(!0,l)};return document.addEventListener("visibilitychange",n),()=>{window.clearInterval(s),document.removeEventListener("visibilitychange",n),w.current&&window.clearTimeout(w.current)}},[l]);const V=async(s,n)=>{try{await navigator.clipboard.writeText(s),p(`${n}\u5DF2\u590D\u5236`)}catch{p("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9","err")}},B=async s=>{if(await P(`\u5220\u9664\u4EFB\u52A1 ${s.id} \u7684\u8BB0\u5F55\uFF1F\u4EC5\u6E05\u7406\u672C\u5730\u8BB0\u5F55\uFF0C\u4E0D\u4F1A\u53D6\u6D88\u4E0A\u6E38\u4EFB\u52A1\u3002`))try{await M(`/api/video/tasks/${s.id}`,"DELETE"),p("\u5DF2\u5220\u9664"),u(!1,l)}catch(n){p(n.message,"err")}},d=(r==null?void 0:r.tasks)??[],_=(r==null?void 0:r.can_view_all)===!0,C=l==="all",F=d.filter(s=>s.status==="in_progress"||s.status==="queued").length,X=d.filter(s=>s.status==="completed").length,O=d.filter(s=>s.status==="failed"||s.status==="cancelled").length,z=d.filter(s=>s.waiting_slot).length,T=d.filter(s=>L(s,x)),E=s=>e.jsx("div",{className:s,children:ee.map(n=>{const c=d.filter(U=>L(U,n.key)).length,S=x===n.key;return e.jsxs("button",{type:"button",onClick:()=>D(n.key),title:n.hint,className:i("inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors",S?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:[n.label,e.jsx("span",{className:i("rounded px-1 text-[10px] font-mono",S?"bg-brand/15":"bg-surface2"),children:c})]},n.key)})});return e.jsxs("div",{className:"flex flex-col gap-4",children:[R,a?e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-end gap-2",children:[_?e.jsxs("div",{className:"inline-flex overflow-hidden rounded-lg border border-line",children:[e.jsx("button",{type:"button",onClick:()=>f("own"),className:i("inline-flex h-8 items-center justify-center px-3 text-xs font-medium transition-colors",l==="own"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u6211\u7684\u4EFB\u52A1"}),e.jsx("button",{type:"button",onClick:()=>f("all"),className:i("inline-flex h-8 items-center justify-center px-3 text-xs font-medium transition-colors",l==="all"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u5168\u90E8\u4EFB\u52A1"})]}):e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-lg bg-surface2 px-3 py-1.5 text-xs font-medium text-muted",children:[e.jsx(j,{size:12})," \u6211\u7684\u4EFB\u52A1"]}),e.jsxs(h,{variant:"soft",className:"h-8",onClick:()=>u(!1,l),disabled:m,children:[e.jsx(q,{size:13,className:i(m&&"animate-spin")}),m?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex h-8 items-center rounded-lg bg-surface2 px-3 text-xs font-medium text-muted",title:"\u6BCF 60 \u79D2\u81EA\u52A8\u5237\u65B0\u672A\u5B8C\u6210\u4EFB\u52A1",children:[v,"s"]})]}),E("flex flex-wrap gap-1.5")]}):e.jsxs(g,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(j,{size:18})}),e.jsxs("div",{children:[e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u89C6\u9891\u4EFB\u52A1"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:C?"\u5168\u90E8\u4EFB\u52A1\u89C6\u56FE\uFF1A\u53EF\u67E5\u770B\u6240\u6709\u7528\u6237\u53D1\u8D77\u7684\u89C6\u9891\u4EFB\u52A1\uFF0C\u5E76\u6E05\u7406\u4EFB\u610F\u8BB0\u5F55\u3002":"\u9ED8\u8BA4\u4EC5\u663E\u793A\u4F60\u81EA\u5DF1\u53D1\u8D77\u7684\u4EFB\u52A1\uFF1B\u751F\u6210\u5B8C\u6210\u540E\u53EF\u76F4\u63A5\u64AD\u653E\u6216\u4E0B\u8F7D\u3002"})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[_?e.jsxs("div",{className:"inline-flex overflow-hidden rounded-lg border border-line",children:[e.jsx("button",{type:"button",onClick:()=>f("own"),className:i("inline-flex h-9 items-center justify-center px-3.5 text-[13px] font-medium transition-colors",l==="own"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u6211\u7684\u4EFB\u52A1"}),e.jsx("button",{type:"button",onClick:()=>f("all"),className:i("inline-flex h-9 items-center justify-center px-3.5 text-[13px] font-medium transition-colors",l==="all"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u5168\u90E8\u4EFB\u52A1"})]}):e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-lg bg-surface2 px-3.5 py-2 text-[13px] font-medium text-muted",children:[e.jsx(j,{size:12})," \u6211\u7684\u4EFB\u52A1"]}),e.jsxs(h,{variant:"soft",className:"h-9",onClick:()=>u(!1,l),disabled:m,children:[e.jsx(q,{size:14,className:i(m&&"animate-spin")}),m?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex h-9 items-center rounded-lg bg-surface2 px-3 text-[13px] font-medium text-muted",title:"\u6BCF 60 \u79D2\u81EA\u52A8\u5237\u65B0\u672A\u5B8C\u6210\u4EFB\u52A1\uFF08\u4E0E\u72B6\u6001\u7AD9\u76D1\u63A7\u540C\u9891\uFF09",children:[v,"s"]})]})]}),e.jsxs("div",{className:"mt-3 flex flex-wrap items-center gap-3 text-[11px] text-muted",children:[e.jsxs("span",{children:["\u5171 ",e.jsx("b",{className:"font-mono text-ink",children:d.length})," \u4E2A"]}),e.jsxs("span",{children:["\u8FDB\u884C\u4E2D ",e.jsx("b",{className:"font-mono text-ink",children:F})]}),z>0&&e.jsxs("span",{children:["\u5F85\u63D0\u4EA4 ",e.jsx("b",{className:"font-mono text-amber-500",children:z})]}),e.jsxs("span",{children:["\u5DF2\u5B8C\u6210 ",e.jsx("b",{className:"font-mono text-emerald-500",children:X})]}),e.jsxs("span",{children:["\u5931\u8D25 ",e.jsx("b",{className:"font-mono text-red-500",children:O})]}),r&&e.jsxs("span",{className:"ml-auto",children:["\u4E0A\u6B21\u5237\u65B0 ",b(r.refreshed_at)]})]}),E("mt-3 flex flex-wrap gap-1.5 border-t border-line/70 pt-3")]}),r===null?e.jsx(g,{className:"p-6",children:e.jsx("div",{className:"skeleton h-24 rounded-xl2"})}):T.length===0?e.jsx(g,{children:e.jsx(J,{icon:e.jsx(j,{size:32}),title:x==="pending"?"\u6CA1\u6709\u5F85\u63D0\u4EA4\u7684\u4EFB\u52A1":x==="queued"?"\u6CA1\u6709\u6392\u961F\u4E2D\u7684\u4EFB\u52A1":"\u6682\u65E0\u89C6\u9891\u4EFB\u52A1",hint:x==="pending"?"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF08503 video_queue_full\uFF09\u65F6\uFF0C\u63D0\u4EA4\u7684\u8BF7\u6C42\u4F1A\u6302\u5728\u8FD9\u91CC\uFF0C\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295\u4E00\u6B21\uFF0C\u6324\u5230\u7A7A\u4F4D\u5C31\u81EA\u52A8\u63D0\u4EA4\u3002":x==="queued"?"\u5DF2\u7ECF\u63D0\u4EA4\u5230\u4E0A\u6E38\u3001\u6B63\u5728\u4E0A\u6E38\u961F\u5217\u91CC\u6392\u961F\u7684\u4EFB\u52A1\u4F1A\u663E\u793A\u5728\u8FD9\u91CC\u3002":"\u8C03\u7528 POST /v1/videos \u521B\u5EFA\u4EFB\u52A1\u540E\uFF0C\u8FD9\u91CC\u4F1A\u81EA\u52A8\u51FA\u73B0\uFF0C\u5E76\u6309 60 \u79D2\u95F4\u9694\u8F6E\u8BE2\u8FDB\u5EA6\u3002"})}):e.jsx("div",{className:"flex flex-col gap-3",children:T.map(s=>e.jsxs(g,{className:"p-3.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2",children:[e.jsx(te,{status:s.status}),e.jsx("span",{className:"text-sm font-semibold text-ink",children:s.model}),C&&e.jsx("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px] text-muted",children:s.user_email??s.user_id.slice(0,8)}),s.seconds?e.jsxs("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px] text-muted",children:[s.seconds,"s"]}):null,s.size?e.jsx("span",{className:"rounded bg-line/70 px-1.5 py-0.5 text-[10px] text-muted",children:s.size}):null,e.jsxs("span",{className:"ml-auto flex items-center gap-1.5",children:[s.url&&e.jsxs("a",{className:"inline-flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-[11px] text-brand hover:bg-brand/10",href:s.url,target:"_blank",rel:"noopener noreferrer",children:[e.jsx(Q,{size:11})," \u64AD\u653E / \u4E0B\u8F7D"]}),e.jsxs(h,{variant:"ghost",className:"!px-2 !py-1 text-[11px]",onClick:()=>V(s.id,"\u4EFB\u52A1 ID"),children:[e.jsx(K,{size:11,className:"mr-1"}),"ID"]}),e.jsxs(h,{variant:"ghost",className:"!px-2 !py-1 text-[11px] !text-err",onClick:()=>B(s),children:[e.jsx(W,{size:11,className:"mr-1"}),"\u5220\u9664"]})]})]}),e.jsxs("div",{className:"mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2",children:[e.jsx(ne,{value:s.progress}),e.jsx("code",{className:"text-[11px] font-mono text-muted",children:s.id}),e.jsxs("span",{className:"text-[10px] text-muted",children:["\u521B\u5EFA ",b(s.created_at)]}),s.updated_at>s.created_at&&e.jsxs("span",{className:"text-[10px] text-muted",children:["\u66F4\u65B0 ",b(s.updated_at)]})]}),s.waiting_slot&&e.jsxs("div",{className:"mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-500",children:[e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx($,{size:11})," \u6392\u961F\u7B49\u7A7A\u4F4D"]}),e.jsxs("span",{children:["\u5DF2\u91CD\u8BD5 ",e.jsx("b",{className:"font-mono",children:s.retry_count??0})," \u6B21"]}),s.next_retry_at?e.jsxs("span",{children:["\u4E0B\u6B21\u91CD\u6295 ",b(s.next_retry_at)]}):null,e.jsx("span",{className:"text-amber-500/70",children:"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF0C\u540E\u53F0\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295\uFF0C\u65E0\u9700\u91CD\u65B0\u63D0\u4EA4"})]}),s.error&&e.jsx("p",{className:"mt-2 break-all text-[11px] text-err",children:s.error})]},s.id))})]})}\n',
+            "/assets/VideoTasks-Lc8uBADw.js": {
+              content: 'import{c as I,u as G,i as H,j as e,m as i,B as h,d as g,g as b,E as J,o as K,a as M}from"./index-KwMGOJkp.js";import{r as o}from"./vendor-BbQ_LiY-.js";import{R as q}from"./refresh-cw-BrzRfQC6.js";import{E as Q}from"./external-link-3zVIAjg3.js";import{T as W}from"./trash-2-BF158Quc.js";import{C as $}from"./clock-BJH_AWv4.js";import{C as Y}from"./circle-check-B2pLGJPh.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Z=I("CircleX",[["circle",{cx:"12",cy:"12",r:"10",key:"1mglay"}],["path",{d:"m15 9-6 6",key:"1uzhvr"}],["path",{d:"m9 9 6 6",key:"z0biqf"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const j=I("Film",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",key:"afitv7"}],["path",{d:"M7 3v18",key:"bbkbws"}],["path",{d:"M3 7.5h4",key:"zfgn84"}],["path",{d:"M3 12h18",key:"1i2n21"}],["path",{d:"M3 16.5h4",key:"1230mu"}],["path",{d:"M17 3v18",key:"in4fa5"}],["path",{d:"M17 7.5h4",key:"myr1c1"}],["path",{d:"M17 16.5h4",key:"go4c1d"}]]),y=6e4,ee=[{key:"all",label:"\u5168\u90E8"},{key:"pending",label:"\u5F85\u63D0\u4EA4",hint:"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF0C\u672C\u5730\u6302\u7740\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295"},{key:"queued",label:"\u6392\u961F\u4E2D",hint:"\u5DF2\u63D0\u4EA4\u4E0A\u6E38\uFF0C\u5728\u4E0A\u6E38\u961F\u5217\u91CC\u7B49\u751F\u6210"},{key:"in_progress",label:"\u751F\u6210\u4E2D"},{key:"completed",label:"\u5DF2\u5B8C\u6210"},{key:"failed",label:"\u5931\u8D25"}];function L(t,a){return a==="all"?!0:a==="pending"?t.waiting_slot===!0:a==="queued"?t.status==="queued"&&!t.waiting_slot:a==="failed"?t.status==="failed"||t.status==="cancelled":t.status===a}const se={queued:"\u961F\u5217\u4E2D",in_progress:"\u751F\u6210\u4E2D",completed:"\u5DF2\u5B8C\u6210",failed:"\u5931\u8D25",cancelled:"\u5DF2\u53D6\u6D88"};function te({status:t}){const a=t==="completed"?"bg-emerald-500/10 text-emerald-500":t==="failed"||t==="cancelled"?"bg-red-500/10 text-red-500":t==="in_progress"?"bg-amber-500/10 text-amber-500":"bg-zinc-500/10 text-zinc-400",r=t==="completed"?Y:t==="failed"||t==="cancelled"?Z:$;return e.jsxs("span",{className:i("inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium",a),children:[e.jsx(r,{size:10}),se[t]??t]})}function ne({value:t}){const a=Math.max(0,Math.min(100,Math.round(t||0)));return e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("div",{className:"h-1.5 w-24 overflow-hidden rounded-full bg-line/70",children:e.jsx("div",{className:i("h-full rounded-full",a>=100?"bg-emerald-500":a>0?"bg-brand":"bg-muted/40"),style:{width:`${a}%`}})}),e.jsxs("span",{className:"w-9 text-right font-mono text-[10px] text-muted",children:[a,"%"]})]})}function xe({me:t,embedded:a=!1}){const[r,A]=o.useState(null),[l,f]=o.useState("own"),[x,D]=o.useState("all"),[m,N]=o.useState(!1),[v,k]=o.useState(y/1e3),p=G(),{confirm:P,confirmEl:R}=H(),w=o.useRef(null),u=async(s=!1,n=l)=>{s||N(!0);try{const c=await M(`/api/video/tasks?limit=100&scope=${n}`);A(c)}catch(c){s||p(c.message,"err")}finally{s||N(!1),k(y/1e3)}};o.useEffect(()=>{u(!1,l);const s=window.setInterval(()=>{document.hidden||k(c=>c<=1?(u(!0,l),y/1e3):c-1)},1e3),n=()=>{document.hidden||u(!0,l)};return document.addEventListener("visibilitychange",n),()=>{window.clearInterval(s),document.removeEventListener("visibilitychange",n),w.current&&window.clearTimeout(w.current)}},[l]);const V=async(s,n)=>{try{await navigator.clipboard.writeText(s),p(`${n}\u5DF2\u590D\u5236`)}catch{p("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9","err")}},B=async s=>{if(await P(`\u5220\u9664\u4EFB\u52A1 ${s.id} \u7684\u8BB0\u5F55\uFF1F\u4EC5\u6E05\u7406\u672C\u5730\u8BB0\u5F55\uFF0C\u4E0D\u4F1A\u53D6\u6D88\u4E0A\u6E38\u4EFB\u52A1\u3002`))try{await M(`/api/video/tasks/${s.id}`,"DELETE"),p("\u5DF2\u5220\u9664"),u(!1,l)}catch(n){p(n.message,"err")}},d=(r==null?void 0:r.tasks)??[],_=(r==null?void 0:r.can_view_all)===!0,C=l==="all",F=d.filter(s=>s.status==="in_progress"||s.status==="queued").length,X=d.filter(s=>s.status==="completed").length,O=d.filter(s=>s.status==="failed"||s.status==="cancelled").length,z=d.filter(s=>s.waiting_slot).length,T=d.filter(s=>L(s,x)),E=s=>e.jsx("div",{className:s,children:ee.map(n=>{const c=d.filter(U=>L(U,n.key)).length,S=x===n.key;return e.jsxs("button",{type:"button",onClick:()=>D(n.key),title:n.hint,className:i("inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors",S?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:[n.label,e.jsx("span",{className:i("rounded px-1 text-[10px] font-mono",S?"bg-brand/15":"bg-surface2"),children:c})]},n.key)})});return e.jsxs("div",{className:"flex flex-col gap-4",children:[R,a?e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-end gap-2",children:[_?e.jsxs("div",{className:"inline-flex overflow-hidden rounded-lg border border-line",children:[e.jsx("button",{type:"button",onClick:()=>f("own"),className:i("inline-flex h-8 items-center justify-center px-3 text-xs font-medium transition-colors",l==="own"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u6211\u7684\u4EFB\u52A1"}),e.jsx("button",{type:"button",onClick:()=>f("all"),className:i("inline-flex h-8 items-center justify-center px-3 text-xs font-medium transition-colors",l==="all"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u5168\u90E8\u4EFB\u52A1"})]}):e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-lg bg-surface2 px-3 py-1.5 text-xs font-medium text-muted",children:[e.jsx(j,{size:12})," \u6211\u7684\u4EFB\u52A1"]}),e.jsxs(h,{variant:"soft",className:"h-8",onClick:()=>u(!1,l),disabled:m,children:[e.jsx(q,{size:13,className:i(m&&"animate-spin")}),m?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex h-8 items-center rounded-lg bg-surface2 px-3 text-xs font-medium text-muted",title:"\u6BCF 60 \u79D2\u81EA\u52A8\u5237\u65B0\u672A\u5B8C\u6210\u4EFB\u52A1",children:[v,"s"]})]}),E("flex flex-wrap gap-1.5")]}):e.jsxs(g,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(j,{size:18})}),e.jsxs("div",{children:[e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u89C6\u9891\u4EFB\u52A1"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:C?"\u5168\u90E8\u4EFB\u52A1\u89C6\u56FE\uFF1A\u53EF\u67E5\u770B\u6240\u6709\u7528\u6237\u53D1\u8D77\u7684\u89C6\u9891\u4EFB\u52A1\uFF0C\u5E76\u6E05\u7406\u4EFB\u610F\u8BB0\u5F55\u3002":"\u9ED8\u8BA4\u4EC5\u663E\u793A\u4F60\u81EA\u5DF1\u53D1\u8D77\u7684\u4EFB\u52A1\uFF1B\u751F\u6210\u5B8C\u6210\u540E\u53EF\u76F4\u63A5\u64AD\u653E\u6216\u4E0B\u8F7D\u3002"})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[_?e.jsxs("div",{className:"inline-flex overflow-hidden rounded-lg border border-line",children:[e.jsx("button",{type:"button",onClick:()=>f("own"),className:i("inline-flex h-9 items-center justify-center px-3.5 text-[13px] font-medium transition-colors",l==="own"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u6211\u7684\u4EFB\u52A1"}),e.jsx("button",{type:"button",onClick:()=>f("all"),className:i("inline-flex h-9 items-center justify-center px-3.5 text-[13px] font-medium transition-colors",l==="all"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u5168\u90E8\u4EFB\u52A1"})]}):e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-lg bg-surface2 px-3.5 py-2 text-[13px] font-medium text-muted",children:[e.jsx(j,{size:12})," \u6211\u7684\u4EFB\u52A1"]}),e.jsxs(h,{variant:"soft",className:"h-9",onClick:()=>u(!1,l),disabled:m,children:[e.jsx(q,{size:14,className:i(m&&"animate-spin")}),m?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex h-9 items-center rounded-lg bg-surface2 px-3 text-[13px] font-medium text-muted",title:"\u6BCF 60 \u79D2\u81EA\u52A8\u5237\u65B0\u672A\u5B8C\u6210\u4EFB\u52A1\uFF08\u4E0E\u72B6\u6001\u7AD9\u76D1\u63A7\u540C\u9891\uFF09",children:[v,"s"]})]})]}),e.jsxs("div",{className:"mt-3 flex flex-wrap items-center gap-3 text-[11px] text-muted",children:[e.jsxs("span",{children:["\u5171 ",e.jsx("b",{className:"font-mono text-ink",children:d.length})," \u4E2A"]}),e.jsxs("span",{children:["\u8FDB\u884C\u4E2D ",e.jsx("b",{className:"font-mono text-ink",children:F})]}),z>0&&e.jsxs("span",{children:["\u5F85\u63D0\u4EA4 ",e.jsx("b",{className:"font-mono text-amber-500",children:z})]}),e.jsxs("span",{children:["\u5DF2\u5B8C\u6210 ",e.jsx("b",{className:"font-mono text-emerald-500",children:X})]}),e.jsxs("span",{children:["\u5931\u8D25 ",e.jsx("b",{className:"font-mono text-red-500",children:O})]}),r&&e.jsxs("span",{className:"ml-auto",children:["\u4E0A\u6B21\u5237\u65B0 ",b(r.refreshed_at)]})]}),E("mt-3 flex flex-wrap gap-1.5 border-t border-line/70 pt-3")]}),r===null?e.jsx(g,{className:"p-6",children:e.jsx("div",{className:"skeleton h-24 rounded-xl2"})}):T.length===0?e.jsx(g,{children:e.jsx(J,{icon:e.jsx(j,{size:32}),title:x==="pending"?"\u6CA1\u6709\u5F85\u63D0\u4EA4\u7684\u4EFB\u52A1":x==="queued"?"\u6CA1\u6709\u6392\u961F\u4E2D\u7684\u4EFB\u52A1":"\u6682\u65E0\u89C6\u9891\u4EFB\u52A1",hint:x==="pending"?"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF08503 video_queue_full\uFF09\u65F6\uFF0C\u63D0\u4EA4\u7684\u8BF7\u6C42\u4F1A\u6302\u5728\u8FD9\u91CC\uFF0C\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295\u4E00\u6B21\uFF0C\u6324\u5230\u7A7A\u4F4D\u5C31\u81EA\u52A8\u63D0\u4EA4\u3002":x==="queued"?"\u5DF2\u7ECF\u63D0\u4EA4\u5230\u4E0A\u6E38\u3001\u6B63\u5728\u4E0A\u6E38\u961F\u5217\u91CC\u6392\u961F\u7684\u4EFB\u52A1\u4F1A\u663E\u793A\u5728\u8FD9\u91CC\u3002":"\u8C03\u7528 POST /v1/videos \u521B\u5EFA\u4EFB\u52A1\u540E\uFF0C\u8FD9\u91CC\u4F1A\u81EA\u52A8\u51FA\u73B0\uFF0C\u5E76\u6309 60 \u79D2\u95F4\u9694\u8F6E\u8BE2\u8FDB\u5EA6\u3002"})}):e.jsx("div",{className:"flex flex-col gap-3",children:T.map(s=>e.jsxs(g,{className:"p-3.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2",children:[e.jsx(te,{status:s.status}),e.jsx("span",{className:"text-sm font-semibold text-ink",children:s.model}),C&&e.jsx("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px] text-muted",children:s.user_email??s.user_id.slice(0,8)}),s.seconds?e.jsxs("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px] text-muted",children:[s.seconds,"s"]}):null,s.size?e.jsx("span",{className:"rounded bg-line/70 px-1.5 py-0.5 text-[10px] text-muted",children:s.size}):null,e.jsxs("span",{className:"ml-auto flex items-center gap-1.5",children:[s.url&&e.jsxs("a",{className:"inline-flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-[11px] text-brand hover:bg-brand/10",href:s.url,target:"_blank",rel:"noopener noreferrer",children:[e.jsx(Q,{size:11})," \u64AD\u653E / \u4E0B\u8F7D"]}),e.jsxs(h,{variant:"ghost",className:"!px-2 !py-1 text-[11px]",onClick:()=>V(s.id,"\u4EFB\u52A1 ID"),children:[e.jsx(K,{size:11,className:"mr-1"}),"ID"]}),e.jsxs(h,{variant:"ghost",className:"!px-2 !py-1 text-[11px] !text-err",onClick:()=>B(s),children:[e.jsx(W,{size:11,className:"mr-1"}),"\u5220\u9664"]})]})]}),e.jsxs("div",{className:"mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2",children:[e.jsx(ne,{value:s.progress}),e.jsx("code",{className:"text-[11px] font-mono text-muted",children:s.id}),e.jsxs("span",{className:"text-[10px] text-muted",children:["\u521B\u5EFA ",b(s.created_at)]}),s.updated_at>s.created_at&&e.jsxs("span",{className:"text-[10px] text-muted",children:["\u66F4\u65B0 ",b(s.updated_at)]})]}),s.waiting_slot&&e.jsxs("div",{className:"mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-500",children:[e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx($,{size:11})," \u6392\u961F\u7B49\u7A7A\u4F4D"]}),e.jsxs("span",{children:["\u5DF2\u91CD\u8BD5 ",e.jsx("b",{className:"font-mono",children:s.retry_count??0})," \u6B21"]}),s.next_retry_at?e.jsxs("span",{children:["\u4E0B\u6B21\u91CD\u6295 ",b(s.next_retry_at)]}):null,e.jsx("span",{className:"text-amber-500/70",children:"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF0C\u540E\u53F0\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295\uFF0C\u65E0\u9700\u91CD\u65B0\u63D0\u4EA4"})]}),s.error&&e.jsx("p",{className:"mt-2 break-all text-[11px] text-err",children:s.error})]},s.id))})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
@@ -41952,8 +41952,8 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/circle-check-DY1J2Ix2.js": {
-              content: `import{c}from"./index-C1Wgc1sf.js";/**
+            "/assets/circle-check-B2pLGJPh.js": {
+              content: `import{c}from"./index-KwMGOJkp.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41963,8 +41963,8 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/clock-Bek_ctNZ.js": {
-              content: `import{c}from"./index-C1Wgc1sf.js";/**
+            "/assets/clock-BJH_AWv4.js": {
+              content: `import{c}from"./index-KwMGOJkp.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41974,8 +41974,8 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/download-74qsMNMY.js": {
-              content: `import{c as o}from"./index-C1Wgc1sf.js";/**
+            "/assets/download-vNmvYjVK.js": {
+              content: `import{c as o}from"./index-KwMGOJkp.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41985,8 +41985,8 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/external-link-BXEONH_n.js": {
-              content: `import{c as a}from"./index-C1Wgc1sf.js";/**
+            "/assets/external-link-3zVIAjg3.js": {
+              content: `import{c as a}from"./index-KwMGOJkp.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41996,8 +41996,14 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/index-C1Wgc1sf.js": {
-              content: `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/Dashboard-D0C7JDRR.js","assets/vendor-BbQ_LiY-.js","assets/charts-mu_46IqZ.js","assets/Keys-Dn_rXLV2.js","assets/plus-sJaeYLjc.js","assets/VideoTasks-DMvfj55o.js","assets/refresh-cw-g67Iczt4.js","assets/external-link-BXEONH_n.js","assets/trash-2-Hgm_5qDX.js","assets/clock-Bek_ctNZ.js","assets/circle-check-DY1J2Ix2.js","assets/ScheduledTasks-BoejvN0o.js","assets/Playground-Ev-DpHvX.js","assets/send-BlMsmIhB.js","assets/user-a2FF8pEQ.js","assets/ChatRoom-ammSJd4Y.js","assets/Providers-iZTn0OUh.js","assets/message-square-CuYbKyMO.js","assets/triangle-alert-BVzhzJGL.js","assets/AccountPool-C5nNmUVp.js","assets/ModelsPricing-ZXeWf5_f.js","assets/Logs-CY4B2vum.js","assets/download-74qsMNMY.js","assets/Users-w9V59wdx.js","assets/Invite-C63C__Ob.js","assets/Profile-DJoYjjFw.js","assets/Backup-HWJu0Gys.js","assets/Settings-B-g0O-WH.js"])))=>i.map(i=>d[i]);
+            "/assets/index-D5GYnqn7.css": {
+              content: `*,:before,:after{--tw-border-spacing-x: 0;--tw-border-spacing-y: 0;--tw-translate-x: 0;--tw-translate-y: 0;--tw-rotate: 0;--tw-skew-x: 0;--tw-skew-y: 0;--tw-scale-x: 1;--tw-scale-y: 1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness: proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width: 0px;--tw-ring-offset-color: #fff;--tw-ring-color: rgb(59 130 246 / .5);--tw-ring-offset-shadow: 0 0 #0000;--tw-ring-shadow: 0 0 #0000;--tw-shadow: 0 0 #0000;--tw-shadow-colored: 0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x: 0;--tw-border-spacing-y: 0;--tw-translate-x: 0;--tw-translate-y: 0;--tw-rotate: 0;--tw-skew-x: 0;--tw-skew-y: 0;--tw-scale-x: 1;--tw-scale-y: 1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness: proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width: 0px;--tw-ring-offset-color: #fff;--tw-ring-color: rgb(59 130 246 / .5);--tw-ring-offset-shadow: 0 0 #0000;--tw-ring-shadow: 0 0 #0000;--tw-shadow: 0 0 #0000;--tw-shadow-colored: 0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }*,:before,:after{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}:before,:after{--tw-content: ""}html,:host{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:Inter,-apple-system,PingFang SC,Microsoft YaHei,sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,samp,pre{font-family:SF Mono,ui-monospace,Consolas,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}ol,ul,menu{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canvas,audio,iframe,embed,object{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{top:0;right:0;bottom:0;left:0}.inset-x-0{left:0;right:0}.-right-0\\.5{right:-.125rem}.-top-0\\.5{top:-.125rem}.-top-3{top:-.75rem}.bottom-6{bottom:1.5rem}.bottom-full{bottom:100%}.left-0{left:0}.left-0\\.5{left:.125rem}.left-1\\/2{left:50%}.left-3{left:.75rem}.right-2\\.5{right:.625rem}.right-3{right:.75rem}.right-4{right:1rem}.right-5{right:1.25rem}.right-6{right:1.5rem}.top-0{top:0}.top-1\\/2{top:50%}.top-16{top:4rem}.top-20{top:5rem}.z-30{z-index:30}.z-40{z-index:40}.z-50{z-index:50}.z-\\[60\\]{z-index:60}.col-span-1{grid-column:span 1 / span 1}.mx-1{margin-left:.25rem;margin-right:.25rem}.mx-auto{margin-left:auto;margin-right:auto}.my-4{margin-top:1rem;margin-bottom:1rem}.mb-1{margin-bottom:.25rem}.mb-1\\.5{margin-bottom:.375rem}.mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}.ml-1{margin-left:.25rem}.ml-auto{margin-left:auto}.mr-0\\.5{margin-right:.125rem}.mr-1{margin-right:.25rem}.mt-0\\.5{margin-top:.125rem}.mt-1{margin-top:.25rem}.mt-1\\.5{margin-top:.375rem}.mt-10{margin-top:2.5rem}.mt-2{margin-top:.5rem}.mt-2\\.5{margin-top:.625rem}.mt-3{margin-top:.75rem}.mt-3\\.5{margin-top:.875rem}.mt-4{margin-top:1rem}.mt-5{margin-top:1.25rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.mt-auto{margin-top:auto}.line-clamp-1{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1}.line-clamp-2{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}.line-clamp-3{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}.block{display:block}.inline-block{display:inline-block}.inline{display:inline}.flex{display:flex}.inline-flex{display:inline-flex}.table{display:table}.grid{display:grid}.hidden{display:none}.\\!h-6{height:1.5rem!important}.\\!h-7{height:1.75rem!important}.\\!h-\\[34px\\]{height:34px!important}.h-1\\.5{height:.375rem}.h-10{height:2.5rem}.h-11{height:2.75rem}.h-12{height:3rem}.h-14{height:3.5rem}.h-16{height:4rem}.h-2{height:.5rem}.h-20{height:5rem}.h-24{height:6rem}.h-28{height:7rem}.h-3{height:.75rem}.h-3\\.5{height:.875rem}.h-32{height:8rem}.h-36{height:9rem}.h-4{height:1rem}.h-40{height:10rem}.h-44{height:11rem}.h-5{height:1.25rem}.h-56{height:14rem}.h-6{height:1.5rem}.h-64{height:16rem}.h-7{height:1.75rem}.h-8{height:2rem}.h-9{height:2.25rem}.h-\\[calc\\(100vh-320px\\)\\]{height:calc(100vh - 320px)}.h-fit{height:-moz-fit-content;height:fit-content}.h-full{height:100%}.h-px{height:1px}.h-screen{height:100vh}.max-h-28{max-height:7rem}.max-h-32{max-height:8rem}.max-h-40{max-height:10rem}.max-h-52{max-height:13rem}.max-h-56{max-height:14rem}.max-h-60{max-height:15rem}.max-h-80{max-height:20rem}.max-h-\\[46vh\\]{max-height:46vh}.min-h-\\[40vh\\]{min-height:40vh}.min-h-\\[44px\\]{min-height:44px}.min-h-\\[460px\\]{min-height:460px}.min-h-\\[46px\\]{min-height:46px}.min-h-\\[520px\\]{min-height:520px}.min-h-screen{min-height:100vh}.\\!w-7{width:1.75rem!important}.\\!w-\\[4\\.5rem\\]{width:4.5rem!important}.w-1\\.5{width:.375rem}.w-10{width:2.5rem}.w-12{width:3rem}.w-16{width:4rem}.w-2{width:.5rem}.w-24{width:6rem}.w-3{width:.75rem}.w-3\\.5{width:.875rem}.w-4{width:1rem}.w-40{width:10rem}.w-44{width:11rem}.w-56{width:14rem}.w-6{width:1.5rem}.w-60{width:15rem}.w-7{width:1.75rem}.w-72{width:18rem}.w-8{width:2rem}.w-80{width:20rem}.w-9{width:2.25rem}.w-\\[2\\.5px\\]{width:2.5px}.w-\\[3px\\]{width:3px}.w-full{width:100%}.min-w-0{min-width:0px}.min-w-4{min-width:1rem}.min-w-\\[120px\\]{min-width:120px}.min-w-\\[160px\\]{min-width:160px}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-6xl{max-width:72rem}.max-w-\\[120px\\]{max-width:120px}.max-w-\\[140px\\]{max-width:140px}.max-w-\\[170px\\]{max-width:170px}.max-w-\\[190px\\]{max-width:190px}.max-w-\\[200px\\]{max-width:200px}.max-w-\\[260px\\]{max-width:260px}.max-w-\\[400px\\]{max-width:400px}.max-w-\\[75\\%\\]{max-width:75%}.max-w-\\[80\\%\\]{max-width:80%}.max-w-\\[85\\%\\]{max-width:85%}.max-w-\\[calc\\(100vw-40px\\)\\]{max-width:calc(100vw - 40px)}.max-w-full{max-width:100%}.max-w-lg{max-width:32rem}.max-w-md{max-width:28rem}.max-w-sm{max-width:24rem}.max-w-xl{max-width:36rem}.max-w-xs{max-width:20rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.-translate-x-1\\/2{--tw-translate-x: -50%;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.-translate-y-1\\/2{--tw-translate-y: -50%;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.rotate-180{--tw-rotate: 180deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}@keyframes spin{to{transform:rotate(360deg)}}.animate-spin{animation:spin 1s linear infinite}.cursor-context-menu{cursor:context-menu}.cursor-default{cursor:default}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;-moz-user-select:none;user-select:none}.resize-y{resize:vertical}.scroll-mt-20{scroll-margin-top:5rem}.list-disc{list-style-type:disc}.appearance-none{-webkit-appearance:none;-moz-appearance:none;appearance:none}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.flex-row{flex-direction:row}.flex-row-reverse{flex-direction:row-reverse}.flex-col{flex-direction:column}.flex-col-reverse{flex-direction:column-reverse}.flex-wrap{flex-wrap:wrap}.flex-nowrap{flex-wrap:nowrap}.items-start{align-items:flex-start}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-start{justify-content:flex-start}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-0\\.5{gap:.125rem}.gap-1{gap:.25rem}.gap-1\\.5{gap:.375rem}.gap-10{gap:2.5rem}.gap-12{gap:3rem}.gap-2{gap:.5rem}.gap-2\\.5{gap:.625rem}.gap-3{gap:.75rem}.gap-3\\.5{gap:.875rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.gap-6{gap:1.5rem}.gap-x-10{-moz-column-gap:2.5rem;column-gap:2.5rem}.gap-x-3{-moz-column-gap:.75rem;column-gap:.75rem}.gap-x-4{-moz-column-gap:1rem;column-gap:1rem}.gap-y-1{row-gap:.25rem}.gap-y-2{row-gap:.5rem}.gap-y-4{row-gap:1rem}.space-y-0\\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.125rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.125rem * var(--tw-space-y-reverse))}.space-y-1>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.25rem * var(--tw-space-y-reverse))}.space-y-1\\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.375rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.375rem * var(--tw-space-y-reverse))}.space-y-2>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.5rem * var(--tw-space-y-reverse))}.space-y-2\\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.625rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.625rem * var(--tw-space-y-reverse))}.space-y-3>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.75rem * var(--tw-space-y-reverse))}.space-y-3\\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.875rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.875rem * var(--tw-space-y-reverse))}.space-y-4>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.self-end{align-self:flex-end}.overflow-auto{overflow:auto}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.overflow-x-hidden{overflow-x:hidden}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.whitespace-nowrap{white-space:nowrap}.whitespace-pre-wrap{white-space:pre-wrap}.text-balance{text-wrap:balance}.break-words{overflow-wrap:break-word}.break-all{word-break:break-all}.rounded{border-radius:.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:.5rem}.rounded-md{border-radius:.375rem}.rounded-xl{border-radius:.75rem}.rounded-xl2{border-radius:12px}.border{border-width:1px}.border-y{border-top-width:1px;border-bottom-width:1px}.border-b{border-bottom-width:1px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.\\!border-emerald-500\\/80{border-color:#10b981cc!important}.border-amber-500\\/20{border-color:#f59e0b33}.border-blue-500\\/20{border-color:#3b82f633}.border-brand{--tw-border-opacity: 1;border-color:rgb(243 128 32 / var(--tw-border-opacity, 1))}.border-brand\\/20{border-color:#f3802033}.border-brand\\/30{border-color:#f380204d}.border-brand\\/40{border-color:#f3802066}.border-err\\/30{border-color:#d5393c4d}.border-err\\/40{border-color:#d5393c66}.border-line{--tw-border-opacity: 1;border-color:rgb(var(--c-line) / var(--tw-border-opacity, 1))}.border-line\\/50{border-color:rgb(var(--c-line) / .5)}.border-line\\/60{border-color:rgb(var(--c-line) / .6)}.border-line\\/70{border-color:rgb(var(--c-line) / .7)}.border-ok\\/40{border-color:#15a35066}.border-purple-500\\/20{border-color:#a855f733}.border-red-500\\/30{border-color:#ef44444d}.border-transparent{border-color:transparent}.border-warn\\/30{border-color:#b97d104d}.border-white\\/10{border-color:#ffffff1a}.border-zinc-500\\/20{border-color:#71717a33}.\\!bg-emerald-500\\/10{background-color:#10b9811a!important}.bg-\\[\\#0F1219\\]{--tw-bg-opacity: 1;background-color:rgb(15 18 25 / var(--tw-bg-opacity, 1))}.bg-amber-400\\/20{background-color:#fbbf2433}.bg-amber-500{--tw-bg-opacity: 1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}.bg-amber-500\\/10{background-color:#f59e0b1a}.bg-bg{--tw-bg-opacity: 1;background-color:rgb(var(--c-bg) / var(--tw-bg-opacity, 1))}.bg-bg\\/80{background-color:rgb(var(--c-bg) / .8)}.bg-black\\/40{background-color:#0006}.bg-black\\/45{background-color:#00000073}.bg-blue-500\\/10{background-color:#3b82f61a}.bg-brand{--tw-bg-opacity: 1;background-color:rgb(243 128 32 / var(--tw-bg-opacity, 1))}.bg-brand\\/10{background-color:#f380201a}.bg-brand\\/15{background-color:#f3802026}.bg-emerald-500{--tw-bg-opacity: 1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-emerald-500\\/10{background-color:#10b9811a}.bg-emerald-500\\/15{background-color:#10b98126}.bg-err{--tw-bg-opacity: 1;background-color:rgb(213 57 60 / var(--tw-bg-opacity, 1))}.bg-err\\/10{background-color:#d5393c1a}.bg-err\\/5{background-color:#d5393c0d}.bg-info\\/10{background-color:#2563eb1a}.bg-line{--tw-bg-opacity: 1;background-color:rgb(var(--c-line) / var(--tw-bg-opacity, 1))}.bg-line\\/70{background-color:rgb(var(--c-line) / .7)}.bg-muted\\/40{background-color:rgb(var(--c-muted) / .4)}.bg-ok{--tw-bg-opacity: 1;background-color:rgb(21 163 80 / var(--tw-bg-opacity, 1))}.bg-ok\\/10{background-color:#15a3501a}.bg-orange-700\\/20{background-color:#c2410c33}.bg-purple-500\\/10{background-color:#a855f71a}.bg-red-500{--tw-bg-opacity: 1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.bg-red-500\\/10{background-color:#ef44441a}.bg-sidebar{--tw-bg-opacity: 1;background-color:rgb(var(--c-sidebar) / var(--tw-bg-opacity, 1))}.bg-surface{--tw-bg-opacity: 1;background-color:rgb(var(--c-surface) / var(--tw-bg-opacity, 1))}.bg-surface\\/50{background-color:rgb(var(--c-surface) / .5)}.bg-surface2{--tw-bg-opacity: 1;background-color:rgb(var(--c-surface2) / var(--tw-bg-opacity, 1))}.bg-surface2\\/30{background-color:rgb(var(--c-surface2) / .3)}.bg-surface2\\/40{background-color:rgb(var(--c-surface2) / .4)}.bg-surface2\\/50{background-color:rgb(var(--c-surface2) / .5)}.bg-surface2\\/60{background-color:rgb(var(--c-surface2) / .6)}.bg-transparent{background-color:transparent}.bg-warn\\/10{background-color:#b97d101a}.bg-warn\\/5{background-color:#b97d100d}.bg-white{--tw-bg-opacity: 1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-zinc-400\\/20{background-color:#a1a1aa33}.bg-zinc-500\\/10{background-color:#71717a1a}.object-contain{-o-object-fit:contain;object-fit:contain}.object-cover{-o-object-fit:cover;object-fit:cover}.p-0\\.5{padding:.125rem}.p-1{padding:.25rem}.p-1\\.5{padding:.375rem}.p-2{padding:.5rem}.p-2\\.5{padding:.625rem}.p-3{padding:.75rem}.p-3\\.5{padding:.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.\\!px-0{padding-left:0!important;padding-right:0!important}.\\!px-1\\.5{padding-left:.375rem!important;padding-right:.375rem!important}.\\!px-2{padding-left:.5rem!important;padding-right:.5rem!important}.\\!px-2\\.5{padding-left:.625rem!important;padding-right:.625rem!important}.\\!px-3{padding-left:.75rem!important;padding-right:.75rem!important}.\\!py-1{padding-top:.25rem!important;padding-bottom:.25rem!important}.\\!py-1\\.5{padding-top:.375rem!important;padding-bottom:.375rem!important}.\\!py-2\\.5{padding-top:.625rem!important;padding-bottom:.625rem!important}.px-0{padding-left:0;padding-right:0}.px-1{padding-left:.25rem;padding-right:.25rem}.px-1\\.5{padding-left:.375rem;padding-right:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-3\\.5{padding-left:.875rem;padding-right:.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.px-7{padding-left:1.75rem;padding-right:1.75rem}.py-0\\.5{padding-top:.125rem;padding-bottom:.125rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-1\\.5{padding-top:.375rem;padding-bottom:.375rem}.py-10{padding-top:2.5rem;padding-bottom:2.5rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-14{padding-top:3.5rem;padding-bottom:3.5rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-2\\.5{padding-top:.625rem;padding-bottom:.625rem}.py-20{padding-top:5rem;padding-bottom:5rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.py-3\\.5{padding-top:.875rem;padding-bottom:.875rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.py-8{padding-top:2rem;padding-bottom:2rem}.\\!pl-8{padding-left:2rem!important}.pb-2\\.5{padding-bottom:.625rem}.pb-20{padding-bottom:5rem}.pl-0\\.5{padding-left:.125rem}.pl-4{padding-left:1rem}.pl-6{padding-left:1.5rem}.pr-1{padding-right:.25rem}.pr-8{padding-right:2rem}.pt-0\\.5{padding-top:.125rem}.pt-1{padding-top:.25rem}.pt-2{padding-top:.5rem}.pt-2\\.5{padding-top:.625rem}.pt-3{padding-top:.75rem}.pt-3\\.5{padding-top:.875rem}.pt-32{padding-top:8rem}.pt-4{padding-top:1rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-mono{font-family:SF Mono,ui-monospace,Consolas,monospace}.font-sans{font-family:Inter,-apple-system,PingFang SC,Microsoft YaHei,sans-serif}.\\!text-xs{font-size:.75rem!important;line-height:1rem!important}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-\\[10px\\]{font-size:10px}.text-\\[11px\\]{font-size:11px}.text-\\[12\\.5px\\]{font-size:12.5px}.text-\\[12px\\]{font-size:12px}.text-\\[13px\\]{font-size:13px}.text-\\[15px\\]{font-size:15px}.text-\\[9px\\]{font-size:9px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.tabular-nums{--tw-numeric-spacing: tabular-nums;font-variant-numeric:var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)}.leading-\\[1\\.15\\]{line-height:1.15}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-tight{letter-spacing:-.025em}.tracking-widest{letter-spacing:.1em}.\\!text-emerald-500{--tw-text-opacity: 1 !important;color:rgb(16 185 129 / var(--tw-text-opacity, 1))!important}.\\!text-err{--tw-text-opacity: 1 !important;color:rgb(213 57 60 / var(--tw-text-opacity, 1))!important}.\\!text-muted{--tw-text-opacity: 1 !important;color:rgb(var(--c-muted) / var(--tw-text-opacity, 1))!important}.text-\\[\\#E2E5EC\\]{--tw-text-opacity: 1;color:rgb(226 229 236 / var(--tw-text-opacity, 1))}.text-amber-500{--tw-text-opacity: 1;color:rgb(245 158 11 / var(--tw-text-opacity, 1))}.text-amber-500\\/70{color:#f59e0bb3}.text-amber-600{--tw-text-opacity: 1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-blue-400{--tw-text-opacity: 1;color:rgb(96 165 250 / var(--tw-text-opacity, 1))}.text-brand{--tw-text-opacity: 1;color:rgb(243 128 32 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity: 1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-emerald-500{--tw-text-opacity: 1;color:rgb(16 185 129 / var(--tw-text-opacity, 1))}.text-err{--tw-text-opacity: 1;color:rgb(213 57 60 / var(--tw-text-opacity, 1))}.text-info{--tw-text-opacity: 1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-ink{--tw-text-opacity: 1;color:rgb(var(--c-ink) / var(--tw-text-opacity, 1))}.text-muted{--tw-text-opacity: 1;color:rgb(var(--c-muted) / var(--tw-text-opacity, 1))}.text-muted\\/60{color:rgb(var(--c-muted) / .6)}.text-muted\\/70{color:rgb(var(--c-muted) / .7)}.text-ok{--tw-text-opacity: 1;color:rgb(21 163 80 / var(--tw-text-opacity, 1))}.text-orange-700{--tw-text-opacity: 1;color:rgb(194 65 12 / var(--tw-text-opacity, 1))}.text-purple-400{--tw-text-opacity: 1;color:rgb(192 132 252 / var(--tw-text-opacity, 1))}.text-red-500{--tw-text-opacity: 1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.text-sidebar-ink{--tw-text-opacity: 1;color:rgb(var(--c-sidebar-ink) / var(--tw-text-opacity, 1))}.text-warn{--tw-text-opacity: 1;color:rgb(185 125 16 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity: 1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-white\\/70{color:#ffffffb3}.text-zinc-200{--tw-text-opacity: 1;color:rgb(228 228 231 / var(--tw-text-opacity, 1))}.text-zinc-400{--tw-text-opacity: 1;color:rgb(161 161 170 / var(--tw-text-opacity, 1))}.text-zinc-500{--tw-text-opacity: 1;color:rgb(113 113 122 / var(--tw-text-opacity, 1))}.text-zinc-600{--tw-text-opacity: 1;color:rgb(82 82 91 / var(--tw-text-opacity, 1))}.underline{text-decoration-line:underline}.accent-\\[\\#F38020\\]{accent-color:#F38020}.accent-\\[var\\(--brand\\)\\]{accent-color:var(--brand)}.accent-brand{accent-color:#F38020}.opacity-0{opacity:0}.opacity-60{opacity:.6}.opacity-75{opacity:.75}.opacity-85{opacity:.85}.shadow-card{--tw-shadow: 0 1px 2px rgb(16 24 40 / .06), 0 1px 3px rgb(16 24 40 / .08);--tw-shadow-colored: 0 1px 2px var(--tw-shadow-color), 0 1px 3px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}.shadow-pop{--tw-shadow: 0 8px 30px rgb(16 24 40 / .18);--tw-shadow-colored: 0 8px 30px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}.shadow-sm{--tw-shadow: 0 1px 2px 0 rgb(0 0 0 / .05);--tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}.outline-none{outline:2px solid transparent;outline-offset:2px}.ring-1{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}.ring-brand{--tw-ring-opacity: 1;--tw-ring-color: rgb(243 128 32 / var(--tw-ring-opacity, 1))}.grayscale{--tw-grayscale: grayscale(100%);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-md{--tw-backdrop-blur: blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur: blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-colors{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.duration-200{transition-duration:.2s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}:root{--c-bg: 247 248 250;--c-surface: 255 255 255;--c-surface2: 244 245 247;--c-line: 226 229 234;--c-ink: 31 36 48;--c-muted: 107 114 128;--c-brand-soft: 243 128 32;--c-sidebar: 255 255 255;--c-sidebar-ink: 75 85 99}[data-theme=dark]{--c-bg: 15 18 25;--c-surface: 23 26 35;--c-surface2: 32 36 47;--c-line: 46 51 64;--c-ink: 226 229 236;--c-muted: 138 143 156;--c-sidebar: 15 23 42;--c-sidebar-ink: 148 163 184}html{font-family:Inter,-apple-system,PingFang SC,Microsoft YaHei,sans-serif}body{--tw-bg-opacity: 1;background-color:rgb(var(--c-bg) / var(--tw-bg-opacity, 1));--tw-text-opacity: 1;color:rgb(var(--c-ink) / var(--tw-text-opacity, 1));-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{border-radius:9999px;border-width:2px;border-style:solid;border-color:transparent;--tw-bg-opacity: 1;background-color:rgb(var(--c-line) / var(--tw-bg-opacity, 1));background-clip:padding-box}::-webkit-scrollbar-track{background:transparent}@keyframes toast-in{0%{transform:translate(16px);opacity:0}to{transform:none;opacity:1}}@keyframes fade-in{0%{opacity:0}to{opacity:1}}@keyframes pop-in{0%{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}@keyframes shimmer{0%{background-position:-400px 0}to{background-position:400px 0}}.anim-toast{animation:toast-in .22s ease-out}.anim-fade{animation:fade-in .15s ease-out}.anim-pop{animation:pop-in .18s ease-out}.skeleton{border-radius:.375rem;--tw-bg-opacity: 1;background-color:rgb(var(--c-surface2) / var(--tw-bg-opacity, 1));background-image:linear-gradient(90deg,transparent,rgb(var(--c-line) / .6),transparent);background-size:400px 100%;animation:shimmer 1.4s infinite}.placeholder\\:text-muted\\/60::-moz-placeholder{color:rgb(var(--c-muted) / .6)}.placeholder\\:text-muted\\/60::placeholder{color:rgb(var(--c-muted) / .6)}.placeholder\\:text-muted\\/70::-moz-placeholder{color:rgb(var(--c-muted) / .7)}.placeholder\\:text-muted\\/70::placeholder{color:rgb(var(--c-muted) / .7)}.last\\:border-0:last-child{border-width:0px}.hover\\:-translate-y-1:hover{--tw-translate-y: -.25rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\\:scale-105:hover{--tw-scale-x: 1.05;--tw-scale-y: 1.05;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\\:border-brand\\/40:hover{border-color:#f3802066}.hover\\:bg-brand-hover:hover{--tw-bg-opacity: 1;background-color:rgb(222 110 15 / var(--tw-bg-opacity, 1))}.hover\\:bg-brand\\/10:hover{background-color:#f380201a}.hover\\:bg-brand\\/20:hover{background-color:#f3802033}.hover\\:bg-brand\\/5:hover{background-color:#f380200d}.hover\\:bg-ok\\/20:hover{background-color:#15a35033}.hover\\:bg-surface2:hover{--tw-bg-opacity: 1;background-color:rgb(var(--c-surface2) / var(--tw-bg-opacity, 1))}.hover\\:\\!text-err:hover{--tw-text-opacity: 1 !important;color:rgb(213 57 60 / var(--tw-text-opacity, 1))!important}.hover\\:text-brand:hover{--tw-text-opacity: 1;color:rgb(243 128 32 / var(--tw-text-opacity, 1))}.hover\\:text-ink:hover{--tw-text-opacity: 1;color:rgb(var(--c-ink) / var(--tw-text-opacity, 1))}.hover\\:text-white:hover{--tw-text-opacity: 1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\\:underline:hover{text-decoration-line:underline}.hover\\:opacity-100:hover{opacity:1}.hover\\:opacity-80:hover{opacity:.8}.hover\\:opacity-90:hover{opacity:.9}.hover\\:shadow-pop:hover{--tw-shadow: 0 8px 30px rgb(16 24 40 / .18);--tw-shadow-colored: 0 8px 30px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}.hover\\:grayscale-0:hover{--tw-grayscale: grayscale(0);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.focus\\:border-brand:focus{--tw-border-opacity: 1;border-color:rgb(243 128 32 / var(--tw-border-opacity, 1))}.focus\\:border-brand\\/60:focus{border-color:#f3802099}.focus\\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\\:ring-2:focus{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}.focus\\:ring-brand\\/20:focus{--tw-ring-color: rgb(243 128 32 / .2)}.disabled\\:cursor-not-allowed:disabled{cursor:not-allowed}.disabled\\:opacity-40:disabled{opacity:.4}.disabled\\:opacity-50:disabled{opacity:.5}.group:hover .group-hover\\:text-brand{--tw-text-opacity: 1;color:rgb(243 128 32 / var(--tw-text-opacity, 1))}.group:hover .group-hover\\:opacity-100{opacity:1}.dark\\:text-amber-400:is([data-theme=dark] *){--tw-text-opacity: 1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}@media (min-width: 640px){.sm\\:col-span-2{grid-column:span 2 / span 2}.sm\\:block{display:block}.sm\\:inline{display:inline}.sm\\:\\!w-28{width:7rem!important}.sm\\:\\!w-56{width:14rem!important}.sm\\:w-72{width:18rem}.sm\\:w-auto{width:auto}.sm\\:w-fit{width:-moz-fit-content;width:fit-content}.sm\\:max-w-\\[140px\\]{max-width:140px}.sm\\:max-w-\\[200px\\]{max-width:200px}.sm\\:max-w-\\[280px\\]{max-width:280px}.sm\\:max-w-none{max-width:none}.sm\\:flex-initial{flex:0 1 auto}.sm\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.sm\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.sm\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.sm\\:grid-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}.sm\\:flex-row{flex-direction:row}.sm\\:items-center{align-items:center}.sm\\:justify-end{justify-content:flex-end}.sm\\:justify-between{justify-content:space-between}.sm\\:gap-2{gap:.5rem}.sm\\:gap-2\\.5{gap:.625rem}.sm\\:gap-3{gap:.75rem}.sm\\:self-auto{align-self:auto}.sm\\:p-5{padding:1.25rem}.sm\\:p-6{padding:1.5rem}.sm\\:px-2\\.5{padding-left:.625rem;padding-right:.625rem}.sm\\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\\:py-1\\.5{padding-top:.375rem;padding-bottom:.375rem}.sm\\:pb-28{padding-bottom:7rem}.sm\\:pt-0{padding-top:0}.sm\\:pt-40{padding-top:10rem}.sm\\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\\:text-5xl{font-size:3rem;line-height:1}}@media (min-width: 768px){.md\\:col-span-2{grid-column:span 2 / span 2}.md\\:flex{display:flex}.md\\:hidden{display:none}.md\\:w-auto{width:auto}.md\\:max-w-\\[260px\\]{max-width:260px}.md\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.md\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.md\\:flex-row{flex-direction:row}.md\\:items-center{align-items:center}.md\\:justify-between{justify-content:space-between}}@media (min-width: 1024px){.lg\\:right-6{right:1.5rem}.lg\\:flex{display:flex}.lg\\:inline-flex{display:inline-flex}.lg\\:hidden{display:none}.lg\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.lg\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.lg\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.lg\\:grid-cols-\\[320px\\,1fr\\]{grid-template-columns:320px 1fr}.lg\\:px-6{padding-left:1.5rem;padding-right:1.5rem}}@media (min-width: 1280px){.xl\\:col-span-2{grid-column:span 2 / span 2}.xl\\:col-span-3{grid-column:span 3 / span 3}.xl\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.xl\\:grid-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}}
+`,
+              isBase64: false,
+              type: "text/css; charset=utf-8"
+            },
+            "/assets/index-KwMGOJkp.js": {
+              content: `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/Dashboard-DeAr0cpO.js","assets/vendor-BbQ_LiY-.js","assets/charts-mu_46IqZ.js","assets/Keys-BOU2k6at.js","assets/plus-DVAh7yAY.js","assets/VideoTasks-Lc8uBADw.js","assets/refresh-cw-BrzRfQC6.js","assets/external-link-3zVIAjg3.js","assets/trash-2-BF158Quc.js","assets/clock-BJH_AWv4.js","assets/circle-check-B2pLGJPh.js","assets/ScheduledTasks-2VckwwYM.js","assets/Playground-C1lpUxDf.js","assets/send-BqPM7u0p.js","assets/user-C2AHuWH0.js","assets/ChatRoom-DJrsu_Z8.js","assets/Providers-BrPQBm8U.js","assets/message-square-CrX_4GgU.js","assets/triangle-alert-CuVylkfm.js","assets/AccountPool-BbeJM3Nl.js","assets/ModelsPricing-B3A7W-XX.js","assets/Logs-gQEd4m_c.js","assets/download-vNmvYjVK.js","assets/Users-DFyFxtpd.js","assets/Invite-CBHRBgyg.js","assets/Profile-BxTu0tlP.js","assets/Backup-DHXahAPv.js","assets/Settings-D1bvfg6b.js"])))=>i.map(i=>d[i]);
 import{r as n,a as De,R as pe,u as $e,b as te,L as T,O as qe,N as Ve,B as Ue,d as Be,e as v,f as k}from"./vendor-BbQ_LiY-.js";(function(){const s=document.createElement("link").relList;if(s&&s.supports&&s.supports("modulepreload"))return;for(const r of document.querySelectorAll('link[rel="modulepreload"]'))i(r);new MutationObserver(r=>{for(const l of r)if(l.type==="childList")for(const o of l.addedNodes)o.tagName==="LINK"&&o.rel==="modulepreload"&&i(o)}).observe(document,{childList:!0,subtree:!0});function a(r){const l={};return r.integrity&&(l.integrity=r.integrity),r.referrerPolicy&&(l.referrerPolicy=r.referrerPolicy),r.crossOrigin==="use-credentials"?l.credentials="include":r.crossOrigin==="anonymous"?l.credentials="omit":l.credentials="same-origin",l}function i(r){if(r.ep)return;r.ep=!0;const l=a(r);fetch(r.href,l)}})();var ue={exports:{}},Y={};/**
  * @license React
  * react-jsx-runtime.production.min.js
@@ -42233,19 +42239,13 @@ client = OpenAI(
 res = client.chat.completions.create(
     model="deepseek-chat",
     messages=[{"role": "user", "content": "\u4F60\u597D"}],
-)\`};return e.jsxs("div",{className:"min-h-screen bg-bg text-ink",children:[e.jsxs("header",{className:N("fixed inset-x-0 top-0 z-40 border-b transition-all",p?"border-line bg-bg/80 shadow-card backdrop-blur-md":"border-transparent bg-transparent"),children:[e.jsxs("div",{className:"mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6",children:[e.jsxs(T,{to:"/",className:"flex items-center gap-2.5",children:[e.jsx("img",{src:w,alt:b,className:"h-8 w-8 rounded-lg object-contain"}),e.jsx("span",{className:"text-[15px] font-bold",children:b})]}),e.jsx("nav",{className:"hidden flex-1 items-center gap-1 md:flex",children:$.map(([c,m])=>e.jsx("a",{href:m,onClick:j=>h(j,m),className:"rounded-lg px-3 py-2 text-[13px] text-muted transition-colors hover:bg-surface2 hover:text-ink",children:c},c))}),e.jsxs("div",{className:"ml-auto hidden items-center gap-2 md:flex",children:[e.jsx(me,{}),s?e.jsx(T,{to:"/dashboard",children:e.jsx("button",{className:"rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover",children:"\u8FDB\u5165\u63A7\u5236\u53F0"})}):e.jsxs(e.Fragment,{children:[e.jsx(T,{to:"/login",children:e.jsx("button",{className:"rounded-lg px-4 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-surface2",children:"\u767B\u5F55"})}),e.jsx(T,{to:"/login",children:e.jsx("button",{className:"rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover",children:"\u514D\u8D39\u6CE8\u518C"})})]})]}),e.jsx("button",{className:"ml-auto rounded-lg p-2 text-muted hover:bg-surface2 md:hidden",onClick:()=>i(!a),"aria-label":"\u83DC\u5355",children:a?e.jsx(ae,{size:20}):e.jsx(Ce,{size:20})})]}),a&&e.jsxs("div",{className:"border-t border-line bg-surface px-4 py-3 md:hidden",children:[$.map(([c,m])=>e.jsx("a",{href:m,onClick:j=>{i(!1),h(j,m)},className:"block rounded-lg px-3 py-2.5 text-sm text-ink hover:bg-surface2",children:c},c)),e.jsxs("div",{className:"mt-2 flex items-center gap-2 border-t border-line pt-3",children:[e.jsx(me,{}),s?e.jsx(T,{to:"/dashboard",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white",children:"\u8FDB\u5165\u63A7\u5236\u53F0"})}):e.jsxs(e.Fragment,{children:[e.jsx(T,{to:"/login",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg border border-line px-4 py-2 text-[13px]",children:"\u767B\u5F55"})}),e.jsx(T,{to:"/login",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white",children:"\u514D\u8D39\u6CE8\u518C"})})]})]})]})]}),e.jsxs("section",{className:"relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28",children:[e.jsx("div",{"aria-hidden":!0,className:"pointer-events-none absolute inset-0",style:{backgroundImage:"radial-gradient(ellipse 60% 50% at 50% -10%, rgba(243,128,32,.14), transparent), linear-gradient(rgb(var(--c-line)) .5px, transparent .5px), linear-gradient(90deg, rgb(var(--c-line)) .5px, transparent .5px)",backgroundSize:"auto, 48px 48px, 48px 48px",maskImage:"linear-gradient(to bottom, black 30%, transparent 90%)"}}),e.jsxs("div",{className:"relative mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2",children:[e.jsxs("div",{children:[e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-medium text-brand",children:[e.jsx(ze,{size:12}),(t==null?void 0:t.heroBadge)??"\u8DD1\u5728 EdgeOne \u5168\u7403\u8FB9\u7F18\u8282\u70B9"]}),e.jsx("h1",{className:"mt-5 text-4xl font-bold leading-[1.15] tracking-tight sm:text-5xl",children:e.jsx("span",{className:"text-balance",children:(t==null?void 0:t.heroTitle)??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"})}),e.jsx("p",{className:"mt-5 max-w-lg text-[15px] leading-relaxed text-muted",children:(t==null?void 0:t.heroSubtitle)??"\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\uFF0C\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6CBB\u7406\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002\u5408\u6CD5\u6388\u6743\u4E0A\u6E38\u3001\u900F\u660E\u8BA1\u8D39\u3001\u54C8\u5E0C\u94FE\u5BA1\u8BA1\u2014\u2014\u9762\u5411\u5F00\u53D1\u8005\u4E0E\u4F01\u4E1A\u7684\u6B63\u89C4\u805A\u5408\u5206\u53D1\u5E73\u53F0\u3002"}),e.jsxs("div",{className:"mt-8 flex flex-wrap gap-3",children:[e.jsx(T,{to:s?"/dashboard":"/login",children:e.jsxs("button",{className:"inline-flex items-center gap-1.5 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-brand-hover hover:shadow-pop",children:["\u5F00\u59CB\u4F7F\u7528",e.jsx(ve,{size:15})]})}),e.jsx("a",{href:"#dev",onClick:c=>h(c,"#dev"),children:e.jsxs("button",{className:"inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-6 py-3 text-sm font-medium transition-colors hover:bg-surface2",children:["\u67E5\u770B\u6587\u6863",e.jsx(rt,{size:15})]})})]})]}),e.jsx("div",{className:"min-w-0",children:e.jsx(he,{title:"\u5FEB\u901F\u5F00\u59CB \u2014 curl",code:E.curl})})]})]}),e.jsx("section",{className:"border-y border-line bg-surface py-8",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("p",{className:"text-center text-xs uppercase tracking-widest text-muted",children:"\u5DF2\u652F\u6301\u4E3B\u6D41\u6A21\u578B\u4F9B\u5E94\u5546 \xB7 \u5747\u9700\u5408\u6CD5\u6388\u6743\u63A5\u5165"}),e.jsx("div",{className:"mt-5 flex flex-wrap items-center justify-center gap-x-10 gap-y-4",children:zt.map(c=>e.jsx("span",{className:"text-lg font-semibold text-muted opacity-60 grayscale transition-all hover:text-ink hover:opacity-100 hover:grayscale-0",children:c},c))})]})}),e.jsxs("section",{id:"features",className:"mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6",children:[e.jsxs("h2",{className:"text-center text-3xl font-bold tracking-tight",children:["\u4E3A\u4EC0\u4E48\u9009\u62E9 ",b]}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u4ECE\u63A5\u53E3\u3001\u8DEF\u7531\u3001\u8BA1\u8D39\u5230\u5BA1\u8BA1\uFF0C\u4E00\u4E2A\u5E73\u53F0\u8986\u76D6 AI API \u5206\u53D1\u7684\u5168\u90E8\u5173\u952E\u73AF\u8282\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3",children:It.map(({icon:c,title:m,desc:j})=>e.jsxs("div",{className:"group rounded-xl2 border border-line bg-surface p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-pop",children:[e.jsx("span",{className:"flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10 text-brand",children:e.jsx(c,{size:19})}),e.jsx("h3",{className:"mt-4 text-[15px] font-semibold",children:m}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:j})]},m))})]}),e.jsx("section",{id:"models",className:"border-t border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u4E00\u4E2A\u63A5\u53E3\uFF0C\u63A5\u5165\u4E3B\u6D41\u6A21\u578B"}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u6A21\u578B\u6E05\u5355\u7531\u7BA1\u7406\u5458\u5728\u63A7\u5236\u53F0\u7EDF\u4E00\u914D\u7F6E\uFF0C\u4E3B\u5907\u8DEF\u7531\u4E0E\u4EF7\u683C\u900F\u660E\u53EF\u67E5\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3",children:Ot.map(c=>e.jsxs("div",{className:"rounded-xl2 border border-line bg-bg p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-pop",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsx("span",{className:"text-[15px] font-semibold",children:c.provider}),e.jsx(se,{size:17,className:"text-brand"})]}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:c.desc}),e.jsx("div",{className:"mt-4 flex flex-wrap gap-1.5",children:c.models.map(m=>e.jsx("span",{className:"rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] text-muted",children:m},m))})]},c.provider))}),e.jsx("p",{className:"mt-6 text-center text-xs text-muted",children:"\u5177\u4F53\u53EF\u7528\u6A21\u578B\u4E0E\u4EF7\u683C\uFF0C\u4EE5\u63A7\u5236\u53F0\u300C\u6A21\u578B\u300D\u9875\u548C\u5B9E\u9645\u914D\u7F6E\u4E3A\u51C6\u3002"})]})}),e.jsx("section",{id:"pricing",className:"scroll-mt-20 border-y border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u7075\u6D3B\u7684\u6A21\u578B\u4E0E\u5B9A\u4EF7"}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u4ECE\u4E2A\u4EBA\u4F53\u9A8C\u5230\u4F01\u4E1A\u7EA7\u90E8\u7F72\uFF0C\u6309\u9700\u9009\u62E9\uFF0C\u968F\u65F6\u5347\u7EA7\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4",children:Pt.map(c=>e.jsxs("div",{className:N("relative flex flex-col rounded-xl2 border bg-bg p-6 transition-all hover:-translate-y-1",c.hot?"border-brand shadow-pop ring-1 ring-brand":"border-line shadow-card"),children:[c.hot&&e.jsx("span",{className:"absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3 py-0.5 text-[11px] font-medium text-white",children:"\u6700\u53D7\u6B22\u8FCE"}),e.jsx("div",{className:"text-sm font-medium",children:c.name}),e.jsxs("div",{className:"mt-3",children:[e.jsx("span",{className:"text-3xl font-bold tracking-tight",children:c.price}),e.jsx("span",{className:"text-sm text-muted",children:c.unit})]}),e.jsx("div",{className:"mt-1 text-xs text-muted",children:c.desc}),e.jsx("ul",{className:"mt-5 flex-1 space-y-2.5",children:c.items.map(m=>e.jsxs("li",{className:"flex items-start gap-2 text-[13px]",children:[e.jsx(Z,{size:15,className:"mt-0.5 shrink-0 text-ok"}),m]},m))}),e.jsx(T,{to:s?"/dashboard":"/login",className:"mt-6",children:e.jsx("button",{className:N("w-full rounded-lg px-4 py-2.5 text-[13px] font-medium transition-colors",c.hot?"bg-brand text-white hover:bg-brand-hover":"border border-line bg-surface hover:bg-surface2"),children:c.cta})})]},c.name))}),e.jsx("p",{className:"mt-6 text-center text-xs text-muted",children:"\u6240\u6709\u4EF7\u683C\u4EC5\u4E3A\u793A\u4F8B\uFF0C\u5B9E\u9645\u4EE5\u4E0A\u6E38\u4F9B\u5E94\u5546\u6388\u6743\u4E0E\u5E73\u53F0\u516C\u793A\u4E3A\u51C6\u3002"})]})}),e.jsx("section",{id:"dev",className:"mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6",children:e.jsxs("div",{className:"grid items-center gap-10 lg:grid-cols-2",children:[e.jsxs("div",{children:[e.jsx("h2",{className:"text-3xl font-bold tracking-tight",children:"\u4E3A\u5F00\u53D1\u8005\u800C\u751F"}),e.jsx("p",{className:"mt-4 text-sm leading-relaxed text-muted",children:"\u4EFB\u4F55\u652F\u6301 OpenAI SDK \u7684\u8BED\u8A00\u4E0E\u6846\u67B6\uFF0C\u6539\u4E00\u884C Base URL \u5373\u53EF\u63A5\u5165\u3002\u7EDF\u4E00\u7684\u9519\u8BEF\u683C\u5F0F\u3001\u900F\u660E\u7684\u9650\u6D41\u54CD\u5E94\u3001\u539F\u751F SSE \u6D41\u5F0F\u8F6C\u53D1\u2014\u2014\u4E0D\u9700\u8981\u5B66\u4E60\u65B0\u7684\u79C1\u6709\u534F\u8BAE\u3002"}),e.jsx("ul",{className:"mt-6 space-y-3",children:[["OpenAI \u517C\u5BB9","/v1/chat/completions\u3001/v1/models\uFF0C\u517C\u5BB9\u5B98\u65B9 SDK \u4E0E\u751F\u6001\u5DE5\u5177"],["\u7ED3\u6784\u5316\u9519\u8BEF","\u6BCF\u4E2A\u9519\u8BEF\u90FD\u5E26\u5E73\u53F0\u9519\u8BEF\u7801\u4E0E request_id\uFF0C\u65B9\u4FBF\u5B9A\u4F4D\u4E0E\u5DE5\u5355\u6392\u67E5"],["\u6D41\u5F0F\u54CD\u5E94","SSE \u900F\u4F20 + \u5B9E\u9645 Token \u7528\u91CF\u6355\u83B7\uFF0C\u8BA1\u8D39\u7CBE\u786E\u5230\u6B21"],["\u591A\u8BED\u8A00\u793A\u4F8B","curl / Node.js / Python \u5F00\u7BB1\u5373\u7528"]].map(([c,m])=>e.jsxs("li",{className:"flex gap-3",children:[e.jsx(Z,{size:16,className:"mt-0.5 shrink-0 text-brand"}),e.jsxs("span",{className:"text-[13px]",children:[e.jsx("strong",{className:"font-semibold",children:c})," \u2014 ",e.jsx("span",{className:"text-muted",children:m})]})]},c))}),e.jsxs("a",{href:"https://github.com/wimdaw/EdgeRelay",target:"_blank",rel:"noreferrer",className:"mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-brand hover:underline",children:["\u67E5\u770B\u9879\u76EE\u6587\u6863",e.jsx(dt,{size:14})]})]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"mb-3 flex gap-1 rounded-lg bg-surface2 p-0.5",style:{width:"fit-content"},children:["curl","node","python"].map(c=>e.jsx("button",{onClick:()=>d(c),className:N("rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors",o===c?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:c==="node"?"Node.js":c},c))}),e.jsx(he,{title:\`\${o} \u2014 \u8C03\u7528\u793A\u4F8B\`,code:E[o]})]})]})}),e.jsx("section",{id:"compliance",className:"scroll-mt-20 border-y border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u5408\u89C4\u4E0E\u5B89\u5168\uFF0C\u4ECE\u7B2C\u4E00\u5929\u5F00\u59CB"}),e.jsxs("p",{className:"mx-auto mt-3 max-w-2xl text-center text-sm text-muted",children:[b," \u662F\u6B63\u89C4\u7684 API \u805A\u5408\u4E0E\u5206\u53D1\u5E73\u53F0\u2014\u2014\u4E0D\u6D89\u53CA\u53F7\u6C60\u3001\u8D26\u53F7\u62C6\u5206\u3001\u51ED\u8BC1\u76D7\u7528\u7B49\u4EFB\u4F55\u7070\u4EA7\u884C\u4E3A\u3002"]}),e.jsx("div",{className:"mt-10 grid gap-4 md:grid-cols-3",children:[{icon:Me,title:"\u5408\u6CD5\u6388\u6743\u4E0A\u6E38",desc:"\u4EC5\u63A5\u5165\u6301\u6709\u5408\u6CD5\u4EE3\u7406\u3001\u5206\u9500\u6216\u518D\u8BB8\u53EF\u6388\u6743\u7684\u4F9B\u5E94\u5546\uFF0C\u6388\u6743\u534F\u8BAE\u7F16\u53F7\u767B\u8BB0\u5165\u6863\u5E76\u53EF\u8FFD\u6EAF\u3002"},{icon:ft,title:"\u5185\u5BB9\u5B89\u5168\u5BA1\u6838",desc:"\u53EF\u914D\u7F6E\u7684\u5185\u5BB9\u5BA1\u6838\u94A9\u5B50\u4E0E\u654F\u611F\u8BCD\u89C4\u5219\uFF0C\u547D\u4E2D\u8BF7\u6C42\u81EA\u52A8\u62E6\u622A\u5E76\u8FDB\u5165\u4EBA\u5DE5\u590D\u6838\u961F\u5217\u3002"},{icon:Ee,title:"\u6570\u636E\u9690\u79C1\u4E0E\u5BA1\u8BA1",desc:"\u9ED8\u8BA4\u4E0D\u8BB0\u5F55\u5BF9\u8BDD\u660E\u6587\uFF1B\u5BC6\u94A5\u5168\u94FE\u8DEF\u52A0\u5BC6\uFF1B\u5BA1\u8BA1\u65E5\u5FD7\u54C8\u5E0C\u94FE\u9632\u7BE1\u6539\uFF0C\u4FDD\u7559\u671F\u53EF\u914D 30\u2013180 \u5929\u3002"}].map(({icon:c,title:m,desc:j})=>e.jsxs("div",{className:"rounded-xl2 border border-line bg-bg p-6 shadow-card",children:[e.jsx("span",{className:"flex h-10 w-10 items-center justify-center rounded-lg bg-ok/10 text-ok",children:e.jsx(c,{size:19})}),e.jsx("h3",{className:"mt-4 text-[15px] font-semibold",children:m}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:j})]},m))})]})}),e.jsxs("section",{className:"mx-auto max-w-3xl px-4 py-20 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u5E38\u89C1\u95EE\u9898"}),e.jsx("div",{className:"mt-10 space-y-3",children:Rt.map((c,m)=>e.jsxs("div",{className:"overflow-hidden rounded-xl2 border border-line bg-surface shadow-card",children:[e.jsxs("button",{className:"flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm font-medium",onClick:()=>l(r===m?null:m),"aria-expanded":r===m,children:[c.q.replace(/EdgeRelay/g,b),e.jsx(we,{size:16,className:N("shrink-0 text-muted transition-transform",r===m&&"rotate-180")})]}),r===m&&e.jsx("p",{className:"border-t border-line px-5 py-4 text-[13px] leading-relaxed text-muted",children:c.a.replace(/EdgeRelay/g,b)})]},m))})]}),e.jsx("section",{className:"border-t border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 text-center sm:px-6",children:[e.jsx(nt,{"aria-hidden":!0,className:"mx-auto text-brand",size:36}),e.jsx("h2",{className:"mt-4 text-3xl font-bold tracking-tight",children:"\u51C6\u5907\u597D\u63A5\u5165\u8FB9\u7F18 AI \u7F51\u5173\u4E86\uFF1F"}),e.jsx("p",{className:"mx-auto mt-3 max-w-md text-sm text-muted",children:"\u6CE8\u518C\u5373\u9001\u4F53\u9A8C\u989D\u5EA6\uFF0C5 \u5206\u949F\u5B8C\u6210\u7B2C\u4E00\u6B21\u8C03\u7528\u3002"}),e.jsxs("div",{className:"mt-8 flex flex-wrap justify-center gap-3",children:[e.jsx(T,{to:s?"/dashboard":"/login",children:e.jsx("button",{className:"rounded-lg bg-brand px-7 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-hover",children:"\u514D\u8D39\u5F00\u59CB"})}),e.jsx("a",{href:t!=null&&t.supportEmail?\`mailto:\${t.supportEmail}\`:"mailto:hackerxiaow@gmail.com",children:e.jsx("button",{className:"rounded-lg border border-line bg-surface px-7 py-3 text-sm font-medium transition-colors hover:bg-surface2",children:"\u8054\u7CFB\u9500\u552E"})})]})]})}),e.jsxs("footer",{className:"bg-[#0F1219] text-zinc-400",children:[e.jsxs("div",{className:"mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-4",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2.5",children:[e.jsx("img",{src:w,alt:b,className:"h-7 w-7 rounded-lg object-contain"}),e.jsx("span",{className:"text-[15px] font-bold text-white",children:b})]}),e.jsx("p",{className:"mt-3 max-w-xs text-xs leading-relaxed",children:(t==null?void 0:t.siteDescription)??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173\uFF0C\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6D3E\u53D1\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002"})]}),[{t:"\u4EA7\u54C1",links:[["\u529F\u80FD\u7279\u6027","#features"],["\u6A21\u578B\u4E0E\u5B9A\u4EF7","#pricing"],["\u8FDB\u5165\u63A7\u5236\u53F0","/dashboard"],["\u6CE8\u518C\u8D26\u53F7","/login"]]},{t:"\u5F00\u53D1\u8005",links:[["\u5FEB\u901F\u5F00\u59CB","#dev"],["\u8C03\u7528\u793A\u4F8B","#dev"],["OpenAI \u517C\u5BB9\u63A5\u53E3","https://platform.openai.com/docs/api-reference"]]},{t:"\u5408\u89C4",links:[["\u670D\u52A1\u6761\u6B3E","/terms.html"],["\u9690\u79C1\u653F\u7B56","/privacy.html"],["\u5185\u5BB9\u5B89\u5168","#compliance"]]}].map(c=>e.jsxs("div",{children:[e.jsx("h4",{className:"text-[13px] font-semibold text-white",children:c.t}),e.jsx("ul",{className:"mt-3 space-y-2.5 text-xs",children:c.links.map(([m,j])=>e.jsx("li",{children:j.startsWith("/")&&!j.endsWith(".html")?e.jsx(T,{to:j,className:"transition-colors hover:text-white",children:m}):j.startsWith("#")?e.jsx("a",{href:j,onClick:F=>h(F,j),className:"transition-colors hover:text-white",children:m}):e.jsx("a",{href:j,target:(j.endsWith(".html"),"_blank"),rel:"noreferrer",className:"transition-colors hover:text-white",children:m})},m))})]},c.t))]}),e.jsx("div",{className:"border-t border-white/10",children:e.jsxs("div",{className:"mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-5 text-[11px] sm:flex-row sm:px-6",children:[e.jsx("span",{children:D}),e.jsxs("span",{className:"flex items-center gap-4",children:[e.jsx("a",{href:"/terms.html",className:"hover:text-white",children:"\u670D\u52A1\u6761\u6B3E"}),e.jsx("a",{href:"/privacy.html",className:"hover:text-white",children:"\u9690\u79C1\u653F\u7B56"}),A?e.jsxs("span",{className:"text-zinc-600",children:["\u5907\u6848\u53F7\uFF1A",A]}):null,M?e.jsx("a",{href:M,target:"_blank",rel:"noreferrer","aria-label":"GitHub",children:e.jsx(Se,{size:15,className:"hover:text-white"})}):null]})]})})]})]})}const $t=n.lazy(()=>L(()=>import("./Dashboard-D0C7JDRR.js"),__vite__mapDeps([0,1,2]))),qt=n.lazy(()=>L(()=>import("./Keys-Dn_rXLV2.js"),__vite__mapDeps([3,1,4])));n.lazy(()=>L(()=>import("./VideoTasks-DMvfj55o.js"),__vite__mapDeps([5,1,6,7,8,9,10])));const Vt=n.lazy(()=>L(()=>import("./ScheduledTasks-BoejvN0o.js"),__vite__mapDeps([11,1,5,6,7,8,9,10]))),Ut=n.lazy(()=>L(()=>import("./Playground-Ev-DpHvX.js"),__vite__mapDeps([12,1,13,14]))),Bt=n.lazy(()=>L(()=>import("./ChatRoom-ammSJd4Y.js"),__vite__mapDeps([15,1,13,14]))),Ft=n.lazy(()=>L(()=>import("./Providers-iZTn0OUh.js"),__vite__mapDeps([16,1,17,6,4,8,18,10,7]))),Gt=n.lazy(()=>L(()=>import("./AccountPool-C5nNmUVp.js"),__vite__mapDeps([19,1,6,10,18,9]))),Ht=n.lazy(()=>L(()=>import("./ModelsPricing-ZXeWf5_f.js"),__vite__mapDeps([20,1,4]))),Wt=n.lazy(()=>L(()=>import("./Logs-CY4B2vum.js"),__vite__mapDeps([21,1,22,6,8]))),Kt=n.lazy(()=>L(()=>import("./Users-w9V59wdx.js"),__vite__mapDeps([23,1,24,22,4,8]))),Zt=n.lazy(()=>L(()=>import("./Profile-DJoYjjFw.js"),__vite__mapDeps([25,1,6,4,17]))),Yt=n.lazy(()=>L(()=>import("./Invite-C63C__Ob.js"),__vite__mapDeps([24,1,22]))),Jt=n.lazy(()=>L(()=>import("./Backup-HWJu0Gys.js"),__vite__mapDeps([26,1,22,6,8,13]))),Xt=n.lazy(()=>L(()=>import("./Settings-B-g0O-WH.js"),__vite__mapDeps([27,1,4,8])));function Qt(){const[t,s]=n.useState(()=>typeof window<"u"?window.__EDGERELAY_SITE__??null:null);return n.useEffect(()=>{P("/api/site").then(a=>{s(a),document.title=\`\${a.siteName} \u2014 \${a.heroTitle??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"}\`;const i=(l,o,d)=>{let p=document.head.querySelector(\`meta[\${l}="\${o}"]\`);p||(p=document.createElement("meta"),p.setAttribute(l,o),document.head.appendChild(p)),p.setAttribute("content",d)};i("name","description",a.siteDescription),i("property","og:title",a.siteName),i("property","og:description",a.siteDescription),i("property","og:image",a.siteLogoUrl);const r=document.head.querySelector("link[rel=icon]");r&&(r.href=a.siteLogoUrl)}).catch(()=>{})},[]),t}function es({meKey:t}){const[s,a]=n.useState(null);if(n.useEffect(()=>{P("/api/announcements").then(r=>{const l=r.announcements.filter(o=>o.popup===1).sort((o,d)=>d.id.localeCompare(o.id))[0];l&&(localStorage.getItem(\`ann-never-\${l.id}-\${t}\`)||sessionStorage.getItem(\`ann-later-\${l.id}-\${t}\`)||(a(l),ee(t,[l.id]),window.dispatchEvent(new CustomEvent("gw:ann-changed"))))}).catch(()=>{})},[t]),!s)return null;const i=r=>{(r?localStorage:sessionStorage).setItem(\`\${r?"ann-never":"ann-later"}-\${s.id}-\${t}\`,"1"),ee(t,[s.id]),a(null),window.dispatchEvent(new CustomEvent("gw:ann-changed"))};return e.jsxs(J,{open:!0,onClose:()=>i(!1),title:"\u5E73\u53F0\u516C\u544A",width:480,children:[e.jsx("h3",{className:"text-base font-semibold",children:s.title}),e.jsx("p",{className:"mt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-muted",children:s.content}),e.jsxs("div",{className:"mt-6 flex justify-end gap-2",children:[e.jsx(_,{variant:"ghost",onClick:()=>i(!1),children:"\u4E0B\u6B21\u518D\u8BF4"}),e.jsx(_,{onClick:()=>i(!0),children:"\u4E0D\u518D\u63D0\u793A"})]})]})}function ts(){const[t,s]=n.useState(null),[a,i]=n.useState(!1),r=Qt(),l=te(),{stepUpEl:o}=Ct(),d=()=>P("/api/auth/me").then(M=>{s(M)}).finally(()=>i(!0));if(n.useEffect(()=>{d()},[]),!a)return null;const p=()=>P("/api/auth/logout","POST",{}).catch(()=>{}).finally(()=>{s(null),l("/")}),b=t==null?void 0:t.user.role,w=b==="superadmin",u=b==="superadmin"||b==="admin",S=b==="superadmin"||b==="admin"||b==="auditor";return e.jsxs(e.Fragment,{children:[o,t&&e.jsx(es,{meKey:t.user.id}),e.jsx(n.Suspense,{fallback:e.jsx("div",{className:"flex min-h-[40vh] items-center justify-center text-[13px] text-muted",children:"\u52A0\u8F7D\u4E2D\u2026"}),children:e.jsxs(Be,{children:[e.jsx(v,{path:"/",element:e.jsx(Dt,{site:r,me:t})}),e.jsx(v,{path:"/login",element:e.jsx(At,{site:r,onLogin:d})}),e.jsxs(v,{element:t?e.jsx(Lt,{me:t,site:r,onLogout:p}):e.jsx(k,{to:"/login",replace:!0}),children:[e.jsx(v,{path:"/dashboard",element:t?e.jsx($t,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/keys",element:t?e.jsx(qt,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/playground",element:t?e.jsx(Ut,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/chatroom",element:t?e.jsx(Bt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/tasks",element:t?e.jsx(Vt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/videos",element:e.jsx(k,{to:"/dashboard/tasks",replace:!0})}),e.jsx(v,{path:"/dashboard/models",element:t?e.jsx(Ht,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/pricing",element:e.jsx(k,{to:"/dashboard/models",replace:!0})}),e.jsx(v,{path:"/dashboard/logs",element:t&&S?e.jsx(Wt,{me:t}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(v,{path:"/dashboard/usage",element:e.jsx(k,{to:"/dashboard/logs",replace:!0})}),e.jsx(v,{path:"/dashboard/audit",element:e.jsx(k,{to:"/dashboard/logs",replace:!0})}),e.jsx(v,{path:"/dashboard/profile",element:t?e.jsx(Zt,{me:t,onRefresh:d}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/backup",element:w?e.jsx(Jt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(v,{path:"/dashboard/invite",element:t?u?e.jsx(k,{to:"/dashboard/users",replace:!0}):e.jsx(Yt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/providers",element:w?e.jsx(Ft,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(v,{path:"/dashboard/accounts",element:w?e.jsx(Gt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(v,{path:"/dashboard/users",element:t?e.jsx(Kt,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/settings",element:w?e.jsx(Xt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(v,{path:"/dashboard/announcements",element:e.jsx(k,{to:"/dashboard/settings",replace:!0})})]}),e.jsx(v,{path:"*",element:e.jsx(k,{to:"/",replace:!0})})]})})]})}function ss(){return e.jsx(Nt,{children:e.jsx(Ue,{children:e.jsx(ts,{})})})}X.createRoot(document.getElementById("root")).render(e.jsx(pe.StrictMode,{children:e.jsx(ss,{})}));
+)\`};return e.jsxs("div",{className:"min-h-screen bg-bg text-ink",children:[e.jsxs("header",{className:N("fixed inset-x-0 top-0 z-40 border-b transition-all",p?"border-line bg-bg/80 shadow-card backdrop-blur-md":"border-transparent bg-transparent"),children:[e.jsxs("div",{className:"mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6",children:[e.jsxs(T,{to:"/",className:"flex items-center gap-2.5",children:[e.jsx("img",{src:w,alt:b,className:"h-8 w-8 rounded-lg object-contain"}),e.jsx("span",{className:"text-[15px] font-bold",children:b})]}),e.jsx("nav",{className:"hidden flex-1 items-center gap-1 md:flex",children:$.map(([c,m])=>e.jsx("a",{href:m,onClick:j=>h(j,m),className:"rounded-lg px-3 py-2 text-[13px] text-muted transition-colors hover:bg-surface2 hover:text-ink",children:c},c))}),e.jsxs("div",{className:"ml-auto hidden items-center gap-2 md:flex",children:[e.jsx(me,{}),s?e.jsx(T,{to:"/dashboard",children:e.jsx("button",{className:"rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover",children:"\u8FDB\u5165\u63A7\u5236\u53F0"})}):e.jsxs(e.Fragment,{children:[e.jsx(T,{to:"/login",children:e.jsx("button",{className:"rounded-lg px-4 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-surface2",children:"\u767B\u5F55"})}),e.jsx(T,{to:"/login",children:e.jsx("button",{className:"rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover",children:"\u514D\u8D39\u6CE8\u518C"})})]})]}),e.jsx("button",{className:"ml-auto rounded-lg p-2 text-muted hover:bg-surface2 md:hidden",onClick:()=>i(!a),"aria-label":"\u83DC\u5355",children:a?e.jsx(ae,{size:20}):e.jsx(Ce,{size:20})})]}),a&&e.jsxs("div",{className:"border-t border-line bg-surface px-4 py-3 md:hidden",children:[$.map(([c,m])=>e.jsx("a",{href:m,onClick:j=>{i(!1),h(j,m)},className:"block rounded-lg px-3 py-2.5 text-sm text-ink hover:bg-surface2",children:c},c)),e.jsxs("div",{className:"mt-2 flex items-center gap-2 border-t border-line pt-3",children:[e.jsx(me,{}),s?e.jsx(T,{to:"/dashboard",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white",children:"\u8FDB\u5165\u63A7\u5236\u53F0"})}):e.jsxs(e.Fragment,{children:[e.jsx(T,{to:"/login",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg border border-line px-4 py-2 text-[13px]",children:"\u767B\u5F55"})}),e.jsx(T,{to:"/login",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white",children:"\u514D\u8D39\u6CE8\u518C"})})]})]})]})]}),e.jsxs("section",{className:"relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28",children:[e.jsx("div",{"aria-hidden":!0,className:"pointer-events-none absolute inset-0",style:{backgroundImage:"radial-gradient(ellipse 60% 50% at 50% -10%, rgba(243,128,32,.14), transparent), linear-gradient(rgb(var(--c-line)) .5px, transparent .5px), linear-gradient(90deg, rgb(var(--c-line)) .5px, transparent .5px)",backgroundSize:"auto, 48px 48px, 48px 48px",maskImage:"linear-gradient(to bottom, black 30%, transparent 90%)"}}),e.jsxs("div",{className:"relative mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2",children:[e.jsxs("div",{children:[e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-medium text-brand",children:[e.jsx(ze,{size:12}),(t==null?void 0:t.heroBadge)??"\u8DD1\u5728 EdgeOne \u5168\u7403\u8FB9\u7F18\u8282\u70B9"]}),e.jsx("h1",{className:"mt-5 text-4xl font-bold leading-[1.15] tracking-tight sm:text-5xl",children:e.jsx("span",{className:"text-balance",children:(t==null?void 0:t.heroTitle)??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"})}),e.jsx("p",{className:"mt-5 max-w-lg text-[15px] leading-relaxed text-muted",children:(t==null?void 0:t.heroSubtitle)??"\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\uFF0C\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6CBB\u7406\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002\u5408\u6CD5\u6388\u6743\u4E0A\u6E38\u3001\u900F\u660E\u8BA1\u8D39\u3001\u54C8\u5E0C\u94FE\u5BA1\u8BA1\u2014\u2014\u9762\u5411\u5F00\u53D1\u8005\u4E0E\u4F01\u4E1A\u7684\u6B63\u89C4\u805A\u5408\u5206\u53D1\u5E73\u53F0\u3002"}),e.jsxs("div",{className:"mt-8 flex flex-wrap gap-3",children:[e.jsx(T,{to:s?"/dashboard":"/login",children:e.jsxs("button",{className:"inline-flex items-center gap-1.5 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-brand-hover hover:shadow-pop",children:["\u5F00\u59CB\u4F7F\u7528",e.jsx(ve,{size:15})]})}),e.jsx("a",{href:"#dev",onClick:c=>h(c,"#dev"),children:e.jsxs("button",{className:"inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-6 py-3 text-sm font-medium transition-colors hover:bg-surface2",children:["\u67E5\u770B\u6587\u6863",e.jsx(rt,{size:15})]})})]})]}),e.jsx("div",{className:"min-w-0",children:e.jsx(he,{title:"\u5FEB\u901F\u5F00\u59CB \u2014 curl",code:E.curl})})]})]}),e.jsx("section",{className:"border-y border-line bg-surface py-8",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("p",{className:"text-center text-xs uppercase tracking-widest text-muted",children:"\u5DF2\u652F\u6301\u4E3B\u6D41\u6A21\u578B\u4F9B\u5E94\u5546 \xB7 \u5747\u9700\u5408\u6CD5\u6388\u6743\u63A5\u5165"}),e.jsx("div",{className:"mt-5 flex flex-wrap items-center justify-center gap-x-10 gap-y-4",children:zt.map(c=>e.jsx("span",{className:"text-lg font-semibold text-muted opacity-60 grayscale transition-all hover:text-ink hover:opacity-100 hover:grayscale-0",children:c},c))})]})}),e.jsxs("section",{id:"features",className:"mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6",children:[e.jsxs("h2",{className:"text-center text-3xl font-bold tracking-tight",children:["\u4E3A\u4EC0\u4E48\u9009\u62E9 ",b]}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u4ECE\u63A5\u53E3\u3001\u8DEF\u7531\u3001\u8BA1\u8D39\u5230\u5BA1\u8BA1\uFF0C\u4E00\u4E2A\u5E73\u53F0\u8986\u76D6 AI API \u5206\u53D1\u7684\u5168\u90E8\u5173\u952E\u73AF\u8282\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3",children:It.map(({icon:c,title:m,desc:j})=>e.jsxs("div",{className:"group rounded-xl2 border border-line bg-surface p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-pop",children:[e.jsx("span",{className:"flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10 text-brand",children:e.jsx(c,{size:19})}),e.jsx("h3",{className:"mt-4 text-[15px] font-semibold",children:m}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:j})]},m))})]}),e.jsx("section",{id:"models",className:"border-t border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u4E00\u4E2A\u63A5\u53E3\uFF0C\u63A5\u5165\u4E3B\u6D41\u6A21\u578B"}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u6A21\u578B\u6E05\u5355\u7531\u7BA1\u7406\u5458\u5728\u63A7\u5236\u53F0\u7EDF\u4E00\u914D\u7F6E\uFF0C\u4E3B\u5907\u8DEF\u7531\u4E0E\u4EF7\u683C\u900F\u660E\u53EF\u67E5\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3",children:Ot.map(c=>e.jsxs("div",{className:"rounded-xl2 border border-line bg-bg p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-pop",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsx("span",{className:"text-[15px] font-semibold",children:c.provider}),e.jsx(se,{size:17,className:"text-brand"})]}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:c.desc}),e.jsx("div",{className:"mt-4 flex flex-wrap gap-1.5",children:c.models.map(m=>e.jsx("span",{className:"rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] text-muted",children:m},m))})]},c.provider))}),e.jsx("p",{className:"mt-6 text-center text-xs text-muted",children:"\u5177\u4F53\u53EF\u7528\u6A21\u578B\u4E0E\u4EF7\u683C\uFF0C\u4EE5\u63A7\u5236\u53F0\u300C\u6A21\u578B\u300D\u9875\u548C\u5B9E\u9645\u914D\u7F6E\u4E3A\u51C6\u3002"})]})}),e.jsx("section",{id:"pricing",className:"scroll-mt-20 border-y border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u7075\u6D3B\u7684\u6A21\u578B\u4E0E\u5B9A\u4EF7"}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u4ECE\u4E2A\u4EBA\u4F53\u9A8C\u5230\u4F01\u4E1A\u7EA7\u90E8\u7F72\uFF0C\u6309\u9700\u9009\u62E9\uFF0C\u968F\u65F6\u5347\u7EA7\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4",children:Pt.map(c=>e.jsxs("div",{className:N("relative flex flex-col rounded-xl2 border bg-bg p-6 transition-all hover:-translate-y-1",c.hot?"border-brand shadow-pop ring-1 ring-brand":"border-line shadow-card"),children:[c.hot&&e.jsx("span",{className:"absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3 py-0.5 text-[11px] font-medium text-white",children:"\u6700\u53D7\u6B22\u8FCE"}),e.jsx("div",{className:"text-sm font-medium",children:c.name}),e.jsxs("div",{className:"mt-3",children:[e.jsx("span",{className:"text-3xl font-bold tracking-tight",children:c.price}),e.jsx("span",{className:"text-sm text-muted",children:c.unit})]}),e.jsx("div",{className:"mt-1 text-xs text-muted",children:c.desc}),e.jsx("ul",{className:"mt-5 flex-1 space-y-2.5",children:c.items.map(m=>e.jsxs("li",{className:"flex items-start gap-2 text-[13px]",children:[e.jsx(Z,{size:15,className:"mt-0.5 shrink-0 text-ok"}),m]},m))}),e.jsx(T,{to:s?"/dashboard":"/login",className:"mt-6",children:e.jsx("button",{className:N("w-full rounded-lg px-4 py-2.5 text-[13px] font-medium transition-colors",c.hot?"bg-brand text-white hover:bg-brand-hover":"border border-line bg-surface hover:bg-surface2"),children:c.cta})})]},c.name))}),e.jsx("p",{className:"mt-6 text-center text-xs text-muted",children:"\u6240\u6709\u4EF7\u683C\u4EC5\u4E3A\u793A\u4F8B\uFF0C\u5B9E\u9645\u4EE5\u4E0A\u6E38\u4F9B\u5E94\u5546\u6388\u6743\u4E0E\u5E73\u53F0\u516C\u793A\u4E3A\u51C6\u3002"})]})}),e.jsx("section",{id:"dev",className:"mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6",children:e.jsxs("div",{className:"grid items-center gap-10 lg:grid-cols-2",children:[e.jsxs("div",{children:[e.jsx("h2",{className:"text-3xl font-bold tracking-tight",children:"\u4E3A\u5F00\u53D1\u8005\u800C\u751F"}),e.jsx("p",{className:"mt-4 text-sm leading-relaxed text-muted",children:"\u4EFB\u4F55\u652F\u6301 OpenAI SDK \u7684\u8BED\u8A00\u4E0E\u6846\u67B6\uFF0C\u6539\u4E00\u884C Base URL \u5373\u53EF\u63A5\u5165\u3002\u7EDF\u4E00\u7684\u9519\u8BEF\u683C\u5F0F\u3001\u900F\u660E\u7684\u9650\u6D41\u54CD\u5E94\u3001\u539F\u751F SSE \u6D41\u5F0F\u8F6C\u53D1\u2014\u2014\u4E0D\u9700\u8981\u5B66\u4E60\u65B0\u7684\u79C1\u6709\u534F\u8BAE\u3002"}),e.jsx("ul",{className:"mt-6 space-y-3",children:[["OpenAI \u517C\u5BB9","/v1/chat/completions\u3001/v1/models\uFF0C\u517C\u5BB9\u5B98\u65B9 SDK \u4E0E\u751F\u6001\u5DE5\u5177"],["\u7ED3\u6784\u5316\u9519\u8BEF","\u6BCF\u4E2A\u9519\u8BEF\u90FD\u5E26\u5E73\u53F0\u9519\u8BEF\u7801\u4E0E request_id\uFF0C\u65B9\u4FBF\u5B9A\u4F4D\u4E0E\u5DE5\u5355\u6392\u67E5"],["\u6D41\u5F0F\u54CD\u5E94","SSE \u900F\u4F20 + \u5B9E\u9645 Token \u7528\u91CF\u6355\u83B7\uFF0C\u8BA1\u8D39\u7CBE\u786E\u5230\u6B21"],["\u591A\u8BED\u8A00\u793A\u4F8B","curl / Node.js / Python \u5F00\u7BB1\u5373\u7528"]].map(([c,m])=>e.jsxs("li",{className:"flex gap-3",children:[e.jsx(Z,{size:16,className:"mt-0.5 shrink-0 text-brand"}),e.jsxs("span",{className:"text-[13px]",children:[e.jsx("strong",{className:"font-semibold",children:c})," \u2014 ",e.jsx("span",{className:"text-muted",children:m})]})]},c))}),e.jsxs("a",{href:"https://github.com/wimdaw/EdgeRelay",target:"_blank",rel:"noreferrer",className:"mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-brand hover:underline",children:["\u67E5\u770B\u9879\u76EE\u6587\u6863",e.jsx(dt,{size:14})]})]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"mb-3 flex gap-1 rounded-lg bg-surface2 p-0.5",style:{width:"fit-content"},children:["curl","node","python"].map(c=>e.jsx("button",{onClick:()=>d(c),className:N("rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors",o===c?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:c==="node"?"Node.js":c},c))}),e.jsx(he,{title:\`\${o} \u2014 \u8C03\u7528\u793A\u4F8B\`,code:E[o]})]})]})}),e.jsx("section",{id:"compliance",className:"scroll-mt-20 border-y border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u5408\u89C4\u4E0E\u5B89\u5168\uFF0C\u4ECE\u7B2C\u4E00\u5929\u5F00\u59CB"}),e.jsxs("p",{className:"mx-auto mt-3 max-w-2xl text-center text-sm text-muted",children:[b," \u662F\u6B63\u89C4\u7684 API \u805A\u5408\u4E0E\u5206\u53D1\u5E73\u53F0\u2014\u2014\u4E0D\u6D89\u53CA\u53F7\u6C60\u3001\u8D26\u53F7\u62C6\u5206\u3001\u51ED\u8BC1\u76D7\u7528\u7B49\u4EFB\u4F55\u7070\u4EA7\u884C\u4E3A\u3002"]}),e.jsx("div",{className:"mt-10 grid gap-4 md:grid-cols-3",children:[{icon:Me,title:"\u5408\u6CD5\u6388\u6743\u4E0A\u6E38",desc:"\u4EC5\u63A5\u5165\u6301\u6709\u5408\u6CD5\u4EE3\u7406\u3001\u5206\u9500\u6216\u518D\u8BB8\u53EF\u6388\u6743\u7684\u4F9B\u5E94\u5546\uFF0C\u6388\u6743\u534F\u8BAE\u7F16\u53F7\u767B\u8BB0\u5165\u6863\u5E76\u53EF\u8FFD\u6EAF\u3002"},{icon:ft,title:"\u5185\u5BB9\u5B89\u5168\u5BA1\u6838",desc:"\u53EF\u914D\u7F6E\u7684\u5185\u5BB9\u5BA1\u6838\u94A9\u5B50\u4E0E\u654F\u611F\u8BCD\u89C4\u5219\uFF0C\u547D\u4E2D\u8BF7\u6C42\u81EA\u52A8\u62E6\u622A\u5E76\u8FDB\u5165\u4EBA\u5DE5\u590D\u6838\u961F\u5217\u3002"},{icon:Ee,title:"\u6570\u636E\u9690\u79C1\u4E0E\u5BA1\u8BA1",desc:"\u9ED8\u8BA4\u4E0D\u8BB0\u5F55\u5BF9\u8BDD\u660E\u6587\uFF1B\u5BC6\u94A5\u5168\u94FE\u8DEF\u52A0\u5BC6\uFF1B\u5BA1\u8BA1\u65E5\u5FD7\u54C8\u5E0C\u94FE\u9632\u7BE1\u6539\uFF0C\u4FDD\u7559\u671F\u53EF\u914D 30\u2013180 \u5929\u3002"}].map(({icon:c,title:m,desc:j})=>e.jsxs("div",{className:"rounded-xl2 border border-line bg-bg p-6 shadow-card",children:[e.jsx("span",{className:"flex h-10 w-10 items-center justify-center rounded-lg bg-ok/10 text-ok",children:e.jsx(c,{size:19})}),e.jsx("h3",{className:"mt-4 text-[15px] font-semibold",children:m}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:j})]},m))})]})}),e.jsxs("section",{className:"mx-auto max-w-3xl px-4 py-20 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u5E38\u89C1\u95EE\u9898"}),e.jsx("div",{className:"mt-10 space-y-3",children:Rt.map((c,m)=>e.jsxs("div",{className:"overflow-hidden rounded-xl2 border border-line bg-surface shadow-card",children:[e.jsxs("button",{className:"flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm font-medium",onClick:()=>l(r===m?null:m),"aria-expanded":r===m,children:[c.q.replace(/EdgeRelay/g,b),e.jsx(we,{size:16,className:N("shrink-0 text-muted transition-transform",r===m&&"rotate-180")})]}),r===m&&e.jsx("p",{className:"border-t border-line px-5 py-4 text-[13px] leading-relaxed text-muted",children:c.a.replace(/EdgeRelay/g,b)})]},m))})]}),e.jsx("section",{className:"border-t border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 text-center sm:px-6",children:[e.jsx(nt,{"aria-hidden":!0,className:"mx-auto text-brand",size:36}),e.jsx("h2",{className:"mt-4 text-3xl font-bold tracking-tight",children:"\u51C6\u5907\u597D\u63A5\u5165\u8FB9\u7F18 AI \u7F51\u5173\u4E86\uFF1F"}),e.jsx("p",{className:"mx-auto mt-3 max-w-md text-sm text-muted",children:"\u6CE8\u518C\u5373\u9001\u4F53\u9A8C\u989D\u5EA6\uFF0C5 \u5206\u949F\u5B8C\u6210\u7B2C\u4E00\u6B21\u8C03\u7528\u3002"}),e.jsxs("div",{className:"mt-8 flex flex-wrap justify-center gap-3",children:[e.jsx(T,{to:s?"/dashboard":"/login",children:e.jsx("button",{className:"rounded-lg bg-brand px-7 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-hover",children:"\u514D\u8D39\u5F00\u59CB"})}),e.jsx("a",{href:t!=null&&t.supportEmail?\`mailto:\${t.supportEmail}\`:"mailto:hackerxiaow@gmail.com",children:e.jsx("button",{className:"rounded-lg border border-line bg-surface px-7 py-3 text-sm font-medium transition-colors hover:bg-surface2",children:"\u8054\u7CFB\u9500\u552E"})})]})]})}),e.jsxs("footer",{className:"bg-[#0F1219] text-zinc-400",children:[e.jsxs("div",{className:"mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-4",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2.5",children:[e.jsx("img",{src:w,alt:b,className:"h-7 w-7 rounded-lg object-contain"}),e.jsx("span",{className:"text-[15px] font-bold text-white",children:b})]}),e.jsx("p",{className:"mt-3 max-w-xs text-xs leading-relaxed",children:(t==null?void 0:t.siteDescription)??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173\uFF0C\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6D3E\u53D1\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002"})]}),[{t:"\u4EA7\u54C1",links:[["\u529F\u80FD\u7279\u6027","#features"],["\u6A21\u578B\u4E0E\u5B9A\u4EF7","#pricing"],["\u8FDB\u5165\u63A7\u5236\u53F0","/dashboard"],["\u6CE8\u518C\u8D26\u53F7","/login"]]},{t:"\u5F00\u53D1\u8005",links:[["\u5FEB\u901F\u5F00\u59CB","#dev"],["\u8C03\u7528\u793A\u4F8B","#dev"],["OpenAI \u517C\u5BB9\u63A5\u53E3","https://platform.openai.com/docs/api-reference"]]},{t:"\u5408\u89C4",links:[["\u670D\u52A1\u6761\u6B3E","/terms.html"],["\u9690\u79C1\u653F\u7B56","/privacy.html"],["\u5185\u5BB9\u5B89\u5168","#compliance"]]}].map(c=>e.jsxs("div",{children:[e.jsx("h4",{className:"text-[13px] font-semibold text-white",children:c.t}),e.jsx("ul",{className:"mt-3 space-y-2.5 text-xs",children:c.links.map(([m,j])=>e.jsx("li",{children:j.startsWith("/")&&!j.endsWith(".html")?e.jsx(T,{to:j,className:"transition-colors hover:text-white",children:m}):j.startsWith("#")?e.jsx("a",{href:j,onClick:F=>h(F,j),className:"transition-colors hover:text-white",children:m}):e.jsx("a",{href:j,target:(j.endsWith(".html"),"_blank"),rel:"noreferrer",className:"transition-colors hover:text-white",children:m})},m))})]},c.t))]}),e.jsx("div",{className:"border-t border-white/10",children:e.jsxs("div",{className:"mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-5 text-[11px] sm:flex-row sm:px-6",children:[e.jsx("span",{children:D}),e.jsxs("span",{className:"flex items-center gap-4",children:[e.jsx("a",{href:"/terms.html",className:"hover:text-white",children:"\u670D\u52A1\u6761\u6B3E"}),e.jsx("a",{href:"/privacy.html",className:"hover:text-white",children:"\u9690\u79C1\u653F\u7B56"}),A?e.jsxs("span",{className:"text-zinc-600",children:["\u5907\u6848\u53F7\uFF1A",A]}):null,M?e.jsx("a",{href:M,target:"_blank",rel:"noreferrer","aria-label":"GitHub",children:e.jsx(Se,{size:15,className:"hover:text-white"})}):null]})]})})]})]})}const $t=n.lazy(()=>L(()=>import("./Dashboard-DeAr0cpO.js"),__vite__mapDeps([0,1,2]))),qt=n.lazy(()=>L(()=>import("./Keys-BOU2k6at.js"),__vite__mapDeps([3,1,4])));n.lazy(()=>L(()=>import("./VideoTasks-Lc8uBADw.js"),__vite__mapDeps([5,1,6,7,8,9,10])));const Vt=n.lazy(()=>L(()=>import("./ScheduledTasks-2VckwwYM.js"),__vite__mapDeps([11,1,5,6,7,8,9,10]))),Ut=n.lazy(()=>L(()=>import("./Playground-C1lpUxDf.js"),__vite__mapDeps([12,1,13,14]))),Bt=n.lazy(()=>L(()=>import("./ChatRoom-DJrsu_Z8.js"),__vite__mapDeps([15,1,13,14]))),Ft=n.lazy(()=>L(()=>import("./Providers-BrPQBm8U.js"),__vite__mapDeps([16,1,17,6,4,8,18,10,7]))),Gt=n.lazy(()=>L(()=>import("./AccountPool-BbeJM3Nl.js"),__vite__mapDeps([19,1,6,10,18,9]))),Ht=n.lazy(()=>L(()=>import("./ModelsPricing-B3A7W-XX.js"),__vite__mapDeps([20,1,4]))),Wt=n.lazy(()=>L(()=>import("./Logs-gQEd4m_c.js"),__vite__mapDeps([21,1,22,6,8]))),Kt=n.lazy(()=>L(()=>import("./Users-DFyFxtpd.js"),__vite__mapDeps([23,1,24,22,4,8]))),Zt=n.lazy(()=>L(()=>import("./Profile-BxTu0tlP.js"),__vite__mapDeps([25,1,6,4,17]))),Yt=n.lazy(()=>L(()=>import("./Invite-CBHRBgyg.js"),__vite__mapDeps([24,1,22]))),Jt=n.lazy(()=>L(()=>import("./Backup-DHXahAPv.js"),__vite__mapDeps([26,1,22,6,8,13]))),Xt=n.lazy(()=>L(()=>import("./Settings-D1bvfg6b.js"),__vite__mapDeps([27,1,4,8])));function Qt(){const[t,s]=n.useState(()=>typeof window<"u"?window.__EDGERELAY_SITE__??null:null);return n.useEffect(()=>{P("/api/site").then(a=>{s(a),document.title=\`\${a.siteName} \u2014 \${a.heroTitle??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"}\`;const i=(l,o,d)=>{let p=document.head.querySelector(\`meta[\${l}="\${o}"]\`);p||(p=document.createElement("meta"),p.setAttribute(l,o),document.head.appendChild(p)),p.setAttribute("content",d)};i("name","description",a.siteDescription),i("property","og:title",a.siteName),i("property","og:description",a.siteDescription),i("property","og:image",a.siteLogoUrl);const r=document.head.querySelector("link[rel=icon]");r&&(r.href=a.siteLogoUrl)}).catch(()=>{})},[]),t}function es({meKey:t}){const[s,a]=n.useState(null);if(n.useEffect(()=>{P("/api/announcements").then(r=>{const l=r.announcements.filter(o=>o.popup===1).sort((o,d)=>d.id.localeCompare(o.id))[0];l&&(localStorage.getItem(\`ann-never-\${l.id}-\${t}\`)||sessionStorage.getItem(\`ann-later-\${l.id}-\${t}\`)||(a(l),ee(t,[l.id]),window.dispatchEvent(new CustomEvent("gw:ann-changed"))))}).catch(()=>{})},[t]),!s)return null;const i=r=>{(r?localStorage:sessionStorage).setItem(\`\${r?"ann-never":"ann-later"}-\${s.id}-\${t}\`,"1"),ee(t,[s.id]),a(null),window.dispatchEvent(new CustomEvent("gw:ann-changed"))};return e.jsxs(J,{open:!0,onClose:()=>i(!1),title:"\u5E73\u53F0\u516C\u544A",width:480,children:[e.jsx("h3",{className:"text-base font-semibold",children:s.title}),e.jsx("p",{className:"mt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-muted",children:s.content}),e.jsxs("div",{className:"mt-6 flex justify-end gap-2",children:[e.jsx(_,{variant:"ghost",onClick:()=>i(!1),children:"\u4E0B\u6B21\u518D\u8BF4"}),e.jsx(_,{onClick:()=>i(!0),children:"\u4E0D\u518D\u63D0\u793A"})]})]})}function ts(){const[t,s]=n.useState(null),[a,i]=n.useState(!1),r=Qt(),l=te(),{stepUpEl:o}=Ct(),d=()=>P("/api/auth/me").then(M=>{s(M)}).finally(()=>i(!0));if(n.useEffect(()=>{d()},[]),!a)return null;const p=()=>P("/api/auth/logout","POST",{}).catch(()=>{}).finally(()=>{s(null),l("/")}),b=t==null?void 0:t.user.role,w=b==="superadmin",u=b==="superadmin"||b==="admin",S=b==="superadmin"||b==="admin"||b==="auditor";return e.jsxs(e.Fragment,{children:[o,t&&e.jsx(es,{meKey:t.user.id}),e.jsx(n.Suspense,{fallback:e.jsx("div",{className:"flex min-h-[40vh] items-center justify-center text-[13px] text-muted",children:"\u52A0\u8F7D\u4E2D\u2026"}),children:e.jsxs(Be,{children:[e.jsx(v,{path:"/",element:e.jsx(Dt,{site:r,me:t})}),e.jsx(v,{path:"/login",element:e.jsx(At,{site:r,onLogin:d})}),e.jsxs(v,{element:t?e.jsx(Lt,{me:t,site:r,onLogout:p}):e.jsx(k,{to:"/login",replace:!0}),children:[e.jsx(v,{path:"/dashboard",element:t?e.jsx($t,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/keys",element:t?e.jsx(qt,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/playground",element:t?e.jsx(Ut,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/chatroom",element:t?e.jsx(Bt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/tasks",element:t?e.jsx(Vt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/videos",element:e.jsx(k,{to:"/dashboard/tasks",replace:!0})}),e.jsx(v,{path:"/dashboard/models",element:t?e.jsx(Ht,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/pricing",element:e.jsx(k,{to:"/dashboard/models",replace:!0})}),e.jsx(v,{path:"/dashboard/logs",element:t&&S?e.jsx(Wt,{me:t}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(v,{path:"/dashboard/usage",element:e.jsx(k,{to:"/dashboard/logs",replace:!0})}),e.jsx(v,{path:"/dashboard/audit",element:e.jsx(k,{to:"/dashboard/logs",replace:!0})}),e.jsx(v,{path:"/dashboard/profile",element:t?e.jsx(Zt,{me:t,onRefresh:d}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/backup",element:w?e.jsx(Jt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(v,{path:"/dashboard/invite",element:t?u?e.jsx(k,{to:"/dashboard/users",replace:!0}):e.jsx(Yt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/providers",element:w?e.jsx(Ft,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(v,{path:"/dashboard/accounts",element:w?e.jsx(Gt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(v,{path:"/dashboard/users",element:t?e.jsx(Kt,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(v,{path:"/dashboard/settings",element:w?e.jsx(Xt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(v,{path:"/dashboard/announcements",element:e.jsx(k,{to:"/dashboard/settings",replace:!0})})]}),e.jsx(v,{path:"*",element:e.jsx(k,{to:"/",replace:!0})})]})})]})}function ss(){return e.jsx(Nt,{children:e.jsx(Ue,{children:e.jsx(ts,{})})})}X.createRoot(document.getElementById("root")).render(e.jsx(pe.StrictMode,{children:e.jsx(ss,{})}));
 `,
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/index-CVqUX4oI.css": {
-              content: `*,:before,:after{--tw-border-spacing-x: 0;--tw-border-spacing-y: 0;--tw-translate-x: 0;--tw-translate-y: 0;--tw-rotate: 0;--tw-skew-x: 0;--tw-skew-y: 0;--tw-scale-x: 1;--tw-scale-y: 1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness: proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width: 0px;--tw-ring-offset-color: #fff;--tw-ring-color: rgb(59 130 246 / .5);--tw-ring-offset-shadow: 0 0 #0000;--tw-ring-shadow: 0 0 #0000;--tw-shadow: 0 0 #0000;--tw-shadow-colored: 0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x: 0;--tw-border-spacing-y: 0;--tw-translate-x: 0;--tw-translate-y: 0;--tw-rotate: 0;--tw-skew-x: 0;--tw-skew-y: 0;--tw-scale-x: 1;--tw-scale-y: 1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness: proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width: 0px;--tw-ring-offset-color: #fff;--tw-ring-color: rgb(59 130 246 / .5);--tw-ring-offset-shadow: 0 0 #0000;--tw-ring-shadow: 0 0 #0000;--tw-shadow: 0 0 #0000;--tw-shadow-colored: 0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }*,:before,:after{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}:before,:after{--tw-content: ""}html,:host{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:Inter,-apple-system,PingFang SC,Microsoft YaHei,sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,samp,pre{font-family:SF Mono,ui-monospace,Consolas,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}ol,ul,menu{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canvas,audio,iframe,embed,object{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{top:0;right:0;bottom:0;left:0}.inset-x-0{left:0;right:0}.-right-0\\.5{right:-.125rem}.-top-0\\.5{top:-.125rem}.-top-3{top:-.75rem}.bottom-6{bottom:1.5rem}.left-0{left:0}.left-0\\.5{left:.125rem}.left-1\\/2{left:50%}.left-3{left:.75rem}.right-2\\.5{right:.625rem}.right-4{right:1rem}.right-5{right:1.25rem}.right-6{right:1.5rem}.top-0{top:0}.top-1\\/2{top:50%}.top-16{top:4rem}.top-20{top:5rem}.z-30{z-index:30}.z-40{z-index:40}.z-50{z-index:50}.z-\\[60\\]{z-index:60}.col-span-1{grid-column:span 1 / span 1}.mx-1{margin-left:.25rem;margin-right:.25rem}.mx-auto{margin-left:auto;margin-right:auto}.my-4{margin-top:1rem;margin-bottom:1rem}.mb-1{margin-bottom:.25rem}.mb-1\\.5{margin-bottom:.375rem}.mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}.ml-1{margin-left:.25rem}.ml-auto{margin-left:auto}.mr-0\\.5{margin-right:.125rem}.mr-1{margin-right:.25rem}.mt-0\\.5{margin-top:.125rem}.mt-1{margin-top:.25rem}.mt-1\\.5{margin-top:.375rem}.mt-10{margin-top:2.5rem}.mt-2{margin-top:.5rem}.mt-2\\.5{margin-top:.625rem}.mt-3{margin-top:.75rem}.mt-3\\.5{margin-top:.875rem}.mt-4{margin-top:1rem}.mt-5{margin-top:1.25rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.mt-auto{margin-top:auto}.line-clamp-1{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1}.line-clamp-2{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}.line-clamp-3{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}.block{display:block}.inline-block{display:inline-block}.inline{display:inline}.flex{display:flex}.inline-flex{display:inline-flex}.table{display:table}.grid{display:grid}.hidden{display:none}.\\!h-6{height:1.5rem!important}.\\!h-7{height:1.75rem!important}.\\!h-\\[34px\\]{height:34px!important}.h-1\\.5{height:.375rem}.h-10{height:2.5rem}.h-11{height:2.75rem}.h-12{height:3rem}.h-14{height:3.5rem}.h-16{height:4rem}.h-2{height:.5rem}.h-20{height:5rem}.h-24{height:6rem}.h-28{height:7rem}.h-3{height:.75rem}.h-3\\.5{height:.875rem}.h-32{height:8rem}.h-36{height:9rem}.h-4{height:1rem}.h-40{height:10rem}.h-44{height:11rem}.h-5{height:1.25rem}.h-56{height:14rem}.h-6{height:1.5rem}.h-64{height:16rem}.h-7{height:1.75rem}.h-8{height:2rem}.h-9{height:2.25rem}.h-\\[calc\\(100vh-320px\\)\\]{height:calc(100vh - 320px)}.h-fit{height:-moz-fit-content;height:fit-content}.h-full{height:100%}.h-px{height:1px}.h-screen{height:100vh}.max-h-28{max-height:7rem}.max-h-32{max-height:8rem}.max-h-40{max-height:10rem}.max-h-52{max-height:13rem}.max-h-60{max-height:15rem}.max-h-80{max-height:20rem}.max-h-\\[46vh\\]{max-height:46vh}.min-h-\\[40vh\\]{min-height:40vh}.min-h-\\[44px\\]{min-height:44px}.min-h-\\[460px\\]{min-height:460px}.min-h-\\[46px\\]{min-height:46px}.min-h-\\[520px\\]{min-height:520px}.min-h-screen{min-height:100vh}.\\!w-7{width:1.75rem!important}.\\!w-\\[4\\.5rem\\]{width:4.5rem!important}.w-1\\.5{width:.375rem}.w-10{width:2.5rem}.w-12{width:3rem}.w-16{width:4rem}.w-2{width:.5rem}.w-24{width:6rem}.w-3{width:.75rem}.w-3\\.5{width:.875rem}.w-4{width:1rem}.w-40{width:10rem}.w-44{width:11rem}.w-56{width:14rem}.w-6{width:1.5rem}.w-60{width:15rem}.w-7{width:1.75rem}.w-72{width:18rem}.w-8{width:2rem}.w-80{width:20rem}.w-9{width:2.25rem}.w-\\[2\\.5px\\]{width:2.5px}.w-\\[3px\\]{width:3px}.w-full{width:100%}.min-w-0{min-width:0px}.min-w-4{min-width:1rem}.min-w-\\[120px\\]{min-width:120px}.min-w-\\[160px\\]{min-width:160px}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-6xl{max-width:72rem}.max-w-\\[120px\\]{max-width:120px}.max-w-\\[140px\\]{max-width:140px}.max-w-\\[170px\\]{max-width:170px}.max-w-\\[190px\\]{max-width:190px}.max-w-\\[200px\\]{max-width:200px}.max-w-\\[260px\\]{max-width:260px}.max-w-\\[400px\\]{max-width:400px}.max-w-\\[75\\%\\]{max-width:75%}.max-w-\\[80\\%\\]{max-width:80%}.max-w-\\[85\\%\\]{max-width:85%}.max-w-\\[calc\\(100vw-40px\\)\\]{max-width:calc(100vw - 40px)}.max-w-full{max-width:100%}.max-w-lg{max-width:32rem}.max-w-md{max-width:28rem}.max-w-sm{max-width:24rem}.max-w-xl{max-width:36rem}.max-w-xs{max-width:20rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.-translate-x-1\\/2{--tw-translate-x: -50%;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.-translate-y-1\\/2{--tw-translate-y: -50%;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.rotate-180{--tw-rotate: 180deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}@keyframes spin{to{transform:rotate(360deg)}}.animate-spin{animation:spin 1s linear infinite}.cursor-context-menu{cursor:context-menu}.cursor-default{cursor:default}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;-moz-user-select:none;user-select:none}.resize-y{resize:vertical}.scroll-mt-20{scroll-margin-top:5rem}.list-disc{list-style-type:disc}.appearance-none{-webkit-appearance:none;-moz-appearance:none;appearance:none}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.flex-row{flex-direction:row}.flex-row-reverse{flex-direction:row-reverse}.flex-col{flex-direction:column}.flex-col-reverse{flex-direction:column-reverse}.flex-wrap{flex-wrap:wrap}.flex-nowrap{flex-wrap:nowrap}.items-start{align-items:flex-start}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-start{justify-content:flex-start}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-0\\.5{gap:.125rem}.gap-1{gap:.25rem}.gap-1\\.5{gap:.375rem}.gap-10{gap:2.5rem}.gap-12{gap:3rem}.gap-2{gap:.5rem}.gap-2\\.5{gap:.625rem}.gap-3{gap:.75rem}.gap-3\\.5{gap:.875rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.gap-6{gap:1.5rem}.gap-x-10{-moz-column-gap:2.5rem;column-gap:2.5rem}.gap-x-3{-moz-column-gap:.75rem;column-gap:.75rem}.gap-x-4{-moz-column-gap:1rem;column-gap:1rem}.gap-y-1{row-gap:.25rem}.gap-y-2{row-gap:.5rem}.gap-y-4{row-gap:1rem}.space-y-0\\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.125rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.125rem * var(--tw-space-y-reverse))}.space-y-1>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.25rem * var(--tw-space-y-reverse))}.space-y-1\\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.375rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.375rem * var(--tw-space-y-reverse))}.space-y-2>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.5rem * var(--tw-space-y-reverse))}.space-y-2\\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.625rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.625rem * var(--tw-space-y-reverse))}.space-y-3>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.75rem * var(--tw-space-y-reverse))}.space-y-3\\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(.875rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.875rem * var(--tw-space-y-reverse))}.space-y-4>:not([hidden])~:not([hidden]){--tw-space-y-reverse: 0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.self-end{align-self:flex-end}.overflow-auto{overflow:auto}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.overflow-x-hidden{overflow-x:hidden}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.whitespace-nowrap{white-space:nowrap}.whitespace-pre-wrap{white-space:pre-wrap}.text-balance{text-wrap:balance}.break-words{overflow-wrap:break-word}.break-all{word-break:break-all}.rounded{border-radius:.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:.5rem}.rounded-md{border-radius:.375rem}.rounded-xl{border-radius:.75rem}.rounded-xl2{border-radius:12px}.border{border-width:1px}.border-y{border-top-width:1px;border-bottom-width:1px}.border-b{border-bottom-width:1px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.\\!border-emerald-500\\/80{border-color:#10b981cc!important}.border-amber-500\\/20{border-color:#f59e0b33}.border-blue-500\\/20{border-color:#3b82f633}.border-brand{--tw-border-opacity: 1;border-color:rgb(243 128 32 / var(--tw-border-opacity, 1))}.border-brand\\/20{border-color:#f3802033}.border-brand\\/30{border-color:#f380204d}.border-brand\\/40{border-color:#f3802066}.border-err\\/30{border-color:#d5393c4d}.border-err\\/40{border-color:#d5393c66}.border-line{--tw-border-opacity: 1;border-color:rgb(var(--c-line) / var(--tw-border-opacity, 1))}.border-line\\/50{border-color:rgb(var(--c-line) / .5)}.border-line\\/60{border-color:rgb(var(--c-line) / .6)}.border-line\\/70{border-color:rgb(var(--c-line) / .7)}.border-ok\\/40{border-color:#15a35066}.border-purple-500\\/20{border-color:#a855f733}.border-red-500\\/30{border-color:#ef44444d}.border-transparent{border-color:transparent}.border-warn\\/30{border-color:#b97d104d}.border-white\\/10{border-color:#ffffff1a}.border-zinc-500\\/20{border-color:#71717a33}.\\!bg-emerald-500\\/10{background-color:#10b9811a!important}.bg-\\[\\#0F1219\\]{--tw-bg-opacity: 1;background-color:rgb(15 18 25 / var(--tw-bg-opacity, 1))}.bg-amber-400\\/20{background-color:#fbbf2433}.bg-amber-500{--tw-bg-opacity: 1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}.bg-amber-500\\/10{background-color:#f59e0b1a}.bg-bg{--tw-bg-opacity: 1;background-color:rgb(var(--c-bg) / var(--tw-bg-opacity, 1))}.bg-bg\\/80{background-color:rgb(var(--c-bg) / .8)}.bg-black\\/40{background-color:#0006}.bg-black\\/45{background-color:#00000073}.bg-blue-500\\/10{background-color:#3b82f61a}.bg-brand{--tw-bg-opacity: 1;background-color:rgb(243 128 32 / var(--tw-bg-opacity, 1))}.bg-brand\\/10{background-color:#f380201a}.bg-brand\\/15{background-color:#f3802026}.bg-emerald-500{--tw-bg-opacity: 1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-emerald-500\\/10{background-color:#10b9811a}.bg-emerald-500\\/15{background-color:#10b98126}.bg-err{--tw-bg-opacity: 1;background-color:rgb(213 57 60 / var(--tw-bg-opacity, 1))}.bg-err\\/10{background-color:#d5393c1a}.bg-err\\/5{background-color:#d5393c0d}.bg-info\\/10{background-color:#2563eb1a}.bg-line{--tw-bg-opacity: 1;background-color:rgb(var(--c-line) / var(--tw-bg-opacity, 1))}.bg-line\\/70{background-color:rgb(var(--c-line) / .7)}.bg-muted\\/40{background-color:rgb(var(--c-muted) / .4)}.bg-ok{--tw-bg-opacity: 1;background-color:rgb(21 163 80 / var(--tw-bg-opacity, 1))}.bg-ok\\/10{background-color:#15a3501a}.bg-orange-700\\/20{background-color:#c2410c33}.bg-purple-500\\/10{background-color:#a855f71a}.bg-red-500{--tw-bg-opacity: 1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.bg-red-500\\/10{background-color:#ef44441a}.bg-sidebar{--tw-bg-opacity: 1;background-color:rgb(var(--c-sidebar) / var(--tw-bg-opacity, 1))}.bg-surface{--tw-bg-opacity: 1;background-color:rgb(var(--c-surface) / var(--tw-bg-opacity, 1))}.bg-surface\\/50{background-color:rgb(var(--c-surface) / .5)}.bg-surface2{--tw-bg-opacity: 1;background-color:rgb(var(--c-surface2) / var(--tw-bg-opacity, 1))}.bg-surface2\\/30{background-color:rgb(var(--c-surface2) / .3)}.bg-surface2\\/40{background-color:rgb(var(--c-surface2) / .4)}.bg-surface2\\/50{background-color:rgb(var(--c-surface2) / .5)}.bg-surface2\\/60{background-color:rgb(var(--c-surface2) / .6)}.bg-transparent{background-color:transparent}.bg-warn\\/10{background-color:#b97d101a}.bg-warn\\/5{background-color:#b97d100d}.bg-white{--tw-bg-opacity: 1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-zinc-400\\/20{background-color:#a1a1aa33}.bg-zinc-500\\/10{background-color:#71717a1a}.object-contain{-o-object-fit:contain;object-fit:contain}.object-cover{-o-object-fit:cover;object-fit:cover}.p-0\\.5{padding:.125rem}.p-1{padding:.25rem}.p-1\\.5{padding:.375rem}.p-2{padding:.5rem}.p-2\\.5{padding:.625rem}.p-3{padding:.75rem}.p-3\\.5{padding:.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.\\!px-0{padding-left:0!important;padding-right:0!important}.\\!px-1\\.5{padding-left:.375rem!important;padding-right:.375rem!important}.\\!px-2{padding-left:.5rem!important;padding-right:.5rem!important}.\\!px-2\\.5{padding-left:.625rem!important;padding-right:.625rem!important}.\\!px-3{padding-left:.75rem!important;padding-right:.75rem!important}.\\!py-1{padding-top:.25rem!important;padding-bottom:.25rem!important}.\\!py-1\\.5{padding-top:.375rem!important;padding-bottom:.375rem!important}.\\!py-2\\.5{padding-top:.625rem!important;padding-bottom:.625rem!important}.px-0{padding-left:0;padding-right:0}.px-1{padding-left:.25rem;padding-right:.25rem}.px-1\\.5{padding-left:.375rem;padding-right:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-3\\.5{padding-left:.875rem;padding-right:.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.px-7{padding-left:1.75rem;padding-right:1.75rem}.py-0\\.5{padding-top:.125rem;padding-bottom:.125rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-1\\.5{padding-top:.375rem;padding-bottom:.375rem}.py-10{padding-top:2.5rem;padding-bottom:2.5rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-14{padding-top:3.5rem;padding-bottom:3.5rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-2\\.5{padding-top:.625rem;padding-bottom:.625rem}.py-20{padding-top:5rem;padding-bottom:5rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.py-3\\.5{padding-top:.875rem;padding-bottom:.875rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.py-8{padding-top:2rem;padding-bottom:2rem}.\\!pl-8{padding-left:2rem!important}.pb-2\\.5{padding-bottom:.625rem}.pb-20{padding-bottom:5rem}.pl-0\\.5{padding-left:.125rem}.pl-4{padding-left:1rem}.pl-6{padding-left:1.5rem}.pr-1{padding-right:.25rem}.pr-8{padding-right:2rem}.pt-0\\.5{padding-top:.125rem}.pt-1{padding-top:.25rem}.pt-2{padding-top:.5rem}.pt-2\\.5{padding-top:.625rem}.pt-3{padding-top:.75rem}.pt-3\\.5{padding-top:.875rem}.pt-32{padding-top:8rem}.pt-4{padding-top:1rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-mono{font-family:SF Mono,ui-monospace,Consolas,monospace}.font-sans{font-family:Inter,-apple-system,PingFang SC,Microsoft YaHei,sans-serif}.\\!text-xs{font-size:.75rem!important;line-height:1rem!important}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-\\[10px\\]{font-size:10px}.text-\\[11px\\]{font-size:11px}.text-\\[12\\.5px\\]{font-size:12.5px}.text-\\[12px\\]{font-size:12px}.text-\\[13px\\]{font-size:13px}.text-\\[15px\\]{font-size:15px}.text-\\[9px\\]{font-size:9px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.tabular-nums{--tw-numeric-spacing: tabular-nums;font-variant-numeric:var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)}.leading-\\[1\\.15\\]{line-height:1.15}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-tight{letter-spacing:-.025em}.tracking-widest{letter-spacing:.1em}.\\!text-emerald-500{--tw-text-opacity: 1 !important;color:rgb(16 185 129 / var(--tw-text-opacity, 1))!important}.\\!text-err{--tw-text-opacity: 1 !important;color:rgb(213 57 60 / var(--tw-text-opacity, 1))!important}.\\!text-muted{--tw-text-opacity: 1 !important;color:rgb(var(--c-muted) / var(--tw-text-opacity, 1))!important}.text-\\[\\#E2E5EC\\]{--tw-text-opacity: 1;color:rgb(226 229 236 / var(--tw-text-opacity, 1))}.text-amber-500{--tw-text-opacity: 1;color:rgb(245 158 11 / var(--tw-text-opacity, 1))}.text-amber-500\\/70{color:#f59e0bb3}.text-amber-600{--tw-text-opacity: 1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-blue-400{--tw-text-opacity: 1;color:rgb(96 165 250 / var(--tw-text-opacity, 1))}.text-brand{--tw-text-opacity: 1;color:rgb(243 128 32 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity: 1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-emerald-500{--tw-text-opacity: 1;color:rgb(16 185 129 / var(--tw-text-opacity, 1))}.text-err{--tw-text-opacity: 1;color:rgb(213 57 60 / var(--tw-text-opacity, 1))}.text-info{--tw-text-opacity: 1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-ink{--tw-text-opacity: 1;color:rgb(var(--c-ink) / var(--tw-text-opacity, 1))}.text-muted{--tw-text-opacity: 1;color:rgb(var(--c-muted) / var(--tw-text-opacity, 1))}.text-muted\\/60{color:rgb(var(--c-muted) / .6)}.text-muted\\/70{color:rgb(var(--c-muted) / .7)}.text-ok{--tw-text-opacity: 1;color:rgb(21 163 80 / var(--tw-text-opacity, 1))}.text-orange-700{--tw-text-opacity: 1;color:rgb(194 65 12 / var(--tw-text-opacity, 1))}.text-purple-400{--tw-text-opacity: 1;color:rgb(192 132 252 / var(--tw-text-opacity, 1))}.text-red-500{--tw-text-opacity: 1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.text-sidebar-ink{--tw-text-opacity: 1;color:rgb(var(--c-sidebar-ink) / var(--tw-text-opacity, 1))}.text-warn{--tw-text-opacity: 1;color:rgb(185 125 16 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity: 1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-white\\/70{color:#ffffffb3}.text-zinc-200{--tw-text-opacity: 1;color:rgb(228 228 231 / var(--tw-text-opacity, 1))}.text-zinc-400{--tw-text-opacity: 1;color:rgb(161 161 170 / var(--tw-text-opacity, 1))}.text-zinc-500{--tw-text-opacity: 1;color:rgb(113 113 122 / var(--tw-text-opacity, 1))}.text-zinc-600{--tw-text-opacity: 1;color:rgb(82 82 91 / var(--tw-text-opacity, 1))}.underline{text-decoration-line:underline}.accent-\\[\\#F38020\\]{accent-color:#F38020}.accent-\\[var\\(--brand\\)\\]{accent-color:var(--brand)}.accent-brand{accent-color:#F38020}.opacity-0{opacity:0}.opacity-60{opacity:.6}.opacity-75{opacity:.75}.opacity-85{opacity:.85}.shadow-card{--tw-shadow: 0 1px 2px rgb(16 24 40 / .06), 0 1px 3px rgb(16 24 40 / .08);--tw-shadow-colored: 0 1px 2px var(--tw-shadow-color), 0 1px 3px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}.shadow-pop{--tw-shadow: 0 8px 30px rgb(16 24 40 / .18);--tw-shadow-colored: 0 8px 30px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}.shadow-sm{--tw-shadow: 0 1px 2px 0 rgb(0 0 0 / .05);--tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}.outline-none{outline:2px solid transparent;outline-offset:2px}.ring-1{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}.ring-brand{--tw-ring-opacity: 1;--tw-ring-color: rgb(243 128 32 / var(--tw-ring-opacity, 1))}.grayscale{--tw-grayscale: grayscale(100%);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-md{--tw-backdrop-blur: blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur: blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-colors{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.duration-200{transition-duration:.2s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}:root{--c-bg: 247 248 250;--c-surface: 255 255 255;--c-surface2: 244 245 247;--c-line: 226 229 234;--c-ink: 31 36 48;--c-muted: 107 114 128;--c-brand-soft: 243 128 32;--c-sidebar: 255 255 255;--c-sidebar-ink: 75 85 99}[data-theme=dark]{--c-bg: 15 18 25;--c-surface: 23 26 35;--c-surface2: 32 36 47;--c-line: 46 51 64;--c-ink: 226 229 236;--c-muted: 138 143 156;--c-sidebar: 15 23 42;--c-sidebar-ink: 148 163 184}html{font-family:Inter,-apple-system,PingFang SC,Microsoft YaHei,sans-serif}body{--tw-bg-opacity: 1;background-color:rgb(var(--c-bg) / var(--tw-bg-opacity, 1));--tw-text-opacity: 1;color:rgb(var(--c-ink) / var(--tw-text-opacity, 1));-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{border-radius:9999px;border-width:2px;border-style:solid;border-color:transparent;--tw-bg-opacity: 1;background-color:rgb(var(--c-line) / var(--tw-bg-opacity, 1));background-clip:padding-box}::-webkit-scrollbar-track{background:transparent}@keyframes toast-in{0%{transform:translate(16px);opacity:0}to{transform:none;opacity:1}}@keyframes fade-in{0%{opacity:0}to{opacity:1}}@keyframes pop-in{0%{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}@keyframes shimmer{0%{background-position:-400px 0}to{background-position:400px 0}}.anim-toast{animation:toast-in .22s ease-out}.anim-fade{animation:fade-in .15s ease-out}.anim-pop{animation:pop-in .18s ease-out}.skeleton{border-radius:.375rem;--tw-bg-opacity: 1;background-color:rgb(var(--c-surface2) / var(--tw-bg-opacity, 1));background-image:linear-gradient(90deg,transparent,rgb(var(--c-line) / .6),transparent);background-size:400px 100%;animation:shimmer 1.4s infinite}.placeholder\\:text-muted\\/60::-moz-placeholder{color:rgb(var(--c-muted) / .6)}.placeholder\\:text-muted\\/60::placeholder{color:rgb(var(--c-muted) / .6)}.placeholder\\:text-muted\\/70::-moz-placeholder{color:rgb(var(--c-muted) / .7)}.placeholder\\:text-muted\\/70::placeholder{color:rgb(var(--c-muted) / .7)}.last\\:border-0:last-child{border-width:0px}.hover\\:-translate-y-1:hover{--tw-translate-y: -.25rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\\:scale-105:hover{--tw-scale-x: 1.05;--tw-scale-y: 1.05;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\\:border-brand\\/40:hover{border-color:#f3802066}.hover\\:bg-brand-hover:hover{--tw-bg-opacity: 1;background-color:rgb(222 110 15 / var(--tw-bg-opacity, 1))}.hover\\:bg-brand\\/10:hover{background-color:#f380201a}.hover\\:bg-brand\\/20:hover{background-color:#f3802033}.hover\\:bg-brand\\/5:hover{background-color:#f380200d}.hover\\:bg-ok\\/20:hover{background-color:#15a35033}.hover\\:bg-surface2:hover{--tw-bg-opacity: 1;background-color:rgb(var(--c-surface2) / var(--tw-bg-opacity, 1))}.hover\\:\\!text-err:hover{--tw-text-opacity: 1 !important;color:rgb(213 57 60 / var(--tw-text-opacity, 1))!important}.hover\\:text-brand:hover{--tw-text-opacity: 1;color:rgb(243 128 32 / var(--tw-text-opacity, 1))}.hover\\:text-ink:hover{--tw-text-opacity: 1;color:rgb(var(--c-ink) / var(--tw-text-opacity, 1))}.hover\\:text-white:hover{--tw-text-opacity: 1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\\:underline:hover{text-decoration-line:underline}.hover\\:opacity-100:hover{opacity:1}.hover\\:opacity-80:hover{opacity:.8}.hover\\:opacity-90:hover{opacity:.9}.hover\\:shadow-pop:hover{--tw-shadow: 0 8px 30px rgb(16 24 40 / .18);--tw-shadow-colored: 0 8px 30px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}.hover\\:grayscale-0:hover{--tw-grayscale: grayscale(0);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.focus\\:border-brand:focus{--tw-border-opacity: 1;border-color:rgb(243 128 32 / var(--tw-border-opacity, 1))}.focus\\:border-brand\\/60:focus{border-color:#f3802099}.focus\\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\\:ring-2:focus{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}.focus\\:ring-brand\\/20:focus{--tw-ring-color: rgb(243 128 32 / .2)}.disabled\\:cursor-not-allowed:disabled{cursor:not-allowed}.disabled\\:opacity-40:disabled{opacity:.4}.disabled\\:opacity-50:disabled{opacity:.5}.group:hover .group-hover\\:text-brand{--tw-text-opacity: 1;color:rgb(243 128 32 / var(--tw-text-opacity, 1))}.group:hover .group-hover\\:opacity-100{opacity:1}.dark\\:text-amber-400:is([data-theme=dark] *){--tw-text-opacity: 1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}@media (min-width: 640px){.sm\\:col-span-2{grid-column:span 2 / span 2}.sm\\:block{display:block}.sm\\:inline{display:inline}.sm\\:\\!w-28{width:7rem!important}.sm\\:\\!w-56{width:14rem!important}.sm\\:w-72{width:18rem}.sm\\:w-auto{width:auto}.sm\\:w-fit{width:-moz-fit-content;width:fit-content}.sm\\:max-w-\\[140px\\]{max-width:140px}.sm\\:max-w-\\[200px\\]{max-width:200px}.sm\\:max-w-\\[280px\\]{max-width:280px}.sm\\:max-w-none{max-width:none}.sm\\:flex-initial{flex:0 1 auto}.sm\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.sm\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.sm\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.sm\\:grid-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}.sm\\:flex-row{flex-direction:row}.sm\\:items-center{align-items:center}.sm\\:justify-end{justify-content:flex-end}.sm\\:justify-between{justify-content:space-between}.sm\\:gap-2{gap:.5rem}.sm\\:gap-2\\.5{gap:.625rem}.sm\\:gap-3{gap:.75rem}.sm\\:self-auto{align-self:auto}.sm\\:p-5{padding:1.25rem}.sm\\:p-6{padding:1.5rem}.sm\\:px-2\\.5{padding-left:.625rem;padding-right:.625rem}.sm\\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\\:py-1\\.5{padding-top:.375rem;padding-bottom:.375rem}.sm\\:pb-28{padding-bottom:7rem}.sm\\:pt-0{padding-top:0}.sm\\:pt-40{padding-top:10rem}.sm\\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\\:text-5xl{font-size:3rem;line-height:1}}@media (min-width: 768px){.md\\:col-span-2{grid-column:span 2 / span 2}.md\\:flex{display:flex}.md\\:hidden{display:none}.md\\:w-auto{width:auto}.md\\:max-w-\\[260px\\]{max-width:260px}.md\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.md\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.md\\:flex-row{flex-direction:row}.md\\:items-center{align-items:center}.md\\:justify-between{justify-content:space-between}}@media (min-width: 1024px){.lg\\:right-6{right:1.5rem}.lg\\:flex{display:flex}.lg\\:inline-flex{display:inline-flex}.lg\\:hidden{display:none}.lg\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.lg\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.lg\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.lg\\:grid-cols-\\[320px\\,1fr\\]{grid-template-columns:320px 1fr}.lg\\:px-6{padding-left:1.5rem;padding-right:1.5rem}}@media (min-width: 1280px){.xl\\:col-span-2{grid-column:span 2 / span 2}.xl\\:col-span-3{grid-column:span 3 / span 3}.xl\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.xl\\:grid-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}}
-`,
-              isBase64: false,
-              type: "text/css; charset=utf-8"
-            },
-            "/assets/message-square-CuYbKyMO.js": {
-              content: `import{c as e}from"./index-C1Wgc1sf.js";/**
+            "/assets/message-square-CrX_4GgU.js": {
+              content: `import{c as e}from"./index-KwMGOJkp.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -42255,8 +42255,8 @@ res = client.chat.completions.create(
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/plus-sJaeYLjc.js": {
-              content: `import{c as e}from"./index-C1Wgc1sf.js";/**
+            "/assets/plus-DVAh7yAY.js": {
+              content: `import{c as e}from"./index-KwMGOJkp.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -42266,8 +42266,8 @@ res = client.chat.completions.create(
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/refresh-cw-g67Iczt4.js": {
-              content: `import{c as e}from"./index-C1Wgc1sf.js";/**
+            "/assets/refresh-cw-BrzRfQC6.js": {
+              content: `import{c as e}from"./index-KwMGOJkp.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -42277,8 +42277,8 @@ res = client.chat.completions.create(
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/send-BlMsmIhB.js": {
-              content: `import{c as e}from"./index-C1Wgc1sf.js";/**
+            "/assets/send-BqPM7u0p.js": {
+              content: `import{c as e}from"./index-KwMGOJkp.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -42293,8 +42293,8 @@ res = client.chat.completions.create(
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/trash-2-Hgm_5qDX.js": {
-              content: `import{c as e}from"./index-C1Wgc1sf.js";/**
+            "/assets/trash-2-BF158Quc.js": {
+              content: `import{c as e}from"./index-KwMGOJkp.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -42304,8 +42304,8 @@ res = client.chat.completions.create(
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/triangle-alert-BVzhzJGL.js": {
-              content: `import{c as e}from"./index-C1Wgc1sf.js";/**
+            "/assets/triangle-alert-CuVylkfm.js": {
+              content: `import{c as e}from"./index-KwMGOJkp.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -42320,8 +42320,8 @@ res = client.chat.completions.create(
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/user-a2FF8pEQ.js": {
-              content: `import{c as e}from"./index-C1Wgc1sf.js";/**
+            "/assets/user-C2AHuWH0.js": {
+              content: `import{c as e}from"./index-KwMGOJkp.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -42425,9 +42425,9 @@ Error generating stack: \`+i.message+\`
         window.location.replace(window.location.hash.slice(1));
       }
     </script>
-    <script type="module" crossorigin src="/assets/index-C1Wgc1sf.js"></script>
+    <script type="module" crossorigin src="/assets/index-KwMGOJkp.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/vendor-BbQ_LiY-.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-CVqUX4oI.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-D5GYnqn7.css">
   </head>
   <body>
     <div id="root"></div>
@@ -42785,22 +42785,22 @@ Error generating stack: \`+i.message+\`
         try {
           const handler = (() => {
             const method = req.method;
-            if (method === "GET" && mod_16.onRequestGet) {
-              return mod_16.onRequestGet;
-            } else if (method === "POST" && mod_16.onRequestPost) {
-              return mod_16.onRequestPost;
-            } else if (method === "PUT" && mod_16.onRequestPut) {
-              return mod_16.onRequestPut;
-            } else if (method === "DELETE" && mod_16.onRequestDelete) {
-              return mod_16.onRequestDelete;
-            } else if (method === "PATCH" && mod_16.onRequestPatch) {
-              return mod_16.onRequestPatch;
-            } else if (method === "HEAD" && mod_16.onRequestHead) {
-              return mod_16.onRequestHead;
-            } else if (method === "OPTIONS" && mod_16.onRequestOptions) {
-              return mod_16.onRequestOptions;
+            if (method === "GET" && mod_18.onRequestGet) {
+              return mod_18.onRequestGet;
+            } else if (method === "POST" && mod_18.onRequestPost) {
+              return mod_18.onRequestPost;
+            } else if (method === "PUT" && mod_18.onRequestPut) {
+              return mod_18.onRequestPut;
+            } else if (method === "DELETE" && mod_18.onRequestDelete) {
+              return mod_18.onRequestDelete;
+            } else if (method === "PATCH" && mod_18.onRequestPatch) {
+              return mod_18.onRequestPatch;
+            } else if (method === "HEAD" && mod_18.onRequestHead) {
+              return mod_18.onRequestHead;
+            } else if (method === "OPTIONS" && mod_18.onRequestOptions) {
+              return mod_18.onRequestOptions;
             } else {
-              return mod_16.onRequest;
+              return mod_18.onRequest;
             }
           })();
           if (handler) {

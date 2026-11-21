@@ -109,15 +109,27 @@ async function smtpReady(env: Env): Promise<{ to: string[]; send: (subject: stri
   };
 }
 
-/** 机器人被 @ 提及的判定（@Relay助手 / @机器人 / @小R / @bot / @assistant，大小写不敏感） */
-function isBotMentioned(content: string): boolean {
-  return /@(relay助手|机器人|小r|bot|assistant)/i.test(content);
+/** 机器人被 @ 提及的判定：内置别名 + 后台自定义名字（转义后匹配），大小写不敏感 */
+function isBotMentioned(content: string, botName: string): boolean {
+  const escaped = botName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`@(relay助手|机器人|小r|bot|assistant|${escaped})`, "i").test(content);
 }
 
-/** 调用 Agnes agnes-3.0-flash 生成机器人回复（带记忆）；模型可由后台设置覆盖 */
-async function botReply(env: Env, history: ChatMessage[]): Promise<string> {
+/** 聊天室机器人默认系统提示词（后台「聊天室机器人系统提示词」可覆盖） */
+export const CHATBOT_DEFAULT_SYSTEM =
+  "你是 Relay 平台（EdgeOne 边缘 AI API 网关）聊天室里的官方助手「Relay 助手」，用简体中文、简短友好地回答平台使用问题：" +
+  "如何注册登录、创建 API Key、查看模型与定价、在操练场试用模型、账号池/渠道的含义、额度与计费方式等。" +
+  "遇到你无法确定的问题、用户投诉、请求人工处理或要求联系管理员时，先正常简短回应，然后在回复末尾另起一行输出：[ESCALATE] 需要人工处理的原因。" +
+  "不要编造平台不存在的功能。聊天室内容所有人可见，不要让用户发送密码等敏感信息。";
+
+/** 调用配置的机器人模型生成回复（带记忆）；模型/提示词/名字后台可配 */
+async function botReply(env: Env, history: ChatMessage[]): Promise<{ content: string; model: string }> {
   const settings = await getSettings(env);
-  const model = String(settings.chatBotModel || "agnes-3.0-flash").trim();
+  const rawModel = String(settings.chatBotModel || "agnes-3.0-flash").trim();
+  // 支持 渠道/模型 规范格式：取渠道前缀之后的模型名（当前固定走 Agnes 密钥池）
+  const model = rawModel.includes("/") ? rawModel.slice(rawModel.indexOf("/") + 1) : rawModel;
+  const botName = String(settings.chatBotName || "Relay 助手").trim();
+  const systemPrompt = String(settings.chatBotSystemPrompt || "").trim() || CHATBOT_DEFAULT_SYSTEM.replace("「Relay 助手」", `「${botName}」`);
   const { getProviders, getProviderKeys, getProviderKeysAll } = await import("../storage/db");
   const providers = await getProviders(env);
   const agnes = providers.find((p) => p.slug === "agnes" && p.status === "active");
@@ -128,10 +140,8 @@ async function botReply(env: Env, history: ChatMessage[]): Promise<string> {
   const key = await decryptSecret(env, activeKey.encryptedKey);
 
   const system =
-    "你是 Relay 平台（EdgeOne 边缘 AI API 网关）聊天室里的官方助手「Relay 助手」，用简体中文、简短友好地回答平台使用问题：" +
-    "如何注册登录、创建 API Key、查看模型与定价、在操练场试用模型、账号池/渠道的含义、额度与计费方式等。" +
-    "遇到你无法确定的问题、用户投诉、请求人工处理或要求联系管理员时，先正常简短回应，然后在回复末尾另起一行输出：[ESCALATE] 需要人工处理的原因。" +
-    "不要编造平台不存在的功能。聊天室内容所有人可见，不要让用户发送密码等敏感信息。";
+    systemPrompt +
+    "\n（你当前实际使用的上游模型：" + model + "。回答与平台功能相关的问题；与模型选择无关的请求正常应答。）";
   const context = history.slice(-CONTEXT_MESSAGES).map((m) => ({
     role: m.role === "bot" ? "assistant" : m.role === "system" ? "assistant" : "user",
     content: m.role === "system" ? `[系统提示] ${m.content}` : m.content,
@@ -156,7 +166,7 @@ async function botReply(env: Env, history: ChatMessage[]): Promise<string> {
   const j = JSON.parse(text);
   const content = j?.choices?.[0]?.message?.content;
   if (typeof content !== "string" || !content.trim()) throw new Error("Agnes 上游未返回内容");
-  return content.trim();
+  return { content: content.trim(), model };
 }
 
 /** 拍一拍：系统消息 + 机器人俏皮回应（微信式轻互动） */
@@ -174,20 +184,20 @@ chatroomRouter.post("/pat", async (c) => {
       userId: user.id,
       email: user.email,
       role: "system",
-      content: `"${user.email.split("@")[0]}" 拍了拍「Relay 助手」`,
+      content: `"${user.email.split("@")[0]}" 拍了拍「${(await getSettings(env)).chatBotName || "Relay 助手"}」`,
       createdAt: now,
     });
     // 机器人简短回应（带上下文）
     try {
       const history: ChatMessage[] = [...list, { id: uuid(), userId: user.id, email: user.email, role: "user", content: "[拍一拍] 用户刚刚拍了拍你，请用不超过 20 字简短俏皮地回应。", createdAt: now }];
-      const reply = await botReply(env, history);
+      const { content: reply } = await botReply(env, history);
       await appendChatMessage(env, {
-        id: uuid(), userId: "bot", email: "bot", nickname: "Relay 助手", role: "bot",
+        id: uuid(), userId: "bot", email: "bot", nickname: String((await getSettings(env)).chatBotName || "Relay 助手"), role: "bot",
         content: reply.slice(0, 60), createdAt: Math.floor(Date.now() / 1000),
       });
     } catch {}
     const finalList = await loadChatMessages(env);
-    return json({ ok: true, messages: finalList.slice(-200) });
+    return json({ ok: true, messages: finalList.slice(-200), botName: String((await getSettings(env)).chatBotName || "Relay 助手") });
   } catch (err) {
     return errorResponse(hCtx, err);
   }
@@ -200,7 +210,8 @@ chatroomRouter.get("/messages", async (c) => {
   try {
     await requireUser(hCtx);
     const messages = await loadChatMessages(env);
-    return json({ ok: true, messages: messages.slice(-200), retainedDays: 30 });
+    const settings = await getSettings(env);
+    return json({ ok: true, messages: messages.slice(-200), retainedDays: 30, botName: String(settings.chatBotName || "Relay 助手") });
   } catch (err) {
     return errorResponse(hCtx, err);
   }
@@ -233,13 +244,14 @@ chatroomRouter.post("/messages", async (c) => {
     let list = await appendChatMessage(env, userMsg);
 
     // 只有 @ 机器人才触发回复；普通消息不予理会
-    if (!isBotMentioned(content)) {
-      return json({ ok: true, messages: list.slice(-200) });
+    const botName = String((await getSettings(env)).chatBotName || "Relay 助手").trim();
+    if (!isBotMentioned(content, botName)) {
+      return json({ ok: true, messages: list.slice(-200), botName });
     }
 
     // 机器人回复（同步生成；失败则落一条系统提示，不影响用户消息）
     try {
-      const reply = await botReply(env, list);
+      const { content: reply } = await botReply(env, list);
       let botContent = reply;
       // 升级邮件：机器人输出 [ESCALATE] 原因 → 剥离标记 + SMTP 邮件给超级管理员
       const m = botContent.match(/\[ESCALATE\]\s*(.+)/i);
@@ -277,7 +289,7 @@ chatroomRouter.post("/messages", async (c) => {
         id: uuid(),
         userId: "bot",
         email: "bot",
-        nickname: "Relay 助手",
+        nickname: botName,
         role: "bot",
         content: botContent,
         createdAt: Math.floor(Date.now() / 1000),

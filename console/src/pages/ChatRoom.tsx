@@ -30,13 +30,16 @@ export default function ChatRoom({ me }: { me: Me }) {
   const patBusyRef = useRef(false);
   /** @ 提及候选：输入 @ 后弹出房间内所有用户 */
   const [mention, setMention] = useState<{ query: string } | null>(null);
+  /** 机器人名字：后台「网站设置 → 站点信息 → 聊天室机器人名字」可配 */
+  const [botName, setBotName] = useState("Relay 助手");
   const listRef = useRef<HTMLDivElement | null>(null);
   const toast = useToast();
 
   const poll = async () => {
     try {
-      const r = await api<{ messages: ChatMessage[] }>("/api/chatroom/messages");
+      const r = await api<{ messages: ChatMessage[]; botName?: string }>("/api/chatroom/messages");
       setMsgs(r.messages || []);
+      if (r.botName) setBotName(r.botName);
     } catch {
       // 轮询失败静默，下个周期重试
     }
@@ -63,8 +66,9 @@ export default function ChatRoom({ me }: { me: Me }) {
     patBusyRef.current = true;
     setMenu(null);
     try {
-      const r = await api<{ messages: ChatMessage[] }>("/api/chatroom/pat", "POST", {});
+      const r = await api<{ messages: ChatMessage[]; botName?: string }>("/api/chatroom/pat", "POST", {});
       setMsgs(r.messages || []);
+      if (r.botName) setBotName(r.botName);
     } catch (e) {
       toast((e as Error).message, "err");
     } finally {
@@ -75,7 +79,7 @@ export default function ChatRoom({ me }: { me: Me }) {
   /** 把 @ 助手 插进输入框 */
   const mentionBot = () => {
     setMenu(null);
-    setInput((v) => (v.includes("@Relay助手") ? v : `${v ? v + " " : ""}@Relay助手 `));
+    setInput((v) => (v.includes(`@${botName}`) ? v : `${v ? v + " " : ""}@${botName} `));
   };
 
   /** 长按计时（移动端） */
@@ -94,8 +98,9 @@ export default function ChatRoom({ me }: { me: Me }) {
     setBusy(true);
     try {
       // 发送响应即含最新消息（含机器人回复），随后轮询兜底
-      const r = await api<{ messages: ChatMessage[] }>("/api/chatroom/messages", "POST", { content: text });
+      const r = await api<{ messages: ChatMessage[]; botName?: string }>("/api/chatroom/messages", "POST", { content: text });
       setMsgs(r.messages || []);
+      if (r.botName) setBotName(r.botName);
     } catch (e) {
       toast((e as Error).message, "err");
     } finally {
@@ -103,7 +108,7 @@ export default function ChatRoom({ me }: { me: Me }) {
     }
   };
 
-  const displayEmail = (m: ChatMessage) => (m.role === "bot" ? "Relay 助手" : m.role === "system" ? "系统" : m.nickname || m.email);
+  const displayEmail = (m: ChatMessage) => (m.role === "bot" ? m.nickname || botName : m.role === "system" ? "系统" : m.nickname || m.email);
   const isMine = (m: ChatMessage) => m.role === "user" && m.userId === me.user.id;
 
   /** 房间参与者：出现过的用户去重（附机器人）；@ 提及候选来源 */
