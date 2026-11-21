@@ -1337,12 +1337,14 @@ export async function fetchTraeModels(
     const text = await res.text();
     if (!res.ok) {
       // 国际版固定 403（no schema found），这属于预期行为，不当成错误刷屏
+      // 带上上游响应体片段，便于定位 400/403 的具体原因
+      const snippet = text.slice(0, 180).replace(/\s+/g, " ");
       return {
         models: fallback,
         message:
           region === "global"
             ? "国际版不开放 model_list（403），已使用内置目录；如需新模型请手动添加"
-            : `model_list 拉取失败 HTTP ${res.status}，已回退内置目录`,
+            : `model_list 拉取失败 HTTP ${res.status}，已回退内置目录（${snippet}）`,
       };
     }
     const models = parseTraeModelList(JSON.parse(text));
