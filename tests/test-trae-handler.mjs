@@ -136,6 +136,40 @@ const glAuth = await mod.buildTraeAuthUrl(env, "https://core-normal.traeapi.us")
 check("国际授权页落点", new URL(glAuth.url).origin === "https://www.trae.ai", glAuth.url);
 check("两区 state 均非空", !!cnAuth.state && !!glAuth.state);
 
+// 7) 完成授权：换票 DeviceInfo 必须与授权会话设备号一致（20403 "Token device not match" 回归），
+//    真实设备号只写进凭据 checkin_device_id（签到域专用），不得进入换票 DeviceInfo
+{
+  const realDeviceId = "3225342868485628";
+  const auth = await mod.buildTraeAuthUrl(env, "https://trae-api-cn.mchost.guru", realDeviceId);
+  const authUrl = new URL(auth.url);
+  const flowDevice = authUrl.searchParams.get("device_id");
+  const flowMachine = authUrl.searchParams.get("machine_id");
+  check("授权会话设备号是随机号（非真实号）", !!flowDevice && flowDevice !== realDeviceId, flowDevice || "");
+  const authCodeInfo = JSON.stringify({ AuthCode: "AC-1", ExpireAt: Date.now() + 600_000, ExpireDuration: 600_000 });
+  const userInfo = JSON.stringify({ UserID: "u-9", ScreenName: "皮皮猪影视" });
+  const cbUrl = `http://127.0.0.1:18146/authorize?isRedirect=true&scope=trae&authCodeInfo=${encodeURIComponent(authCodeInfo)}&userInfo=${encodeURIComponent(userInfo)}`;
+  const before = seen.length;
+  const done = await mod.completeTraeOAuth(env, cbUrl, auth.state, "https://trae-api-cn.mchost.guru", realDeviceId);
+  const exReq = seen.slice(before).find((r) => r.url.includes("/trae/api/v3/oauth/ExchangeToken"));
+  check("换票请求已发出", !!exReq);
+  const exBody = JSON.parse(exReq?.body || "{}");
+  check("换票 DeviceID == 授权会话 device_id", exBody.DeviceInfo?.DeviceID === flowDevice,
+    JSON.stringify({ got: exBody.DeviceInfo?.DeviceID, want: flowDevice }));
+  check("换票 MachineID == 授权会话 machine_id", exBody.DeviceInfo?.MachineID === flowMachine,
+    JSON.stringify({ got: exBody.DeviceInfo?.MachineID, want: flowMachine }));
+  check("换票带 PKCE CodeVerifier", typeof exBody.CodeVerifier === "string" && exBody.CodeVerifier.length >= 43,
+    String(exBody.CodeVerifier || "").length);
+  const credBack = JSON.parse(done.refreshToken);
+  check("凭据 device_id == 会话设备号", credBack.device_id === flowDevice, credBack.device_id);
+  check("凭据 machine_id == 会话 machine_id", credBack.machine_id === flowMachine, credBack.machine_id);
+  check("凭据 checkin_device_id == 客户端真实设备号", credBack.checkin_device_id === realDeviceId, credBack.checkin_device_id);
+  check("签到用真实设备号优先", (() => {
+    const cred = mod.parseTraeCredential(done.refreshToken);
+    return (cred.checkinDeviceId || cred.deviceId) === realDeviceId && cred.deviceId === flowDevice;
+  })());
+  check("完成授权返回账号昵称", done.email === "皮皮猪影视", done.email || "");
+}
+
 server.close();
 console.log(`\n通过 ${pass} 项，失败 ${fail} 项`);
 process.exit(fail ? 1 : 0);

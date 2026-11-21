@@ -24,6 +24,7 @@
  * 合规：仅使用用户本人已登录的 Trae 账号，凭据 AES-256-GCM 加密入库，不进日志。
  */
 import type { Env } from "../types";
+import { ApiError, ErrorCode } from "../errors";
 import { getKV } from "../storage/blob-store";
 import {
   type OAuthCallParams,
@@ -228,6 +229,12 @@ export type TraeCredential = {
   /** 设备身份（上游风控按账号+设备绑定，必须稳定） */
   machineId: string;
   deviceId: string;
+  /**
+   * 签到域专用设备号：客户端真实注册的十进制号（签到 UG 接口按 x-device-id 头识别设备，
+   * 只认客户端注册过的号，生成的号会被拒成 9074）。与换票/对话用的 deviceId 无关——
+   * 那个必须与授权会话一致，否则换票直接 20403 "Token device not match"。
+   */
+  checkinDeviceId?: string;
   clientId?: string;
   issuedAt?: number;
 };
@@ -274,6 +281,7 @@ export function parseTraeCredential(raw: string, baseUrl?: string): TraeCredenti
         name: String(j.name || j.screen_name || j.screenName || ""),
         machineId: String(j.machine_id || j.machineId || id.machineId),
         deviceId: String(j.device_id || j.deviceId || id.deviceId),
+        checkinDeviceId: String(j.checkin_device_id || j.checkinDeviceId || "") || undefined,
         clientId: j.client_id || j.clientId || undefined,
         issuedAt: Number(j.issued_at || j.issuedAt || 0) || undefined,
       };
@@ -303,6 +311,7 @@ export function serializeTraeCredential(cred: TraeCredential): string {
     name: cred.name || undefined,
     machine_id: cred.machineId,
     device_id: cred.deviceId,
+    checkin_device_id: cred.checkinDeviceId || undefined,
     client_id: cred.clientId || undefined,
     issued_at: cred.issuedAt || Date.now(),
   });
@@ -755,11 +764,15 @@ export async function completeTraeOAuth(
     if (!parsed.authCode) {
       throw new Error("回调只包含 access_token，缺少 refresh_token；请重新授权并粘贴完整回调 URL");
     }
-    // 换票链路同样带真实设备号（若有），让上游把账号与该设备绑定
-    const exchangeFlow: TraeFlow | null = flow
-      ? { ...flow, deviceId: effectiveRealDeviceId || flow.deviceId, realDeviceId: effectiveRealDeviceId || undefined }
-      : flow;
-    const ex = await exchangeTraeAuthCode(env, ep, exchangeFlow, parsed.authCode);
+    // 换票必须复用授权会话的同一套设备号：AuthCode 签发时已与授权 URL 里的
+    // machine_id/device_id 绑定，DeviceInfo 覆盖成别的设备会被上游拒成
+    // 20403 "Token device not match"。真实设备号只进 cred.checkinDeviceId（签到头）。
+    let ex: { accessToken: string; refreshToken: string; expiresAt: number };
+    try {
+      ex = await exchangeTraeAuthCode(env, ep, flow, parsed.authCode);
+    } catch (err) {
+      throw new ApiError(502, ErrorCode.UPSTREAM_ERROR, (err as Error).message || "Trae 授权码换票失败");
+    }
     refreshToken = ex.refreshToken;
     accessToken = ex.accessToken || accessToken;
     expiresAt = ex.expiresAt;
@@ -770,10 +783,15 @@ export async function completeTraeOAuth(
       region,
       refreshToken,
       machineId: flow?.machineId || deviceIdentity(refreshToken).machineId,
-      deviceId: effectiveRealDeviceId || flow?.deviceId || deviceIdentity(refreshToken).deviceId,
+      deviceId: flow?.deviceId || deviceIdentity(refreshToken).deviceId,
       clientId: ep.clientId,
     };
-    const refreshed = await refreshTraeToken(env, tmp);
+    let refreshed: Awaited<ReturnType<typeof refreshTraeToken>>;
+    try {
+      refreshed = await refreshTraeToken(env, tmp);
+    } catch (err) {
+      throw new ApiError(502, ErrorCode.UPSTREAM_ERROR, (err as Error).message || "Trae 凭据验证失败");
+    }
     refreshToken = refreshed.refreshToken || refreshToken;
     accessToken = refreshed.accessToken;
     expiresAt = Date.now() + refreshed.expiresIn * 1000;
@@ -797,8 +815,10 @@ export async function completeTraeOAuth(
     uid: uid || undefined,
     name: name || undefined,
     machineId: flow?.machineId || id.machineId,
-    // 签到域只认客户端真实注册的十进制设备号；没有时回退生成号（聊天可用，签到会 9074）
-    deviceId: effectiveRealDeviceId || flow?.deviceId || id.deviceId,
+    // 换票/对话沿用授权会话设备（与 token 绑定一致，否则上游 20403）；
+    // 签到域按 x-device-id 头识别设备，只认客户端真实注册的十进制号 → 单独存 checkinDeviceId
+    deviceId: flow?.deviceId || id.deviceId,
+    checkinDeviceId: effectiveRealDeviceId || undefined,
     clientId: ep.clientId,
     issuedAt: Date.now(),
   };
@@ -1521,7 +1541,10 @@ export async function checkinTrae(env: Env, refreshToken: string): Promise<TraeC
     }
   }
   try {
-    const status = await traeCheckinPost("/trae/api/v2/ug/checkin_credits/status", token, cred.deviceId);
+    // 签到域按 x-device-id 头识别设备：必须是客户端真实注册的十进制号（抗 9074），
+    // 没有真实号时回退凭据设备号（此时多半仍 9074，但链路可诊断）
+    const checkinDevice = cred.checkinDeviceId || cred.deviceId;
+    const status = await traeCheckinPost("/trae/api/v2/ug/checkin_credits/status", token, checkinDevice);
     if (status?.enable === false) {
       return { ok: false, message: "当前账号签到活动未开启（enable=false）" };
     }
@@ -1529,7 +1552,7 @@ export async function checkinTrae(env: Env, refreshToken: string): Promise<TraeC
       const credits = traeCheckinCreditsOf(status);
       return { ok: true, already: true, reward: credits || undefined, message: credits ? `今日已签到（积分 ${credits}）` : "今日已签到" };
     }
-    const claim = await traeCheckinPost("/trae/api/v2/ug/checkin_credits/claim", token, cred.deviceId);
+    const claim = await traeCheckinPost("/trae/api/v2/ug/checkin_credits/claim", token, checkinDevice);
     const code = Number(claim?.code ?? 0);
     // 上游业务码：0 成功；9004/9095 本设备今日已签；9074 排队限流（勿立刻重试）
     if (code === 0) {
