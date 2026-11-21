@@ -27,7 +27,10 @@ export default function ChatRoom({ me }: { me: Me }) {
   /** 长按/右键菜单：定位到机器人消息 */
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const longPressTimer = useRef<number | null>(null);
+  const longPressFired = useRef(false);
+  const lastTapRef = useRef<{ time: number } | null>(null);
   const patBusyRef = useRef(false);
+  const [mentionIdx, setMentionIdx] = useState(0);
   /** @ 提及候选：输入 @ 后弹出房间内所有用户 */
   const [mention, setMention] = useState<{ query: string } | null>(null);
   /** 机器人名字：后台「网站设置 → 站点信息 → 聊天室机器人名字」可配 */
@@ -82,13 +85,22 @@ export default function ChatRoom({ me }: { me: Me }) {
     setInput((v) => (v.includes(`@${botName}`) ? v : `${v ? v + " " : ""}@${botName} `));
   };
 
-  /** 长按计时（移动端） */
+  /** 长按计时（移动端）：480ms 触发菜单；期间松手取消 */
   const startLongPress = (x: number, y: number) => {
     if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
-    longPressTimer.current = window.setTimeout(() => setMenu({ x, y }), 480);
+    longPressFired.current = false;
+    longPressTimer.current = window.setTimeout(() => { longPressFired.current = true; setMenu({ x, y }); }, 480);
   };
   const cancelLongPress = () => {
     if (longPressTimer.current) { window.clearTimeout(longPressTimer.current); longPressTimer.current = null; }
+  };
+  /** 触摸双击（双触）拍一拍：两次点击间隔 <320ms；长按已触发菜单则跳过 */
+  const handleTouchTap = () => {
+    const now = Date.now();
+    const last = lastTapRef.current;
+    if (longPressFired.current) { lastTapRef.current = null; return; }
+    if (last && now - last.time < 320) { lastTapRef.current = null; void pat(); }
+    else lastTapRef.current = { time: now };
   };
 
   const send = async () => {
@@ -117,7 +129,7 @@ export default function ChatRoom({ me }: { me: Me }) {
     for (const m of msgs || []) {
       if (m.role === "system") continue;
       const uid = m.role === "bot" ? "bot" : m.userId;
-      if (uid === "bot") { map.set("bot", "Relay 助手"); continue; }
+      if (uid === "bot") { map.set("bot", botName); continue; }
       if (!map.has(uid)) map.set(uid, m.nickname || m.email.split("@")[0] || m.email);
     }
     const list = [...map.entries()].map(([uid, name]) => ({ uid, name }));
@@ -131,6 +143,7 @@ export default function ChatRoom({ me }: { me: Me }) {
     setInput(v);
     const at = v.lastIndexOf("@");
     setMention(at >= 0 && !v.slice(at).includes(" ") ? { query: v.slice(at + 1) } : null);
+    setMentionIdx(0);
   };
 
   /** 点选候选：替换末尾 @片段 为 @名字  */
@@ -176,23 +189,19 @@ export default function ChatRoom({ me }: { me: Me }) {
                   <div
                     className={cn(
                       "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
-                      m.role === "bot" ? "bg-emerald-500/15 text-emerald-500" : isMine(m) ? "bg-brand/15 text-brand" : "bg-surface2 text-muted"
-                    )}
-                  >
-                    {m.role === "bot" ? <Bot size={14} /> : isMine(m) ? <User size={14} /> : (m.email[0] || "?").toUpperCase()}
-                  </div>
-                  <div
-                    className={cn(
-                      "max-w-[75%] space-y-0.5",
-                      isMine(m) && "flex flex-col items-end",
+                      m.role === "bot" ? "bg-emerald-500/15 text-emerald-500" : isMine(m) ? "bg-brand/15 text-brand" : "bg-surface2 text-muted",
                       m.role === "bot" && "cursor-context-menu select-none"
                     )}
                     onContextMenu={m.role === "bot" ? (e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }); } : undefined}
                     onTouchStart={m.role === "bot" ? (e) => { const t = e.touches[0]; if (t) startLongPress(t.clientX, t.clientY); } : undefined}
-                    onTouchEnd={m.role === "bot" ? () => cancelLongPress() : undefined}
+                    onTouchEnd={m.role === "bot" ? () => { cancelLongPress(); handleTouchTap(); } : undefined}
                     onTouchMove={m.role === "bot" ? () => cancelLongPress() : undefined}
-                    onDoubleClick={m.role === "bot" ? () => void pat() : undefined}
-                    title={m.role === "bot" ? "右键 / 长按：@ 助手；双击：拍一拍" : undefined}
+                    title={m.role === "bot" ? "右键 / 长按：菜单（@ 助手、拍一拍）；双触：拍一拍" : undefined}
+                  >
+                    {m.role === "bot" ? <Bot size={14} /> : isMine(m) ? <User size={14} /> : (m.email[0] || "?").toUpperCase()}
+                  </div>
+                  <div
+                    className={cn("max-w-[75%] space-y-0.5", isMine(m) && "flex flex-col items-end")}
                   >
                     <div className="flex items-center gap-1.5 text-[10px] text-muted">
                       <span className="font-medium text-ink">{displayEmail(m)}</span>
@@ -218,11 +227,14 @@ export default function ChatRoom({ me }: { me: Me }) {
           {mention && (
             <div className="absolute bottom-full left-3 right-3 mb-2 max-h-56 overflow-y-auto rounded-xl border border-line bg-surface shadow-card">
               <div className="border-b border-line/70 px-3 py-1.5 text-[10px] text-muted">选择要 @ 的用户</div>
-              {participants.map((u) => (
+              {participants.map((u, i) => (
                 <button
                   key={u.uid}
                   type="button"
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-ink transition-colors hover:bg-surface2"
+                  className={cn(
+                    "flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-ink transition-colors",
+                    i === mentionIdx ? "bg-brand/10" : "hover:bg-surface2"
+                  )}
                   onClick={() => pickMention(u.name)}
                 >
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface2 text-[10px] text-muted">{u.name[0]?.toUpperCase()}</span>
@@ -238,6 +250,21 @@ export default function ChatRoom({ me }: { me: Me }) {
               onChange={(e) => onInputChange(e.target.value.slice(0, CHARS_LIMIT))}
               onKeyDown={(e) => {
                 // 中文输入法选词时的 Enter（isComposing / keyCode 229）不触发发送
+                if (e.key === "Escape" && mention) { setMention(null); return; }
+                if (mention && participants.length) {
+                  // @ 候选打开：上下选择、Enter 选中（不发送），关闭后再 Enter 才发送
+                  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                    e.preventDefault();
+                    setMentionIdx((i) => (e.key === "ArrowDown" ? i + 1 : i - 1 + participants.length) % participants.length);
+                    return;
+                  }
+                  if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) {
+                    e.preventDefault();
+                    const u = participants[Math.max(0, Math.min(mentionIdx, participants.length - 1))];
+                    pickMention(u.name);
+                    return;
+                  }
+                }
                 if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && e.keyCode !== 229) {
                   e.preventDefault();
                   void send();

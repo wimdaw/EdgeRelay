@@ -243,9 +243,18 @@ chatroomRouter.post("/messages", async (c) => {
     };
     let list = await appendChatMessage(env, userMsg);
 
-    // 只有 @ 机器人才触发回复；普通消息不予理会
+    // 触发条件：@ 机器人名字，或 @ 任意房间用户（@某人提问，机器人跟进回答）
     const botName = String((await getSettings(env)).chatBotName || "Relay 助手").trim();
-    if (!isBotMentioned(content, botName)) {
+    const mentionsUser = ((): boolean => {
+      const lower = content.toLowerCase();
+      for (const m of list) {
+        if (m.role !== "user" || !m.userId) continue;
+        const name = (m.nickname || m.email.split("@")[0] || "").toLowerCase();
+        if (name && lower.includes("@" + name)) return true;
+      }
+      return false;
+    })();
+    if (!isBotMentioned(content, botName) && !mentionsUser) {
       return json({ ok: true, messages: list.slice(-200), botName });
     }
 
