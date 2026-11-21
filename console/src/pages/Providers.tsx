@@ -201,6 +201,8 @@ type OAuthDialogState = {
   step: "region" | "loading" | "ready" | "polling" | "error";
   message?: string;
   codeInput: string;
+  /** Trae 专用：客户端真实设备号（选填，签到域 UG 接口只认它） */
+  deviceIdInput?: string;
   busy?: boolean;
 };
 
@@ -739,6 +741,7 @@ export default function Providers() {
         code: oauthDlg.codeInput.trim(),
         state: oauthDlg.state,
         baseUrl: oauthDlg.baseUrl,
+        deviceId: oauthDlg.deviceIdInput?.trim() || undefined,
       });
       const token = r.result?.refreshToken;
       if (!token) throw new Error("上游未返回 refresh_token");
@@ -1624,6 +1627,23 @@ export default function Providers() {
                 className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
               />
             </Field>
+            {oauthDlg?.meta.type === "trae" && (
+              <Field label="客户端真实设备号（选填，每日签到用）">
+                <Input
+                  value={oauthDlg.deviceIdInput ?? ""}
+                  onChange={(e) => oauthDlg && setOauthDlg({ ...oauthDlg, deviceIdInput: e.target.value.replace(/\D/g, "").slice(0, 20) })}
+                  placeholder="十进制 12~20 位数字"
+                  inputMode="numeric"
+                  className="font-mono"
+                />
+                <p className="mt-1 text-[10px] leading-relaxed text-muted">
+                  签到接口只认 Trae 客户端注册过的真实设备号（聊天不受影响）。获取：打开客户端 storage.json
+                  （Windows <code className="rounded bg-line px-0.5">%APPDATA%\Trae CN\User\globalStorage\storage.json</code>，macOS{" "}
+                  <code className="rounded bg-line px-0.5">~/Library/Application Support/Trae CN/User/globalStorage/storage.json</code>
+                  ，搜索 <code className="rounded bg-line px-0.5">icube-dc</code>，键名冒号后那串十进制数字即为设备号）。不填则签到可能被拒（9074）。
+                </p>
+              </Field>
+            )}
             {oauthDlg?.message && <div className="text-[11px] text-muted">{oauthDlg.message}</div>}
             <div className="flex justify-end gap-2">
               <Button variant="ghost" onClick={closeOAuth}>取消</Button>

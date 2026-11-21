@@ -322,12 +322,13 @@ type TraeFlow = {
   traceId: string;
   machineId: string;
   deviceId: string;
+  /** 用户提供的客户端真实设备号（十进制，签到域 UG 接口只认它，见 checkinTrae） */
+  realDeviceId?: string;
   callbackUrl: string;
   createdAt: number;
 };
 
-function buildCallbackUrl(): string {
-  // 官方客户端用随机空闲端口；云端无法监听，端口只需"看起来合法"，用户粘贴整段 URL
+function buildCallbackUrl(): string {  // 官方客户端用随机空闲端口；云端无法监听，端口只需"看起来合法"，用户粘贴整段 URL
   const port = 18080 + Math.floor(Math.random() * 120);
   return `http://127.0.0.1:${port}${CALLBACK_PATH}`;
 }
@@ -348,9 +349,15 @@ async function createTraePkce(): Promise<{ verifier: string; challenge: string }
  * client_id / redirect / login_trace_id / auth_callback_url / machine_id /
  * device_id / x_* / code_challenge / code_challenge_method
  */
+/** 客户端真实设备号：十进制 12~20 位（实测 15/16 位常见），生成号会被签到域拒成 9074 */
+export function isValidTraeDeviceId(v?: string | null): boolean {
+  return /^\d{12,20}$/.test(String(v || "").trim());
+}
+
 export async function buildTraeAuthUrl(
   env: Env,
-  baseUrl?: string
+  baseUrl?: string,
+  realDeviceId?: string
 ): Promise<{ url: string; state: string; region: TraeRegion }> {
   const region = regionFromBaseUrl(baseUrl);
   const ep = traeEndpoints(env, region);
@@ -372,6 +379,7 @@ export async function buildTraeAuthUrl(
   q.set("login_trace_id", traceId);
   q.set("auth_callback_url", callbackUrl);
   q.set("machine_id", machineId);
+  // 用户提供了客户端真实设备号时，授权链路就带真实号，签到域设备校验才能通过
   q.set("device_id", deviceId);
   q.set("x_device_id", deviceId);
   q.set("x_machine_id", machineId);
@@ -390,6 +398,7 @@ export async function buildTraeAuthUrl(
     traceId,
     machineId,
     deviceId,
+    realDeviceId: isValidTraeDeviceId(realDeviceId) ? String(realDeviceId).trim() : undefined,
     callbackUrl,
     createdAt: Date.now(),
   };
@@ -711,7 +720,8 @@ export async function completeTraeOAuth(
   env: Env,
   input: string,
   state: string,
-  baseUrl?: string
+  baseUrl?: string,
+  realDeviceId?: string
 ): Promise<{ refreshToken: string; email?: string; account?: { uid?: string } }> {
   let flow: TraeFlow | null = null;
   try {
@@ -720,6 +730,13 @@ export async function completeTraeOAuth(
   } catch {
     /* 流程状态可缺失：回调里带 refreshToken 时无需 verifier */
   }
+
+  // 真实设备号：显式参数优先，其次授权发起时已提供的 flow.realDeviceId
+  const effectiveRealDeviceId = isValidTraeDeviceId(realDeviceId)
+    ? String(realDeviceId).trim()
+    : isValidTraeDeviceId(flow?.realDeviceId)
+    ? String(flow!.realDeviceId)
+    : "";
 
   const parsed = parseTraeCallback(input);
   if (parsed.error) throw new Error(`Trae 授权失败：${parsed.error}`);
@@ -738,7 +755,11 @@ export async function completeTraeOAuth(
     if (!parsed.authCode) {
       throw new Error("回调只包含 access_token，缺少 refresh_token；请重新授权并粘贴完整回调 URL");
     }
-    const ex = await exchangeTraeAuthCode(env, ep, flow, parsed.authCode);
+    // 换票链路同样带真实设备号（若有），让上游把账号与该设备绑定
+    const exchangeFlow: TraeFlow | null = flow
+      ? { ...flow, deviceId: effectiveRealDeviceId || flow.deviceId, realDeviceId: effectiveRealDeviceId || undefined }
+      : flow;
+    const ex = await exchangeTraeAuthCode(env, ep, exchangeFlow, parsed.authCode);
     refreshToken = ex.refreshToken;
     accessToken = ex.accessToken || accessToken;
     expiresAt = ex.expiresAt;
@@ -749,7 +770,7 @@ export async function completeTraeOAuth(
       region,
       refreshToken,
       machineId: flow?.machineId || deviceIdentity(refreshToken).machineId,
-      deviceId: flow?.deviceId || deviceIdentity(refreshToken).deviceId,
+      deviceId: effectiveRealDeviceId || flow?.deviceId || deviceIdentity(refreshToken).deviceId,
       clientId: ep.clientId,
     };
     const refreshed = await refreshTraeToken(env, tmp);
@@ -776,7 +797,8 @@ export async function completeTraeOAuth(
     uid: uid || undefined,
     name: name || undefined,
     machineId: flow?.machineId || id.machineId,
-    deviceId: flow?.deviceId || id.deviceId,
+    // 签到域只认客户端真实注册的十进制设备号；没有时回退生成号（聊天可用，签到会 9074）
+    deviceId: effectiveRealDeviceId || flow?.deviceId || id.deviceId,
     clientId: ep.clientId,
     issuedAt: Date.now(),
   };

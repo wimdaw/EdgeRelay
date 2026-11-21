@@ -1049,7 +1049,8 @@ adminRouter.post("/actions", async (c) => {
         const type = String(p.provider || "");
         const { startOAuth, isOAuthType } = await import("../oauth");
         if (!isOAuthType(type)) throw new ApiError(400, ErrorCode.BAD_REQUEST, `不支持的 OAuth 渠道: ${type}`);
-        const result = await startOAuth(env, type, p.baseUrl ? String(p.baseUrl) : undefined);
+        // deviceId：Trae 客户端真实设备号（选填），签到域 UG 接口只认它
+        const result = await startOAuth(env, type, p.baseUrl ? String(p.baseUrl) : undefined, p.deviceId ? String(p.deviceId) : undefined);
         return done(result, "oauth", type);
       }
       case "oauth_complete": {
@@ -1062,7 +1063,8 @@ adminRouter.post("/actions", async (c) => {
           type,
           String(p.code),
           String(p.state),
-          p.baseUrl ? String(p.baseUrl) : undefined
+          p.baseUrl ? String(p.baseUrl) : undefined,
+          p.deviceId ? String(p.deviceId) : undefined
         );
         return done({ refreshToken: result.refreshToken, email: result.email, account: result.account }, "oauth", type);
       }

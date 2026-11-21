@@ -226,7 +226,12 @@ export type OAuthStartResult =
   | { mode: "device"; state: string; verification_uri: string; verification_uri_complete?: string; user_code: string; interval: number; expires_in?: number };
 
 /** 发起授权：redirect 返回授权链接，device 返回设备码信息 */
-export async function startOAuth(env: Env, type: OAuthProviderType, baseUrl?: string): Promise<OAuthStartResult> {
+export async function startOAuth(
+  env: Env,
+  type: OAuthProviderType,
+  baseUrl?: string,
+  deviceId?: string
+): Promise<OAuthStartResult> {
   if (type === "claude") {
     const { url, state } = await buildClaudeAuthUrl(env);
     return { mode: "redirect", url, state };
@@ -255,7 +260,8 @@ export async function startOAuth(env: Env, type: OAuthProviderType, baseUrl?: st
   if (type === "trae") {
     // Trae 是浏览器授权码 + PKCE，回调落在 127.0.0.1，云端收不到：
     // 前端展示授权链接，用户授权后把地址栏整段 URL 粘回来完成换票。
-    const flow = await buildTraeAuthUrl(env, baseUrl);
+    // deviceId：客户端真实设备号（选填）——签到域 UG 接口只认它
+    const flow = await buildTraeAuthUrl(env, baseUrl, deviceId);
     return { mode: "redirect", url: flow.url, state: flow.state };
   }
   if (type === "doubao") {
@@ -288,10 +294,11 @@ export async function completeOAuth(
   type: OAuthProviderType,
   code: string,
   state: string,
-  baseUrl?: string
+  baseUrl?: string,
+  deviceId?: string
 ): Promise<{ refreshToken: string; email?: string; account?: { uid?: string } }> {
   if (type === "trae") {
-    return completeTraeOAuth(env, code, state, baseUrl);
+    return completeTraeOAuth(env, code, state, baseUrl, deviceId);
   }
   if (type === "doubao") {
     // 「code」即用户粘贴的整段豆包 Cookie；校验 sessionid 存在即入库
