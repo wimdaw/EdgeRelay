@@ -1337,6 +1337,44 @@ export async function fetchTraeModels(
   if (!cred) return { models: fallback, message: "凭据格式无效，已回退内置目录" };
 
   try {
+    // 首选：Web/Remote 平面的 /models（对齐 TRAE2API 的 web 客户端契约——
+    // IDE 的 model_list 已失效 4001）。token 与 IDE 链路同为 Cloud-IDE-JWT。
+    try {
+      const accessToken = await getAccessToken(env, cred);
+      const webUrl = `${ep.core.replace("/api/ide", "")}/api/remote/v1/models?functions=solo_agent_remote%2Csolo_work_remote%2Csolo_design_remote&show_custom_model=true`;
+      const webHeaders: Record<string, string> = {
+        accept: "application/json",
+        "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
+        authorization: `Cloud-IDE-JWT ${accessToken}`,
+        origin: "https://work.trae.cn",
+        referer: "https://work.trae.cn/",
+        "sec-ch-ua": '"Chromium";v="152", "Not:A-Brand";v="24"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "cross-site",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+        "x-preferenced-language": "zh-cn",
+        "x-trae-client-type": "web",
+        "x-trae-user-timezone": "Asia/Shanghai",
+      };
+      const webRes = await fetch(webUrl, { headers: webHeaders, signal: AbortSignal.timeout(30000) });
+      if (webRes.ok) {
+        const j: any = await webRes.json().catch(() => null);
+        const out: string[] = [];
+        for (const group of (j?.data?.groups ?? j?.groups ?? []) as any[]) {
+          for (const raw of (group?.models ?? []) as any[]) {
+            const name = String(raw?.config_name || raw?.configName || raw?.name || raw?.model_name || "").trim();
+            if (name) out.push(name);
+          }
+        }
+        const models = [...new Set(out)];
+        if (models.length) return { models, message: `model_list OK（web/remote，${models.length} 个）` };
+      }
+    } catch {
+      // web/remote 拉取失败，回退 IDE 探测链
+    }
     // 上游可能变更参数要求：依次探测 GET(原样) / GET+查询参数 / POST / account 域，取第一个成功形态
     const accessToken = await getAccessToken(env, cred);
     const headers = traeHeaders(ep, cred, accessToken, false);
