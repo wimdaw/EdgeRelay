@@ -159,6 +159,40 @@ async function botReply(env: Env, history: ChatMessage[]): Promise<string> {
   return content.trim();
 }
 
+/** 拍一拍：系统消息 + 机器人俏皮回应（微信式轻互动） */
+chatroomRouter.post("/pat", async (c) => {
+  const env = c.env as Env;
+  const hCtx: HandlerCtx = { env, req: c.req as any };
+  try {
+    const user = await requireUser(hCtx);
+    if (!(await checkRate(env, user.id))) {
+      throw new ApiError(429, ErrorCode.RATE_LIMITED, "操作太频繁，稍后再试");
+    }
+    const now = Math.floor(Date.now() / 1000);
+    const list = await appendChatMessage(env, {
+      id: uuid(),
+      userId: user.id,
+      email: user.email,
+      role: "system",
+      content: `"${user.email.split("@")[0]}" 拍了拍「Relay 助手」`,
+      createdAt: now,
+    });
+    // 机器人简短回应（带上下文）
+    try {
+      const history: ChatMessage[] = [...list, { id: uuid(), userId: user.id, email: user.email, role: "user", content: "[拍一拍] 用户刚刚拍了拍你，请用不超过 20 字简短俏皮地回应。", createdAt: now }];
+      const reply = await botReply(env, history);
+      await appendChatMessage(env, {
+        id: uuid(), userId: "bot", email: "bot", nickname: "Relay 助手", role: "bot",
+        content: reply.slice(0, 60), createdAt: Math.floor(Date.now() / 1000),
+      });
+    } catch {}
+    const finalList = await loadChatMessages(env);
+    return json({ ok: true, messages: finalList.slice(-200) });
+  } catch (err) {
+    return errorResponse(hCtx, err);
+  }
+});
+
 /** 拉取消息列表 */
 chatroomRouter.get("/messages", async (c) => {
   const env = c.env as Env;

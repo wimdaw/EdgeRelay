@@ -797,7 +797,8 @@ export default function Playground({ me }: { me: Me }) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
+                  // 中文输入法选词时的 Enter（isComposing / keyCode 229）不触发发送
+                  if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && e.keyCode !== 229) {
                     e.preventDefault();
                     send();
                   }

@@ -24,6 +24,10 @@ export default function ChatRoom({ me }: { me: Me }) {
   const [msgs, setMsgs] = useState<ChatMessage[] | null>(null);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  /** 长按/右键菜单：定位到机器人消息 */
+  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+  const longPressTimer = useRef<number | null>(null);
+  const patBusyRef = useRef(false);
   const listRef = useRef<HTMLDivElement | null>(null);
   const toast = useToast();
 
@@ -50,6 +54,36 @@ export default function ChatRoom({ me }: { me: Me }) {
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [msgs]);
+
+  /** 拍一拍：后端落系统消息 + 机器人俏皮回应 */
+  const pat = async () => {
+    if (patBusyRef.current) return;
+    patBusyRef.current = true;
+    setMenu(null);
+    try {
+      const r = await api<{ messages: ChatMessage[] }>("/api/chatroom/pat", "POST", {});
+      setMsgs(r.messages || []);
+    } catch (e) {
+      toast((e as Error).message, "err");
+    } finally {
+      patBusyRef.current = false;
+    }
+  };
+
+  /** 把 @ 助手 插进输入框 */
+  const mentionBot = () => {
+    setMenu(null);
+    setInput((v) => (v.includes("@Relay助手") ? v : `${v ? v + " " : ""}@Relay助手 `));
+  };
+
+  /** 长按计时（移动端） */
+  const startLongPress = (x: number, y: number) => {
+    if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
+    longPressTimer.current = window.setTimeout(() => setMenu({ x, y }), 480);
+  };
+  const cancelLongPress = () => {
+    if (longPressTimer.current) { window.clearTimeout(longPressTimer.current); longPressTimer.current = null; }
+  };
 
   const send = async () => {
     const text = input.trim();
@@ -111,7 +145,19 @@ export default function ChatRoom({ me }: { me: Me }) {
                   >
                     {m.role === "bot" ? <Bot size={14} /> : isMine(m) ? <User size={14} /> : (m.email[0] || "?").toUpperCase()}
                   </div>
-                  <div className={cn("max-w-[75%] space-y-0.5", isMine(m) && "flex flex-col items-end")}>
+                  <div
+                    className={cn(
+                      "max-w-[75%] space-y-0.5",
+                      isMine(m) && "flex flex-col items-end",
+                      m.role === "bot" && "cursor-context-menu select-none"
+                    )}
+                    onContextMenu={m.role === "bot" ? (e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }); } : undefined}
+                    onTouchStart={m.role === "bot" ? (e) => { const t = e.touches[0]; if (t) startLongPress(t.clientX, t.clientY); } : undefined}
+                    onTouchEnd={m.role === "bot" ? () => cancelLongPress() : undefined}
+                    onTouchMove={m.role === "bot" ? () => cancelLongPress() : undefined}
+                    onDoubleClick={m.role === "bot" ? () => void pat() : undefined}
+                    title={m.role === "bot" ? "右键 / 长按：@ 助手；双击：拍一拍" : undefined}
+                  >
                     <div className="flex items-center gap-1.5 text-[10px] text-muted">
                       <span className="font-medium text-ink">{displayEmail(m)}</span>
                       {m.role === "bot" && <span className="rounded bg-emerald-500/10 px-1 text-[9px] text-emerald-500">机器人</span>}
@@ -138,7 +184,8 @@ export default function ChatRoom({ me }: { me: Me }) {
               value={input}
               onChange={(e) => setInput(e.target.value.slice(0, CHARS_LIMIT))}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
+                // 中文输入法选词时的 Enter（isComposing / keyCode 229）不触发发送
+                if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && e.keyCode !== 229) {
                   e.preventDefault();
                   void send();
                 }
@@ -154,6 +201,32 @@ export default function ChatRoom({ me }: { me: Me }) {
           <p className="mt-1 text-right text-[10px] text-muted">{input.length}/{CHARS_LIMIT}</p>
         </div>
       </Card>
+
+      {/* 长按/右键菜单（微信式） */}
+      {menu && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setMenu(null)} onContextMenu={(e) => { e.preventDefault(); setMenu(null); }} />
+          <div
+            className="fixed z-50 w-40 overflow-hidden rounded-xl border border-line bg-surface shadow-card"
+            style={{ left: Math.min(menu.x, window.innerWidth - 170), top: Math.min(menu.y, window.innerHeight - 110) }}
+          >
+            <button
+              type="button"
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-surface2"
+              onClick={() => mentionBot()}
+            >
+              <span className="font-medium">@ 助手</span>
+            </button>
+            <button
+              type="button"
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-surface2"
+              onClick={() => void pat()}
+            >
+              <span className="font-medium">拍一拍</span>
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
