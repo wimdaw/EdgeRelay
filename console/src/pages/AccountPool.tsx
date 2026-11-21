@@ -367,7 +367,7 @@ export default function AccountPool() {
       ) : rows.length === 0 ? (
         <Card><EmptyState icon={<Wallet size={32} />} title="暂无 OAuth / Web 账号" hint="先在「供应商」页的 OAuth 授权或 Web 反代选项卡接入渠道账号。" /></Card>
       ) : (
-        <div className="grid gap-3.5 grid-cols-1 lg:grid-cols-2 items-start">
+        <div className="flex flex-col gap-3.5">
           {visibleRows.map((p) => (
             <Card key={p.id} className={cn("p-4", p.status === "disabled" && "opacity-75 border-dashed")}>
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2.5">
@@ -420,7 +420,7 @@ export default function AccountPool() {
                 </div>
               </div>
 
-              <div className="mt-2.5 space-y-2">
+              <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-2 items-start">
                 {p.accounts.length === 0 ? (
                   <p className="py-4 text-center text-xs text-muted">该渠道暂无账号凭据</p>
                 ) : p.accounts.map((a) => (
