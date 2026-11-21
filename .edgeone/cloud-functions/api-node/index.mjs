@@ -6054,7 +6054,7 @@ try {
 } catch (error) {
   console.error("Uncaught Exception:", error);
 }
-var port = 9001;
+var port = 9002;
 var EdgeoneBodyParser = class {
   /**
    * Parse request body according to Content-Type, strictly following Edgeone rules
@@ -6572,7 +6572,7 @@ var server = http.createServer(async (req, res) => {
         const params = {};
         params["default"] = cleanPath.split("/");
         context.params = params;
-        const mod_4 = (() => {
+        const mod_6 = (() => {
           var __defProp = Object.defineProperty;
           var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
           var __publicField = (obj, key, value) => {
@@ -42370,22 +42370,22 @@ Error generating stack: \`+i.message+\`
         try {
           const handler = (() => {
             const method = req.method;
-            if (method === "GET" && mod_4.onRequestGet) {
-              return mod_4.onRequestGet;
-            } else if (method === "POST" && mod_4.onRequestPost) {
-              return mod_4.onRequestPost;
-            } else if (method === "PUT" && mod_4.onRequestPut) {
-              return mod_4.onRequestPut;
-            } else if (method === "DELETE" && mod_4.onRequestDelete) {
-              return mod_4.onRequestDelete;
-            } else if (method === "PATCH" && mod_4.onRequestPatch) {
-              return mod_4.onRequestPatch;
-            } else if (method === "HEAD" && mod_4.onRequestHead) {
-              return mod_4.onRequestHead;
-            } else if (method === "OPTIONS" && mod_4.onRequestOptions) {
-              return mod_4.onRequestOptions;
+            if (method === "GET" && mod_6.onRequestGet) {
+              return mod_6.onRequestGet;
+            } else if (method === "POST" && mod_6.onRequestPost) {
+              return mod_6.onRequestPost;
+            } else if (method === "PUT" && mod_6.onRequestPut) {
+              return mod_6.onRequestPut;
+            } else if (method === "DELETE" && mod_6.onRequestDelete) {
+              return mod_6.onRequestDelete;
+            } else if (method === "PATCH" && mod_6.onRequestPatch) {
+              return mod_6.onRequestPatch;
+            } else if (method === "HEAD" && mod_6.onRequestHead) {
+              return mod_6.onRequestHead;
+            } else if (method === "OPTIONS" && mod_6.onRequestOptions) {
+              return mod_6.onRequestOptions;
             } else {
-              return mod_4.onRequest;
+              return mod_6.onRequest;
             }
           })();
           if (handler) {

@@ -46,9 +46,11 @@ export default function ProviderSubmissions() {
   const load = async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const r = await adminAction<{ submissions: Submission[]; pendingCount: number }>("list_provider_submissions");
-      setSubs(r.submissions || []);
-      setPendingCount(r.pendingCount || 0);
+      // adminAction 返回完整 {ok, result}，需解一层 result
+      const r = await adminAction<{ result?: { submissions: Submission[]; pendingCount: number } }>("list_provider_submissions");
+      const data = r.result ?? (r as unknown as { submissions: Submission[]; pendingCount: number });
+      setSubs(data.submissions || []);
+      setPendingCount(data.pendingCount || 0);
     } catch (e) {
       if (!silent) toast((e as Error).message, "err");
     } finally {
@@ -60,8 +62,9 @@ export default function ProviderSubmissions() {
 
   const openThread = async (sub: Submission) => {
     try {
-      const r = await adminAction<{ messages: ThreadMessage[] }>("provider_submission_thread", { id: sub.id });
-      setThread({ sub, messages: r.messages || [] });
+      const r = await adminAction<{ result?: { messages: ThreadMessage[] } }>("provider_submission_thread", { id: sub.id });
+      const data = r.result ?? (r as unknown as { messages: ThreadMessage[] });
+      setThread({ sub, messages: data.messages || [] });
     } catch (e) {
       toast((e as Error).message, "err");
     }
