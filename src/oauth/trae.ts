@@ -1360,6 +1360,9 @@ export async function fetchTraeModels(
         "x-trae-user-timezone": "Asia/Shanghai",
       };
       const webRes = await fetch(webUrl, { headers: webHeaders, signal: AbortSignal.timeout(30000) });
+      webStatus = webRes.status;
+      const webText = await webRes.text().catch(() => "");
+      webSnippet = webText.slice(0, 120).replace(/\s+/g, " ");
       if (webRes.ok) {
         const j: any = await webRes.json().catch(() => null);
         const out: string[] = [];
@@ -1372,9 +1375,11 @@ export async function fetchTraeModels(
         const models = [...new Set(out)];
         if (models.length) return { models, message: `model_list OK（web/remote，${models.length} 个）` };
       }
-    } catch {
-      // web/remote 拉取失败，回退 IDE 探测链
+    } catch (e: any) {
+      diag.push(`web:${(e?.message || "异常").slice(0, 60)}`);
     }
+    // web 失败时带上诊断（状态码 + 响应片段），避免静默吞掉原因
+    diag.push(`web:${webStatus || 0}:${webSnippet}`);
     // 上游可能变更参数要求：依次探测 GET(原样) / GET+查询参数 / POST / account 域，取第一个成功形态
     const accessToken = await getAccessToken(env, cred);
     const headers = traeHeaders(ep, cred, accessToken, false);
@@ -1387,6 +1392,8 @@ export async function fetchTraeModels(
       { label: "POST", url: probeUrl, method: "POST", body: JSON.stringify({ ide_version: ep.ideVersion, version_code: ep.ideVersionCode, plugin_channel: PLUGIN_CHANNEL }) },
       { label: "GET@account", url: `${ep.account}/api/ide/v1/model_list`, method: "GET" },
     ];
+    let webStatus = 0;
+    let webSnippet = "";
     let text2 = "";
     let lastStatus = 0;
     let lastLabel = "";
