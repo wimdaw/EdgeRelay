@@ -245,16 +245,31 @@ export default function AccountPool() {
       setLastUpdated(Date.now());
     } catch (e) {
       toast((e as Error).message, "err");
-      setRows([]);
       setLastUpdated(Date.now());
     } finally {
       setLoading(false);
     }
   };
 
+  /** 单渠道刷新：只查询该渠道的额度与状态，不打扰其他渠道 */
+  const refreshOne = async (p: PoolProvider) => {
+    setRefreshing(p.id);
+    try {
+      const r = await adminAction<{ providers: PoolProvider[] }>("account_pool", { providerId: p.id });
+      const one = r.providers?.[0];
+      if (one) setRows((prev) => (prev || []).map((x) => (x.id === one.id ? one : x)));
+      setLastUpdated(Date.now());
+    } catch (e) {
+      toast((e as Error).message, "err");
+    } finally {
+      setRefreshing("");
+    }
+  };
+
   const totalAccounts = (rows || []).reduce((n, p) => n + p.accounts.length, 0);
   const visibleRows = (rows || []).filter((p) => tab === "all" || p.id === tab);
   const [checkinBusy, setCheckinBusy] = useState<string>("");
+  const [refreshing, setRefreshing] = useState<string>("");
 
   /** 立即签到：对单个渠道手动跑一轮，force 跳过后端当日去重 */
   const runCheckin = async (type: string, name: string, action = "签到") => {
@@ -308,7 +323,7 @@ export default function AccountPool() {
           </div>
         </div>
         <p className="mt-3 rounded-lg border border-line bg-surface2/40 px-3 py-2 text-[11px] text-muted">
-          进入页面不会自动查询；点击「刷新额度」后才会实时请求，账号较多时可能需要几秒。查询失败不会影响账号正常调用，只影响本页展示。
+          进入页面不会自动查询；点「刷新额度」全站查询，或按渠道点「刷新」只查该渠道。查询失败不会影响账号正常调用，只影响本页展示。
         </p>
 
         {rows && rows.length > 0 && (
@@ -376,6 +391,16 @@ export default function AccountPool() {
                       </Button>
                     </>
                   )}
+                  <Button
+                    variant="soft"
+                    className="!h-7 !px-2 text-[11px]"
+                    disabled={refreshing === p.id}
+                    onClick={() => void refreshOne(p)}
+                    title="只刷新该渠道的额度与状态"
+                  >
+                    <RefreshCw size={12} className={cn(refreshing === p.id && "animate-spin")} />
+                    {refreshing === p.id ? "查询中…" : "刷新"}
+                  </Button>
                   <span className="inline-flex items-center gap-1 text-[11px] text-muted"><Users size={11} />{p.accounts.length} 个账号</span>
                 </div>
               </div>
