@@ -116,10 +116,25 @@ export default function Playground({ me }: { me: Me }) {
 
   /** 规范调用格式：渠道ID/模型名（与模型池一致，可精确路由到渠道） */
   const canonicalId = (m: ModelItem) => `${m.slug}/${m.id}`;
-  /** 当前端点推荐模型（分类匹配） */
-  const kindModels = useMemo(() => models.filter((m) => m.kind === endpoint), [models, endpoint]);
-  /** 其他模型（分类不匹配，但允许手动跨端点尝试，比如能生图的对话模型） */
-  const otherModels = useMemo(() => models.filter((m) => m.kind !== endpoint), [models, endpoint]);
+  /**
+   * 按供应商分组（一目了然：顶部渠道、底下它的模型）。
+   * 含当前端点推荐模型的渠道排前；渠道内推荐模型（✓ 标记）排前。
+   */
+  const groupedProviders = useMemo(() => {
+    const map = new Map<string, ModelItem[]>();
+    for (const m of models) {
+      const arr = map.get(m.provider) || [];
+      arr.push(m);
+      map.set(m.provider, arr);
+    }
+    const entries = [...map.entries()].map(([prov, list]) => {
+      const rec = list.filter((m) => m.kind === endpoint);
+      const rest = list.filter((m) => m.kind !== endpoint);
+      return { prov, list: [...rec, ...rest], recN: rec.length };
+    });
+    entries.sort((a, b) => (b.recN > 0 ? 1 : 0) - (a.recN > 0 ? 1 : 0) || a.prov.localeCompare(b.prov));
+    return entries.map((e) => [e.prov, e.list] as const);
+  }, [models, endpoint]);
   /** 音色按语言分组 */
   const voiceGroups = useMemo(() => {
     const map = new Map<string, VoiceItem[]>();
@@ -539,26 +554,17 @@ export default function Playground({ me }: { me: Me }) {
                 {models.length > 0 ? (
                   <Select value={model} onChange={(e) => pickModel(e.target.value)} className="w-full">
                     {!models.some((m) => canonicalId(m) === model) && <option value="">请选择模型</option>}
-                    {kindModels.length > 0 && (
-                      <optgroup label={`✓ 推荐 · ${ENDPOINTS.find((e) => e.key === endpoint)?.label}端点`}>
-                        {kindModels.map((m) => (
+                    {groupedProviders.map(([prov, list]) => (
+                      <optgroup key={prov} label={`${prov}（${list.length}）`}>
+                        {list.map((m) => (
                           <option key={`${m.slug}/${m.id}`} value={canonicalId(m)}>
+                            {m.kind === endpoint ? "✓ " : ""}
                             {canonicalId(m)}
                             {m.paid ? "（付费）" : ""}
                           </option>
                         ))}
                       </optgroup>
-                    )}
-                    {otherModels.length > 0 && (
-                      <optgroup label="其他模型（可手动跨端点尝试）">
-                        {otherModels.map((m) => (
-                          <option key={`${m.slug}/${m.id}`} value={canonicalId(m)}>
-                            {canonicalId(m)}
-                            {m.paid ? "（付费）" : ""}
-                          </option>
-                        ))}
-                      </optgroup>
-                    )}
+                    ))}
                   </Select>
                 ) : (
                   <div className="rounded-lg border border-line bg-surface2 px-2.5 py-2 text-[11px] text-muted">{KIND_EMPTY_HINT[endpoint]}</div>
