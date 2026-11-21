@@ -170,6 +170,7 @@ export default function Settings() {
           <Field label="站点主页（可选，用于 Logo 跳转）"><Input value={String(s.siteHomepage ?? "")} onChange={(e) => set("siteHomepage", e.target.value)} placeholder="https://..." /></Field>
           <Field label="首页徽章标签（Hero Badge）"><Input value={String(s.heroBadge ?? "跑在 EdgeOne 全球边缘节点")} onChange={(e) => set("heroBadge", e.target.value)} /></Field>
           <Field label="底部技术支持邮箱"><Input value={String(s.supportEmail ?? "hackerxiaow@gmail.com")} onChange={(e) => set("supportEmail", e.target.value)} /></Field>
+          <Field label="聊天室机器人模型" hint="聊天室内 @ 机器人触发回复时使用的模型（默认 agnes-3.0-flash）"><Input value={String(s.chatBotModel ?? "agnes-3.0-flash")} onChange={(e) => set("chatBotModel", e.target.value)} placeholder="agnes-3.0-flash" /></Field>
           <Field label="备案号（ICP）"><Input value={String(s.icpNumber ?? "")} onChange={(e) => set("icpNumber", e.target.value)} placeholder="如：京ICP备2024000000号-1；留空则不显示" /></Field>
           <Field label="版权文案"><Input value={String(s.copyrightText ?? "")} onChange={(e) => set("copyrightText", e.target.value)} placeholder="留空自动使用 © 年份 站点名" /></Field>
           <Field label="GitHub 链接"><Input value={String(s.githubUrl ?? "")} onChange={(e) => set("githubUrl", e.target.value)} placeholder="https://github.com/...；留空则隐藏图标" /></Field>

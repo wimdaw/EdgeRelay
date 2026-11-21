@@ -109,8 +109,15 @@ async function smtpReady(env: Env): Promise<{ to: string[]; send: (subject: stri
   };
 }
 
-/** 调用 Agnes agnes-3.0-flash 生成机器人回复（带记忆） */
+/** 机器人被 @ 提及的判定（@Relay助手 / @机器人 / @小R / @bot / @assistant，大小写不敏感） */
+function isBotMentioned(content: string): boolean {
+  return /@(relay助手|机器人|小r|bot|assistant)/i.test(content);
+}
+
+/** 调用 Agnes agnes-3.0-flash 生成机器人回复（带记忆）；模型可由后台设置覆盖 */
 async function botReply(env: Env, history: ChatMessage[]): Promise<string> {
+  const settings = await getSettings(env);
+  const model = String(settings.chatBotModel || "agnes-3.0-flash").trim();
   const { getProviders, getProviderKeys, getProviderKeysAll } = await import("../storage/db");
   const providers = await getProviders(env);
   const agnes = providers.find((p) => p.slug === "agnes" && p.status === "active");
@@ -136,7 +143,7 @@ async function botReply(env: Env, history: ChatMessage[]): Promise<string> {
     method: "POST",
     headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
     body: JSON.stringify({
-      model: "agnes-3.0-flash",
+      model,
       messages: [{ role: "system", content: system }, ...context],
       max_tokens: 1024,
       temperature: 0.7,
@@ -190,6 +197,11 @@ chatroomRouter.post("/messages", async (c) => {
       createdAt: now,
     };
     let list = await appendChatMessage(env, userMsg);
+
+    // 只有 @ 机器人才触发回复；普通消息不予理会
+    if (!isBotMentioned(content)) {
+      return json({ ok: true, messages: list.slice(-200) });
+    }
 
     // 机器人回复（同步生成；失败则落一条系统提示，不影响用户消息）
     try {

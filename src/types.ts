@@ -48,6 +48,8 @@ export type HandlerCtx = {
 };
 
 export type PlatformSettings = {
+  /** 聊天室机器人模型（默认 agnes-3.0-flash，后台可改） */
+  chatBotModel?: string;
   signupsEnabled: boolean;
   requireTosAcceptance: boolean;
   /** 注册是否强制邮箱验证码。默认 true；仅当后台显式关闭时才允许无码注册 */
@@ -117,6 +119,7 @@ export function clampAuditRetentionDays(value: unknown): number {
 }
 
 export const DEFAULT_SETTINGS: PlatformSettings = {
+  chatBotModel: "agnes-3.0-flash",
   signupsEnabled: true,
   requireTosAcceptance: true,
   requireEmailVerification: true,
