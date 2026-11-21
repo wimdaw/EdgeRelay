@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Bot, MessagesSquare, Send, User } from "lucide-react";
 import { api, type Me } from "../lib/api";
 import { Button, Card, useToast } from "../components/ui";
@@ -28,6 +28,8 @@ export default function ChatRoom({ me }: { me: Me }) {
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const longPressTimer = useRef<number | null>(null);
   const patBusyRef = useRef(false);
+  /** @ 提及候选：输入 @ 后弹出房间内所有用户 */
+  const [mention, setMention] = useState<{ query: string } | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const toast = useToast();
 
@@ -104,6 +106,35 @@ export default function ChatRoom({ me }: { me: Me }) {
   const displayEmail = (m: ChatMessage) => (m.role === "bot" ? "Relay 助手" : m.role === "system" ? "系统" : m.nickname || m.email);
   const isMine = (m: ChatMessage) => m.role === "user" && m.userId === me.user.id;
 
+  /** 房间参与者：出现过的用户去重（附机器人）；@ 提及候选来源 */
+  const participants = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const m of msgs || []) {
+      if (m.role === "system") continue;
+      const uid = m.role === "bot" ? "bot" : m.userId;
+      if (uid === "bot") { map.set("bot", "Relay 助手"); continue; }
+      if (!map.has(uid)) map.set(uid, m.nickname || m.email.split("@")[0] || m.email);
+    }
+    const list = [...map.entries()].map(([uid, name]) => ({ uid, name }));
+    const q = (mention?.query || "").toLowerCase();
+    const hit = q ? list.filter((x) => x.name.toLowerCase().includes(q)) : list;
+    return hit.length ? hit : list;
+  }, [msgs, mention]);
+
+  /** 输入检测：末尾是 @xxx（@ 后无空格）时打开提及候选 */
+  const onInputChange = (v: string) => {
+    setInput(v);
+    const at = v.lastIndexOf("@");
+    setMention(at >= 0 && !v.slice(at).includes(" ") ? { query: v.slice(at + 1) } : null);
+  };
+
+  /** 点选候选：替换末尾 @片段 为 @名字  */
+  const pickMention = (name: string) => {
+    const at = input.lastIndexOf("@");
+    setInput(at >= 0 ? input.slice(0, at) + `@${name} ` : input + `@${name} `);
+    setMention(null);
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <Card className="p-4 sm:p-5">
@@ -178,11 +209,28 @@ export default function ChatRoom({ me }: { me: Me }) {
           )}
         </div>
 
-        <div className="border-t border-line p-3">
+        <div className="relative border-t border-line p-3">
+          {mention && (
+            <div className="absolute bottom-full left-3 right-3 mb-2 max-h-56 overflow-y-auto rounded-xl border border-line bg-surface shadow-card">
+              <div className="border-b border-line/70 px-3 py-1.5 text-[10px] text-muted">选择要 @ 的用户</div>
+              {participants.map((u) => (
+                <button
+                  key={u.uid}
+                  type="button"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-ink transition-colors hover:bg-surface2"
+                  onClick={() => pickMention(u.name)}
+                >
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface2 text-[10px] text-muted">{u.name[0]?.toUpperCase()}</span>
+                  <span className="truncate">{u.name}</span>
+                </button>
+              ))}
+              {participants.length === 0 && <p className="px-3 py-3 text-center text-xs text-muted">还没有可 @ 的用户</p>}
+            </div>
+          )}
           <div className="flex items-end gap-2">
             <textarea
               value={input}
-              onChange={(e) => setInput(e.target.value.slice(0, CHARS_LIMIT))}
+              onChange={(e) => onInputChange(e.target.value.slice(0, CHARS_LIMIT))}
               onKeyDown={(e) => {
                 // 中文输入法选词时的 Enter（isComposing / keyCode 229）不触发发送
                 if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && e.keyCode !== 229) {
