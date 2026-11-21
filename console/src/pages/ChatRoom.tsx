@@ -4,6 +4,7 @@ import { api, type Me } from "../lib/api";
 import { Button, Card, useToast } from "../components/ui";
 import { cn } from "../lib/utils";
 
+type ChatroomUser = { id: string; name: string };
 type ChatMessage = {
   id: string;
   userId: string;
@@ -40,6 +41,7 @@ export default function ChatRoom({ me }: { me: Me }) {
   const [mention, setMention] = useState<{ query: string } | null>(null);
   /** 机器人名字：后台「网站设置 → 站点信息 → 聊天室机器人名字」可配 */
   const [botName, setBotName] = useState("Relay 助手");
+  const [roomUsers, setRoomUsers] = useState<ChatroomUser[]>([]);
   const listRef = useRef<HTMLDivElement | null>(null);
   const toast = useToast();
 
@@ -98,9 +100,10 @@ export default function ChatRoom({ me }: { me: Me }) {
     patBusyRef.current = true;
     setMenu(null);
     try {
-      const r = await api<{ messages: ChatMessage[]; botName?: string }>("/api/chatroom/pat", "POST", {});
+      const r = await api<{ messages: ChatMessage[]; botName?: string; users?: ChatroomUser[] }>("/api/chatroom/pat", "POST", {});
       applyMsgs(r.messages || []);
       if (r.botName) setBotName(r.botName);
+      if (r.users) setRoomUsers(r.users);
     } catch (e) {
       toast((e as Error).message, "err");
     } finally {
@@ -139,9 +142,10 @@ export default function ChatRoom({ me }: { me: Me }) {
     setBusy(true);
     try {
       // 发送响应即含最新消息（含机器人回复），随后轮询兜底
-      const r = await api<{ messages: ChatMessage[]; botName?: string }>("/api/chatroom/messages", "POST", { content: text });
+      const r = await api<{ messages: ChatMessage[]; botName?: string; users?: ChatroomUser[] }>("/api/chatroom/messages", "POST", { content: text });
       applyMsgs(r.messages || []);
       if (r.botName) setBotName(r.botName);
+      if (r.users) setRoomUsers(r.users);
     } catch (e) {
       toast((e as Error).message, "err");
     } finally {
@@ -159,24 +163,20 @@ export default function ChatRoom({ me }: { me: Me }) {
     return new RegExp(`@(relay助手|机器人|小r|bot|assistant|${botName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "i").test(last.content);
   })();
 
-  /** 房间参与者：出现过的用户去重（附机器人）；@ 提及候选来源 */
+  /** @ 提及候选：全站注册用户 + 机器人置顶，自己排最后 */
   const participants = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const m of msgs || []) {
-      if (m.role === "system") continue;
-      const uid = m.role === "bot" ? "bot" : m.userId;
-      if (uid === "bot") { map.set("bot", botName); continue; }
-      if (!map.has(uid)) map.set(uid, m.nickname || m.email.split("@")[0] || m.email);
-    }
-    const list = [...map.entries()].map(([uid, name]) => ({ uid, name }));
-    // 机器人置顶：@ 候选第一个永远是 Relay 助手
-    const botIdx = list.findIndex((x) => x.uid === "bot");
-    if (botIdx > 0) { const [b] = list.splice(botIdx, 1); list.unshift(b); }
+    const meEntry: ChatroomUser = { id: me.user.id, name: me.nickname || me.user.email.split("@")[0] };
+    const others = roomUsers.filter((u) => u.id !== me.user.id);
+    const bot: ChatroomUser = { id: "bot", name: botName };
+    const list = [bot, ...others, ...(meEntry.name ? [meEntry] : [])];
     const q = (mention?.query || "").toLowerCase();
     const hit = q ? list.filter((x) => x.name.toLowerCase().includes(q)) : list;
-    if (q) { const bi = hit.findIndex((x) => x.uid === "bot"); if (bi > 0) { const [b] = hit.splice(bi, 1); hit.unshift(b); } }
-    return hit.length ? hit : list;
-  }, [msgs, mention]);
+    if (q) {
+      const bi = hit.findIndex((x) => x.id === "bot");
+      if (bi > 0) { const [b] = hit.splice(bi, 1); hit.unshift(b); }
+    }
+    return hit;
+  }, [roomUsers, botName, mention, me]);
 
   /** 输入检测：末尾是 @xxx（@ 后无空格）时打开提及候选 */
   const onInputChange = (v: string) => {
@@ -306,7 +306,7 @@ export default function ChatRoom({ me }: { me: Me }) {
               <div className="border-b border-line/70 px-3 py-1.5 text-[10px] text-muted">选择要 @ 的用户</div>
               {participants.map((u, i) => (
                 <button
-                  key={u.uid}
+                  key={u.id}
                   type="button"
                   className={cn(
                     "flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-ink transition-colors",

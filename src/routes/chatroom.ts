@@ -283,145 +283,10 @@ chatroomRouter.get("/messages", async (c) => {
     let messages = await loadChatMessages(env);
     const settings = await getSettings(env);
     const botName = String(settings.chatBotName || "Relay 助手").trim();
-
-    const last = messages[messages.length - 1];
-    if (last && last.role === "user" && isBotMentioned(last.content, botName)) {
-      const kv = getKV(env);
-      const lockKey = "chatroom:botlock";
-      let mine = false;
-      try {
-        mine = (await kv.get(lockKey)) !== "1";
-        if (mine) await kv.put(lockKey, "1", { expirationTtl: 30 });
-      } catch {}
-      if (mine) {
-        try {
-          const { content: reply } = await botAnswer(env, last.content, messages);
-          let botContent = reply;
-          // 升级邮件：机器人输出 [ESCALATE] 原因 → 剥离标记 + SMTP 邮件给超级管理员
-          const m = botContent.match(/\[ESCALATE\]\s*(.+)/i);
-          if (m) {
-            botContent = botContent.replace(/\[ESCALATE\][^\n]*\n?/i, "").trim();
-            const mailer = await smtpReady(env);
-            if (mailer) {
-              // 同一用户 10 分钟内最多升级一封，防刷
-              const guardKey = `chatroom:esc:${last.userId}:${Math.floor(Date.now() / 600_000)}`;
-              let recent = false;
-              try {
-                recent = (await kv.get(guardKey)) === "1";
-                if (!recent) await kv.put(guardKey, "1", { expirationTtl: 600 });
-              } catch {}
-              if (recent) {
-                botContent += "\n（你的问题已记录，管理员会尽快回复，请勿短时间重复催促。）";
-              } else {
-                await mailer.send(
-                  `[聊天室转达] ${last.email} 需要人工处理`,
-                  `聊天室用户 ${last.email} 的问题需要人工处理：\n\n「${last.content}」\n\n升级原因：${(m[1] || "").trim()}\n\n时间：${new Date(last.createdAt * 1000).toLocaleString("zh-CN")}`,
-                );
-                messages = await appendChatMessage(env, {
-                  id: uuid(), userId: "system", email: "system", role: "system",
-                  content: "已将你的问题通过邮件转达管理员，请留意后续回复。",
-                  createdAt: Math.floor(Date.now() / 1000),
-                });
-              }
-            }
-          }
-          messages = await appendChatMessage(env, {
-            id: uuid(), userId: "bot", email: "bot", nickname: botName, role: "bot",
-            content: botContent, createdAt: Math.floor(Date.now() / 1000),
-          });
-        } catch (e: any) {
-          messages = await appendChatMessage(env, {
-            id: uuid(), userId: "system", email: "system", role: "system",
-            content: `机器人暂时不可用：${(e?.message || "未知错误").slice(0, 120)}`,
-            createdAt: Math.floor(Date.now() / 1000),
-          });
-        } finally {
-          await kv.delete(lockKey).catch(() => {});
-        }
-      }
-    }
-
-    return json({ ok: true, messages: messages.slice(-200), retainedDays: 30, botName });
-  } catch (err) {
-    return errorResponse(hCtx, err);
-  }
-});
-
-/** 发送消息：仅落库即回（秒发）。@ 机器人时由下一次轮询生成回复（见 GET /messages） */
-chatroomRouter.post("/messages", async (c) => {
-  const env = c.env as Env;
-  const hCtx: HandlerCtx = { env, req: c.req as any };
-  try {
-    const user = await requireUser(hCtx);
-    const body = (await c.req.json().catch(() => ({}))) as { content?: string };
-    const content = String(body.content || "").trim();
-    if (!content) throw new ApiError(400, ErrorCode.BAD_REQUEST, "消息不能为空");
-    if (content.length > CHARS_LIMIT) throw new ApiError(400, ErrorCode.BAD_REQUEST, `单条消息不超过 ${CHARS_LIMIT} 字`);
-
-    if (!(await checkRate(env, user.id))) {
-      throw new ApiError(429, ErrorCode.RATE_LIMITED, `聊天室每分钟最多 ${RATE_LIMIT_PER_MIN} 条，稍后再试`);
-    }
-
-    const now = Math.floor(Date.now() / 1000);
-    const userMsg: ChatMessage = {
-      id: uuid(),
-      userId: user.id,
-      email: user.email,
-      role: "user",
-      content,
-      createdAt: now,
-    };
-    const list = await appendChatMessage(env, userMsg);
-    const settings = await getSettings(env);
-    return json({ ok: true, messages: list.slice(-200), botName: String(settings.chatBotName || "Relay 助手") });
-  } catch (err) {
-    return errorResponse(hCtx, err);
-  }
-});
-
-/** 拍一拍：系统消息 + 机器人俏皮回应（微信式轻互动） */
-chatroomRouter.post("/pat", async (c) => {
-  const env = c.env as Env;
-  const hCtx: HandlerCtx = { env, req: c.req as any };
-  try {
-    const user = await requireUser(hCtx);
-    if (!(await checkRate(env, user.id))) {
-      throw new ApiError(429, ErrorCode.RATE_LIMITED, "操作太频繁，稍后再试");
-    }
-    const now = Math.floor(Date.now() / 1000);
-    const list = await appendChatMessage(env, {
-      id: uuid(),
-      userId: user.id,
-      email: user.email,
-      role: "system",
-      content: `"${user.email.split("@")[0]}" 拍了拍「${(await getSettings(env)).chatBotName || "Relay 助手"}」`,
-      createdAt: now,
-    });
-    // 机器人简短回应（带上下文）
-    try {
-      const history: ChatMessage[] = [...list, { id: uuid(), userId: user.id, email: user.email, role: "user", content: "[拍一拍] 用户刚刚拍了拍你，请用不超过 20 字简短俏皮地回应。", createdAt: now }];
-      const { content: reply } = await botReply(env, history);
-      await appendChatMessage(env, {
-        id: uuid(), userId: "bot", email: "bot", nickname: String((await getSettings(env)).chatBotName || "Relay 助手"), role: "bot",
-        content: reply.slice(0, 60), createdAt: Math.floor(Date.now() / 1000),
-      });
-    } catch {}
-    const finalList = await loadChatMessages(env);
-    return json({ ok: true, messages: finalList.slice(-200), botName: String((await getSettings(env)).chatBotName || "Relay 助手") });
-  } catch (err) {
-    return errorResponse(hCtx, err);
-  }
-});
-
-/** 拉取消息列表；最后一条是 @ 机器人的用户消息时，借本次轮询生成机器人回复（伪异步，KV 锁防并发重复生成） */
-chatroomRouter.get("/messages", async (c) => {
-  const env = c.env as Env;
-  const hCtx: HandlerCtx = { env, req: c.req as any };
-  try {
-    await requireUser(hCtx);
-    let messages = await loadChatMessages(env);
-    const settings = await getSettings(env);
-    const botName = String(settings.chatBotName || "Relay 助手").trim();
+    // @ 候选：全站注册用户（昵称优先，回退邮箱前缀）
+    const users = (await listAllUsers(env))
+      .filter((u) => u.status === "active" && u.email)
+      .map((u) => ({ id: String(u.id), name: String(u.nickname || u.email.split("@")[0]) }));
 
     const last = messages[messages.length - 1];
     if (last && last.role === "user" && isBotMentioned(last.content, botName)) {
@@ -480,7 +345,7 @@ chatroomRouter.get("/messages", async (c) => {
       }
     }
 
-    return json({ ok: true, messages: messages.slice(-200), retainedDays: 30, botName });
+    return json({ ok: true, messages: messages.slice(-200), retainedDays: 30, botName, users });
   } catch (err) {
     return errorResponse(hCtx, err);
   }
