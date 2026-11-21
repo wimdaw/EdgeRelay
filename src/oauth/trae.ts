@@ -1338,12 +1338,13 @@ export async function handleTraeRequest(p: OAuthCallParams, baseUrl?: string): P
 // 模型目录 / 连通性测试
 // =====================================================================
 
-/** 解析 model_list 的多种返回形态（Result.ModelList / Data / 裸数组） */
+/** 解析 model_list 的多种返回形态（Result.ModelList / model_configs / Data / 裸数组） */
 export function parseTraeModelList(json: any): string[] {
   const candidates: any[] = [
     json?.Result?.ModelList,
     json?.Result?.modelList,
     json?.Result?.Models,
+    json?.model_configs,
     json?.model_list,
     json?.modelList,
     json?.Data,
@@ -1382,7 +1383,29 @@ export async function fetchTraeModels(
   let webStatus = 0;
   let webSnippet = "";
   try {
-    // 首选：Web/Remote 平面的 /models（对齐 TRAE2API 的 web 客户端契约——
+    // 首选：IDE model_list（PROTOCOL 第八节：POST {"type":"chat"}）。
+    // llm_raw_chat 的 model_name 只认这份目录登记的上游实名——用 web/remote
+    // 目录或快照里的名字直接打对话会被拒成 4023 "the model is unknown"。
+    try {
+      const accessToken = await getAccessToken(env, cred);
+      const ideHeaders = traeHeaders(ep, cred, accessToken, false);
+      const ideRes = await fetch(`${ep.core}/api/ide/v1/model_list`, {
+        method: "POST",
+        headers: ideHeaders,
+        body: JSON.stringify({ type: "chat" }),
+        signal: AbortSignal.timeout(30000),
+      });
+      diag.push(`ide:${ideRes.status}`);
+      if (ideRes.ok) {
+        const ideText = await ideRes.text();
+        const ideModels = parseTraeModelList(JSON.parse(ideText));
+        if (ideModels.length) return { models: ideModels, message: `model_list OK（IDE，${ideModels.length} 个）` };
+        diag.push("ide:200 但解析为空");
+      }
+    } catch (e: any) {
+      diag.push(`ide:${(e?.message || "异常").slice(0, 60)}`);
+    }
+    // 备选：Web/Remote 平面的 /models（对齐 TRAE2API 的 web 客户端契约——
     // IDE 的 model_list 已失效 4001）。token 与 IDE 链路同为 Cloud-IDE-JWT。
     try {
       const accessToken = await getAccessToken(env, cred);
