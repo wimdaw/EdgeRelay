@@ -1369,7 +1369,9 @@ export async function fetchTraeModels(
       if (webRes.ok) {
         const j: any = await webRes.json().catch(() => null);
         const out: string[] = [];
-        for (const group of (j?.data?.groups ?? j?.groups ?? []) as any[]) {
+        // 实测形态：{code:0, data:{list:[{function, models:[{name, ...}]}]}}
+        const lists: any[] = (j?.data?.list ?? j?.data?.groups ?? j?.list ?? []) as any[];
+        for (const group of lists) {
           for (const raw of (group?.models ?? []) as any[]) {
             const name = String(raw?.config_name || raw?.configName || raw?.name || raw?.model_name || "").trim();
             if (name) out.push(name);
