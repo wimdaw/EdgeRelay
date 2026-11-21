@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ProviderSubmissions from "./ProviderSubmissions";
 import {
   Plus,
   RefreshCw,
@@ -280,7 +281,7 @@ type WebDialogState = {
 
 export default function Providers() {
   const [rows, setRows] = useState<Provider[] | null>(null);
-  const [tab, setTab] = useState<"direct" | "oauth" | "web">("direct");
+  const [tab, setTab] = useState<"direct" | "oauth" | "web" | "subs">("direct");
   const [dlg, setDlg] = useState(false);
   const [form, setForm] = useState({ id: "", name: "DeepSeek", slug: "deepseek", kind: "openai_compat", url: "https://api.deepseek.com", key: "" });
   const [saving, setSaving] = useState(false);
@@ -820,6 +821,7 @@ export default function Providers() {
           ["direct", "API 直连"],
           ["oauth", "OAuth 授权"],
           ["web", "Web 反代"],
+          ["subs", "用户提交"],
         ] as const).map(([k, l]) => (
           <button
             key={k}
@@ -835,6 +837,8 @@ export default function Providers() {
           </button>
         ))}
       </div>
+
+      {tab === "subs" && <ProviderSubmissions />}
 
       {tab === "direct" && (
         <>

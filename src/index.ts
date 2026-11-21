@@ -19,6 +19,7 @@ import { siteRouter } from "./routes/site";
 import { videoRouter } from "./routes/video";
 import { imagesRouter } from "./routes/images";
 import { audioRouter } from "./routes/audio";
+import { userProvidersRouter } from "./routes/user-providers";
 import { monitorRouter } from "./routes/monitor";
 import { videoManageRouter } from "./routes/video-manage";
 import { playgroundRouter } from "./routes/playground";
@@ -76,6 +77,7 @@ app.route("/api/admin/backup", backupRouter);
 app.route("/api/usage", usageRouter);
 app.route("/api/invite", inviteRouter);
 app.route("/api/user/profile", profileRouter);
+app.route("/api/user/providers", userProvidersRouter);
 app.route("/api", siteRouter);
 
 // 4. 静态资产与 SPA Fallback 路由（最后挂载）

@@ -249,6 +249,47 @@ export interface ProviderRecord {
   authorizationRef?: string | null;
   authorizationExpiresAt?: number | null;
   createdAt: number;
+  /** 用户提交渠道：归属与审核溯源（管理员手工创建的渠道无此字段） */
+  ownerUserId?: string | null;
+  submissionId?: string | null;
+}
+
+/** 用户提交供应商的审核状态流转：pending →（超管审核）→ approved / rejected */
+export type ProviderSubmissionStatus = "pending" | "approved" | "rejected";
+
+/** 用户提交的供应商（独立于正式 providers 配置，审核通过才落地为 ProviderRecord） */
+export interface ProviderSubmission {
+  id: string;
+  ownerUserId: string;
+  ownerEmail?: string;
+  name: string;
+  slug: string;
+  kind: string; // openai_compat | anthropic
+  baseUrl: string;
+  authScheme: string; // bearer | x-api-key
+  extraHeaders?: string | null;
+  /** 用户提交的上游密钥（AES-256-GCM 加密存储；审核通过才写入正式渠道 Key 池） */
+  encryptedKey?: string | null;
+  keyFingerprint?: string | null;
+  status: ProviderSubmissionStatus;
+  rejectionReason?: string | null;
+  reviewerUserId?: string | null;
+  reviewedAt?: number | null;
+  /** 审核通过后落地的正式渠道 id */
+  providerId?: string | null;
+  createdAt: number;
+  updatedAt: number;
+}
+
+/** 提交审核的站内信线程消息（1 个提交 = 1 个用户↔管理员线程） */
+export interface ProviderSubmissionMessage {
+  id: string;
+  submissionId: string;
+  fromUserId: string;
+  fromEmail: string;
+  fromRole: "user" | "admin";
+  content: string;
+  createdAt: number;
 }
 
 export interface ProviderKeyRecord {

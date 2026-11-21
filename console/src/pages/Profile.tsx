@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Camera, KeyRound } from "lucide-react";
+import { Camera, KeyRound, Wallet } from "lucide-react";
+import MyProviders from "./MyProviders";
 import { api, type Me } from "../lib/api";
 import { Button, Card, Field, Input, useToast } from "../components/ui";
 
 export default function Profile({ me, onRefresh }: { me: Me; onRefresh: () => void }) {
-  const [tab, setTab] = useState<"profile" | "password">("profile");
+  const [tab, setTab] = useState<"profile" | "password" | "providers">("profile");
   const [nickname, setNickname] = useState(me.nickname ?? "");
   const [bio, setBio] = useState(me.bio ?? "");
   const [avatarUrl, setAvatarUrl] = useState(me.avatarUrl ?? "");
@@ -66,7 +67,7 @@ export default function Profile({ me, onRefresh }: { me: Me; onRefresh: () => vo
     <div className="flex flex-col gap-4">
       {/* 选项卡栏（与网站设置同款形态） */}
       <div className="flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit" role="tablist">
-        {([["profile", "个人资料"], ["password", "修改密码"]] as const).map(([k, l]) => (
+        {([["profile", "个人资料"], ["password", "修改密码"], ["providers", "我的供应商"]] as const).map(([k, l]) => (
           <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
             className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${tab === k ? "bg-surface text-brand shadow-sm" : "text-muted hover:text-ink"}`}>{l}</button>
         ))}
@@ -103,6 +104,8 @@ export default function Profile({ me, onRefresh }: { me: Me; onRefresh: () => vo
         <div className="mt-4"><Button disabled={savingProfile} onClick={saveProfile}>{savingProfile ? "保存中…" : "保存资料"}</Button></div>
       </Card>
       )}
+
+      {tab === "providers" && <MyProviders meEmail={me.user.email} />}
 
       {tab === "password" && (
       <Card className="p-5">

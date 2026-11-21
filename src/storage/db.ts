@@ -19,6 +19,8 @@ import {
   type ApiKeyRecord,
   type ProviderRecord,
   type ProviderKeyRecord,
+  type ProviderSubmission,
+  type ProviderSubmissionMessage,
   type ModelRouteRecord,
   type ModelPricingRecord,
   type BalanceRecord,
@@ -177,6 +179,44 @@ export async function deleteProvider(env: any, providerId: string): Promise<void
     env,
     providers.filter((p) => p.id !== providerId)
   );
+}
+
+/* ---- 用户提交供应商（审核流）：独立存储，未审核记录不进入正式 providers 配置 ---- */
+
+const PROVIDER_SUBMISSIONS_KEY = "provider_submissions";
+const PROVIDER_SUB_MSG_KEY = (submissionId: string) => `provider_sub_msg:${submissionId}`;
+
+export async function getProviderSubmissions(env: any): Promise<ProviderSubmission[]> {
+  const store = getBlobStore(env);
+  return (await store.get(PROVIDER_SUBMISSIONS_KEY, { type: "json", consistency: "strong" })) || [];
+}
+
+export async function saveProviderSubmissions(env: any, list: ProviderSubmission[]): Promise<void> {
+  const store = getBlobStore(env);
+  await store.setJSON(PROVIDER_SUBMISSIONS_KEY, list);
+}
+
+/** 新提交插到列表头（列表按提交时间倒序的自然展示顺序） */
+export async function upsertProviderSubmission(env: any, sub: ProviderSubmission): Promise<void> {
+  const list = await getProviderSubmissions(env);
+  const idx = list.findIndex((x) => x.id === sub.id);
+  const next = list.slice();
+  if (idx >= 0) next[idx] = sub;
+  else next.unshift(sub);
+  await saveProviderSubmissions(env, next);
+}
+
+/** 提交对应的站内信线程（1 个提交 = 1 个用户↔管理员线程） */
+export async function getProviderSubmissionThread(env: any, submissionId: string): Promise<ProviderSubmissionMessage[]> {
+  const store = getBlobStore(env);
+  return (await store.get(PROVIDER_SUB_MSG_KEY(submissionId), { type: "json", consistency: "strong" })) || [];
+}
+
+export async function appendProviderSubmissionMessage(env: any, msg: ProviderSubmissionMessage): Promise<void> {
+  const list = await getProviderSubmissionThread(env, msg.submissionId);
+  list.push(msg);
+  const store = getBlobStore(env);
+  await store.setJSON(PROVIDER_SUB_MSG_KEY(msg.submissionId), list);
 }
 
 export async function getModels(env: any): Promise<ModelRouteRecord[]> {

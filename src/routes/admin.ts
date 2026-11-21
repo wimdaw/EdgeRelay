@@ -42,6 +42,10 @@ import {
   getAnnouncements,
   saveAnnouncements,
   getBlobStore,
+  getProviderSubmissions,
+  upsertProviderSubmission,
+  appendProviderSubmissionMessage,
+  getProviderSubmissionThread,
 } from "../storage/db";
 import { readKeyHealth } from "../key-health";
 import { mapLimit } from "../storage/cache";
@@ -222,6 +226,10 @@ adminRouter.post("/actions", async (c) => {
     } else if (
       action === "account_pool" ||
       action === "checkin_status" ||
+      action === "list_provider_submissions" ||
+      action === "provider_submission_thread" ||
+      action === "provider_submission_review" ||
+      action === "provider_submission_reply" ||
       action === "codebuddy_checkin" ||
       action === "codebuddy_checkin_link" ||
       action === "checkin_config" ||
@@ -739,6 +747,129 @@ adminRouter.post("/actions", async (c) => {
         const types = typeof p.type === "string" && p.type ? [String(p.type)] : undefined;
         const run = await runCheckins(env, { force: true, types });
         return done(run, "checkin", types ? types.join(",") : "all");
+      }
+
+      /* ---- 用户提交供应商：审核流 ---- */
+      case "list_provider_submissions": {
+        const subs = await getProviderSubmissions(env);
+        const pendingCount = subs.filter((x) => x.status === "pending").length;
+        return done(
+          {
+            ok: true,
+            pendingCount,
+            // 审核列表不透出加密凭据
+            submissions: subs.map(({ encryptedKey, ...rest }) => ({ ...rest, hasKey: !!encryptedKey })),
+          },
+          "provider_submission",
+          "list"
+        );
+      }
+      case "provider_submission_thread": {
+        const id = String(p.id || "");
+        const subs = await getProviderSubmissions(env);
+        const sub = subs.find((x) => x.id === id);
+        if (!sub) throw new ApiError(404, ErrorCode.NOT_FOUND, "提交记录不存在");
+        const messages = await getProviderSubmissionThread(env, id);
+        return done({ ok: true, submission: { ...sub, encryptedKey: undefined }, messages }, "provider_submission", id);
+      }
+      case "provider_submission_review": {
+        const id = String(p.id || "");
+        const decision = String(p.decision || "");
+        if (!["approved", "rejected"].includes(decision)) throw new ApiError(400, ErrorCode.BAD_REQUEST, "decision 必须是 approved / rejected");
+        const subs = await getProviderSubmissions(env);
+        const sub = subs.find((x) => x.id === id);
+        if (!sub) throw new ApiError(404, ErrorCode.NOT_FOUND, "提交记录不存在");
+        if (sub.status !== "pending") throw new ApiError(400, ErrorCode.BAD_REQUEST, `该提交已是 ${sub.status} 状态，不能重复审核`);
+
+        const now = Math.floor(Date.now() / 1000);
+        const reason = String(p.reason || "").trim();
+        if (decision === "rejected" && !reason) throw new ApiError(400, ErrorCode.BAD_REQUEST, "驳回必须填写原因");
+
+        let providerId: string | null = sub.providerId ?? null;
+        if (decision === "approved") {
+          // 审核内容覆盖（可选）：通过前允许修正名称/BaseURL/密钥
+          if (p.name) sub.name = String(p.name).trim();
+          if (p.baseUrl) sub.baseUrl = String(p.baseUrl).trim();
+          // 落地正式渠道（独立 uuid，带归属与审核溯源）
+          providerId = uuid();
+          await upsertProvider(env, {
+            id: providerId,
+            name: sub.name,
+            slug: sub.slug,
+            kind: sub.kind,
+            baseUrl: sub.baseUrl,
+            authScheme: sub.authScheme,
+            extraHeaders: sub.extraHeaders ?? null,
+            status: "active",
+            createdAt: now,
+            ownerUserId: sub.ownerUserId,
+            submissionId: sub.id,
+          });
+          // 密钥：审核时可替换，缺省用用户提交的
+          let encryptedKey = sub.encryptedKey ?? null;
+          let keyFingerprint = sub.keyFingerprint ?? null;
+          if (p.key) {
+            encryptedKey = await encryptSecret(env, String(p.key).trim());
+            const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(p.key).trim()));
+            keyFingerprint = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
+          }
+          if (encryptedKey) {
+            await bulkUpsertProviderKeys(env, providerId, [
+              {
+                id: uuid(),
+                providerId,
+                label: "user-submitted",
+                encryptedKey,
+                keyFingerprint,
+                status: "active",
+                createdAt: now,
+              },
+            ]);
+          }
+        }
+
+        sub.status = decision as "approved" | "rejected";
+        sub.rejectionReason = decision === "rejected" ? reason : null;
+        sub.reviewerUserId = admin.id;
+        sub.reviewedAt = now;
+        sub.providerId = providerId;
+        sub.updatedAt = now;
+        await upsertProviderSubmission(env, sub);
+
+        // 审核结果同步进站内信线程（提交用户可见）
+        await appendProviderSubmissionMessage(env, {
+          id: uuid(),
+          submissionId: sub.id,
+          fromUserId: admin.id,
+          fromEmail: admin.email,
+          fromRole: "admin",
+          content:
+            decision === "approved"
+              ? `审核通过：已创建正式渠道「${sub.name}」（${sub.slug}）。${reason ? `备注：${reason}` : ""}`
+              : `审核驳回：${reason}`,
+          createdAt: now,
+        });
+
+        return done({ ok: true, submission: { ...sub, encryptedKey: undefined }, providerId }, "provider_submission", id);
+      }
+      case "provider_submission_reply": {
+        const id = String(p.id || "");
+        const content = String(p.content || "").trim();
+        if (!content || content.length > 1000) throw new ApiError(400, ErrorCode.BAD_REQUEST, "请填写 1000 字以内的回复");
+        const subs = await getProviderSubmissions(env);
+        const sub = subs.find((x) => x.id === id);
+        if (!sub) throw new ApiError(404, ErrorCode.NOT_FOUND, "提交记录不存在");
+        const msg = {
+          id: uuid(),
+          submissionId: sub.id,
+          fromUserId: admin.id,
+          fromEmail: admin.email,
+          fromRole: "admin" as const,
+          content,
+          createdAt: Math.floor(Date.now() / 1000),
+        };
+        await appendProviderSubmissionMessage(env, msg);
+        return done({ ok: true }, "provider_submission", id);
       }
 
       /* ---- 签到任务总览（定时任务页）：渠道注册表 + 开关 + 各渠道账号数 ---- */
