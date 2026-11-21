@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Bell, Boxes, CalendarClock, CircleUser, DatabaseBackup, FlaskConical, Gauge, KeyRound, Layers, LogOut, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, Sun, Users, Wallet, X } from "lucide-react";
+import { Bell, Boxes, CalendarClock, CircleUser, DatabaseBackup, FlaskConical, MessagesSquare, Gauge, KeyRound, Layers, LogOut, Menu, Monitor, Moon, PanelLeftClose, PanelLeftOpen, ScrollText, Server, Settings as SettingsIcon, Sun, Users, Wallet, X } from "lucide-react";
 import { api, type Me, type SiteInfo } from "../lib/api";
 import { getSeenAnnouncementIds, markAnnouncementsSeen } from "../lib/announcements";
 import { cn, fmtMoney } from "../lib/utils";
@@ -16,6 +16,7 @@ const NAV = [
   { to: "/dashboard/models", label: "模型与定价", icon: Layers, roles: ALL_ROLES },
   { to: "/dashboard/users", label: "用户与组织", icon: Users, roles: ALL_ROLES },
   { to: "/dashboard/playground", label: "操练场", icon: FlaskConical, roles: ALL_ROLES },
+  { to: "/dashboard/chatroom", label: "聊天室", icon: MessagesSquare, roles: ALL_ROLES },
   { to: "/dashboard/logs", label: "运行日志", icon: ScrollText, roles: ["superadmin", "admin", "auditor"] },
   { to: "/dashboard/profile", label: "个人主页", icon: CircleUser, roles: ALL_ROLES },
   { to: "/dashboard/tasks", label: "定时任务", icon: CalendarClock, roles: ALL_ROLES },
