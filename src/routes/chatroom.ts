@@ -169,9 +169,9 @@ function looksRealtime(question: string): boolean {
   return /(天气|气温|降雨|台风|新闻|头条|热搜|汇率|股价|基金净值|比分|赛果|现在几点|最新消息|今天|刚刚)/i.test(question);
 }
 
-/** Agnes 回答中的「无联网」拒答模式 */
+/** Agnes 回答中的「无联网」拒答模式（宽松匹配：中间可隔其他文字） */
 function looksRefusal(answer: string): boolean {
-  return /(没有|无法)[^\n。]{0,10}(联网|搜索|接入|获取实时|访问互联网|查(询|看)实时)|不能访问互联网|没有接入实时/.test(answer);
+  return /(没有|无法|不能)[^。\n]{0,16}(联网|搜索|实时|互联网|外部搜索)|没有接入实时|无法获取实时|建议[^。\n]{0,10}(天气 ?App|天气应用|气象服务)/.test(answer);
 }
 
 /**
