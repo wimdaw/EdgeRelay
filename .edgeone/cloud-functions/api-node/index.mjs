@@ -5629,7 +5629,7 @@ var require_ws = __commonJS({
 import http from "http";
 import { getStore as dh } from "@edgeone/pages-blob";
 import { deflateSync as hI } from "zlib";
-import { createContext as GI, runInContext as B1 } from "vm";
+import { createContext as VI, runInContext as B1 } from "vm";
 import Dt from "crypto";
 import ba from "crypto";
 import gj from "tls";
@@ -6572,7 +6572,7 @@ var server = http.createServer(async (req, res) => {
         const params = {};
         params["default"] = cleanPath.split("/");
         context.params = params;
-        const mod_6 = (() => {
+        const mod_7 = (() => {
           var __defProp = Object.defineProperty;
           var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
           var __publicField = (obj, key, value) => {
@@ -6738,7 +6738,7 @@ var server = http.createServer(async (req, res) => {
           var Pm;
           var Rm;
           var Rw;
-          var Gn = F(() => {
+          var Vn = F(() => {
             gl = (e) => {
               let t = e.split("/");
               return t[0] === "" && t.shift(), t;
@@ -6858,7 +6858,7 @@ var server = http.createServer(async (req, res) => {
             bm();
             vm();
             Am();
-            Gn();
+            Vn();
             Mm = (_a2 = class {
               constructor(e, t = "/", n = [[]]) {
                 __privateAdd(this, _n2);
@@ -7153,7 +7153,7 @@ var server = http.createServer(async (req, res) => {
           var $m;
           var _i;
           var Ei;
-          var Jn = F(() => {
+          var Yn = F(() => {
             $m = ["get", "post", "put", "delete", "options", "patch", "query"], _i = "Can not add a route since the matcher is already built.", Ei = class extends Error {
             };
           });
@@ -7167,9 +7167,9 @@ var server = http.createServer(async (req, res) => {
           var Wm = F(() => {
             var _t2, _e2, e_fn, _n2, _s2, s_fn, _r2, r_fn, _a, a_fn, _a2;
             Bm();
-            Gn();
+            Vn();
             wl();
-            Jn();
+            Yn();
             Hm();
             Lw = (e) => e.text("404 Not Found", 404), zm = (e, t) => {
               if ("getResponse" in e) {
@@ -7350,7 +7350,7 @@ var server = http.createServer(async (req, res) => {
           }
           var Ti;
           var El = F(() => {
-            Jn();
+            Yn();
             Ti = [];
           });
           function Uw(e, t) {
@@ -7359,13 +7359,13 @@ var server = http.createServer(async (req, res) => {
           var Sl;
           var Al;
           var kn;
-          var Vm;
           var Gm;
+          var Vm;
           var Cl = F(() => {
             var _t2, _e2, _n2, _a;
             Aa();
-            Sl = "[^/]+", Al = "(?:|/.*)", kn = Symbol(), Vm = new Set(".\\+*[^]$()");
-            Gm = (_a = class {
+            Sl = "[^/]+", Al = "(?:|/.*)", kn = Symbol(), Gm = new Set(".\\+*[^]$()");
+            Vm = (_a = class {
               constructor() {
                 __privateAdd(this, _t2, void 0);
                 __privateAdd(this, _e2, void 0);
@@ -7377,7 +7377,7 @@ var server = http.createServer(async (req, res) => {
                   let u = t[o], l = u.length === 1 ? u === "*" ? o === c - 1 ? ["", "", ".*"] : ["", "", Sl] : null : u === "/*" ? ["", "", Al] : u.match(/^\:([^\{\}]+)(?:\{(.+)\})?$/), p;
                   if (l) {
                     let y = l[1], m = l[2] || "[^/]+";
-                    if (y && l[2] && (m === ".*" || (m = m.replace(/^\((?!\?:)(?=[^)]+\)$)/, "(?:"), /\((?!\?:)/.test(m)) || m.length === 1 && Vm.has(m)))
+                    if (y && l[2] && (m === ".*" || (m = m.replace(/^\((?!\?:)(?=[^)]+\)$)/, "(?:"), /\((?!\?:)/.test(m)) || m.length === 1 && Gm.has(m)))
                       throw kn;
                     if (p = __privateGet(i, _n2)[m], !p) {
                       if (m !== ".*" && m !== "(?:|/.*)") {
@@ -7403,14 +7403,14 @@ var server = http.createServer(async (req, res) => {
               buildRegExpStr() {
                 let t = Object.keys(__privateGet(this, _n2)).sort(Uw).map((n) => {
                   let r = __privateGet(this, _n2)[n], a = r.buildRegExpStr();
-                  return a === "" ? "" : (typeof __privateGet(r, _e2) == "number" ? `(${n})@${__privateGet(r, _e2)}` : Vm.has(n) ? `\\${n}` : n) + a;
+                  return a === "" ? "" : (typeof __privateGet(r, _e2) == "number" ? `(${n})@${__privateGet(r, _e2)}` : Gm.has(n) ? `\\${n}` : n) + a;
                 }).filter(Boolean);
                 return typeof __privateGet(this, _t2) == "number" && __privateGet(this, _t2) !== -1 && t.unshift(`#${__privateGet(this, _t2)}`), t.length === 0 ? "" : t.length === 1 ? t[0] : "(?:" + t.join("|") + ")";
               }
             }, _t2 = /* @__PURE__ */ new WeakMap(), _e2 = /* @__PURE__ */ new WeakMap(), _n2 = /* @__PURE__ */ new WeakMap(), _a);
           });
           var Nl;
-          var Jm = F(() => {
+          var Ym = F(() => {
             var _t2, _e2, _n2, _a;
             Aa();
             Cl();
@@ -7419,7 +7419,7 @@ var server = http.createServer(async (req, res) => {
                 __privateAdd(this, _t2, {
                   varIndex: 0
                 });
-                __privateAdd(this, _e2, new Gm());
+                __privateAdd(this, _e2, new Vm());
                 __privateAdd(this, _n2, 0);
                 __publicField(this, "paths", dt());
               }
@@ -7458,24 +7458,24 @@ var server = http.createServer(async (req, res) => {
             }, _t2 = /* @__PURE__ */ new WeakMap(), _e2 = /* @__PURE__ */ new WeakMap(), _n2 = /* @__PURE__ */ new WeakMap(), _a);
           });
           function Xm(e) {
-            return Ym[e] ?? (Ym[e] = new RegExp(`^${e.replace(/\/:[^/{}]+(?:\{\[\^\/]\+})?(?=[/{]|$)|\/?\*$|([.\\+*[^\]$()?{}|])/g, (t, n) => n ? `\\${n}` : t === "/*" ? Al : t === "*" ? ".*" : `/:${Sl}`)}$`));
+            return Jm[e] ?? (Jm[e] = new RegExp(`^${e.replace(/\/:[^/{}]+(?:\{\[\^\/]\+})?(?=[/{]|$)|\/?\*$|([.\\+*[^\]$()?{}|])/g, (t, n) => n ? `\\${n}` : t === "/*" ? Al : t === "*" ? ".*" : `/:${Sl}`)}$`));
           }
           function Si(e, t) {
             for (let n of Object.keys(e).sort((r, a) => a.length - r.length))
               if (Xm(n).test(t))
                 return [...e[n]];
           }
-          var Ym;
+          var Jm;
           var Ai;
           var Ci = F(() => {
             var _t2, _e2, _n2, _s2, s_fn, _r2, r_fn, _a;
-            Gn();
-            Jn();
+            Vn();
+            Yn();
             Aa();
             El();
             Cl();
-            Jm();
-            Ym = dt();
+            Ym();
+            Jm = dt();
             Ai = (_a = class {
               constructor() {
                 __privateAdd(this, _s2);
@@ -7526,7 +7526,7 @@ var server = http.createServer(async (req, res) => {
                 let e = dt();
                 for (let t of Object.keys(__privateGet(this, _e2)))
                   e[t] = __privateMethod(this, _r2, r_fn).call(this, t);
-                return __privateSet(this, _t2, __privateSet(this, _e2, __privateSet(this, _n2, void 0))), Ym = dt(), e;
+                return __privateSet(this, _t2, __privateSet(this, _e2, __privateSet(this, _n2, void 0))), Jm = dt(), e;
               }
             }, _t2 = /* @__PURE__ */ new WeakMap(), _e2 = /* @__PURE__ */ new WeakMap(), _n2 = /* @__PURE__ */ new WeakMap(), _s2 = /* @__PURE__ */ new WeakSet(), s_fn = function(e, t) {
               try {
@@ -7549,7 +7549,7 @@ var server = http.createServer(async (req, res) => {
             }, _a);
           });
           var Qm = F(() => {
-            Jn();
+            Yn();
             El();
             Ci();
           });
@@ -7560,7 +7560,7 @@ var server = http.createServer(async (req, res) => {
           var eh;
           var th = F(() => {
             var _t2, _e2, _a;
-            Jn();
+            Yn();
             eh = (_a = class {
               constructor(e) {
                 __publicField(this, "name", "SmartRouter");
@@ -7607,8 +7607,8 @@ var server = http.createServer(async (req, res) => {
           var nh;
           var ah = F(() => {
             var _t2, _e2, _n2, _s2, _r2, _a, a_fn, _a2;
-            Gn();
-            Jn();
+            Vn();
+            Yn();
             Aa();
             Ol = dt(), Bw = 0, nh = (_a2 = class {
               constructor() {
@@ -7701,7 +7701,7 @@ var server = http.createServer(async (req, res) => {
           var Il;
           var jl = F(() => {
             var _t2, _a;
-            Gn();
+            Vn();
             ah();
             Il = (_a = class {
               constructor() {
@@ -7744,10 +7744,10 @@ var server = http.createServer(async (req, res) => {
           tt(Pl, {
             ApiError: () => C,
             ErrorCode: () => A,
-            errorResponse: () => Y,
+            errorResponse: () => J,
             openAiError: () => ft
           });
-          function Y(e, t) {
+          function J(e, t) {
             return t instanceof C ? ft(t.status, t.code, t.message, t.details) : (console.error("internal_error", t), ft(500, A.INTERNAL, "Internal server error"));
           }
           function ft(e, t, n, r) {
@@ -7877,14 +7877,14 @@ var server = http.createServer(async (req, res) => {
           }
           async function lh(e) {
             let t = String(e.ENCRYPTION_KEY || "edgerelay-default-encryption-secret-32b");
-            if (Yn && Yn.secret === t)
-              return Yn.key;
+            if (Jn && Jn.secret === t)
+              return Jn.key;
             let n = crypto.subtle.digest("SHA-256", _n.encode(t)).then((r) => crypto.subtle.importKey("raw", r, {
               name: "AES-GCM"
             }, false, ["encrypt", "decrypt"])).catch((r) => {
-              throw Yn && Yn.secret === t && (Yn = null), r;
+              throw Jn && Jn.secret === t && (Jn = null), r;
             });
-            return Yn = {
+            return Jn = {
               secret: t,
               key: n
             }, n;
@@ -7925,13 +7925,13 @@ var server = http.createServer(async (req, res) => {
           }
           var _n;
           var $w;
-          var Yn;
+          var Jn;
           var Ni;
           var Hw;
           var nt = F(() => {
             "use strict";
             _n = new TextEncoder(), $w = new TextDecoder();
-            Yn = null;
+            Jn = null;
             Ni = /* @__PURE__ */ new Map(), Hw = 4096;
           });
           function Ml() {
@@ -7962,7 +7962,7 @@ var server = http.createServer(async (req, res) => {
               }
             };
           }
-          function V(e) {
+          function G(e) {
             if (an)
               return an;
             if ((e == null ? void 0 : e.USE_MEMORY_STORE) === "1")
@@ -7981,8 +7981,8 @@ var server = http.createServer(async (req, res) => {
             }
             return an = Ml(), an;
           }
-          function G(e) {
-            let t = V(e);
+          function V(e) {
+            let t = G(e);
             return {
               async get(n) {
                 try {
@@ -8040,7 +8040,7 @@ var server = http.createServer(async (req, res) => {
             };
           }
           var an;
-          var Ye = F(() => {
+          var Je = F(() => {
             "use strict";
             an = null;
           });
@@ -8169,7 +8169,7 @@ var server = http.createServer(async (req, res) => {
             appendAuditLog: () => ou,
             appendContentFlag: () => lu,
             appendLedgerEntries: () => cr,
-            appendLedgerEntry: () => Jw,
+            appendLedgerEntry: () => Yw,
             appendProviderSubmissionMessage: () => er,
             bulkUpsertProviderKeys: () => ir,
             clearAuditLogs: () => iu,
@@ -8182,16 +8182,16 @@ var server = http.createServer(async (req, res) => {
             deletePricing: () => Fi,
             deleteProvider: () => Bi,
             deleteProviderKey: () => Xl,
-            deleteRedeemCode: () => Yw,
+            deleteRedeemCode: () => Jw,
             deleteSession: () => Ba,
             deleteUser: () => qw,
             getAllPricing: () => Pt,
             getAnnouncements: () => An,
-            getApiKeyByHash: () => Vt,
+            getApiKeyByHash: () => Gt,
             getApiKeyById: () => $a,
             getAppeals: () => za,
-            getAuditLogs: () => Vi,
-            getBlobStore: () => V,
+            getAuditLogs: () => Gi,
+            getBlobStore: () => G,
             getContentFlags: () => uu,
             getDailyUsage: () => Wi,
             getLedgerEntries: () => eu,
@@ -8202,7 +8202,7 @@ var server = http.createServer(async (req, res) => {
             getProviderKeysAll: () => Ke,
             getProviderSubmissionThread: () => Pr,
             getProviderSubmissions: () => Wt,
-            getProviders: () => Ve,
+            getProviders: () => Ge,
             getRecentUsageRecords: () => ru,
             getRedeemCodes: () => tu,
             getSession: () => Ua,
@@ -8216,16 +8216,16 @@ var server = http.createServer(async (req, res) => {
             listAllUsers: () => Rr,
             listUserApiKeys: () => tr,
             migrateProviderKeysToShards: () => Ww,
-            persistBalanceNow: () => Gw,
+            persistBalanceNow: () => Vw,
             redeemCodeAtomic: () => Xw,
-            rewriteProviderKeyShards: () => Yl,
+            rewriteProviderKeyShards: () => Jl,
             saveAnnouncements: () => qa,
             saveProviderSubmissions: () => hh,
             saveRedeemCodes: () => nu,
             seedInitialData: () => wh,
             setModels: () => Hl,
             setPricing: () => La,
-            setProviderKeys: () => Jl,
+            setProviderKeys: () => Yl,
             setProviders: () => jr,
             syncUserVipStatus: () => Hi,
             touchApiKeyUsage: () => Nt,
@@ -8237,7 +8237,7 @@ var server = http.createServer(async (req, res) => {
             updateUser: () => pt,
             upsertModel: () => $i,
             upsertProvider: () => Ui,
-            upsertProviderKey: () => Vw,
+            upsertProviderKey: () => Gw,
             upsertProviderSubmission: () => Da,
             verifyAuditChain: () => cu
           });
@@ -8246,7 +8246,7 @@ var server = http.createServer(async (req, res) => {
           }
           async function Pa(e) {
             return $l.get("snapshot", async () => {
-              let t = V(e), n = await t.get("config:all", {
+              let t = G(e), n = await t.get("config:all", {
                 type: "json",
                 consistency: "strong"
               });
@@ -8293,7 +8293,7 @@ var server = http.createServer(async (req, res) => {
             });
           }
           async function Ra(e, t) {
-            let n = V(e), a = {
+            let n = G(e), a = {
               ...await Pa(e),
               ...t
             };
@@ -8313,7 +8313,7 @@ var server = http.createServer(async (req, res) => {
               settings: r
             }), r;
           }
-          async function Ve(e) {
+          async function Ge(e) {
             return (await Pa(e)).providers;
           }
           async function jr(e, t) {
@@ -8322,35 +8322,35 @@ var server = http.createServer(async (req, res) => {
             });
           }
           async function Ui(e, t) {
-            let n = await Ve(e), r = n.findIndex((s) => s.id === t.id), a = n.slice();
+            let n = await Ge(e), r = n.findIndex((s) => s.id === t.id), a = n.slice();
             r >= 0 ? a[r] = t : a.push(t), await jr(e, a);
           }
           async function Bi(e, t) {
-            let n = await Ve(e);
+            let n = await Ge(e);
             await jr(e, n.filter((r) => r.id !== t));
           }
           async function Wt(e) {
-            return await V(e).get(ph, {
+            return await G(e).get(ph, {
               type: "json",
               consistency: "strong"
             }) || [];
           }
           async function hh(e, t) {
-            await V(e).setJSON(ph, t);
+            await G(e).setJSON(ph, t);
           }
           async function Da(e, t) {
             let n = await Wt(e), r = n.findIndex((s) => s.id === t.id), a = n.slice();
             r >= 0 ? a[r] = t : a.unshift(t), await hh(e, a);
           }
           async function Pr(e, t) {
-            return await V(e).get(mh(t), {
+            return await G(e).get(mh(t), {
               type: "json",
               consistency: "strong"
             }) || [];
           }
           async function er(e, t) {
             let n = await Pr(e, t.submissionId);
-            n.push(t), await V(e).setJSON(mh(t.submissionId), n);
+            n.push(t), await G(e).setJSON(mh(t.submissionId), n);
           }
           async function jt(e) {
             return (await Pa(e)).models;
@@ -8403,27 +8403,27 @@ var server = http.createServer(async (req, res) => {
             }), true;
           }
           async function Sn(e, t) {
-            let n = V(e), r = t.trim().toLowerCase(), a = await n.get(`idx:user:email:${encodeURIComponent(r)}`, {
+            let n = G(e), r = t.trim().toLowerCase(), a = await n.get(`idx:user:email:${encodeURIComponent(r)}`, {
               type: "json",
               consistency: "strong"
             });
             return (a == null ? void 0 : a.userId) ? Be(e, a.userId) : null;
           }
           async function Be(e, t) {
-            return Ir.get(t, async () => await V(e).get(`user:${t}`, {
+            return Ir.get(t, async () => await G(e).get(`user:${t}`, {
               type: "json",
               consistency: "strong"
             }));
           }
           async function ql(e) {
-            let n = await V(e).get("idx:users:all", {
+            let n = await G(e).get("idx:users:all", {
               type: "json",
               consistency: "strong"
             }) || [];
             return Array.isArray(n) && n.length > 0;
           }
           async function Kl(e, t) {
-            let n = V(e), r = t.email.trim().toLowerCase(), a = await n.get("idx:users:all", {
+            let n = G(e), r = t.email.trim().toLowerCase(), a = await n.get("idx:users:all", {
               type: "json",
               consistency: "strong"
             }) || [];
@@ -8432,7 +8432,7 @@ var server = http.createServer(async (req, res) => {
             }), a.unshift(t.id), await n.setJSON("idx:users:all", a), Ir.set(t.id, t), await Rt(e, `user:${t.id}`), t;
           }
           async function pt(e, t, n) {
-            let r = V(e), a = await Be(e, t);
+            let r = G(e), a = await Be(e, t);
             if (!a)
               return null;
             let s = {
@@ -8443,14 +8443,14 @@ var server = http.createServer(async (req, res) => {
             return await r.setJSON(`user:${t}`, s), Ir.set(t, s), s;
           }
           async function Rr(e) {
-            let n = await V(e).get("idx:users:all", {
+            let n = await G(e).get("idx:users:all", {
               type: "json",
               consistency: "strong"
             }) || [];
             return (await it(n, 12, async (a) => await Be(e, a))).filter((a) => !!a);
           }
           async function qw(e, t) {
-            let n = V(e), r = await Be(e, t);
+            let n = G(e), r = await Be(e, t);
             if (!r)
               return false;
             let s = (await n.get("idx:users:all", {
@@ -8485,22 +8485,22 @@ var server = http.createServer(async (req, res) => {
             })), s;
           }
           async function Mr(e, t) {
-            await V(e).setJSON(`session:${t.id}`, t), ja.set(t.id, t);
+            await G(e).setJSON(`session:${t.id}`, t), ja.set(t.id, t);
           }
           async function Ua(e, t) {
-            let n = await ja.get(t, async () => await V(e).get(`session:${t}`, {
+            let n = await ja.get(t, async () => await G(e).get(`session:${t}`, {
               type: "json",
               consistency: "strong"
             }));
-            return n ? n.expiresAt < Math.floor(Date.now() / 1e3) ? (ja.delete(t), V(e).delete(`session:${t}`).catch(() => {
+            return n ? n.expiresAt < Math.floor(Date.now() / 1e3) ? (ja.delete(t), G(e).delete(`session:${t}`).catch(() => {
             }), null) : n : null;
           }
           async function Ba(e, t) {
-            ja.delete(t), await V(e).delete(`session:${t}`).catch(() => {
+            ja.delete(t), await G(e).delete(`session:${t}`).catch(() => {
             });
           }
-          async function Vt(e, t) {
-            let n = await Zn.get(t, async () => await V(e).get(`key:${t}`, {
+          async function Gt(e, t) {
+            let n = await Zn.get(t, async () => await G(e).get(`key:${t}`, {
               type: "json",
               consistency: "strong"
             }));
@@ -8510,13 +8510,13 @@ var server = http.createServer(async (req, res) => {
             let n = Qn.get(t);
             if (n) {
               let s = Zn.peek(n);
-              return s || await Vt(e, n);
+              return s || await Gt(e, n);
             }
             let a = (await Fa(e)).find((s) => s.id === t) || null;
             return a && Qn.set(a.id, a.keyHash), a;
           }
           async function zi(e, t) {
-            let n = V(e);
+            let n = G(e);
             await n.setJSON(`key:${t.keyHash}`, t), Zn.set(t.keyHash, t), Qn.set(t.id, t.keyHash);
             let r = await n.get(`idx:keys:user:${t.userId}`, {
               type: "json",
@@ -8530,21 +8530,21 @@ var server = http.createServer(async (req, res) => {
             return a.unshift(t.keyHash), await n.setJSON("idx:keys:all", a), t;
           }
           async function tr(e, t) {
-            let r = await V(e).get(`idx:keys:user:${t}`, {
+            let r = await G(e).get(`idx:keys:user:${t}`, {
               type: "json",
               consistency: "strong"
             }) || [];
-            return (await it(r, 12, async (s) => await Vt(e, s))).filter((s) => !!s);
+            return (await it(r, 12, async (s) => await Gt(e, s))).filter((s) => !!s);
           }
           async function Fa(e) {
-            let n = await V(e).get("idx:keys:all", {
+            let n = await G(e).get("idx:keys:all", {
               type: "json",
               consistency: "strong"
             }) || [];
-            return (await it(n, 12, async (a) => await Vt(e, a))).filter((a) => !!a);
+            return (await it(n, 12, async (a) => await Gt(e, a))).filter((a) => !!a);
           }
           async function nr(e, t, n) {
-            let r = V(e), a = await Vt(e, t);
+            let r = G(e), a = await Gt(e, t);
             if (!a)
               return null;
             let s = {
@@ -8565,7 +8565,7 @@ var server = http.createServer(async (req, res) => {
               return;
             let t = Array.from(Oa);
             Oa.clear();
-            let n = V(e);
+            let n = G(e);
             await Promise.all(t.map(async (r) => {
               let a = Zn.peek(r);
               a && await n.setJSON(`key:${r}`, {
@@ -8579,18 +8579,18 @@ var server = http.createServer(async (req, res) => {
           function gh(e) {
             return `provider_keys:${e}:m`;
           }
-          function Vl(e, t) {
+          function Gl(e, t) {
             return `provider_keys:${e}:s${t}`;
           }
           async function qi(e, t) {
-            return await V(e).get(Wl(t), {
+            return await G(e).get(Wl(t), {
               type: "json",
               consistency: "strong"
             }) || [];
           }
           async function ar(e, t) {
             return Ul.get(t, async () => {
-              let r = await V(e).get(gh(t), {
+              let r = await G(e).get(gh(t), {
                 type: "json",
                 consistency: "strong"
               });
@@ -8600,17 +8600,17 @@ var server = http.createServer(async (req, res) => {
               };
             });
           }
-          async function Gl(e, t, n) {
-            return Di.get(`${t}:${n}`, async () => await V(e).get(Vl(t, n), {
+          async function Vl(e, t, n) {
+            return Di.get(`${t}:${n}`, async () => await G(e).get(Gl(t, n), {
               type: "json",
               consistency: "strong"
             }) || []);
           }
           async function yh(e, t, n, r) {
-            await V(e).setJSON(Vl(t, n), r), Di.set(`${t}:${n}`, r);
+            await G(e).setJSON(Gl(t, n), r), Di.set(`${t}:${n}`, r);
           }
           async function bh(e, t, n) {
-            await V(e).setJSON(gh(t), n), Ul.set(t, n);
+            await G(e).setJSON(gh(t), n), Ul.set(t, n);
           }
           async function sr(e, t) {
             let n = await ar(e, t);
@@ -8621,7 +8621,7 @@ var server = http.createServer(async (req, res) => {
               let i = Math.floor(Math.random() * n.shards);
               r.includes(i) || r.push(i);
             }
-            return (await Promise.all(r.map((i) => Gl(e, t, i)))).flat();
+            return (await Promise.all(r.map((i) => Vl(e, t, i)))).flat();
           }
           async function Ke(e, t) {
             let n = await ar(e, t);
@@ -8630,20 +8630,20 @@ var server = http.createServer(async (req, res) => {
             let r = Array.from({
               length: n.shards
             }, (s, i) => i);
-            return (await it(r, 8, (s) => Gl(e, t, s))).flat();
-          }
-          async function Jl(e, t, n) {
-            await V(e).setJSON(Wl(t), n), Mi.set(t, n);
+            return (await it(r, 8, (s) => Vl(e, t, s))).flat();
           }
           async function Yl(e, t, n) {
+            await G(e).setJSON(Wl(t), n), Mi.set(t, n);
+          }
+          async function Jl(e, t, n) {
             let r = [];
             for (let s = 0; s < n.length; s += Ri)
               r.push(n.slice(s, s + Ri));
             let a = await ar(e, t);
             if (await Promise.all(r.map((s, i) => yh(e, t, i, s))), a && a.shards > r.length) {
-              let s = V(e);
+              let s = G(e);
               for (let i = r.length; i < a.shards; i++)
-                await s.delete(Vl(t, i)).catch(() => {
+                await s.delete(Gl(t, i)).catch(() => {
                 }), Di.delete(`${t}:${i}`);
             }
             await bh(e, t, {
@@ -8660,7 +8660,7 @@ var server = http.createServer(async (req, res) => {
                 count: n.count
               };
             let r = await qi(e, t);
-            return r.length ? (await Yl(e, t, r), await V(e).delete(Wl(t)).catch(() => {
+            return r.length ? (await Jl(e, t, r), await G(e).delete(Wl(t)).catch(() => {
             }), Mi.delete(t), {
               migrated: true,
               shards: Math.ceil(r.length / Ri),
@@ -8673,12 +8673,12 @@ var server = http.createServer(async (req, res) => {
           }
           async function Ki(e, t, n) {
             if (!await ar(e, t)) {
-              await Jl(e, t, n);
+              await Yl(e, t, n);
               return;
             }
-            await Yl(e, t, n);
+            await Jl(e, t, n);
           }
-          async function Vw(e, t) {
+          async function Gw(e, t) {
             let n = await Ke(e, t.providerId), r = n.findIndex((s) => s.id === t.id), a = n.slice();
             r >= 0 ? a[r] = t : a.push(t), await Ki(e, t.providerId, a);
           }
@@ -8690,10 +8690,10 @@ var server = http.createServer(async (req, res) => {
               let c = await qi(e, t), u = new Map(c.map((l) => [l.id, l]));
               for (let l of n)
                 u.set(l.id, l);
-              await Jl(e, t, Array.from(u.values()));
+              await Yl(e, t, Array.from(u.values()));
               return;
             }
-            let a = r.shards, s = Math.max(0, a - 1), i = a > 0 ? await Gl(e, t, s) : [];
+            let a = r.shards, s = Math.max(0, a - 1), i = a > 0 ? await Vl(e, t, s) : [];
             a === 0 && (a = 1);
             let o = /* @__PURE__ */ new Map();
             for (let c of n)
@@ -8735,7 +8735,7 @@ var server = http.createServer(async (req, res) => {
             if (r)
               return r;
             let a = (async () => {
-              let s = V(e), i = await s.get(`balance:${t}`, {
+              let s = G(e), i = await s.get(`balance:${t}`, {
                 type: "json",
                 consistency: "strong"
               });
@@ -8760,17 +8760,17 @@ var server = http.createServer(async (req, res) => {
             }
           }
           async function or(e, t, n) {
-            n.updatedAt = Math.floor(Date.now() / 1e3), Ia.set(t, n), await V(e).setJSON(`balance:${t}`, {
+            n.updatedAt = Math.floor(Date.now() / 1e3), Ia.set(t, n), await G(e).setJSON(`balance:${t}`, {
               ...n
             });
           }
-          async function Gw(e, t, n) {
+          async function Vw(e, t, n) {
             await or(e, t, n);
           }
           async function cr(e, t) {
             if (!t.length)
               return;
-            let n = V(e), r = /* @__PURE__ */ new Map();
+            let n = G(e), r = /* @__PURE__ */ new Map();
             for (let a of t) {
               let s = r.get(a.scope) || [];
               s.push(a), r.set(a.scope, s);
@@ -8783,25 +8783,25 @@ var server = http.createServer(async (req, res) => {
               await n.setJSON(i, l);
             }));
           }
-          async function Jw(e, t) {
+          async function Yw(e, t) {
             await cr(e, [t]);
           }
           async function eu(e, t, n = 50) {
-            return (await V(e).get(`ledger:${t}`, {
+            return (await G(e).get(`ledger:${t}`, {
               type: "json",
               consistency: "strong"
             }) || []).slice(0, n);
           }
           async function tu(e) {
-            return await V(e).get("redeem_codes:all", {
+            return await G(e).get("redeem_codes:all", {
               type: "json",
               consistency: "strong"
             }) || [];
           }
           async function nu(e, t) {
-            await V(e).setJSON("redeem_codes:all", t);
+            await G(e).setJSON("redeem_codes:all", t);
           }
-          async function Yw(e, t) {
+          async function Jw(e, t) {
             let r = (await tu(e)).filter((a) => a.id !== t && a.code !== t);
             await nu(e, r);
           }
@@ -8817,7 +8817,7 @@ var server = http.createServer(async (req, res) => {
             return i.status = "used", i.usedByUserId = n, i.usedByEmail = r, i.usedAt = o, await nu(e, s), i;
           }
           async function lr(e, t, n) {
-            let r = V(e), a = new Date(t.createdAt * 1e3).toISOString().slice(0, 10), s = [r.setJSON(`usage:record:${t.requestId}`, t), Qw(e, r, a, t), Zw(e, r, t), ek(e, r, t, a)];
+            let r = G(e), a = new Date(t.createdAt * 1e3).toISOString().slice(0, 10), s = [r.setJSON(`usage:record:${t.requestId}`, t), Qw(e, r, a, t), Zw(e, r, t), ek(e, r, t, a)];
             (n == null ? void 0 : n.apiKeyWrite) && s.push(r.setJSON(`key:${n.apiKeyWrite.keyHash}`, n.apiKeyWrite.record)), await Promise.all(s);
           }
           async function Qw(e, t, n, r) {
@@ -8865,26 +8865,26 @@ var server = http.createServer(async (req, res) => {
             await t.setJSON(a, o);
           }
           async function Wi(e, t) {
-            return await V(e).get(`usage:daily:${t}`, {
+            return await G(e).get(`usage:daily:${t}`, {
               type: "json",
               consistency: "strong"
             });
           }
           async function Ha(e, t, n) {
-            return await V(e).get(`usage:user:${t}:${n}`, {
+            return await G(e).get(`usage:user:${t}:${n}`, {
               type: "json",
               consistency: "strong"
             }) || [];
           }
           async function ru(e) {
-            return await V(e).get("usage:recent", {
+            return await G(e).get("usage:recent", {
               type: "json",
               consistency: "strong"
             }) || [];
           }
           async function au(e) {
             return Tn || (Pi || (Pi = (async () => {
-              let n = await V(e).get("audit:chain", {
+              let n = await G(e).get("audit:chain", {
                 type: "json",
                 consistency: "strong"
               }) || [];
@@ -8906,14 +8906,14 @@ var server = http.createServer(async (req, res) => {
             return n;
           }
           async function su(e, t) {
-            let n = V(e), r = await au(e), a = r.filter((i) => i.id !== t);
+            let n = G(e), r = await au(e), a = r.filter((i) => i.id !== t);
             if (a.length === r.length)
               return r.length;
             let s = await tk(a);
             return await n.setJSON("audit:chain", s), Tn = s, s.length;
           }
           async function iu(e) {
-            await V(e).setJSON("audit:chain", []), Tn = [];
+            await G(e).setJSON("audit:chain", []), Tn = [];
           }
           async function vh(e, t) {
             if (t.length === 0)
@@ -8924,7 +8924,7 @@ var server = http.createServer(async (req, res) => {
             return s === t.length ? t : t.slice(0, s);
           }
           async function ou(e, t) {
-            let n = V(e), a = (await au(e)).slice(), s = a.length > 0 ? a[0] : null, i = s ? s.hash : xh, o = ae(), c = Math.floor(Date.now() / 1e3), u = t.meta ? JSON.stringify(t.meta) : "", l = `${i}|${o}|${t.action}|${u}|${c}`, p = await yt(l), y = {
+            let n = G(e), a = (await au(e)).slice(), s = a.length > 0 ? a[0] : null, i = s ? s.hash : xh, o = ae(), c = Math.floor(Date.now() / 1e3), u = t.meta ? JSON.stringify(t.meta) : "", l = `${i}|${o}|${t.action}|${u}|${c}`, p = await yt(l), y = {
               id: o,
               actorUserId: t.actorUserId,
               actorIp: t.actorIp,
@@ -8940,12 +8940,12 @@ var server = http.createServer(async (req, res) => {
             let m = await vh(e, a);
             return m.length > 1e3 && (m.length = 1e3), await n.setJSON("audit:chain", m), Tn = m, y;
           }
-          async function Vi(e, t = 100) {
-            let n = V(e), r = await au(e), a = await vh(e, r);
+          async function Gi(e, t = 100) {
+            let n = G(e), r = await au(e), a = await vh(e, r);
             return a !== r && (await n.setJSON("audit:chain", a), Tn = a), a.slice(0, t);
           }
           async function cu(e) {
-            let t = await Vi(e, 1e3);
+            let t = await Gi(e, 1e3);
             if (t.length <= 1)
               return {
                 valid: true,
@@ -8973,34 +8973,34 @@ var server = http.createServer(async (req, res) => {
             };
           }
           async function lu(e, t) {
-            let n = V(e), r = await n.get("content_flags:all", {
+            let n = G(e), r = await n.get("content_flags:all", {
               type: "json",
               consistency: "strong"
             }) || [];
             r.unshift(t), r.length > 500 && (r.length = 500), await n.setJSON("content_flags:all", r);
           }
           async function uu(e) {
-            return await V(e).get("content_flags:all", {
+            return await G(e).get("content_flags:all", {
               type: "json",
               consistency: "strong"
             }) || [];
           }
           async function du(e, t) {
-            let n = V(e), r = await n.get("appeals:all", {
+            let n = G(e), r = await n.get("appeals:all", {
               type: "json",
               consistency: "strong"
             }) || [];
             r.unshift(t), r.length > 500 && (r.length = 500), await n.setJSON("appeals:all", r);
           }
           async function za(e) {
-            return await V(e).get("appeals:all", {
+            return await G(e).get("appeals:all", {
               type: "json",
               consistency: "strong"
             }) || [];
           }
           async function An(e) {
             return Bl.get("all", async () => {
-              let t = V(e), n = await t.get("announcements:all", {
+              let t = G(e), n = await t.get("announcements:all", {
                 type: "json",
                 consistency: "strong"
               });
@@ -9019,10 +9019,10 @@ var server = http.createServer(async (req, res) => {
             });
           }
           async function qa(e, t) {
-            await V(e).setJSON("announcements:all", t), Bl.set("all", t);
+            await G(e).setJSON("announcements:all", t), Bl.set("all", t);
           }
           async function wh(e) {
-            let t = V(e), n = Math.floor(Date.now() / 1e3), r = [{
+            let t = G(e), n = Math.floor(Date.now() / 1e3), r = [{
               id: "openai",
               name: "OpenAI",
               slug: "openai",
@@ -9228,7 +9228,7 @@ var server = http.createServer(async (req, res) => {
           var Pi;
           var Ie = F(() => {
             "use strict";
-            Ye();
+            Je();
             Ca();
             Dl();
             nt();
@@ -9364,7 +9364,7 @@ var server = http.createServer(async (req, res) => {
             let n = (e.req.header("authorization") ?? "").match(/^Bearer\s+(sk-gw-\S+)$/i);
             if (!n)
               throw new C(401, A.AUTH_REQUIRED, "\u7F3A\u5C11 Bearer API Key");
-            let r = n[1], a = await yt(r), s = Math.floor(Date.now() / 1e3), i = await Vt(e.env, a);
+            let r = n[1], a = await yt(r), s = Math.floor(Date.now() / 1e3), i = await Gt(e.env, a);
             if (!i)
               throw new C(401, A.AUTH_INVALID, "API Key \u65E0\u6548");
             if (i.status === "revoked")
@@ -9429,14 +9429,14 @@ var server = http.createServer(async (req, res) => {
           function Th(e, t) {
             return `rl:${e}:${t}`;
           }
-          function Gi() {
+          function Vi() {
             return Math.floor(Date.now() / 6e4);
           }
-          async function Ji(e, t, n) {
+          async function Yi(e, t, n) {
             let r = mu.get(t);
             if (r && r.minute === n)
               return r;
-            let s = await V(e).get(Th(t, n), {
+            let s = await G(e).get(Th(t, n), {
               type: "json",
               consistency: "strong"
             }), i = {
@@ -9456,14 +9456,14 @@ var server = http.createServer(async (req, res) => {
             let t = Array.from(mu.values()).filter((r) => r.dirty);
             if (t.length === 0)
               return;
-            let n = V(e);
+            let n = G(e);
             await Promise.all(t.map((r) => n.setJSON(Th(r.keyId, r.minute), r.state).catch(() => {
             })));
             for (let r of t)
               r.dirty = false;
           }
           async function Lr(e, t, n, r, a) {
-            let s = Gi(), i = await Ji(e, t, s), o = 60 - Math.floor(Date.now() % 6e4 / 1e3) + 1;
+            let s = Vi(), i = await Yi(e, t, s), o = 60 - Math.floor(Date.now() % 6e4 / 1e3) + 1;
             if (r !== 0) {
               if (typeof r == "number" && r > 0 && a) {
                 if (i.dirty = true, i.state.modelRpm[a] = (i.state.modelRpm[a] || 0) + 1, i.state.modelRpm[a] > r)
@@ -9492,23 +9492,23 @@ var server = http.createServer(async (req, res) => {
             };
           }
           async function Sh(e, t, n) {
-            let r = Gi(), a = await Ji(e, t, r);
+            let r = Vi(), a = await Yi(e, t, r);
             a.dirty = true, a.state.tpm += n;
           }
           async function Ah(e, t, n) {
             if (n.tpm <= 0)
               return true;
-            let r = Gi();
-            return (await Ji(e, t, r)).state.tpm <= n.tpm;
+            let r = Vi();
+            return (await Yi(e, t, r)).state.tpm <= n.tpm;
           }
-          async function Gt(e, t) {
-            let n = Gi(), r = await Ji(e, t, n);
+          async function Vt(e, t) {
+            let n = Vi(), r = await Yi(e, t, n);
             r.dirty = true, r.state.conc = Math.max(0, r.state.conc - 1);
           }
           var mu;
-          var Yi = F(() => {
+          var Ji = F(() => {
             "use strict";
-            Ye();
+            Je();
             nt();
             mu = /* @__PURE__ */ new Map();
           });
@@ -9528,7 +9528,7 @@ var server = http.createServer(async (req, res) => {
                 let a = Qi.get(t) || 0;
                 (async () => {
                   try {
-                    let i = await V(e).get(`key_health:${t}`, {
+                    let i = await G(e).get(`key_health:${t}`, {
                       type: "json",
                       consistency: "strong"
                     });
@@ -9545,7 +9545,7 @@ var server = http.createServer(async (req, res) => {
               return Oh(r.val);
             }
             try {
-              let i = await V(e).get(`key_health:${t}`, {
+              let i = await G(e).get(`key_health:${t}`, {
                 type: "json",
                 consistency: "strong"
               }) || {};
@@ -9563,7 +9563,7 @@ var server = http.createServer(async (req, res) => {
               at: Date.now()
             });
             try {
-              let r = V(e), a = {};
+              let r = G(e), a = {};
               for (let [s, i] of Object.entries(n))
                 (i.failures > 0 || i.demotedAt && Date.now() - i.demotedAt < jh) && (a[s] = i);
               Object.keys(a).length > 0 ? await r.setJSON(`key_health:${t}`, a) : await r.delete(`key_health:${t}`);
@@ -9608,7 +9608,7 @@ var server = http.createServer(async (req, res) => {
           var ak;
           var fr = F(() => {
             "use strict";
-            Ye();
+            Je();
             Ih = 3, jh = 6e4, Xi = /* @__PURE__ */ new Map(), Qi = /* @__PURE__ */ new Map(), hu = /* @__PURE__ */ new Set(), ak = 3e4;
           });
           function sk(e, t, n) {
@@ -9633,7 +9633,7 @@ var server = http.createServer(async (req, res) => {
               headers: {}
             };
           }
-          function Va(e, t, n) {
+          function Ga(e, t, n) {
             return (e === "google" || /generativelanguage\.googleapis\.com/i.test(t || "")) && /^models\//i.test(n) ? n.replace(/^models\//i, "") : n;
           }
           async function gu(e, t) {
@@ -9717,7 +9717,7 @@ var server = http.createServer(async (req, res) => {
           async function Cn(e, t) {
             let n = await jt(e), r = n.filter((o) => o.publicName === t && o.enabled === 1);
             if (!r.length && t.includes("/")) {
-              let o = t.indexOf("/"), c = t.slice(0, o), u = t.slice(o + 1), p = (await Ve(e)).find((y) => y.slug === c || y.id === c);
+              let o = t.indexOf("/"), c = t.slice(0, o), u = t.slice(o + 1), p = (await Ge(e)).find((y) => y.slug === c || y.id === c);
               if (p && (r = n.filter((y) => y.providerId === p.id && (y.publicName === u || y.upstreamModel === u) && y.enabled === 1), !r.length)) {
                 let y = u.toLowerCase(), m = n.filter((d) => d.providerId === p.id && d.enabled === 1 && (d.publicName.toLowerCase() === y || d.upstreamModel.toLowerCase() === y));
                 $h(m) && (r = m);
@@ -9730,7 +9730,7 @@ var server = http.createServer(async (req, res) => {
             if (!r.length)
               return [];
             r.sort((o, c) => o.priority - c.priority || o.costWeight - c.costWeight);
-            let a = await Ve(e), s = new Map(a.map((o) => [o.id, o])), i = [];
+            let a = await Ge(e), s = new Map(a.map((o) => [o.id, o])), i = [];
             for (let o of r) {
               let c = s.get(o.providerId) || s.get(o.providerId.replace(/^p_/, "")) || s.get("p_" + o.providerId);
               !c || c.status !== "active" || i.push({
@@ -9757,7 +9757,7 @@ var server = http.createServer(async (req, res) => {
               extraHeaders: zh(t.extraHeaders),
               providerKeyId: "keyless",
               encryptedKey: "",
-              upstreamModel: Va(t.slug, t.baseUrl, e.upstreamModel),
+              upstreamModel: Ga(t.slug, t.baseUrl, e.upstreamModel),
               priority: e.priority,
               costWeight: e.costWeight
             };
@@ -9780,7 +9780,7 @@ var server = http.createServer(async (req, res) => {
               extraHeaders: u,
               providerKeyId: l.id,
               encryptedKey: l.encryptedKey,
-              upstreamModel: Va(s.slug, s.baseUrl, a.upstreamModel),
+              upstreamModel: Ga(s.slug, s.baseUrl, a.upstreamModel),
               priority: a.priority,
               costWeight: a.costWeight
             }));
@@ -9795,7 +9795,7 @@ var server = http.createServer(async (req, res) => {
             }
           }
           async function qh(e) {
-            let t = await jt(e), n = await Ve(e), r = new Set(n.filter((c) => c.status === "active").map((c) => c.id)), a = new Map(n.map((c) => [c.id, c])), s = t.filter((c) => c.enabled === 1 && r.has(c.providerId)), i = /* @__PURE__ */ new Set();
+            let t = await jt(e), n = await Ge(e), r = new Set(n.filter((c) => c.status === "active").map((c) => c.id)), a = new Map(n.map((c) => [c.id, c])), s = t.filter((c) => c.enabled === 1 && r.has(c.providerId)), i = /* @__PURE__ */ new Set();
             for (let c of s) {
               let u = a.get(c.providerId);
               if (!(u == null ? void 0 : u.slug)) {
@@ -9812,7 +9812,7 @@ var server = http.createServer(async (req, res) => {
             }));
           }
           var Bh;
-          var Ga = F(() => {
+          var Va = F(() => {
             "use strict";
             qe();
             Ie();
@@ -9944,7 +9944,7 @@ var server = http.createServer(async (req, res) => {
               createdAt: a
             }]);
           }
-          var Jt = F(() => {
+          var Yt = F(() => {
             "use strict";
             qe();
             nt();
@@ -9964,20 +9964,20 @@ var server = http.createServer(async (req, res) => {
           function ut(e) {
             return [...crypto.getRandomValues(new Uint8Array(e))].map((n) => n.toString(16).padStart(2, "0")).join("");
           }
-          function Ja(e) {
+          function Ya(e) {
             let t = "";
             for (let n of e)
               t += String.fromCharCode(n);
             return btoa(t).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
           }
           async function Hr() {
-            let e = Ja(crypto.getRandomValues(new Uint8Array(32))), t = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(e));
+            let e = Ya(crypto.getRandomValues(new Uint8Array(32))), t = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(e));
             return {
               verifier: e,
-              challenge: Ja(new Uint8Array(t))
+              challenge: Ya(new Uint8Array(t))
             };
           }
-          function J(e, t, n = "oauth_error") {
+          function Y(e, t, n = "oauth_error") {
             return new Response(JSON.stringify({
               error: {
                 message: e,
@@ -10005,7 +10005,7 @@ var server = http.createServer(async (req, res) => {
             let r = t + await Ot(n), a = pr.get(r);
             if (a == null ? void 0 : a.accessToken)
               return a;
-            let s = await G(e).get(r);
+            let s = await V(e).get(r);
             if (!s)
               return null;
             try {
@@ -10020,7 +10020,7 @@ var server = http.createServer(async (req, res) => {
             let s = t + await Ot(n);
             pr.size >= Kh && pr.clear(), pr.set(s, r);
             let i = Math.min(720 * 3600, Math.max(a * 2, 24 * 3600));
-            await G(e).put(s, JSON.stringify(r), {
+            await V(e).put(s, JSON.stringify(r), {
               expirationTtl: i
             }).catch(() => {
             });
@@ -10055,7 +10055,7 @@ var server = http.createServer(async (req, res) => {
           var Kh;
           var bt = F(() => {
             "use strict";
-            Ye();
+            Je();
             pr = /* @__PURE__ */ new Map(), Kh = 500;
           });
           function fk(e, t, n = 1) {
@@ -10092,7 +10092,7 @@ var server = http.createServer(async (req, res) => {
             }
           }
           function Wh(e, t, n, r, a) {
-            for (let s = 0; s < Ya / 8; s++) {
+            for (let s = 0; s < Ja / 8; s++) {
               let i = r + s * 8;
               e[s] ^= n[i] | n[i + 1] << 8 | n[i + 2] << 16 | n[i + 3] << 24, t[s] ^= n[i + 4] | n[i + 5] << 8 | n[i + 6] << 16 | n[i + 7] << 24;
             }
@@ -10111,9 +10111,9 @@ var server = http.createServer(async (req, res) => {
             for (let b = 0; b < 8; b++)
               s[b] = a[b * 4] | a[b * 4 + 1] << 8 | a[b * 4 + 2] << 16 | a[b * 4 + 3] << 24;
             let i = new TextEncoder().encode(e), o = new Uint32Array(25), c = new Uint32Array(25), u = 0;
-            for (; u + Ya <= i.length; )
-              Wh(o, c, i, u, 1), u += Ya;
-            let l = i.length - u, p = i.subarray(u), y = new Uint8Array(20), m = new Uint8Array(Ya), d = new Uint32Array(25), g = new Uint32Array(25), h = Date.now();
+            for (; u + Ja <= i.length; )
+              Wh(o, c, i, u, 1), u += Ja;
+            let l = i.length - u, p = i.subarray(u), y = new Uint8Array(20), m = new Uint8Array(Ja), d = new Uint32Array(25), g = new Uint32Array(25), h = Date.now();
             for (let b = 0; b < n; b++) {
               if ((b & 1023) === 0 && Date.now() - h > r)
                 return null;
@@ -10126,7 +10126,7 @@ var server = http.createServer(async (req, res) => {
               let k = 20 - v;
               d.set(o), g.set(c), m.fill(0), m.set(p, 0), m.set(y.subarray(v, 20), l);
               let w = l + k;
-              if (m[w] = 6, m[Ya - 1] |= 128, Wh(d, g, m, 0, 1), d[0] === s[0] && g[0] === s[1] && d[1] === s[2] && g[1] === s[3] && d[2] === s[4] && g[2] === s[5] && d[3] === s[6] && g[3] === s[7])
+              if (m[w] = 6, m[Ja - 1] |= 128, Wh(d, g, m, 0, 1), d[0] === s[0] && g[0] === s[1] && d[1] === s[2] && g[1] === s[3] && d[2] === s[4] && g[2] === s[5] && d[3] === s[6] && g[3] === s[7])
                 return b;
             }
             return null;
@@ -10144,7 +10144,7 @@ var server = http.createServer(async (req, res) => {
               a += String.fromCharCode(s);
             return btoa(a);
           }
-          function Vh(e, t = 25e3) {
+          function Gh(e, t = 25e3) {
             if (e.algorithm !== "DeepSeekHashV1")
               return null;
             let n = Number(e.difficulty) > 0 ? Number(e.difficulty) : 144e3, r = mk(pk(e.salt, e.expire_at), e.challenge, n, t);
@@ -10153,16 +10153,16 @@ var server = http.createServer(async (req, res) => {
           var lk;
           var uk;
           var dk;
-          var Ya;
-          var Gh = F(() => {
+          var Ja;
+          var Vh = F(() => {
             "use strict";
-            lk = new Uint32Array([1, 32898, 32906, 2147516416, 32907, 2147483649, 2147516545, 32777, 138, 136, 2147516425, 2147483658, 2147516555, 139, 32905, 32771, 32770, 128, 32778, 2147483658, 2147516545, 32896, 2147483649, 2147516424]), uk = new Uint32Array([0, 0, 2147483648, 2147483648, 0, 0, 2147483648, 2147483648, 0, 0, 0, 0, 0, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 0, 2147483648, 2147483648, 2147483648, 0, 2147483648]), dk = new Uint8Array([0, 1, 62, 28, 27, 36, 44, 6, 55, 20, 3, 10, 43, 25, 39, 41, 45, 15, 21, 8, 18, 2, 61, 56, 14]), Ya = 136;
+            lk = new Uint32Array([1, 32898, 32906, 2147516416, 32907, 2147483649, 2147516545, 32777, 138, 136, 2147516425, 2147483658, 2147516555, 139, 32905, 32771, 32770, 128, 32778, 2147483658, 2147516545, 32896, 2147483649, 2147516424]), uk = new Uint32Array([0, 0, 2147483648, 2147483648, 0, 0, 2147483648, 2147483648, 0, 0, 0, 0, 0, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 0, 2147483648, 2147483648, 2147483648, 0, 2147483648]), dk = new Uint8Array([0, 1, 62, 28, 27, 36, 44, 6, 55, 20, 3, 10, 43, 25, 39, 41, 45, 15, 21, 8, 18, 2, 61, 56, 14]), Ja = 136;
           });
-          function Jh(e) {
+          function Yh(e) {
             return e === "\uFF5C" ? "|" : e === "\u2581" ? "_" : e;
           }
           function gk(e, t) {
-            return e === t || Jh(e) === Jh(t);
+            return e === t || Yh(e) === Yh(t);
           }
           function eg(e, t) {
             let n = [...t], r = [...e];
@@ -10185,7 +10185,7 @@ var server = http.createServer(async (req, res) => {
             }
             return null;
           }
-          function Yh(e, t = It) {
+          function Jh(e, t = It) {
             let n = t.replace(/>+$/, ""), r = e.indexOf(n);
             return r >= 0 ? {
               index: r,
@@ -10533,9 +10533,9 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                   }
                   return n;
                 }
-                let r = Yh(this.buf);
+                let r = Jh(this.buf);
                 for (; r && _k(this.buf, r.index); ) {
-                  let o = r.index + r.text.length, c = Yh(this.buf.slice(o));
+                  let o = r.index + r.text.length, c = Jh(this.buf.slice(o));
                   r = c ? {
                     index: o + c.index,
                     text: c.text
@@ -10852,7 +10852,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
           }
           async function sg(e, t, n = false) {
             var _a, _b2, _c2;
-            let r = Ck + await Ot(t), a = G(e);
+            let r = Ck + await Ot(t), a = V(e);
             if (!n) {
               let c = await a.get(r).catch(() => null);
               if (c)
@@ -10905,7 +10905,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             });
             if (!r.ok) {
               let i = (await r.text().catch(() => "")).slice(0, 300);
-              return J(`HTTP ${r.status}: ${i}`, r.status, "upstream_error");
+              return Y(`HTTP ${r.status}: ${i}`, r.status, "upstream_error");
             }
             if (n && r.body) {
               let [i, o] = r.body.tee();
@@ -10948,7 +10948,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             try {
               s = JSON.parse(a);
             } catch {
-              return J(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${a.slice(0, 200)}`, 502, "upstream_error");
+              return Y(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${a.slice(0, 200)}`, 502, "upstream_error");
             }
             return ye(e, Ee(e, {
               promptTokens: Number((_b2 = s == null ? void 0 : s.usage) == null ? void 0 : _b2.prompt_tokens) || 0,
@@ -10965,13 +10965,13 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             var _a, _b2, _c2;
             let n = (e.refreshTokens || []).filter((h) => h && h.trim());
             if (n.length === 0)
-              return J("\u8BE5 deepseek \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u53EF\u586B DeepSeek \u5B98\u65B9 API Key\uFF08sk- \u5F00\u5934\uFF0C\u8D70\u5B98\u65B9 API\uFF0C\u514D\u8D39\u7248\u53EF\u7528\uFF09\u6216 chat.deepseek.com \u7684 userToken\uFF08\u7F51\u9875\u53CD\u4EE3\uFF0C\u9700 Workers Paid\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 deepseek \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u53EF\u586B DeepSeek \u5B98\u65B9 API Key\uFF08sk- \u5F00\u5934\uFF0C\u8D70\u5B98\u65B9 API\uFF0C\u514D\u8D39\u7248\u53EF\u7528\uFF09\u6216 chat.deepseek.com \u7684 userToken\uFF08\u7F51\u9875\u53CD\u4EE3\uFF0C\u9700 Workers Paid\uFF09", 400, "configuration_error");
             let r = n.find(Dk);
             if (r)
               return Uk(e, r.trim());
             let a = ng(e.body || {}), s = rg(a, tg((_a = e.body) == null ? void 0 : _a.response_format)), i = !!(a.defsText || a.formatBlock), o = Nk((_b2 = e.body) == null ? void 0 : _b2.messages, s);
             if (!o)
-              return J("\u8BF7\u6C42\u7F3A\u5C11\u53EF\u7528\u5185\u5BB9\uFF08messages \u4E3A\u7A7A\uFF09", 400, "invalid_request_error");
+              return Y("\u8BF7\u6C42\u7F3A\u5C11\u53EF\u7528\u5185\u5BB9\uFF08messages \u4E3A\u7A7A\uFF09", 400, "invalid_request_error");
             let c = ((_c2 = e.body) == null ? void 0 : _c2.stream) === true, {
               modelType: u,
               thinking: l,
@@ -10980,7 +10980,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             for (let h of n)
               try {
                 let b = await sg(e.env, h), x = async (T) => {
-                  let O = await Mk(h, "/api/v0/chat/completion"), I = Vh(O, Ak);
+                  let O = await Mk(h, "/api/v0/chat/completion"), I = Gh(O, Ak);
                   if (!I)
                     throw new Error("PoW \u89E3\u7B97\u8D85\u65F6\uFF08CPU \u9884\u7B97\u4E0D\u8DB3\uFF09\uFF1ADeepSeek \u7F51\u9875\u53CD\u4EE3\u9700\u8981 Cloudflare Workers Paid \u5957\u9910\uFF08\u514D\u8D39\u7248 CPU \u4E0A\u9650 10ms\uFF09\uFF0C\u6216\u964D\u4F4E\u96BE\u5EA6/\u7A0D\u540E\u91CD\u8BD5");
                   return fetch(`${Eu}/chat/completion`, {
@@ -11002,7 +11002,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                 if (!v.ok && (v.status === 400 || v.status === 404) && (b = await sg(e.env, h, true), v = await x(b)), !v.ok) {
                   if (g = v.status, d = `HTTP ${v.status}: ${(await v.text().catch(() => "")).slice(0, 300)}`, [401, 403, 429].includes(v.status) || v.status >= 500)
                     continue;
-                  return J(d, v.status, "upstream_error");
+                  return Y(d, v.status, "upstream_error");
                 }
                 if (c && v.body) {
                   let T = Pk(v.body, e.requestedModel, (O) => {
@@ -11019,7 +11019,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                 }
                 let k = await v.text();
                 if (/value="captcha"|__cf_chl|CloudFront|Request blocked/i.test(k.slice(0, 500)))
-                  return J("\u4E0A\u6E38\u8FD4\u56DE\u62E6\u622A\u9875\u9762\uFF08WAF/\u98CE\u63A7\uFF09\uFF1A\u5F53\u524D Worker \u51FA\u53E3 IP \u53EF\u80FD\u88AB DeepSeek \u62E6\u622A", 502, "waf_blocked");
+                  return Y("\u4E0A\u6E38\u8FD4\u56DE\u62E6\u622A\u9875\u9762\uFF08WAF/\u98CE\u63A7\uFF09\uFF1A\u5F53\u524D Worker \u51FA\u53E3 IP \u53EF\u80FD\u88AB DeepSeek \u62E6\u622A", 502, "waf_blocked");
                 let {
                   body: w,
                   usage: _
@@ -11035,7 +11035,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                 d = b.message || "\u672A\u77E5\u9519\u8BEF", g = 502;
                 continue;
               }
-            return J(`\u6240\u6709 DeepSeek \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${d || "\u672A\u77E5"}`, g, "key_exhausted");
+            return Y(`\u6240\u6709 DeepSeek \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${d || "\u672A\u77E5"}`, g, "key_exhausted");
           }
           function cg() {
             return {
@@ -11051,9 +11051,9 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
           var Lk;
           var lg = F(() => {
             "use strict";
-            Ye();
+            Je();
             bt();
-            Gh();
+            Vh();
             ag();
             Eu = "https://chat.deepseek.com/api/v0", Ak = 2e4, Ck = "deepseek:sess:", Tu = ["deepseek-v4-flash", "deepseek-v4-pro", "deepseek-v4-flash-search", "deepseek-v4-pro-search"];
             ro = class {
@@ -11213,7 +11213,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
           function Wk(e) {
             return e.startsWith("eyJ") && e.split(".").length === 3;
           }
-          async function Vk(e, t) {
+          async function Gk(e, t) {
             if (Wk(t)) {
               let c = pg(t), u = c ? Math.max(60, Math.floor((c * 1e3 - Date.now()) / 1e3)) : 3600;
               return {
@@ -11247,7 +11247,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             };
           }
           async function hg(e, t, n) {
-            return (await st(e, $k, n, (a) => Vk(t, a))).accessToken;
+            return (await st(e, $k, n, (a) => Gk(t, a))).accessToken;
           }
           async function gg(e, t, n) {
             let r = mg(n), a = "";
@@ -11286,7 +11286,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                   message: "\u4E0A\u6E38\u8FD4\u56DE\u975E JSON"
                 };
               }
-              let c = Gk([o]);
+              let c = Vk([o]);
               return c.length === 0 ? {
                 success: false,
                 models: [],
@@ -11303,7 +11303,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
               };
             }
           }
-          function Gk(e) {
+          function Vk(e) {
             let t = [];
             for (let a of e) {
               let s = (a == null ? void 0 : a.availableModels) || (a == null ? void 0 : a.available_models);
@@ -11336,14 +11336,14 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
               });
             return r;
           }
-          function Jk(e) {
+          function Yk(e) {
             return typeof e == "string" ? e : Array.isArray(e) ? e.map((t) => typeof t == "string" ? t : (t == null ? void 0 : t.type) === "text" ? String(t.text || "") : "").filter(Boolean).join(`
 `) : e == null ? "" : String(e);
           }
-          function Yk(e) {
+          function Jk(e) {
             let t = [];
             for (let n of e) {
-              let r = Jk(n.content).trim();
+              let r = Yk(n.content).trim();
               if (!r)
                 continue;
               let a = n.role === "assistant" ? "assistant" : n.role === "system" ? "system" : "user";
@@ -11561,7 +11561,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
               for (let l of r.feed(u)) {
                 let p = bg(l);
                 if (p.reasoning && (s += p.reasoning), p.content && (a += p.content), p.error)
-                  return J(`Kimi Web \u4E0A\u6E38\u9519\u8BEF: ${p.error}`, 502, "upstream_error");
+                  return Y(`Kimi Web \u4E0A\u6E38\u9519\u8BEF: ${p.error}`, 502, "upstream_error");
                 p.done && (i = "stop");
               }
             }
@@ -11592,10 +11592,10 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             var _a, _b2, _c2, _d2, _e2, _f2;
             let n = (e.refreshTokens || []).map((y) => (y || "").trim()).filter(Boolean);
             if (n.length === 0)
-              return J("\u8BE5 kimiweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u767B\u5F55 https://www.kimi.ai \u540E\uFF0C\u5728\u6D4F\u89C8\u5668 Local Storage \u91CC\u53D6 access_token \u6216 refresh_token\uFF0C\u6BCF\u884C\u4E00\u4E2A\u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
-            let r = Zk(e.requestedModel || e.modelId), a = Array.isArray((_a = e.body) == null ? void 0 : _a.messages) ? e.body.messages : [], s = Yk(a);
+              return Y("\u8BE5 kimiweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u767B\u5F55 https://www.kimi.ai \u540E\uFF0C\u5728\u6D4F\u89C8\u5668 Local Storage \u91CC\u53D6 access_token \u6216 refresh_token\uFF0C\u6BCF\u884C\u4E00\u4E2A\u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
+            let r = Zk(e.requestedModel || e.modelId), a = Array.isArray((_a = e.body) == null ? void 0 : _a.messages) ? e.body.messages : [], s = Jk(a);
             if (!s)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let i = ((_b2 = e.body) == null ? void 0 : _b2.stream) === true, o = !!(((_c2 = e.body) == null ? void 0 : _c2.web_search) || ((_d2 = e.body) == null ? void 0 : _d2.enable_web_search)), c = Xk(r, s, o), u = Kk(c), l = "", p = 502;
             for (let y of n) {
               let m = mg(t);
@@ -11611,10 +11611,10 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                 if (!g.ok) {
                   if (p = g.status, l = `HTTP ${g.status}: ${(await je(g)).slice(0, 300)}`, [401, 403, 429].includes(g.status) || g.status >= 500)
                     continue;
-                  return J(l, g.status, "upstream_error");
+                  return Y(l, g.status, "upstream_error");
                 }
                 if (!g.body)
-                  return J("Kimi Web \u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
+                  return Y("Kimi Web \u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
                 if (i && g.body) {
                   let [b, x] = g.body.tee(), v = x.getReader();
                   ye(e, (async () => {
@@ -11663,7 +11663,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
                 continue;
               }
             }
-            return J(`\u6240\u6709 Kimi \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${l || "\u672A\u77E5"}`, p, "key_exhausted");
+            return Y(`\u6240\u6709 Kimi \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${l || "\u672A\u77E5"}`, p, "key_exhausted");
           }
           var Bk;
           var $k;
@@ -12015,7 +12015,7 @@ ${JSON.stringify(t.json_schema.schema ?? t.json_schema, null, 2)}
             }
           }
           async function Sg(e, t, n = false) {
-            let r = G(e);
+            let r = V(e);
             if (!n) {
               let s = await r.get(Tg);
               if (s)
@@ -12462,10 +12462,10 @@ ${s}` : a : s;
               sapisid: ""
             }], a = f_(e.requestedModel || e.modelId);
             if (a.error)
-              return J(a.error, 400, "invalid_request_error");
+              return Y(a.error, 400, "invalid_request_error");
             let s = Array.isArray((_a = e.body) == null ? void 0 : _a.messages) ? e.body.messages : [], i = __((_b2 = e.body) == null ? void 0 : _b2.tools), o = A_(s, i, (_c2 = e.body) == null ? void 0 : _c2.tool_choice);
             if (!o)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let c = ((_d2 = e.body) == null ? void 0 : _d2.stream) === true, u = "\u672A\u77E5\u9519\u8BEF", l = 502;
             for (let y of r) {
               let m;
@@ -12480,7 +12480,7 @@ ${s}` : a : s;
                 let w = Cg(m.text);
                 if (w && (u = w), [401, 403, 429].includes(m.status) || m.status >= 500)
                   continue;
-                return J(u, m.status, "upstream_error");
+                return Y(u, m.status, "upstream_error");
               }
               if (c) {
                 let w = await w_(m.body);
@@ -12573,7 +12573,7 @@ ${s}` : a : s;
                 }
               });
             }
-            return r.length === 1 && !r[0].cookie && !r[0].sapisid && l === 429 ? J(`Gemini \u7F51\u9875\u7248\u5F53\u524D\u4E3A\u533F\u540D\u6A21\u5F0F\uFF0C\u89E6\u53D1\u4E86 Google \u51FA\u53E3 IP \u9891\u6B21\u9650\u5236\uFF08\u4E0A\u6E38\u751F\u6210\u5931\u8D25\uFF09\u3002\u5EFA\u8BAE\u5728\u300C\u4F9B\u5E94\u5546\u300D\u9875\u4E3A\u8BE5\u6E20\u9053\u914D\u7F6E Google \u8D26\u53F7 Cookie \u51ED\u636E\u89E3\u9664\u9650\u5236\u3002\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${u}`, 429, "rate_limit_exceeded") : J(`\u6240\u6709 Gemini \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${u}`, l, "key_exhausted");
+            return r.length === 1 && !r[0].cookie && !r[0].sapisid && l === 429 ? Y(`Gemini \u7F51\u9875\u7248\u5F53\u524D\u4E3A\u533F\u540D\u6A21\u5F0F\uFF0C\u89E6\u53D1\u4E86 Google \u51FA\u53E3 IP \u9891\u6B21\u9650\u5236\uFF08\u4E0A\u6E38\u751F\u6210\u5931\u8D25\uFF09\u3002\u5EFA\u8BAE\u5728\u300C\u4F9B\u5E94\u5546\u300D\u9875\u4E3A\u8BE5\u6E20\u9053\u914D\u7F6E Google \u8D26\u53F7 Cookie \u51ED\u636E\u89E3\u9664\u9650\u5236\u3002\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${u}`, 429, "rate_limit_exceeded") : Y(`\u6240\u6709 Gemini \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${u}`, l, "key_exhausted");
           }
           function Rg() {
             return {
@@ -12596,7 +12596,7 @@ ${s}` : a : s;
           var v_;
           var Mg = F(() => {
             "use strict";
-            Ye();
+            Je();
             kg();
             bt();
             Qa = "https://gemini.google.com", o_ = `${Qa}/app`, c_ = "/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate", _g = "boq_gemini-web-uiserver_20261007.01_p0", l_ = 3600 * 1e3, Eg = 12e4, Tg = "geminiweb:bl", ao = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"], so = ["en-US,en;q=0.9", "en", "en-GB,en;q=0.9"], u_ = /boq_assistant-bard-web-server_\d{8}\.\d+(_p\d+)?/, d_ = /"cfb2h"\s*:\s*"(boq_[a-z0-9\-]+_\d{8}\.\d+(_p\d+)?)"/, qr = {
@@ -12643,7 +12643,7 @@ ${s}` : a : s;
             };
             v_ = ["I encountered an error doing what you asked", "I seem to be encountering an error", "I'm having a hard time fulfilling your request", "\u8BF7\u6055\u6211\u7231\u83AB\u80FD\u52A9\uFF0C\u6211\u53EA\u662F\u4E00\u4E2A\u8BED\u8A00\u6A21\u578B", "\u7531\u4E8E\u7A0B\u5E8F\u4EE3\u7801\u7684\u5C40\u9650\uFF0C\u6211\u6CA1\u6CD5\u529E\u5230", "\u6211\u53EA\u662F\u4E00\u4E2A\u8BED\u8A00\u6A21\u578B\uFF0C\u4E0D\u5177\u5907\u8FD9\u65B9\u9762\u7684\u4FE1\u606F\u6216\u80FD\u529B", "\u6211\u662F\u4E00\u4E2A\u8BED\u8A00\u6A21\u578B\uFF0C\u8FD9\u8D85\u51FA\u4E86\u6211\u7684\u8BBE\u8BA1\u7528\u9014", "\u8EAB\u4E3A\u4E00\u4E2A\u8BED\u8A00\u6A21\u578B\uFF0C\u6211\u6CA1\u529E\u6CD5\u63D0\u4F9B\u8FD9\u65B9\u9762\u7684\u5E2E\u52A9", "\u6211\u53EA\u662F\u4E00\u4E2A\u6587\u672C AI\uFF0C\u5728\u8FD9\u65B9\u9762\u6CA1\u6CD5\u5E2E\u5230\u4F60"];
           });
-          function Yt(e) {
+          function Jt(e) {
             let t = new TextEncoder().encode(e), n = t.length * 8, r = new Uint8Array(((t.length + 8 >> 6) + 1) * 64);
             r.set(t), r[t.length] = 128;
             let a = new DataView(r.buffer);
@@ -12697,11 +12697,11 @@ ${s}` : a : s;
             return [...crypto.getRandomValues(new Uint8Array(e))].map((n) => n.toString(16).padStart(2, "0")).join("");
           }
           function P_(e, t) {
-            return Yt(`${e}${O_}${t || ""}`);
+            return Jt(`${e}${O_}${t || ""}`);
           }
           function R_(e, t, n) {
-            let r = `${I_(e)}_${t}${Yt(String(n))}ooui`;
-            return Yt(r);
+            let r = `${I_(e)}_${t}${Jt(String(n))}ooui`;
+            return Jt(r);
           }
           function M_(e, t) {
             let n = -(/* @__PURE__ */ new Date()).getTimezoneOffset() / 60;
@@ -12976,10 +12976,10 @@ ${s}` : a : s;
             var _a, _b2;
             let n = (e.refreshTokens || []).map((u) => (u || "").trim()).filter(Boolean), r = j_(n, t);
             if (r.length === 0)
-              return J("\u8BE5 minimaxweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u767B\u5F55 https://agent.minimaxi.com \u540E\u4ECE\u6D4F\u89C8\u5668 Network \u91CC\u53D6 token\uFF08JWT\uFF09\uFF0C\u6309 `token|agentId` \u683C\u5F0F\u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
+              return Y("\u8BE5 minimaxweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u767B\u5F55 https://agent.minimaxi.com \u540E\u4ECE\u6D4F\u89C8\u5668 Network \u91CC\u53D6 token\uFF08JWT\uFF09\uFF0C\u6309 `token|agentId` \u683C\u5F0F\u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
             let a = Array.isArray((_a = e.body) == null ? void 0 : _a.messages) ? e.body.messages : [];
             if (a.length === 0)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let s = e.requestedModel || e.modelId, i = ((_b2 = e.body) == null ? void 0 : _b2.stream) === true, o = "\u672A\u77E5\u9519\u8BEF", c = 502;
             for (let u of r) {
               let l;
@@ -12992,7 +12992,7 @@ ${s}` : a : s;
               if (!l.ok || !l.body) {
                 if (c = l.status, o = `HTTP ${l.status}: ${(l.text || "").slice(0, 300)}`, [401, 403, 409, 429].includes(l.status) || l.status >= 500)
                   continue;
-                return J(o, l.status, "upstream_error");
+                return Y(o, l.status, "upstream_error");
               }
               if (i) {
                 let [h, b] = l.body.tee(), x = b.getReader();
@@ -13025,7 +13025,7 @@ ${s}` : a : s;
               for (let h of y.feed(p)) {
                 let b = Hg(h);
                 if (b.content && (m += b.content), b.error)
-                  return J(`MiniMax \u4E0A\u6E38\u9519\u8BEF: ${b.error}`, 502, "upstream_error");
+                  return Y(`MiniMax \u4E0A\u6E38\u9519\u8BEF: ${b.error}`, 502, "upstream_error");
               }
               let d = Math.ceil(m.length / 4), g = {
                 id: `chatcmpl-minimaxweb-${_e()}`,
@@ -13057,7 +13057,7 @@ ${s}` : a : s;
                 }
               });
             }
-            return J(`\u6240\u6709 MiniMax \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${o}`, c, "key_exhausted");
+            return Y(`\u6240\u6709 MiniMax \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${o}`, c, "key_exhausted");
           }
           function qg() {
             return {
@@ -13118,7 +13118,7 @@ ${s}` : a : s;
             let e = /* @__PURE__ */ new Date(), t = new Date(e.getTime() + (e.getTimezoneOffset() + 480) * 6e4), n = (r) => String(r).padStart(2, "0");
             return `${t.getFullYear()}-${n(t.getMonth() + 1)}-${n(t.getDate())}T${n(t.getHours())}:${n(t.getMinutes())}:${n(t.getSeconds())}+08:00`;
           }
-          function V_(e, t, n) {
+          function G_(e, t, n) {
             let r = {
               pcVersion: "1.7.0",
               h5Version: "3.2.0",
@@ -13159,7 +13159,7 @@ ${s}` : a : s;
               continuationInfo: null
             };
           }
-          function G_(e) {
+          function V_(e) {
             let t = {
               Host: "ai.yun.139.com",
               "User-Agent": H_,
@@ -13182,7 +13182,7 @@ ${s}` : a : s;
             };
             return e.authorization && (t.Authorization = e.authorization), t;
           }
-          function Vg() {
+          function Gg() {
             let e = "";
             return {
               feed(t) {
@@ -13211,7 +13211,7 @@ ${s}` : a : s;
               }
             };
           }
-          function Gg(e) {
+          function Vg(e) {
             if (!e || typeof e != "object")
               return {};
             let t = e.error || e.errorMsg || e.result && e.result.errorMsg;
@@ -13237,8 +13237,8 @@ ${s}` : a : s;
               done: true
             } : n;
           }
-          function J_(e, t, n) {
-            let r = Vg(), a = new TextEncoder(), s = new TextDecoder(), i = {
+          function Y_(e, t, n) {
+            let r = Gg(), a = new TextEncoder(), s = new TextDecoder(), i = {
               id: `chatcmpl-lingxi-${_e()}`,
               model: t
             }, o = false, c = false, u = 0, l, p = (m, d = null) => {
@@ -13290,7 +13290,7 @@ ${s}` : a : s;
                     }))) {
                       if (c)
                         return;
-                      let v = Gg(x);
+                      let v = Vg(x);
                       if (v.content && (o || (o = true, p({
                         role: "assistant",
                         content: ""
@@ -13329,10 +13329,10 @@ ${s}` : a : s;
               }
             });
           }
-          async function Y_(e, t, n) {
-            let r = JSON.stringify(V_(t, e, n)), a = await fetch(`${B_}${$_}`, {
+          async function J_(e, t, n) {
+            let r = JSON.stringify(G_(t, e, n)), a = await fetch(`${B_}${$_}`, {
               method: "POST",
-              headers: G_(e),
+              headers: V_(e),
               body: r,
               signal: AbortSignal.timeout(F_)
             });
@@ -13353,22 +13353,22 @@ ${s}` : a : s;
               text: await a.text().catch(() => "")
             };
           }
-          async function Jg(e, t) {
+          async function Yg(e, t) {
             var _a, _b2, _c2, _d2;
             let n = (e.refreshTokens || []).map((l) => (l || "").trim()).filter(Boolean), r = z_(n, t);
             if (r.length === 0)
-              return J("\u8BE5 lingxi \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u767B\u5F55\u4E2D\u56FD\u79FB\u52A8\u90AE\u7BB1\u7F51\u9875\u7248\u540E\uFF0C\u4ECE\u6D4F\u89C8\u5668\u8BF7\u6C42\u5934\u91CC\u53D6 Authorization(Basic ...) \u4E0E user_id\uFF0C\u6309 `authorization|userId` \u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
+              return Y("\u8BE5 lingxi \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u767B\u5F55\u4E2D\u56FD\u79FB\u52A8\u90AE\u7BB1\u7F51\u9875\u7248\u540E\uFF0C\u4ECE\u6D4F\u89C8\u5668\u8BF7\u6C42\u5934\u91CC\u53D6 Authorization(Basic ...) \u4E0E user_id\uFF0C\u6309 `authorization|userId` \u586B\u5165\u300CAPI Keys\u300D", 400, "configuration_error");
             let a = Array.isArray((_a = e.body) == null ? void 0 : _a.messages) ? e.body.messages : [];
             if (a.length === 0)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let s = K_(a);
             if (!s)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let i = ((_b2 = e.body) == null ? void 0 : _b2.stream) === true, o = !!(((_c2 = e.body) == null ? void 0 : _c2.web_search) || ((_d2 = e.body) == null ? void 0 : _d2.enable_web_search)), c = "\u672A\u77E5\u9519\u8BEF", u = 502;
             for (let l of r) {
               let p;
               try {
-                p = await Y_(l, s, o);
+                p = await J_(l, s, o);
               } catch (b) {
                 c = b.message || "\u4E0A\u6E38\u8BF7\u6C42\u5931\u8D25", u = 502;
                 continue;
@@ -13376,7 +13376,7 @@ ${s}` : a : s;
               if (!p.ok || !p.body) {
                 if (u = p.status, c = `HTTP ${p.status}: ${(p.text || "").slice(0, 300)}`, [401, 403, 429].includes(p.status) || p.status >= 500)
                   continue;
-                return J(c, p.status, "upstream_error");
+                return Y(c, p.status, "upstream_error");
               }
               if (i) {
                 let [b, x] = p.body.tee(), v = x.getReader();
@@ -13396,7 +13396,7 @@ ${s}` : a : s;
                     completionTokens: Math.ceil(k / 4)
                   }, true, 200);
                 })().catch(() => {
-                })), new Response(J_(b, e.requestedModel), {
+                })), new Response(Y_(b, e.requestedModel), {
                   status: 200,
                   headers: {
                     "Content-Type": "text/event-stream; charset=utf-8",
@@ -13405,11 +13405,11 @@ ${s}` : a : s;
                   }
                 });
               }
-              let y = await new Response(p.body).text(), m = Vg(), d = "";
+              let y = await new Response(p.body).text(), m = Gg(), d = "";
               for (let b of m.feed(y)) {
-                let x = Gg(b);
+                let x = Vg(b);
                 if (x.content && (d += x.content), x.error)
-                  return J(`\u7075\u7280\u4E0A\u6E38\u9519\u8BEF: ${x.error}`, 502, "upstream_error");
+                  return Y(`\u7075\u7280\u4E0A\u6E38\u9519\u8BEF: ${x.error}`, 502, "upstream_error");
               }
               let g = Math.ceil(d.length / 4), h = {
                 id: `chatcmpl-lingxi-${_e()}`,
@@ -13441,9 +13441,9 @@ ${s}` : a : s;
                 }
               });
             }
-            return J(`\u6240\u6709\u7075\u7280\u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c}`, u, "key_exhausted");
+            return Y(`\u6240\u6709\u7075\u7280\u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c}`, u, "key_exhausted");
           }
-          function Yg() {
+          function Jg() {
             return {
               success: true,
               models: Ru
@@ -13529,9 +13529,9 @@ ${s}` : a : s;
             fetchChatgptWebModels: () => XE,
             generateChatgptWebImage: () => eT,
             generateChatgptWebImageWithAccessToken: () => ZE,
-            handleChatgptWebRequest: () => Vu,
+            handleChatgptWebRequest: () => Gu,
             isWebImageGenerationRequest: () => zu,
-            listChatgptWebModels: () => Gu,
+            listChatgptWebModels: () => Vu,
             testChatgptWeb: () => QE
           });
           function ns(e) {
@@ -13546,11 +13546,11 @@ ${s}` : a : s;
               n[r] = t.charCodeAt(r);
             return n;
           }
-          function Vr(e) {
+          function Gr(e) {
             return new TextEncoder().encode(e);
           }
           function gE(e) {
-            return ns(Vr(JSON.stringify(e)));
+            return ns(Gr(JSON.stringify(e)));
           }
           function Wr(e) {
             return e[Math.floor(Math.random() * e.length)];
@@ -13681,10 +13681,10 @@ ${s}` : a : s;
             let i = new Uint8Array(s.length / 2);
             for (let m = 0; m < i.length; m++)
               i[m] = parseInt(s.slice(m * 2, m * 2 + 2), 16);
-            let o = Vr(String(e || "")), c = o0(n, r, a), u = JSON.stringify(c.slice(0, 3)).slice(0, -1) + ",", l = "," + JSON.stringify(c.slice(4, 9)).slice(1, -1) + ",", p = "," + JSON.stringify(c.slice(10)).slice(1), y = Date.now();
+            let o = Gr(String(e || "")), c = o0(n, r, a), u = JSON.stringify(c.slice(0, 3)).slice(0, -1) + ",", l = "," + JSON.stringify(c.slice(4, 9)).slice(1, -1) + ",", p = "," + JSON.stringify(c.slice(10)).slice(1), y = Date.now();
             for (let m = 0; m < 5e5; m++) {
               c[3] = m, c[9] = Date.now() - y;
-              let d = u + m + l + (m >> 1) + p, g = ns(Vr(d)), h = kE(jE(o, Vr(g)));
+              let d = u + m + l + (m >> 1) + p, g = ns(Gr(d)), h = kE(jE(o, Gr(g)));
               if (OE(h, i))
                 return "gAAAAAB" + g;
             }
@@ -13731,7 +13731,7 @@ ${s}` : a : s;
                   a.set(u, l);
                 },
                 3: (u) => {
-                  i = ns(Vr(String(u)));
+                  i = ns(Gr(String(u)));
                 },
                 5: (u, l) => {
                   let p = a.get(u), y = a.get(l);
@@ -13769,7 +13769,7 @@ ${s}` : a : s;
                   a.set(u, new TextDecoder().decode(t0(o(a.get(u)))));
                 },
                 19: (u) => {
-                  a.set(u, ns(Vr(o(a.get(u)))));
+                  a.set(u, ns(Gr(o(a.get(u)))));
                 },
                 20: (u, l, p, ...y) => {
                   if (a.get(u) === a.get(l)) {
@@ -13880,7 +13880,7 @@ ${s}` : a : s;
               if (uo(n))
                 r = n;
               else {
-                let o = await G(e).get(a0 + await Ot(n)).catch(() => null);
+                let o = await V(e).get(a0 + await Ot(n)).catch(() => null);
                 if (o)
                   try {
                     r = JSON.parse(o).accessToken || "";
@@ -13975,7 +13975,7 @@ ${s}` : a : s;
           }
           async function Fu(e, t) {
             try {
-              let n = await G(e).get(Qg);
+              let n = await V(e).get(Qg);
               if (n) {
                 let r = JSON.parse(n);
                 if (r && Array.isArray(r.scripts) && Date.now() - Number(r.at || 0) < Zg * 1e3)
@@ -13993,7 +13993,7 @@ ${s}` : a : s;
                   ...UE(r),
                   at: Date.now()
                 };
-                return await G(e).put(Qg, JSON.stringify(s), {
+                return await V(e).put(Qg, JSON.stringify(s), {
                   expirationTtl: Zg
                 }).catch(() => {
                 }), s;
@@ -14312,22 +14312,22 @@ ${i}`);
           }
           async function WE(e, t) {
             try {
-              let n = await G(e).get(Du + t);
+              let n = await V(e).get(Du + t);
               return n ? JSON.parse(n) : {};
             } catch {
               return {};
             }
           }
-          async function VE(e, t, n) {
+          async function GE(e, t, n) {
             let r = Date.now(), a = {};
             for (let [s, i] of Object.entries(n))
               i && i.cooldownUntil > r && (a[s] = i);
             try {
-              Object.keys(a).length ? await G(e).put(Du + t, JSON.stringify(a)) : await G(e).delete(Du + t);
+              Object.keys(a).length ? await V(e).put(Du + t, JSON.stringify(a)) : await V(e).delete(Du + t);
             } catch {
             }
           }
-          function GE(e, t) {
+          function VE(e, t) {
             let n = Date.now(), r = [], a = [], s = [];
             for (let o of e) {
               let c = t[o.hash];
@@ -14447,19 +14447,19 @@ ${i}`);
             }
             return [];
           }
-          async function Vu(e) {
+          async function Gu(e) {
             var _a, _b2;
             let t = [...new Set((e.refreshTokens || []).map(ss).filter(Boolean))];
             if (!t.length)
-              return J("\u8BE5 chatgptweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u4E00\u884C\u4E00\u4E2A\u8D26\u53F7\uFF0C\u76F4\u63A5\u7C98\u8D34\u53D1\u8D27\u6574\u884C\u300C\u8D26\u53F7----GPT\u5BC6\u7801----\u90AE\u7BB1\u5BC6\u7801----rt.1.xxx\u300D\uFF0C\u6216\u53EA\u586B rt.1.xxx / rt_xxx", 400, "configuration_error");
+              return Y("\u8BE5 chatgptweb \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u4E00\u884C\u4E00\u4E2A\u8D26\u53F7\uFF0C\u76F4\u63A5\u7C98\u8D34\u53D1\u8D27\u6574\u884C\u300C\u8D26\u53F7----GPT\u5BC6\u7801----\u90AE\u7BB1\u5BC6\u7801----rt.1.xxx\u300D\uFF0C\u6216\u53EA\u586B rt.1.xxx / rt_xxx", 400, "configuration_error");
             let n = Array.isArray((_a = e.body) == null ? void 0 : _a.messages) ? e.body.messages : [];
             if (!n.length)
-              return J("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
+              return Y("messages \u5185\u5BB9\u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u8F6C\u53D1", 400, "invalid_request_error");
             let r = ((_b2 = e.body) == null ? void 0 : _b2.stream) === true, a = "", s = 502, i = await Promise.all(t.map(async (h, b) => ({
               raw: h,
               index: b + 1,
               hash: await Ot(h)
-            }))), o = await WE(e.env, e.providerId), c = GE(i, o), u = false, l = c.filter((h) => {
+            }))), o = await WE(e.env, e.providerId), c = VE(i, o), u = false, l = c.filter((h) => {
               let b = o[h.hash];
               return !!(b == null ? void 0 : b.cooldownUntil) && Date.now() < b.cooldownUntil;
             }).length, p = (h, b, x) => {
@@ -14470,7 +14470,7 @@ ${i}`);
             }, y = (h) => {
               o[h] && (delete o[h], u = true);
             }, m = async () => {
-              u && (u = false, await VE(e.env, e.providerId, o));
+              u && (u = false, await GE(e.env, e.providerId, o));
             }, d = await rs(t[0]), g = await Fu(e.env, d);
             for (let h of c) {
               let b = await rs(h.raw);
@@ -14498,7 +14498,7 @@ ${i}`);
                   } : {}
                 }), T = po(e.modelId, n, e.body || {});
                 if (!Array.isArray(T.messages) || T.messages.length === 0)
-                  return J("\u5BA2\u6237\u7AEF\u8BF7\u6C42\u4E2D\u6CA1\u6709\u53EF\u8F6C\u6362\u7684\u6587\u672C\u5185\u5BB9\uFF08\u53EF\u80FD\u662F\u7EAF tool_calls / \u56FE\u7247\u6D88\u606F\uFF09\uFF1B\u5F53\u524D chatgptweb \u6E20\u9053\u53EA\u652F\u6301\u6587\u672C", 400, "invalid_request_error");
+                  return Y("\u5BA2\u6237\u7AEF\u8BF7\u6C42\u4E2D\u6CA1\u6709\u53EF\u8F6C\u6362\u7684\u6587\u672C\u5185\u5BB9\uFF08\u53EF\u80FD\u662F\u7EAF tool_calls / \u56FE\u7247\u6D88\u606F\uFF09\uFF1B\u5F53\u524D chatgptweb \u6E20\u9053\u53EA\u652F\u6301\u6587\u672C", 400, "invalid_request_error");
                 let O = async (Q) => fetch(vt + w, {
                   method: "POST",
                   headers: _,
@@ -14527,7 +14527,7 @@ ${i}`);
                       p(h.hash, a.slice(0, 120), lo);
                       continue;
                     }
-                    return await m(), J(a, I.status, "upstream_error");
+                    return await m(), Y(a, I.status, "upstream_error");
                   }
                 }
                 y(h.hash), ye(e, m());
@@ -14536,7 +14536,7 @@ ${i}`);
                   "x-chatgptweb-cooldown": String(l)
                 };
                 if (!I.body)
-                  return J("\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
+                  return Y("\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
                 let R = zu(e.body || {}, e.modelId), B = {
                   fp: b,
                   token: x,
@@ -14544,7 +14544,7 @@ ${i}`);
                   isImageMode: R
                 };
                 if (r) {
-                  let Q = JE(I.body, e.requestedModel, e, n, B);
+                  let Q = YE(I.body, e.requestedModel, e, n, B);
                   return new Response(Q, {
                     status: 200,
                     headers: {
@@ -14555,7 +14555,7 @@ ${i}`);
                     }
                   });
                 }
-                let U = await YE(I.body, e.requestedModel, n, B);
+                let U = await JE(I.body, e.requestedModel, n, B);
                 return ye(e, Ee(e, {
                   promptTokens: U.promptTokens,
                   completionTokens: U.completionTokens
@@ -14575,7 +14575,7 @@ ${i}`);
                 continue;
               }
             }
-            return await m(), J(`\u6240\u6709 ChatGPT \u7F51\u9875\u7248\u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${a || "\u672A\u77E5"}`, s === 401 ? 401 : s, s === 401 ? "authentication_error" : "key_exhausted");
+            return await m(), Y(`\u6240\u6709 ChatGPT \u7F51\u9875\u7248\u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${a || "\u672A\u77E5"}`, s === 401 ? 401 : s, s === 401 ? "authentication_error" : "key_exhausted");
           }
           function mn(e, t, n, r, a = null, s) {
             let i = {
@@ -14598,7 +14598,7 @@ ${i}`);
 
 `));
           }
-          function JE(e, t, n, r, a) {
+          function YE(e, t, n, r, a) {
             let s = new TextEncoder(), i = new TextDecoder(), o = {
               id: `chatcmpl-chatgptweb-${_e()}`,
               model: t
@@ -14729,7 +14729,7 @@ ${i}`);
               }
             });
           }
-          async function YE(e, t, n, r) {
+          async function JE(e, t, n, r) {
             let a = e.getReader(), s = new TextDecoder(), i = es(n.map((v) => as(v.content)).join(`
 `)), o = n.filter((v) => String(v.role || "").toLowerCase() === "assistant").map((v) => as(v.content)).join(""), c = "", u = "", l = false, p = false, y = [], m = "", d = (v) => {
               var _a, _b2;
@@ -14828,7 +14828,7 @@ ${i}`);
               }
             };
           }
-          function Gu() {
+          function Vu() {
             return {
               models: [...hE]
             };
@@ -15087,10 +15087,10 @@ ${i}`);
           var SE;
           var AE;
           var Bu;
-          var Gr = F(() => {
+          var Vr = F(() => {
             "use strict";
             bt();
-            Ye();
+            Je();
             Za();
             vt = "https://chatgpt.com", $u = "https://chatgpt.com/backend-api/sentinel/sdk.js", aE = "app_2SKx67EdpoN0G6j64rFvigXD", sE = "pdlLIX2Y72MIl2rhLhTE9VV9bN905kBh", iE = "com.openai.chat://auth0.openai.com/ios/com.openai.chat/callback", oE = "prod-a194cd50d4416d3c0b47c740f206b12ce60f5887", cE = "6708908", lE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36", r0 = '"Chromium";v="145", "Google Chrome";v="145", "Not/A)Brand";v="99"', a0 = "chatgptweb:at:", Du = "chatgptweb:health:", Qg = "chatgptweb:pow", Zg = 3600, uE = 15e3, Lu = 3e4, dE = 2e4, fE = 11e4, pE = 1800 * 1e3, e0 = 3600 * 1e3, lo = 300 * 1e3, mE = 360 * 60 * 1e3, hE = ["gpt-5-5", "gpt-5-5-thinking", "gpt-5-4", "gpt-4o", "auto"], ts = class extends Error {
             }, Nn = class extends Error {
@@ -15116,23 +15116,23 @@ ${i}`);
               }
             };
           });
-          var Yu = {};
-          tt(Yu, {
-            WEB_KIND_PREFIX: () => Ju,
-            WEB_PROVIDERS: () => Jr,
+          var Ju = {};
+          tt(Ju, {
+            WEB_KIND_PREFIX: () => Yu,
+            WEB_PROVIDERS: () => Yr,
             fetchWebModels: () => aT,
             handleWebChat: () => rT,
             isWebType: () => nT,
             parseWebKind: () => tT
           });
           function tT(e) {
-            if (!e || !e.startsWith(Ju))
+            if (!e || !e.startsWith(Yu))
               return null;
-            let t = e.slice(Ju.length);
-            return Jr[t] ? t : null;
+            let t = e.slice(Yu.length);
+            return Yr[t] ? t : null;
           }
           function nT(e) {
-            return !!Jr[e];
+            return !!Yr[e];
           }
           async function rT(e) {
             let t = {
@@ -15158,9 +15158,9 @@ ${i}`);
               case "minimaxweb":
                 return zg(t);
               case "lingxi":
-                return Jg(t);
+                return Yg(t);
               case "chatgptweb":
-                return Vu(t);
+                return Gu(t);
               default:
                 return new Response(JSON.stringify({
                   error: {
@@ -15175,7 +15175,7 @@ ${i}`);
             }
           }
           async function aT(e, t, n, r) {
-            let a = Jr[t].defaultModels;
+            let a = Yr[t].defaultModels;
             try {
               if (t === "deepseek") {
                 let s = cg();
@@ -15204,10 +15204,10 @@ ${i}`);
                 };
               if (t === "lingxi")
                 return {
-                  models: Yg().models
+                  models: Jg().models
                 };
               if (t === "chatgptweb") {
-                let s = await Promise.resolve().then(() => (Gr(), is)).then((i) => i.fetchChatgptWebModels(e, n));
+                let s = await Promise.resolve().then(() => (Vr(), is)).then((i) => i.fetchChatgptWebModels(e, n));
                 return s.success && s.models.length ? {
                   models: s.models
                 } : {
@@ -15225,8 +15225,8 @@ ${i}`);
               models: a
             };
           }
-          var Jr;
-          var Ju;
+          var Yr;
+          var Yu;
           var mo = F(() => {
             "use strict";
             lg();
@@ -15234,8 +15234,8 @@ ${i}`);
             Mg();
             Kg();
             Xg();
-            Gr();
-            Jr = {
+            Vr();
+            Yr = {
               deepseek: {
                 type: "deepseek",
                 name: "DeepSeek \u7F51\u9875\u7248",
@@ -15289,9 +15289,9 @@ ${i}`);
                 baseUrl: "https://chatgpt.com",
                 desc: "ChatGPT \u7F51\u9875/App \u534F\u8BAE\u53CD\u4EE3\uFF08sentinel + PoW\uFF09\uFF0C\u9002\u5408 Free \u8D26\u53F7\u3002",
                 credHint: "refresh_token\uFF08rt_xxx / rt.1.xxx\uFF1B\u4E5F\u652F\u6301\u53D1\u8D27\u6574\u884C\uFF0C\u81EA\u52A8\u63D0\u53D6\u6700\u540E\u4E00\u6BB5\uFF09",
-                defaultModels: Gu().models
+                defaultModels: Vu().models
               }
-            }, Ju = "web:";
+            }, Yu = "web:";
           });
           var Zu = {};
           tt(Zu, {
@@ -15299,7 +15299,7 @@ ${i}`);
             createOpenAIStreamFromAnthropic: () => Qu,
             openAIToAnthropicRequest: () => go
           });
-          function Yr() {
+          function Jr() {
             try {
               return crypto.randomUUID();
             } catch {
@@ -15428,7 +15428,7 @@ ${i}`);
                     }
                   c.push({
                     type: "tool_use",
-                    id: u.id || `toolu_${Yr().replace(/-/g, "").slice(0, 20)}`,
+                    id: u.id || `toolu_${Jr().replace(/-/g, "").slice(0, 20)}`,
                     name: l.name,
                     input: p
                   });
@@ -15440,7 +15440,7 @@ ${i}`);
                 continue;
               }
               if (o === "tool") {
-                let c = i.tool_call_id || `toolu_${Yr().replace(/-/g, "").slice(0, 20)}`, u = ho(i.content), l = u.length > 0 ? u : [{
+                let c = i.tool_call_id || `toolu_${Jr().replace(/-/g, "").slice(0, 20)}`, u = ho(i.content), l = u.length > 0 ? u : [{
                   type: "text",
                   text: ""
                 }];
@@ -15491,7 +15491,7 @@ ${i}`);
             let n = Array.isArray(e == null ? void 0 : e.content) ? e.content : [], r = "", a = [];
             for (let o of n)
               (o == null ? void 0 : o.type) === "text" && typeof o.text == "string" ? r += o.text : (o == null ? void 0 : o.type) === "tool_use" && a.push({
-                id: o.id || `call_${Yr().replace(/-/g, "").slice(0, 24)}`,
+                id: o.id || `call_${Jr().replace(/-/g, "").slice(0, 24)}`,
                 type: "function",
                 function: {
                   name: o.name,
@@ -15506,7 +15506,7 @@ ${i}`);
             a.length > 0 && (s.tool_calls = a);
             let i = (e == null ? void 0 : e.usage) || {};
             return {
-              id: (e == null ? void 0 : e.id) || `chatcmpl-${Yr()}`,
+              id: (e == null ? void 0 : e.id) || `chatcmpl-${Jr()}`,
               object: "chat.completion",
               created: Math.floor(Date.now() / 1e3),
               model: t,
@@ -15547,7 +15547,7 @@ ${i}`);
           function Qu(e, t, n) {
             let r = new TextDecoder(), a = new TextEncoder(), s = oT(), i = false, o = -1, c = null, u = 0, l = 0, p = (m, d, g = null, h = false) => {
               let b = {
-                id: `chatcmpl-anthropic-${Yr()}`,
+                id: `chatcmpl-anthropic-${Jr()}`,
                 object: "chat.completion.chunk",
                 created: Math.floor(Date.now() / 1e3),
                 model: t,
@@ -15585,7 +15585,7 @@ ${i}`);
                   b.type === "tool_use" && (o += 1, p(m, {
                     tool_calls: [{
                       index: o,
-                      id: b.id || `call_${Yr().replace(/-/g, "").slice(0, 24)}`,
+                      id: b.id || `call_${Jr().replace(/-/g, "").slice(0, 24)}`,
                       type: "function",
                       function: {
                         name: b.name || "",
@@ -15687,7 +15687,7 @@ ${i}`);
               verifier: n,
               challenge: r
             } = await Hr();
-            await G(e).put(ed + t, JSON.stringify({
+            await V(e).put(ed + t, JSON.stringify({
               verifier: n
             }), {
               expirationTtl: 600
@@ -15717,10 +15717,10 @@ ${i}`);
           }
           async function v0(e, t, n) {
             var _a;
-            let r = await G(e).get(ed + n);
+            let r = await V(e).get(ed + n);
             if (!r)
               throw new Error("\u6388\u6743\u4F1A\u8BDD\u4E0D\u5B58\u5728\u6216\u5DF2\u8FC7\u671F\uFF0810 \u5206\u949F\uFF09\uFF0C\u8BF7\u91CD\u65B0\u70B9\u51FB\u300C\u7528 Claude \u8D26\u53F7\u6388\u6743\u300D");
-            await G(e).delete(ed + n).catch(() => {
+            await V(e).delete(ed + n).catch(() => {
             });
             let {
               verifier: a
@@ -15814,7 +15814,7 @@ ${i}`);
             var _a;
             let n = (e.refreshTokens || []).filter((o) => o && o.trim());
             if (n.length === 0)
-              return J("\u8BE5 claude \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Anthropic OAuth refresh_token\uFF08\u53EF\u70B9\u300C\u7528 Claude \u8D26\u53F7\u6388\u6743\u300D\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 claude \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Anthropic OAuth refresh_token\uFF08\u53EF\u70B9\u300C\u7528 Claude \u8D26\u53F7\u6388\u6743\u300D\u83B7\u53D6\uFF09", 400, "configuration_error");
             let r = ((_a = e.body) == null ? void 0 : _a.stream) === true;
             if (t === "messages-passthrough")
               return gT(e, n[0].trim(), r);
@@ -15835,7 +15835,7 @@ ${i}`);
                 if (!u.ok) {
                   if (i = u.status, s = `HTTP ${u.status}: ${(await je(u)).slice(0, 300)}`, [401, 403, 429].includes(u.status) || u.status >= 500)
                     continue;
-                  return J(s, u.status, "upstream_error");
+                  return Y(s, u.status, "upstream_error");
                 }
                 if (r && u.body) {
                   let m = Qu(u.body, e.requestedModel, (d) => {
@@ -15854,7 +15854,7 @@ ${i}`);
                 try {
                   p = JSON.parse(l);
                 } catch {
-                  return J(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
+                  return Y(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
                 }
                 let y = Xu(p, e.requestedModel);
                 return ye(e, Ee(e, hT(p), true, 200)), new Response(JSON.stringify(y), {
@@ -15868,7 +15868,7 @@ ${i}`);
                 s = c.message || "\u672A\u77E5\u9519\u8BEF", i = 502;
                 continue;
               }
-            return J(`\u6240\u6709 Claude \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
+            return Y(`\u6240\u6709 Claude \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
           }
           async function gT(e, t, n) {
             try {
@@ -15879,7 +15879,7 @@ ${i}`);
                 signal: AbortSignal.timeout(6e5)
               });
               if (!a.ok)
-                return J(`HTTP ${a.status}: ${(await je(a)).slice(0, 300)}`, a.status, "upstream_error");
+                return Y(`HTTP ${a.status}: ${(await je(a)).slice(0, 300)}`, a.status, "upstream_error");
               let s = {
                 "Content-Type": a.headers.get("Content-Type") || (n ? "text/event-stream" : "application/json"),
                 "Cache-Control": "no-store"
@@ -15889,7 +15889,7 @@ ${i}`);
                 headers: s
               });
             } catch (r) {
-              return J(r.message || "\u900F\u4F20\u5931\u8D25", 502, "proxy_error");
+              return Y(r.message || "\u900F\u4F20\u5931\u8D25", 502, "proxy_error");
             }
           }
           async function k0(e, t, n) {
@@ -15980,7 +15980,7 @@ ${i}`);
           var ed;
           var E0 = F(() => {
             "use strict";
-            Ye();
+            Je();
             bt();
             yo();
             td = "9d1c250a-e61b-44d9-88ed-5944d1962f5e", cT = "https://claude.ai/oauth/authorize", h0 = "https://platform.claude.com/v1/oauth/token", g0 = "http://localhost:54545/callback", y0 = "user:profile user:inference user:sessions:claude_code user:mcp_servers user:file_upload", lT = "axios/1.15.2", uT = "claude-cli/2.1.258 (external, cli)", bo = "https://api.anthropic.com", dT = "claude-code-20250219,oauth-2025-04-20", fT = "claude:at:", ed = "claude:oauth:";
@@ -16509,7 +16509,7 @@ ${i}`);
           });
           async function ko(e) {
             try {
-              let t = await G(e).get(ET);
+              let t = await V(e).get(ET);
               if (!t)
                 return null;
               let n = JSON.parse(t), r = String((n == null ? void 0 : n.url) || "").trim().replace(/\/+$/, ""), a = String((n == null ? void 0 : n.key) || "").trim();
@@ -16594,7 +16594,7 @@ ${i}`);
               verifier: n,
               challenge: r
             } = await Hr();
-            await G(e).put(id + t, JSON.stringify({
+            await V(e).put(id + t, JSON.stringify({
               verifier: n
             }), {
               expirationTtl: 600
@@ -16622,10 +16622,10 @@ ${i}`);
             return n ? decodeURIComponent(n[1]) : t;
           }
           async function dd(e, t, n) {
-            let r = await G(e).get(id + n);
+            let r = await V(e).get(id + n);
             if (!r)
               throw new Error("\u6388\u6743\u4F1A\u8BDD\u4E0D\u5B58\u5728\u6216\u5DF2\u8FC7\u671F\uFF0810 \u5206\u949F\uFF09\uFF0C\u8BF7\u91CD\u65B0\u70B9\u51FB\u300C\u6388\u6743\u65B0\u8D26\u53F7\u300D");
-            await G(e).delete(id + n).catch(() => {
+            await V(e).delete(id + n).catch(() => {
             });
             let {
               verifier: a
@@ -16875,7 +16875,7 @@ ${i}`);
           }
           async function RT(e, t) {
             try {
-              let n = await G(e).get(cd + t);
+              let n = await V(e).get(cd + t);
               return n ? JSON.parse(n) : {};
             } catch {
               return {};
@@ -16886,7 +16886,7 @@ ${i}`);
             for (let [s, i] of Object.entries(n))
               i && i.cooldownUntil > r && (a[s] = i);
             try {
-              Object.keys(a).length > 0 ? await G(e).put(cd + t, JSON.stringify(a)) : await G(e).delete(cd + t);
+              Object.keys(a).length > 0 ? await V(e).put(cd + t, JSON.stringify(a)) : await V(e).delete(cd + t);
             } catch {
             }
           }
@@ -17057,13 +17057,13 @@ ${i}`);
             var _a, _b2, _c2, _d2, _e2, _f2, _g2;
             let n = await ko(e.env), r = [...new Set((e.refreshTokens || []).map(jn).filter(Boolean))];
             if (r.length === 0 && !n)
-              return J("\u8BE5 codex \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A OpenAI OAuth refresh_token\u3001\u56DB\u6BB5\u53D1\u8D27\u884C\u6216 CPA JSON\uFF08\u53EF\u70B9\u300C\u6388\u6743\u65B0\u8D26\u53F7\u300D\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 codex \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A OpenAI OAuth refresh_token\u3001\u56DB\u6BB5\u53D1\u8D27\u884C\u6216 CPA JSON\uFF08\u53EF\u70B9\u300C\u6388\u6743\u65B0\u8D26\u53F7\u300D\u83B7\u53D6\uFF09", 400, "configuration_error");
             let a = ((_a = e.body) == null ? void 0 : _a.stream) === true, s = ad(e.body || {}), i = s && r.length > 0 ? null : n;
             if (s && i) {
               let x = co((_b2 = e.body) == null ? void 0 : _b2.messages);
               if (x) {
                 let v = await pd(i, od(e), x, e.body || {});
-                return v.ok && ((_c2 = v.images) == null ? void 0 : _c2.length) ? I0(v.images, e.requestedModel, Math.max(1, Math.ceil(x.length / 4)), a) : J(v.error || "\u4E2D\u7EE7\u751F\u56FE\u5931\u8D25", v.status || 502, "upstream_error");
+                return v.ok && ((_c2 = v.images) == null ? void 0 : _c2.length) ? I0(v.images, e.requestedModel, Math.max(1, Math.ceil(x.length / 4)), a) : Y(v.error || "\u4E2D\u7EE7\u751F\u56FE\u5931\u8D25", v.status || 502, "upstream_error");
               }
             }
             if (t === "responses-passthrough")
@@ -17115,7 +17115,7 @@ ${i}`);
                     try {
                       let {
                         generateChatgptWebImageWithAccessToken: B
-                      } = await Promise.resolve().then(() => (Gr(), is)), U = await B(e.env, j, R, e.body || {}, 3e4);
+                      } = await Promise.resolve().then(() => (Vr(), is)), U = await B(e.env, j, R, e.body || {}, 3e4);
                       if (U.ok && U.body) {
                         let Q = JSON.parse(U.body), K = (Array.isArray(Q == null ? void 0 : Q.data) ? Q.data : []).map((W) => ({
                           b64: typeof (W == null ? void 0 : W.b64_json) == "string" ? W.b64_json : void 0,
@@ -17154,7 +17154,7 @@ ${i}`);
                     d(k, c.slice(0, 120), O0);
                     continue;
                   }
-                  return await h(), J(c, T.status, "upstream_error");
+                  return await h(), Y(c, T.status, "upstream_error");
                 }
                 g(k), ye(e, h());
                 let O = i ? {} : {
@@ -17176,12 +17176,12 @@ ${i}`);
                   });
                 }
                 if (!T.body)
-                  return J("\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
+                  return Y("\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", 502, "upstream_error");
                 let I;
                 try {
                   I = await S0(T.body, e.requestedModel);
                 } catch (j) {
-                  return J(j.message || "\u4E0A\u6E38\u6D41\u89E3\u6790\u5931\u8D25", 502, "upstream_error");
+                  return Y(j.message || "\u4E0A\u6E38\u6D41\u89E3\u6790\u5931\u8D25", 502, "upstream_error");
                 }
                 return ye(e, Ee(e, {
                   promptTokens: Number((_f2 = I.usage) == null ? void 0 : _f2.prompt_tokens) || 0,
@@ -17198,7 +17198,7 @@ ${i}`);
                 c = w.message || "\u672A\u77E5\u9519\u8BEF", u = w instanceof mr ? 401 : 502, d(k, `exception ${c.slice(0, 120)}`, w instanceof mr ? N0 : O0);
                 continue;
               }
-            return await h(), J(`\u6240\u6709 Codex \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c || "\u672A\u77E5"}`, u, u === 401 ? "authentication_error" : "key_exhausted");
+            return await h(), Y(`\u6240\u6709 Codex \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c || "\u672A\u77E5"}`, u, u === 401 ? "authentication_error" : "key_exhausted");
           }
           async function BT(e, t, n, r) {
             try {
@@ -17223,7 +17223,7 @@ ${i}`);
                 signal: AbortSignal.timeout(6e5)
               });
               if (!o.ok)
-                return J(`HTTP ${o.status}: ${(await je(o)).slice(0, 300)}`, o.status, "upstream_error");
+                return Y(`HTTP ${o.status}: ${(await je(o)).slice(0, 300)}`, o.status, "upstream_error");
               let c = {
                 "Content-Type": o.headers.get("Content-Type") || (n ? "text/event-stream" : "application/json"),
                 "Cache-Control": "no-store"
@@ -17234,7 +17234,7 @@ ${i}`);
               });
             } catch (a) {
               let s = a instanceof mr;
-              return J(a.message || "\u900F\u4F20\u5931\u8D25", s ? 401 : 502, s ? "authentication_error" : "proxy_error");
+              return Y(a.message || "\u900F\u4F20\u5931\u8D25", s ? 401 : 502, s ? "authentication_error" : "proxy_error");
             }
           }
           async function hd(e, t, n, r) {
@@ -17531,7 +17531,7 @@ ${i}`);
           var jT;
           var _o = F(() => {
             "use strict";
-            Ye();
+            Je();
             bt();
             sd();
             Za();
@@ -17693,7 +17693,7 @@ ${i}`);
               });
             return t;
           }
-          function JT(e, t) {
+          function YT(e, t) {
             var _a;
             let n = {}, r = (l) => typeof l == "number" && Number.isFinite(l) ? l : void 0, a = r(e.temperature), s = r(e.top_p), i = r(e.top_k), o = r(e.max_tokens) ?? r(e.max_completion_tokens);
             if (a !== void 0 && (n.temperature = a), s !== void 0 && (n.topP = s), i !== void 0 && (n.topK = i), o !== void 0) {
@@ -17708,10 +17708,10 @@ ${i}`);
                   thinkingBudget: l
                 };
               else if (typeof l == "string" && l.trim()) {
-                let p = l.trim().toLowerCase(), y = GT[p] ?? p;
+                let p = l.trim().toLowerCase(), y = VT[p] ?? p;
                 y === "auto" ? n.thinkingConfig = {
                   thinkingBudget: -1
-                } : y !== "none" && VT.has(y) && (n.thinkingConfig = {
+                } : y !== "none" && GT.has(y) && (n.thinkingConfig = {
                   thinkingLevel: y
                 });
               }
@@ -17729,7 +17729,7 @@ ${i}`);
             }
             return n;
           }
-          function YT(e) {
+          function JT(e) {
             var _a;
             let t = e.tool_choice;
             if (t) {
@@ -17914,11 +17914,11 @@ ${i}`);
               role: "user",
               parts: u
             });
-            let d = JT(e, t == null ? void 0 : t.modelId);
+            let d = YT(e, t == null ? void 0 : t.modelId);
             Object.keys(d).length > 0 && (m.generationConfig = d);
             let g = XT(e, r);
             g && (m.tools = g);
-            let h = YT(e);
+            let h = JT(e);
             return h && (m.toolConfig = h), m.safetySettings = FT, {
               request: m,
               nameMap: r
@@ -17980,7 +17980,7 @@ ${i}`);
                 return false;
             }
           }
-          function V0(e, t, n, r) {
+          function G0(e, t, n, r) {
             var _a;
             let a = F0(e), s = Array.isArray(a.candidates) ? a.candidates[0] : void 0, i = ((_a = s == null ? void 0 : s.content) == null ? void 0 : _a.parts) || [], o = "", c = "", u = [], l = false;
             for (let m of i)
@@ -18025,7 +18025,7 @@ ${i}`);
               usage: z0(p)
             };
           }
-          function G0(e, t, n, r, a, s) {
+          function V0(e, t, n, r, a, s) {
             let i = new TextDecoder(), o = new TextEncoder(), c = "", u = false, l = 0, p = "", y = false, m = false, d = t, g = `chatcmpl-${To().replace(/-/g, "").slice(0, 24)}`, h = {
               promptTokens: 0,
               completionTokens: 0,
@@ -18153,10 +18153,10 @@ ${i}`);
           var HT;
           var zT;
           var qT;
-          var VT;
           var GT;
+          var VT;
           var us;
-          var J0 = F(() => {
+          var Y0 = F(() => {
             "use strict";
             FT = [{
               category: "HARM_CATEGORY_HARASSMENT",
@@ -18178,7 +18178,7 @@ ${i}`);
             HT = /* @__PURE__ */ new Set(["$schema", "$id", "$ref", "$defs", "definitions", "$comment", "$anchor", "$dynamicRef", "$dynamicAnchor", "$vocabulary", "propertyNames", "patternProperties", "unevaluatedProperties", "unevaluatedItems", "contains", "dependencies", "dependentSchemas", "dependentRequired", "if", "then", "else", "not", "allOf", "oneOf", "additionalItems", "prefixItems", "uniqueItems", "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "contentEncoding", "contentMediaType", "contentSchema", "title", "examples", "example", "default", "const", "deprecated", "readOnly", "writeOnly", "additionalProperties"]);
             zT = /* @__PURE__ */ new Set(["minItems", "maxItems", "minLength", "maxLength", "oneOf", "anyOf", "allOf", "not"]);
             qT = [[/gpt-oss/i, 32768], [/gemini-3\.(6|7|8)-flash/i, 65536], [/gemini-3-flash|gemini-3\.1-flash-image/i, 65536], [/claude|gemini/i, 64e3]];
-            VT = /* @__PURE__ */ new Set(["minimal", "low", "medium", "high"]), GT = {
+            GT = /* @__PURE__ */ new Set(["minimal", "low", "medium", "high"]), VT = {
               enabled: "high",
               on: "high",
               true: "high",
@@ -18248,7 +18248,7 @@ ${i}`);
             let t = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(e));
             return [...new Uint8Array(t)].map((n) => n.toString(16).padStart(2, "0")).join("");
           }
-          function Y0() {
+          function J0() {
             try {
               return crypto.randomUUID();
             } catch {
@@ -18286,7 +18286,7 @@ ${i}`);
           }
           async function Ed(e) {
             let t = uS(32);
-            await G(e).put(kd + t, "1", {
+            await V(e).put(kd + t, "1", {
               expirationTtl: 600
             });
             let n = new URLSearchParams({
@@ -18308,7 +18308,7 @@ ${i}`);
             return n ? decodeURIComponent(n[1]) : t;
           }
           async function Td(e, t, n) {
-            let r = G(e);
+            let r = V(e);
             if (!await r.get(kd + n))
               throw new Error("\u6388\u6743\u4F1A\u8BDD\u4E0D\u5B58\u5728\u6216\u5DF2\u8FC7\u671F\uFF0810 \u5206\u949F\uFF09\uFF0C\u8BF7\u91CD\u65B0\u70B9\u51FB\u300C\u7528 Google \u8D26\u53F7\u6388\u6743\u300D");
             let s = dS(t);
@@ -18403,7 +18403,7 @@ ${i}`);
             var _a;
             if (r)
               return r;
-            let a = G(e), s = lS + n, i = await a.get(s);
+            let a = V(e), s = lS + n, i = await a.get(s);
             if (i)
               return i;
             let o = await fetch(`${ey}/${Pn}:loadCodeAssist`, {
@@ -18489,7 +18489,7 @@ ${i}`);
               project: t,
               userAgent: "antigravity",
               requestType: a ? "image_gen" : "agent",
-              requestId: a ? `image_gen/${Date.now()}/${Y0()}/12` : `agent-${Y0()}`,
+              requestId: a ? `image_gen/${Date.now()}/${J0()}/12` : `agent-${J0()}`,
               request: r
             };
           }
@@ -18537,7 +18537,7 @@ ${i}`);
           }
           async function vS(e, t) {
             try {
-              let n = await G(e).get(_d(t));
+              let n = await V(e).get(_d(t));
               return n ? JSON.parse(n) : {};
             } catch {
               return {};
@@ -18548,7 +18548,7 @@ ${i}`);
             for (let [s, i] of Object.entries(n))
               i && i.cooldownUntil > r && (a[s] = i);
             try {
-              Object.keys(a).length > 0 ? await G(e).put(_d(t), JSON.stringify(a)) : await G(e).delete(_d(t));
+              Object.keys(a).length > 0 ? await V(e).put(_d(t), JSON.stringify(a)) : await V(e).delete(_d(t));
             } catch {
             }
           }
@@ -18633,7 +18633,7 @@ ${i}`);
                   return await u(), So(d, B.status, "upstream_error");
                 }
                 if (c(_), await u(), l && B.body) {
-                  let ie = G0(B.body, e.requestedModel, m, () => {
+                  let ie = V0(B.body, e.requestedModel, m, () => {
                   }, (pe) => {
                     let me = X0(e, pe, true, 200);
                     if (e.waitUntil)
@@ -18666,7 +18666,7 @@ ${i}`);
                 }
                 let K;
                 try {
-                  K = V0(Q, e.requestedModel, m, p);
+                  K = G0(Q, e.requestedModel, m, p);
                 } catch (ie) {
                   if (ie instanceof us) {
                     d = ie.message, g = 502, o(_, `zero_output ${ie.finishReason}`, wd);
@@ -18962,9 +18962,9 @@ ${i}`);
           var wd;
           var Nd = F(() => {
             "use strict";
-            Ye();
+            Je();
             bt();
-            J0();
+            Y0();
             QT = "ag:health:";
             ZT = ["https://www.googleapis.com/auth/cloud-platform", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/aicode", "https://www.googleapis.com/auth/cclog", "https://www.googleapis.com/auth/experimentsandconfigs"], eS = "https://accounts.google.com/o/oauth2/v2/auth", Q0 = "https://oauth2.googleapis.com/token", Z0 = "http://localhost:51121/oauth-callback", ea = "https://daily-cloudcode-pa.googleapis.com", ey = "https://cloudcode-pa.googleapis.com", Pn = "v1internal", ty = "gl-node/22.21.1", tS = "https://antigravity-hub-auto-updater-974169037036.us-central1.run.app/manifest/latest-arm64-mac.yml", nS = "2.29.0", rS = "os_type=darwin; arch=arm64", aS = 360 * 60 * 1e3, sS = "google-api-nodejs-client/10.3.0", iS = {
               "2.23.0": "998057262",
@@ -19006,7 +19006,7 @@ ${i}`);
               throw new Error(`\u8BBE\u5907\u7801\u8BF7\u6C42\u5931\u8D25 HTTP ${s.status}: ${i.slice(0, 300)}`);
             let c = _e();
             try {
-              await G(e).put(ms + c, JSON.stringify({
+              await V(e).put(ms + c, JSON.stringify({
                 deviceCode: o.device_code,
                 deviceId: r,
                 auth: n.auth
@@ -19026,7 +19026,7 @@ ${i}`);
             };
           }
           async function my(e, t) {
-            let n = await G(e).get(ms + t);
+            let n = await V(e).get(ms + t);
             if (!n)
               return console.log("[kimi] poll miss", t.slice(0, 8)), {
                 status: "error",
@@ -19062,18 +19062,18 @@ ${i}`);
             }
             return l.error ? (console.log("[kimi] poll upstream", t.slice(0, 8), l.error), l.error === "authorization_pending" || l.error === "slow_down" ? {
               status: "pending"
-            } : l.error === "expired_token" ? (await G(e).delete(ms + t).catch(() => {
+            } : l.error === "expired_token" ? (await V(e).delete(ms + t).catch(() => {
             }), {
               status: "error",
               message: `\u8BBE\u5907\u7801\u5DF2\u8FC7\u671F\uFF08\u6709\u6548\u671F ${NS} \u5206\u949F\uFF09\uFF0C\u8BF7\u91CD\u65B0\u53D1\u8D77\u6388\u6743`
-            }) : l.error === "access_denied" ? (await G(e).delete(ms + t).catch(() => {
+            }) : l.error === "access_denied" ? (await V(e).delete(ms + t).catch(() => {
             }), {
               status: "error",
               message: "\u7528\u6237\u62D2\u7EDD\u4E86\u6388\u6743"
             }) : {
               status: "error",
               message: `Kimi OAuth \u9519\u8BEF: ${l.error} ${l.error_description || ""}`.trim()
-            }) : l.access_token ? l.refresh_token ? (await G(e).put(ms + t, JSON.stringify({
+            }) : l.access_token ? l.refresh_token ? (await V(e).put(ms + t, JSON.stringify({
               deviceCode: a,
               deviceId: s,
               auth: i,
@@ -19130,7 +19130,7 @@ ${i}`);
             var _a, _b2, _c2, _d2;
             let n = Oo(t), r = (e.refreshTokens || []).filter((o) => o && o.trim());
             if (r.length === 0)
-              return J("\u8BE5 kimi \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Kimi OAuth refresh_token\uFF08\u53EF\u901A\u8FC7\u8BBE\u5907\u7801\u6388\u6743\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 kimi \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Kimi OAuth refresh_token\uFF08\u53EF\u901A\u8FC7\u8BBE\u5907\u7801\u6388\u6743\u83B7\u53D6\uFF09", 400, "configuration_error");
             let a = {
               ...e.body,
               model: hy(e.modelId)
@@ -19150,7 +19150,7 @@ ${i}`);
                 if (!u.ok) {
                   if (i = u.status, s = `HTTP ${u.status}: ${(await je(u)).slice(0, 300)}`, [401, 403, 429].includes(u.status) || u.status >= 500)
                     continue;
-                  return J(s, u.status, "upstream_error");
+                  return Y(s, u.status, "upstream_error");
                 }
                 if (((_b2 = e.body) == null ? void 0 : _b2.stream) === true && u.body) {
                   let [y, m] = u.body.tee();
@@ -19167,7 +19167,7 @@ ${i}`);
                 try {
                   p = JSON.parse(l);
                 } catch {
-                  return J(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
+                  return Y(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
                 }
                 return ye(e, Ee(e, {
                   promptTokens: Number((_c2 = p == null ? void 0 : p.usage) == null ? void 0 : _c2.prompt_tokens) || 0,
@@ -19183,7 +19183,7 @@ ${i}`);
                 s = c.message || "\u672A\u77E5\u9519\u8BEF", i = 502;
                 continue;
               }
-            return J(`\u6240\u6709 Kimi \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
+            return Y(`\u6240\u6709 Kimi \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
           }
           async function jS(e, t) {
             try {
@@ -19306,7 +19306,7 @@ ${i}`);
           var IS;
           var xy = F(() => {
             "use strict";
-            Ye();
+            Je();
             bt();
             Od = "17e5f671-d194-4dfb-9706-5516cb48c098", SS = {
               auth: "https://auth.kimi.ai",
@@ -19374,7 +19374,7 @@ ${i}`);
             }
             if (!s.ok || !o.device_code)
               throw new Error(`Qwen \u8BBE\u5907\u7801\u8BF7\u6C42\u5931\u8D25 HTTP ${s.status}: ${i.slice(0, 300)}`);
-            return await G(e).put(hs + t, JSON.stringify({
+            return await V(e).put(hs + t, JSON.stringify({
               deviceCode: o.device_code,
               verifier: n
             }), {
@@ -19390,7 +19390,7 @@ ${i}`);
             };
           }
           async function _y(e, t) {
-            let n = await G(e).get(hs + t);
+            let n = await V(e).get(hs + t);
             if (!n)
               return {
                 status: "error",
@@ -19424,18 +19424,18 @@ ${i}`);
             }
             return c.error ? c.error === "authorization_pending" || c.error === "slow_down" ? {
               status: "pending"
-            } : c.error === "expired_token" ? (await G(e).delete(hs + t).catch(() => {
+            } : c.error === "expired_token" ? (await V(e).delete(hs + t).catch(() => {
             }), {
               status: "error",
               message: "\u8BBE\u5907\u7801\u5DF2\u8FC7\u671F\uFF0C\u8BF7\u91CD\u65B0\u53D1\u8D77\u6388\u6743"
-            }) : c.error === "access_denied" ? (await G(e).delete(hs + t).catch(() => {
+            }) : c.error === "access_denied" ? (await V(e).delete(hs + t).catch(() => {
             }), {
               status: "error",
               message: "\u7528\u6237\u62D2\u7EDD\u4E86\u6388\u6743"
             }) : {
               status: "error",
               message: `Qwen OAuth \u9519\u8BEF: ${c.error} ${c.error_description || ""}`.trim()
-            } : c.access_token ? c.refresh_token ? (await G(e).delete(hs + t).catch(() => {
+            } : c.access_token ? c.refresh_token ? (await V(e).delete(hs + t).catch(() => {
             }), {
               status: "ok",
               refreshToken: c.refresh_token
@@ -19492,7 +19492,7 @@ ${i}`);
             var _a, _b2, _c2;
             let t = (e.refreshTokens || []).filter((s) => s && s.trim());
             if (t.length === 0)
-              return J("\u8BE5 qwen \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Qwen OAuth refresh_token\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u7528\u8BBE\u5907\u7801\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 qwen \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Qwen OAuth refresh_token\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u7528\u8BBE\u5907\u7801\u83B7\u53D6\uFF09", 400, "configuration_error");
             let n = ((_a = e.body) == null ? void 0 : _a.stream) === true, r = "", a = 502;
             for (let s of t)
               try {
@@ -19511,7 +19511,7 @@ ${i}`);
                 if (!c.ok) {
                   if (a = c.status, r = `HTTP ${c.status}: ${(await je(c)).slice(0, 300)}`, [401, 403, 429].includes(c.status) || c.status >= 500)
                     continue;
-                  return J(r, c.status, "upstream_error");
+                  return Y(r, c.status, "upstream_error");
                 }
                 if (n && c.body) {
                   let [p, y] = c.body.tee();
@@ -19528,7 +19528,7 @@ ${i}`);
                 try {
                   l = JSON.parse(u);
                 } catch {
-                  return J(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${u.slice(0, 200)}`, 502, "upstream_error");
+                  return Y(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${u.slice(0, 200)}`, 502, "upstream_error");
                 }
                 return ye(e, Ee(e, {
                   promptTokens: Number((_b2 = l == null ? void 0 : l.usage) == null ? void 0 : _b2.prompt_tokens) || 0,
@@ -19544,7 +19544,7 @@ ${i}`);
                 r = i.message || "\u672A\u77E5\u9519\u8BEF", a = 502;
                 continue;
               }
-            return J(`\u6240\u6709 Qwen \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${r || "\u672A\u77E5"}`, a, "key_exhausted");
+            return Y(`\u6240\u6709 Qwen \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${r || "\u672A\u77E5"}`, a, "key_exhausted");
           }
           async function FS(e, t) {
             try {
@@ -19630,12 +19630,12 @@ ${i}`);
           var hs;
           var Cy = F(() => {
             "use strict";
-            Ye();
+            Je();
             bt();
             Pd = "f0304373b74a44d2b584a3fb70ca9e56", PS = "https://chat.qwen.ai/api/v1/oauth2/device/code", vy = "https://chat.qwen.ai/api/v1/oauth2/token", RS = "openid profile email model.completion", MS = "urn:ietf:params:oauth:grant-type:device_code", DS = "https://portal.qwen.ai/v1", LS = ["coder-model", "qwen3-coder-plus", "qwen3-coder-flash", "vision-model"], gs = "QwenCode/0.9.1 (darwin; arm64)", US = "qwen:at:", hs = "qwen:device:";
           });
           async function Dd(e) {
-            let t = G(e), n = await t.get(Ny + "v1").catch(() => null);
+            let t = V(e), n = await t.get(Ny + "v1").catch(() => null);
             if (n)
               try {
                 return JSON.parse(n);
@@ -19688,7 +19688,7 @@ ${i}`);
             if (!r.ok || !s.device_code)
               throw new Error(`\u8BBE\u5907\u7801\u8BF7\u6C42\u5931\u8D25 HTTP ${r.status}: ${a.slice(0, 300)}`);
             let i = _e();
-            return await G(e).put(ys + i, JSON.stringify({
+            return await V(e).put(ys + i, JSON.stringify({
               deviceCode: s.device_code
             }), {
               expirationTtl: Math.max(300, Number(s.expires_in) || 1800)
@@ -19703,7 +19703,7 @@ ${i}`);
             };
           }
           async function Iy(e, t) {
-            let n = await G(e).get(ys + t);
+            let n = await V(e).get(ys + t);
             if (!n)
               return {
                 status: "error",
@@ -19734,18 +19734,18 @@ ${i}`);
             }
             return c.error ? c.error === "authorization_pending" || c.error === "slow_down" ? {
               status: "pending"
-            } : c.error === "expired_token" ? (await G(e).delete(ys + t).catch(() => {
+            } : c.error === "expired_token" ? (await V(e).delete(ys + t).catch(() => {
             }), {
               status: "error",
               message: "\u8BBE\u5907\u7801\u5DF2\u8FC7\u671F\uFF0C\u8BF7\u91CD\u65B0\u53D1\u8D77\u6388\u6743"
-            }) : c.error === "access_denied" ? (await G(e).delete(ys + t).catch(() => {
+            }) : c.error === "access_denied" ? (await V(e).delete(ys + t).catch(() => {
             }), {
               status: "error",
               message: "\u7528\u6237\u62D2\u7EDD\u4E86\u6388\u6743"
             }) : {
               status: "error",
               message: `xAI OAuth \u9519\u8BEF: ${c.error} ${c.error_description || ""}`.trim()
-            } : c.access_token ? c.refresh_token ? (await G(e).delete(ys + t).catch(() => {
+            } : c.access_token ? c.refresh_token ? (await V(e).delete(ys + t).catch(() => {
             }), {
               status: "ok",
               refreshToken: c.refresh_token
@@ -19757,7 +19757,7 @@ ${i}`);
               message: "xAI \u672A\u8FD4\u56DE access_token"
             };
           }
-          async function GS(e, t) {
+          async function VS(e, t) {
             let n = await Dd(e), r = new URLSearchParams({
               grant_type: "refresh_token",
               client_id: Rd,
@@ -19785,7 +19785,7 @@ ${i}`);
             };
           }
           async function Ld(e, t) {
-            return (await st(e, VS, t, (n) => GS(e, n))).accessToken;
+            return (await st(e, GS, t, (n) => VS(e, n))).accessToken;
           }
           function Ud(e, t) {
             return {
@@ -19804,10 +19804,10 @@ ${i}`);
             var _a, _b2, _c2;
             let n = (e.refreshTokens || []).filter((o) => o && o.trim());
             if (n.length === 0)
-              return J("\u8BE5 grok \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A xAI OAuth refresh_token\uFF08\u53EF\u901A\u8FC7\u8BBE\u5907\u7801\u6388\u6743\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 grok \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Key\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A xAI OAuth refresh_token\uFF08\u53EF\u901A\u8FC7\u8BBE\u5907\u7801\u6388\u6743\u83B7\u53D6\uFF09", 400, "configuration_error");
             let r = ((_a = e.body) == null ? void 0 : _a.stream) === true;
             if (t === "responses-passthrough")
-              return JS(e, n[0].trim(), r);
+              return YS(e, n[0].trim(), r);
             let {
               request: a
             } = Xr({
@@ -19825,7 +19825,7 @@ ${i}`);
                 if (!u.ok) {
                   if (i = u.status, s = `HTTP ${u.status}: ${(await je(u)).slice(0, 300)}`, [401, 403, 429].includes(u.status) || u.status >= 500)
                     continue;
-                  return J(s, u.status, "upstream_error");
+                  return Y(s, u.status, "upstream_error");
                 }
                 if (r && u.body) {
                   let m = wo(u.body, e.requestedModel, (d) => {
@@ -19844,7 +19844,7 @@ ${i}`);
                 try {
                   p = JSON.parse(l);
                 } catch {
-                  return J(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
+                  return Y(`\u4E0A\u6E38\u8FD4\u56DE\u975E JSON: ${l.slice(0, 200)}`, 502, "upstream_error");
                 }
                 let y = T0(p, e.requestedModel);
                 return ye(e, Ee(e, {
@@ -19861,9 +19861,9 @@ ${i}`);
                 s = c.message || "\u672A\u77E5\u9519\u8BEF", i = 502;
                 continue;
               }
-            return J(`\u6240\u6709 Grok \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
+            return Y(`\u6240\u6709 Grok \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${s || "\u672A\u77E5"}`, i, "key_exhausted");
           }
-          async function JS(e, t, n) {
+          async function YS(e, t, n) {
             try {
               let r = await Ld(e.env, t), a = await fetch(`${Md}/responses`, {
                 method: "POST",
@@ -19872,7 +19872,7 @@ ${i}`);
                 signal: AbortSignal.timeout(6e5)
               });
               if (!a.ok)
-                return J(`HTTP ${a.status}: ${(await je(a)).slice(0, 300)}`, a.status, "upstream_error");
+                return Y(`HTTP ${a.status}: ${(await je(a)).slice(0, 300)}`, a.status, "upstream_error");
               let s = {
                 "Content-Type": a.headers.get("Content-Type") || (n ? "text/event-stream" : "application/json"),
                 "Cache-Control": "no-store"
@@ -19882,7 +19882,7 @@ ${i}`);
                 headers: s
               });
             } catch (r) {
-              return J(r.message || "\u900F\u4F20\u5931\u8D25", 502, "proxy_error");
+              return Y(r.message || "\u900F\u4F20\u5931\u8D25", 502, "proxy_error");
             }
           }
           async function Py(e, t, n) {
@@ -19931,15 +19931,15 @@ ${i}`);
           var Md;
           var KS;
           var WS;
-          var VS;
+          var GS;
           var ys;
           var Ny;
           var Ry = F(() => {
             "use strict";
-            Ye();
+            Je();
             bt();
             sd();
-            HS = "https://auth.x.ai/.well-known/openid-configuration", Rd = "b1a00492-073a-47ea-816f-4c329264a828", zS = "openid profile email offline_access grok-cli:access api:access", qS = "urn:ietf:params:oauth:grant-type:device_code", Md = "https://cli-chat-proxy.grok.com/v1", KS = "xai-grok-workspace/0.2.120", WS = "0.2.120", VS = "grok:at:", ys = "grok:device:", Ny = "grok:endpoints:";
+            HS = "https://auth.x.ai/.well-known/openid-configuration", Rd = "b1a00492-073a-47ea-816f-4c329264a828", zS = "openid profile email offline_access grok-cli:access api:access", qS = "urn:ietf:params:oauth:grant-type:device_code", Md = "https://cli-chat-proxy.grok.com/v1", KS = "xai-grok-workspace/0.2.120", WS = "0.2.120", GS = "grok:at:", ys = "grok:device:", Ny = "grok:endpoints:";
           });
           var bs;
           var Xt;
@@ -20252,7 +20252,7 @@ Before running a command that changes system state \u2014 restarts, deletes, con
             } = s.data || {};
             if (!i || !o)
               throw new Error("ZCode \u6388\u6743\u521D\u59CB\u5316\u8FD4\u56DE\u7F3A\u5C11 flow_id / authorize_url");
-            return await V(e).setJSON(Bd(i), {
+            return await G(e).setJSON(Bd(i), {
               pollToken: r,
               provider: n,
               at: Date.now()
@@ -20266,7 +20266,7 @@ Before running a command that changes system state \u2014 restarts, deletes, con
           }
           async function r2(e) {
             try {
-              return await (await fetch(`${YS}/api/biz/customer/getCustomerInfo`, {
+              return await (await fetch(`${JS}/api/biz/customer/getCustomerInfo`, {
                 headers: {
                   authorization: `Bearer ${e}`,
                   accept: "application/json"
@@ -20279,7 +20279,7 @@ Before running a command that changes system state \u2014 restarts, deletes, con
           }
           async function zd(e, t) {
             var _a, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2, _k2;
-            let n = V(e), r = await n.get(Bd(t), {
+            let n = G(e), r = await n.get(Bd(t), {
               type: "json",
               consistency: "strong"
             });
@@ -20920,7 +20920,7 @@ data: [DONE]
             }
           }
           var wt;
-          var YS;
+          var JS;
           var na;
           var jo;
           var XS;
@@ -20933,22 +20933,22 @@ data: [DONE]
           var e2;
           var yr = F(() => {
             "use strict";
-            Ye();
+            Je();
             My();
             Ly();
-            wt = "https://zcode.z.ai", YS = "https://api.z.ai", na = "3.16.3", jo = "/api/v1/zcode-plan/anthropic/v1/messages", XS = "/api/v1/oauth/cli/init", QS = (e) => `/api/v1/oauth/cli/poll/${encodeURIComponent(e)}`, Po = `/api/v1/zcode-plan/billing/balance?app_version=${na}`, $d = `/api/v1/zcode-plan/billing/preview?app_version=${na}&platform=win32-x64`, ZS = "/api/v1/zcode-plan/billing/claim", Bd = (e) => `zcode:flow:${e}`, ws = ["GLM-5.3", "GLM-5.3-Flash"], e2 = ws;
+            wt = "https://zcode.z.ai", JS = "https://api.z.ai", na = "3.16.3", jo = "/api/v1/zcode-plan/anthropic/v1/messages", XS = "/api/v1/oauth/cli/init", QS = (e) => `/api/v1/oauth/cli/poll/${encodeURIComponent(e)}`, Po = `/api/v1/zcode-plan/billing/balance?app_version=${na}`, $d = `/api/v1/zcode-plan/billing/preview?app_version=${na}&platform=win32-x64`, ZS = "/api/v1/zcode-plan/billing/claim", Bd = (e) => `zcode:flow:${e}`, ws = ["GLM-5.3", "GLM-5.3-Flash"], e2 = ws;
           });
           var tf = {};
           tt(tf, {
             cbRegion: () => br,
-            checkinCodebuddy: () => G2,
-            codebuddyCronToken: () => J2,
+            checkinCodebuddy: () => V2,
+            codebuddyCronToken: () => Y2,
             fetchCodebuddyModels: () => ef,
             fetchCodebuddyStatus: () => Zy,
             handleCodebuddyRequest: () => Qd,
-            pollCodebuddyDeviceFlow: () => Jd,
+            pollCodebuddyDeviceFlow: () => Yd,
             rewriteCodebuddyPayload: () => Xd,
-            startCodebuddyDeviceFlow: () => Gd,
+            startCodebuddyDeviceFlow: () => Vd,
             testCodebuddy: () => Zd
           });
           function Bo(e, t) {
@@ -20990,13 +20990,13 @@ data: [DONE]
             return (await Ot(`wb2a:${t}:${e}`)).slice(0, 36);
           }
           async function C2(e, t, n) {
-            await G(e).put(Jy + await Ot(t), JSON.stringify(n), {
+            await V(e).put(Yy + await Ot(t), JSON.stringify(n), {
               expirationTtl: T2
             }).catch(() => {
             });
           }
           async function N2(e, t) {
-            let n = await G(e).get(Jy + await Ot(t)).catch(() => null);
+            let n = await V(e).get(Yy + await Ot(t)).catch(() => null);
             if (!n)
               return {};
             try {
@@ -21005,7 +21005,7 @@ data: [DONE]
               return {};
             }
           }
-          async function Gd(e, t, n) {
+          async function Vd(e, t, n) {
             var _a, _b2;
             let r = br(t, n), a = await fetch(r.base + p2, {
               method: "POST",
@@ -21024,13 +21024,13 @@ data: [DONE]
             c || (c = `${r.base}/login?state=${encodeURIComponent(o)}&platform=CLI`);
             let u = r.global ? "global" : "cn";
             try {
-              await G(e).put(Vd + o, JSON.stringify({
+              await V(e).put(Gd + o, JSON.stringify({
                 realm: u,
                 base: r.base,
                 origin: r.origin,
                 fallbackDomain: S2(r)
               }), {
-                expirationTtl: Yy
+                expirationTtl: Jy
               });
             } catch (l) {
               throw console.error("[codebuddy] start store failed", String(l)), new Error("\u6388\u6743\u4F1A\u8BDD\u5199\u5165\u5931\u8D25(\u5B58\u50A8\u5F02\u5E38)\uFF0C\u8BF7\u91CD\u8BD5");
@@ -21041,8 +21041,8 @@ data: [DONE]
               realm: u
             };
           }
-          async function Jd(e, t) {
-            let n = await G(e).get(Vd + t).catch(() => null);
+          async function Yd(e, t) {
+            let n = await V(e).get(Gd + t).catch(() => null);
             if (!n)
               return {
                 status: "error",
@@ -21116,18 +21116,18 @@ data: [DONE]
             }
             await C2(e, u, l);
             let p = Number(o.expiresIn) || 0;
-            return p > 0 && await vu(e, Gy, u, {
+            return p > 0 && await vu(e, Vy, u, {
               accessToken: c,
               expiresAt: Date.now() + p * 1e3,
               currentRefreshToken: u
             }, p).catch(() => {
-            }), await G(e).put(Vd + t, JSON.stringify({
+            }), await V(e).put(Gd + t, JSON.stringify({
               ...r,
               done: true,
               refreshToken: u,
               account: l
             }), {
-              expirationTtl: Yy
+              expirationTtl: Jy
             }).catch(() => {
             }), {
               status: "ok",
@@ -21165,11 +21165,11 @@ data: [DONE]
           async function _s(e, t, n) {
             let r = await N2(e, t);
             return {
-              accessToken: (await st(e, Gy, t, (s) => O2(n, s, r))).accessToken,
+              accessToken: (await st(e, Vy, t, (s) => O2(n, s, r))).accessToken,
               account: r
             };
           }
-          async function Yd(e, t, n, r) {
+          async function Jd(e, t, n, r) {
             let a = {
               "Content-Type": "application/json",
               Accept: r ? "application/json, text/event-stream" : "application/json",
@@ -21592,14 +21592,14 @@ data: [DONE]
             var _a;
             let r = (e.refreshTokens || []).filter((u) => u && u.trim());
             if (r.length === 0)
-              return J("\u8BE5 codebuddy \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Keys\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A refresh_token\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u81EA\u52A8\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 codebuddy \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Keys\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A refresh_token\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u81EA\u52A8\u83B7\u53D6\uFF09", 400, "configuration_error");
             let a = br(t, n), s = ((_a = e.body) == null ? void 0 : _a.stream) === true, i = Xd(e.body, e.modelId), o = "", c = 502;
             for (let u of r)
               try {
                 let {
                   accessToken: l,
                   account: p
-                } = await _s(e.env, u, a), y = await Yd(a, l, p, s), m = await fetch(a.base + Ky, {
+                } = await _s(e.env, u, a), y = await Jd(a, l, p, s), m = await fetch(a.base + Ky, {
                   method: "POST",
                   headers: y,
                   body: JSON.stringify(i),
@@ -21608,7 +21608,7 @@ data: [DONE]
                 if (!m.ok) {
                   if (c = m.status, o = `HTTP ${m.status}: ${(await je(m)).slice(0, 300)}`, [401, 403, 429].includes(m.status) || m.status >= 500)
                     continue;
-                  return J(o, m.status, "upstream_error");
+                  return Y(o, m.status, "upstream_error");
                 }
                 if (!m.body) {
                   o = "\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", c = 502;
@@ -21640,7 +21640,7 @@ data: [DONE]
                 o = l.message || "\u672A\u77E5\u9519\u8BEF", c = 502;
                 continue;
               }
-            return J(`\u6240\u6709 CodeBuddy \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${o || "\u672A\u77E5"}`, c, "key_exhausted");
+            return Y(`\u6240\u6709 CodeBuddy \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${o || "\u672A\u77E5"}`, c, "key_exhausted");
           }
           async function Zd(e, t, n, r, a) {
             if (!t)
@@ -21654,7 +21654,7 @@ data: [DONE]
               let {
                 accessToken: i,
                 account: o
-              } = await _s(e, t, s), c = await Yd(s, i, o, true), u = await fetch(s.base + Ky, {
+              } = await _s(e, t, s), c = await Jd(s, i, o, true), u = await fetch(s.base + Ky, {
                 method: "POST",
                 headers: c,
                 body: JSON.stringify(Xd({
@@ -21688,7 +21688,7 @@ data: [DONE]
               let {
                 accessToken: s,
                 account: i
-              } = await _s(e, t, a), o = await Yd(a, s, i, false), u = [a.global ? b2 : y2, x2], l = "";
+              } = await _s(e, t, a), o = await Jd(a, s, i, false), u = [a.global ? b2 : y2, x2], l = "";
               for (let p of u) {
                 let y = await fetch(a.base + p, {
                   method: "GET",
@@ -21750,7 +21750,7 @@ data: [DONE]
             }
             return n;
           }
-          function V2(e) {
+          function G2(e) {
             let t = (i) => Number.isFinite(Number(i)) ? Number(i) : 0, n = t(e.CycleCapacitySize);
             if (n > 0) {
               let i = t(e.CycleCapacityRemain), o = n;
@@ -21816,7 +21816,7 @@ data: [DONE]
                   };
                 let x = ((_b2 = (_a = b == null ? void 0 : b.data) == null ? void 0 : _a.Response) == null ? void 0 : _b2.Data) || ((_c2 = b == null ? void 0 : b.data) == null ? void 0 : _c2.data) || (b == null ? void 0 : b.data) || {}, v = Array.isArray(x.Accounts) ? x.Accounts : [], k = 0, w = 0, _ = 0, T = [];
                 for (let I of v) {
-                  let j = V2(I);
+                  let j = G2(I);
                   k += j.remain, w += j.used, _ += j.size, T.push({
                     name: String((I == null ? void 0 : I.PackageName) || "\u5957\u9910"),
                     remain: j.remain,
@@ -21862,7 +21862,7 @@ data: [DONE]
             }
             return a;
           }
-          async function G2(e, t, n, r) {
+          async function V2(e, t, n, r) {
             var _a, _b2, _c2, _d2;
             if (!t)
               return {
@@ -21928,7 +21928,7 @@ data: [DONE]
               };
             }
           }
-          async function J2(e) {
+          async function Y2(e) {
             let t = String(e.ADMIN_PASSWORD || "");
             if (!t)
               return "";
@@ -21952,21 +21952,21 @@ data: [DONE]
           var b2;
           var x2;
           var Wy;
-          var Vy;
+          var Gy;
           var v2;
           var w2;
           var k2;
           var _2;
           var E2;
-          var Gy;
-          var Vd;
-          var Jy;
+          var Vy;
+          var Gd;
           var Yy;
+          var Jy;
           var T2;
           var I2;
           var $o = F(() => {
             "use strict";
-            Ye();
+            Je();
             bt();
             Mo = {
               base: "https://copilot.tencent.com",
@@ -21979,7 +21979,7 @@ data: [DONE]
               origin: "https://www.workbuddy.ai",
               global: true
             }, Lo = "5.5.4", d2 = "2.137.1", f2 = "CLI/2.63.2 CodeBuddy/2.63.2", p2 = "/v2/plugin/auth/state?platform=CLI", m2 = "/v2/plugin/auth/token", h2 = "/v2/plugin/login/account", g2 = "/v2/plugin/auth/token/refresh", Ky = "/v2/chat/completions", y2 = "/console/enterprises/personal/models", b2 = "/v2/enterprises/personal/models", x2 = "/v3/config";
-            Wy = "/meter/get-user-resource", Vy = "/meter/daily-checkin", v2 = Bo(Mo, Wy), w2 = Bo(Do, Wy), k2 = Bo(Mo, Vy), _2 = Bo(Do, Vy), E2 = "codebuddy-checkin-cron-v1", Gy = "codebuddy:at:", Vd = "codebuddy:auth:", Jy = "codebuddy:acct:", Yy = 3600, T2 = 2160 * 3600;
+            Wy = "/meter/get-user-resource", Gy = "/meter/daily-checkin", v2 = Bo(Mo, Wy), w2 = Bo(Do, Wy), k2 = Bo(Mo, Gy), _2 = Bo(Do, Gy), E2 = "codebuddy-checkin-cron-v1", Vy = "codebuddy:at:", Gd = "codebuddy:auth:", Yy = "codebuddy:acct:", Jy = 3600, T2 = 2160 * 3600;
             I2 = "high";
           });
           var lb = {};
@@ -22051,7 +22051,7 @@ data: [DONE]
             if (!eb.has(t)) {
               eb.add(t);
               try {
-                let n = await G(e).get(Ho + t);
+                let n = await V(e).get(Ho + t);
                 if (!n)
                   return;
                 let r = JSON.parse(n);
@@ -22065,20 +22065,20 @@ data: [DONE]
           }
           async function tb(e, t, n, r) {
             try {
-              let a = await G(e).get(Ho + t), s = a ? JSON.parse(a) : {};
-              s[n] = r, await G(e).put(Ho + t, JSON.stringify(s)).catch(() => {
+              let a = await V(e).get(Ho + t), s = a ? JSON.parse(a) : {};
+              s[n] = r, await V(e).put(Ho + t, JSON.stringify(s)).catch(() => {
               });
             } catch {
             }
           }
           async function nf(e, t, n, r) {
             try {
-              let a = ob(), s = await G(e).get(rf + t), i = s ? JSON.parse(s) : null, o = i && i.date === a && i.models ? i.models : {}, c = o[n] || {
+              let a = ob(), s = await V(e).get(rf + t), i = s ? JSON.parse(s) : null, o = i && i.date === a && i.models ? i.models : {}, c = o[n] || {
                 requests: 0,
                 promptTokens: 0,
                 completionTokens: 0
               };
-              c.requests += 1, c.promptTokens += r.promptTokens, c.completionTokens += r.completionTokens, o[n] = c, await G(e).put(rf + t, JSON.stringify({
+              c.requests += 1, c.promptTokens += r.promptTokens, c.completionTokens += r.completionTokens, o[n] = c, await V(e).put(rf + t, JSON.stringify({
                 date: a,
                 models: o
               })).catch(() => {
@@ -22243,7 +22243,7 @@ data: [DONE]
             var _a;
             let t = (e.refreshTokens || []).filter((l) => l && l.trim());
             if (t.length === 0)
-              return J("\u8BE5 cline \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Keys\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Cline refreshToken\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u81EA\u52A8\u83B7\u53D6\uFF09", 400, "configuration_error");
+              return Y("\u8BE5 cline \u6E20\u9053\u672A\u914D\u7F6E\u51ED\u636E\uFF1A\u8BF7\u5728\u300CAPI Keys\u300D\u91CC\u6BCF\u884C\u586B\u5165\u4E00\u4E2A Cline refreshToken\uFF08\u53EF\u70B9\u300C\u6388\u6743\u767B\u5F55\u300D\u81EA\u52A8\u83B7\u53D6\uFF09", 400, "configuration_error");
             let n = ((_a = e.body) == null ? void 0 : _a.stream) === true, r = rA(e.body, e.modelId, n), a = /* @__PURE__ */ new Map();
             for (let l of t)
               a.set(l, await ib(l));
@@ -22280,7 +22280,7 @@ data: [DONE]
                     ia.set(y, w), tb(e.env, p, e.modelId, w);
                     continue;
                   }
-                  return J(c, d.status, "upstream_error");
+                  return Y(c, d.status, "upstream_error");
                 }
                 if (!d.body) {
                   c = "\u4E0A\u6E38\u672A\u8FD4\u56DE\u54CD\u5E94\u4F53", u = 502;
@@ -22331,7 +22331,7 @@ data: [DONE]
                 continue;
               }
             }
-            return J(`\u6240\u6709 Cline \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c || "\u672A\u77E5"}`, u, "key_exhausted");
+            return Y(`\u6240\u6709 Cline \u8D26\u53F7\u5747\u5931\u8D25\uFF0C\u6700\u540E\u4E00\u6B21\u9519\u8BEF: ${c || "\u672A\u77E5"}`, u, "key_exhausted");
           }
           async function cb(e, t) {
             var _a, _b2;
@@ -22375,7 +22375,7 @@ data: [DONE]
             }
           }
           async function cA(e, t) {
-            let n = await ib(t), [r, a, s] = await Promise.all([cb(e, t), G(e).get(rf + n).catch(() => null), G(e).get(Ho + n).catch(() => null)]), i = {};
+            let n = await ib(t), [r, a, s] = await Promise.all([cb(e, t), V(e).get(rf + n).catch(() => null), V(e).get(Ho + n).catch(() => null)]), i = {};
             try {
               let c = JSON.parse(a || "null");
               c && c.date === ob() && c.models && (i = c.models);
@@ -22566,7 +22566,7 @@ data: [DONE]
           async function lf(e) {
             let t = new URLSearchParams({
               client_id: rb
-            }), n = await fetch(Y2, {
+            }), n = await fetch(J2, {
               method: "POST",
               headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -22583,7 +22583,7 @@ data: [DONE]
               throw new Error(`\u8BBE\u5907\u7801\u8BF7\u6C42\u5931\u8D25 HTTP ${n.status}: ${r.slice(0, 300)}`);
             let s = _e();
             try {
-              await G(e).put(Fo + s, JSON.stringify({
+              await V(e).put(Fo + s, JSON.stringify({
                 deviceCode: a.device_code
               }), {
                 expirationTtl: Math.max(300, Number(a.expires_in) || 600)
@@ -22603,7 +22603,7 @@ data: [DONE]
           }
           async function uf(e, t) {
             var _a, _b2, _c2;
-            let n = await G(e).get(Fo + t);
+            let n = await V(e).get(Fo + t);
             if (!n)
               return {
                 status: "error",
@@ -22639,7 +22639,7 @@ data: [DONE]
             if (o.error)
               return o.error === "authorization_pending" || o.error === "slow_down" ? {
                 status: "pending"
-              } : (await G(e).delete(Fo + t).catch(() => {
+              } : (await V(e).delete(Fo + t).catch(() => {
               }), o.error === "access_denied" ? {
                 status: "error",
                 message: "\u7528\u6237\u62D2\u7EDD\u4E86\u6388\u6743"
@@ -22681,7 +22681,7 @@ data: [DONE]
                 message: `Cline \u6CE8\u518C\u5931\u8D25: ${u.slice(0, 200)}`
               };
             let y = String(((_c2 = (_b2 = l == null ? void 0 : l.data) == null ? void 0 : _b2.userInfo) == null ? void 0 : _c2.email) || "");
-            return await G(e).put(Fo + t, JSON.stringify({
+            return await V(e).put(Fo + t, JSON.stringify({
               deviceCode: r.deviceCode,
               done: true,
               refreshToken: p,
@@ -22696,7 +22696,7 @@ data: [DONE]
             };
           }
           var xr;
-          var Y2;
+          var J2;
           var X2;
           var rb;
           var ab;
@@ -22712,9 +22712,9 @@ data: [DONE]
           var aA;
           var df = F(() => {
             "use strict";
-            Ye();
+            Je();
             bt();
-            xr = "https://api.cline.bot/api/v1", Y2 = "https://api.workos.com/user_management/authorize/device", X2 = "https://api.workos.com/user_management/authenticate", rb = "client_01K3A541FN8TA3EPPHTD2325AR", ab = {
+            xr = "https://api.cline.bot/api/v1", J2 = "https://api.workos.com/user_management/authorize/device", X2 = "https://api.workos.com/user_management/authenticate", rb = "client_01K3A541FN8TA3EPPHTD2325AR", ab = {
               "User-Agent": "Cline/3.0.47",
               "HTTP-Referer": "https://cline.bot",
               "X-Title": "Cline",
@@ -22806,17 +22806,17 @@ data: [DONE]
             return `${t.slice(0, 8)}-${t.slice(8, 12)}-${t.slice(12, 16)}-${t.slice(16, 20)}-${t.slice(20, 32)}`;
           }
           function ff(e) {
-            return fb(Yt(`machine:${e || "anonymous"}`));
+            return fb(Jt(`machine:${e || "anonymous"}`));
           }
           function pf(e) {
-            return fb(Yt(`machinetype:${e || "anonymous"}`)).replace(/-/g, "").slice(0, 18);
+            return fb(Jt(`machinetype:${e || "anonymous"}`)).replace(/-/g, "").slice(0, 18);
           }
           async function mf(e) {
             let t = await crypto.subtle.digest("SHA-512", oa(`machinetoken:${e || "anonymous"}`));
             return vA(new Uint8Array(t)).slice(0, 43);
           }
           function hf(e) {
-            return "DESKTOP-" + Yt(`hostname:${e || "anonymous"}`).slice(0, 7).toUpperCase();
+            return "DESKTOP-" + Jt(`hostname:${e || "anonymous"}`).slice(0, 7).toUpperCase();
           }
           async function pb(e, t) {
             let n = ff(t), r = await mf(t), a = pf(t), s = hf(t), i = [...crypto.getRandomValues(new Uint8Array(8))].map((l) => l.toString(16).padStart(2, "0")).join(""), o = Ts(TA(oa(i))), c = db({
@@ -22851,7 +22851,7 @@ data: [DONE]
               info: e.info,
               requestId: crypto.randomUUID(),
               version: "v1"
-            }))), s = String(Math.floor(Date.now() / 1e3)), i = Yt([a, e.cosyKey, s, t, AA(n)].join(`
+            }))), s = String(Math.floor(Date.now() / 1e3)), i = Jt([a, e.cosyKey, s, t, AA(n)].join(`
 `)), o = {
               "cosy-data-policy": "agree",
               "content-type": "application/json",
@@ -22903,22 +22903,22 @@ data: [DONE]
           var yA;
           var bA;
           var xA;
-          var G4;
+          var V4;
           var gb = F(() => {
             "use strict";
             oo();
-            uA = "_doRTgHZBKcGVjlvpC,@aFSx#DPuNJme&i*MzLOEn)sUrthbf%Y^w.(kIQyXqWA!", dA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/", fA = "c0f22307e5cd362e296bb04470f6de8fbf935ce24e8fcf511a0e2701329769c4a76e499bb938036a52af1eaf818cf79a2600620e3ce87e371d2ca6d85803606a1b3fa5e874643c9ed2db7e85673ef7227fca56e2e7c08f0927609bb896a9f24be1782099a66016a5bfdc3f1ff756bfc9e88d7b5dc5be30bf45a0223a00ebcecf", pA = BigInt("0x" + fA), mA = 65537n, hA = 128, Ko = "1.1.75", gA = "5", yA = "169.254.198.161", bA = "x86_64_linux", xA = new TextEncoder(), G4 = new TextDecoder();
+            uA = "_doRTgHZBKcGVjlvpC,@aFSx#DPuNJme&i*MzLOEn)sUrthbf%Y^w.(kIQyXqWA!", dA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/", fA = "c0f22307e5cd362e296bb04470f6de8fbf935ce24e8fcf511a0e2701329769c4a76e499bb938036a52af1eaf818cf79a2600620e3ce87e371d2ca6d85803606a1b3fa5e874643c9ed2db7e85673ef7227fca56e2e7c08f0927609bb896a9f24be1782099a66016a5bfdc3f1ff756bfc9e88d7b5dc5be30bf45a0223a00ebcecf", pA = BigInt("0x" + fA), mA = 65537n, hA = 128, Ko = "1.1.75", gA = "5", yA = "169.254.198.161", bA = "x86_64_linux", xA = new TextEncoder(), V4 = new TextDecoder();
           });
-          var Yo = {};
-          tt(Yo, {
+          var Jo = {};
+          tt(Jo, {
             QODER_CN_MODELS: () => xb,
-            QODER_MODELS: () => Jo,
+            QODER_MODELS: () => Yo,
             checkinQoder: () => XA,
             fetchQoderModels: () => kf,
             handleQoderRequest: () => vf,
             parseQoderCredential: () => As,
             pollQoderDeviceFlow: () => xf,
-            probeQoder: () => JA,
+            probeQoder: () => YA,
             qoderModelsFor: () => vb,
             regionFromBaseUrl: () => Mn,
             serializeQoderCredential: () => wb,
@@ -22929,7 +22929,7 @@ data: [DONE]
             return /qoder\.com\.cn/i.test(e || "") ? "cn" : "global";
           }
           function vb(e) {
-            return Mn(e) === "cn" ? xb : Jo;
+            return Mn(e) === "cn" ? xb : Yo;
           }
           function As(e) {
             let t = (e || "").trim();
@@ -22988,7 +22988,7 @@ data: [DONE]
             });
             n === "cn" && l.set("redirect_uri", OA);
             let p = `${r.website}/device/selectAccounts?${l.toString()}`, y = `qd-${Date.now().toString(36)}-${ut(6)}`;
-            return await V(e).setJSON(Go(y), {
+            return await G(e).setJSON(Vo(y), {
               verifier: s,
               nonce: c,
               region: n,
@@ -23019,7 +23019,7 @@ data: [DONE]
             }
           }
           async function xf(e, t) {
-            let n = V(e), r = await n.get(Go(t), {
+            let n = G(e), r = await n.get(Vo(t), {
               type: "json",
               consistency: "strong"
             });
@@ -23029,7 +23029,7 @@ data: [DONE]
                 message: "\u6388\u6743\u6D41\u7A0B\u4E0D\u5B58\u5728\u6216\u5DF2\u8FC7\u671F\uFF0C\u8BF7\u91CD\u65B0\u53D1\u8D77"
               };
             if (Date.now() - (r.at || 0) > IA)
-              return await n.delete(Go(t)).catch(() => {
+              return await n.delete(Vo(t)).catch(() => {
               }), {
                 status: "error",
                 message: "\u6388\u6743\u5DF2\u8D85\u65F6\uFF0C\u8BF7\u91CD\u65B0\u53D1\u8D77"
@@ -23080,7 +23080,7 @@ data: [DONE]
               region: a,
               issuedAt: Date.now()
             };
-            return await n.delete(Go(t)).catch(() => {
+            return await n.delete(Vo(t)).catch(() => {
             }), {
               status: "ok",
               refreshToken: wb(d),
@@ -23126,7 +23126,7 @@ data: [DONE]
                   n.type === "image" && n.source && (n.source.type === "base64" && n.source.data ? t.push(`data:${n.source.media_type || "image/png"};base64,${n.source.data}`) : n.source.type === "url" && n.source.url && t.push(String(n.source.url)));
             return t;
           }
-          function Vo() {
+          function Go() {
             return hb();
           }
           function kb(e) {
@@ -23155,7 +23155,7 @@ data: [DONE]
                   role: "user",
                   content: "",
                   contents: o,
-                  response_meta: Vo(),
+                  response_meta: Go(),
                   reasoning_content_signature: ""
                 });
                 continue;
@@ -23164,7 +23164,7 @@ data: [DONE]
                 let s = {
                   role: "assistant",
                   content: Ss(r.content),
-                  response_meta: Vo(),
+                  response_meta: Go(),
                   reasoning_content_signature: ""
                 };
                 Array.isArray(r.tool_calls) && r.tool_calls.length && (s.tool_calls = r.tool_calls), t.push(s);
@@ -23174,7 +23174,7 @@ data: [DONE]
                 let s = {
                   role: "tool",
                   content: Ss(r.content),
-                  response_meta: Vo(),
+                  response_meta: Go(),
                   reasoning_content_signature: ""
                 };
                 r.tool_call_id && (s.tool_call_id = String(r.tool_call_id)), r.name && (s.name = String(r.name)), t.push(s);
@@ -23190,7 +23190,7 @@ data: [DONE]
                 type: "text",
                 text: "hi"
               }],
-              response_meta: Vo(),
+              response_meta: Go(),
               reasoning_content_signature: ""
             }), t;
           }
@@ -23503,7 +23503,7 @@ data: [DONE]
               }
             }));
           }
-          function VA(e, t, n, r, a, s) {
+          function GA(e, t, n, r, a, s) {
             let i = `chatcmpl-${ut(12)}`, o = Math.floor(Date.now() / 1e3), c = {
               id: i,
               object: "chat.completion.chunk",
@@ -23564,7 +23564,7 @@ data: [DONE]
               content: r.content || (a.length ? null : "")
             };
             if (r.reasoning && (s.reasoning_content = r.reasoning), a.length && (s.tool_calls = a), ((_b2 = e.body) == null ? void 0 : _b2.stream) === true)
-              return VA(e.requestedModel, r.content, r.reasoning, a, r.finishReason, r.usage);
+              return GA(e.requestedModel, r.content, r.reasoning, a, r.finishReason, r.usage);
             let i = {
               id: `chatcmpl-${ut(12)}`,
               object: "chat.completion",
@@ -23641,7 +23641,7 @@ data: [DONE]
             }
             return null;
           }
-          async function JA(e, t, n) {
+          async function YA(e, t, n) {
             let r = As(t);
             if (!r)
               throw new Error("\u51ED\u636E\u683C\u5F0F\u65E0\u6548");
@@ -23650,7 +23650,7 @@ data: [DONE]
               accept: "application/json",
               "user-agent": ca[a].userAgent
             }, o = [];
-            for (let d of GA)
+            for (let d of VA)
               try {
                 let g = await fetch(s + d, {
                   headers: i,
@@ -23705,7 +23705,7 @@ data: [DONE]
               message: "\u4F7F\u7528 Qoder \u5B98\u65B9\u6A21\u578B\u76EE\u5F55\uFF08\u52A8\u6001\u76EE\u5F55\u9700\u5E26 body \u7684 GET\uFF0C\u8FB9\u7F18\u8FD0\u884C\u65F6\u4E0D\u53EF\u7528\uFF09"
             };
           }
-          async function YA(e) {
+          async function JA(e) {
             let t = {
               authorization: `Bearer ${e.deviceToken}`,
               accept: "application/json",
@@ -23728,7 +23728,7 @@ data: [DONE]
                 message: "\u51ED\u636E\u683C\u5F0F\u65E0\u6548"
               };
             n && (r.region = Mn(n));
-            let a = r.region === "cn" ? "openapi.qoder.com.cn" : "openapi.qoder.sh", s = await YA(r);
+            let a = r.region === "cn" ? "openapi.qoder.com.cn" : "openapi.qoder.sh", s = await JA(r);
             try {
               let i = await fetch(`https://${a}/sash/api/v1/me/campaigns`, {
                 headers: s,
@@ -23823,23 +23823,23 @@ data: [DONE]
           var CA;
           var NA;
           var OA;
-          var Go;
+          var Vo;
           var IA;
           var gf;
           var ca;
           var jA;
           var xb;
-          var Jo;
+          var Yo;
           var Wo;
           var RA;
           var BA;
-          var GA;
+          var VA;
           var Cs = F(() => {
             "use strict";
-            Ye();
+            Je();
             bt();
             gb();
-            CA = "1c5e33e1-364d-4ce6-b02c-acaa81274a5c", NA = "e883ade2-e6e3-4d6d-adf7-f92ceff5fdcb", OA = "qoder-work-cn://", Go = (e) => `qoder:flow:${e}`, IA = 600 * 1e3, gf = "/algo/api/v2/service/pro/sse/agent_chat_generation?FetchKeys=llm_model_result&AgentId=agent_common&Encode=1", ca = {
+            CA = "1c5e33e1-364d-4ce6-b02c-acaa81274a5c", NA = "e883ade2-e6e3-4d6d-adf7-f92ceff5fdcb", OA = "qoder-work-cn://", Vo = (e) => `qoder:flow:${e}`, IA = 600 * 1e3, gf = "/algo/api/v2/service/pro/sse/agent_chat_generation?FetchKeys=llm_model_result&AgentId=agent_common&Encode=1", ca = {
               cn: {
                 website: "https://qoder.com.cn",
                 openapi: "https://openapi.qoder.com.cn",
@@ -23852,7 +23852,7 @@ data: [DONE]
                 userAgent: "Qoder/1.1.75",
                 chatUrl: "https://api3.qoder.sh" + gf
               }
-            }, jA = ["https://api3.qoder.sh", "https://api2.qoder.sh", "https://api1.qoder.sh"].map((e) => e + gf), xb = ["auto", "qmodel_38max", "qfmodel", "qmodel_latest", "qmodel", "q37fmodel", "dmodel", "dfmodel", "gmodel", "gfmodel", "gm51model", "kmodel_latest", "kmodel", "mmodel", "lmodel"], Jo = ["auto", "qmodel_38max", "qfmodel", "qmodel_latest", "qmodel", "dmodel", "dfmodel", "gmodel", "gfmodel", "kmodel_latest", "kmodel", "mmodel", "lmodel", "ultimate", "performance", "efficient", "fast", "smodel", "cmodel"];
+            }, jA = ["https://api3.qoder.sh", "https://api2.qoder.sh", "https://api1.qoder.sh"].map((e) => e + gf), xb = ["auto", "qmodel_38max", "qfmodel", "qmodel_latest", "qmodel", "q37fmodel", "dmodel", "dfmodel", "gmodel", "gfmodel", "gm51model", "kmodel_latest", "kmodel", "mmodel", "lmodel"], Yo = ["auto", "qmodel_38max", "qfmodel", "qmodel_latest", "qmodel", "dmodel", "dfmodel", "gmodel", "gfmodel", "kmodel_latest", "kmodel", "mmodel", "lmodel", "ultimate", "performance", "efficient", "fast", "smodel", "cmodel"];
             Wo = /* @__PURE__ */ new Map(), RA = 50;
             BA = {
               auto: {
@@ -23982,7 +23982,7 @@ data: [DONE]
                 reasoning: false
               }
             };
-            GA = ["/api/v1/userinfo", "/api/v2/user/plan", "/api/v2/quota/usage", "/api/v1/quota/usage", "/sash/api/v1/me/quota", "/sash/api/v1/me/credits", "/sash/api/v1/me/campaigns"];
+            VA = ["/api/v1/userinfo", "/api/v2/user/plan", "/api/v2/quota/usage", "/api/v1/quota/usage", "/sash/api/v1/me/quota", "/sash/api/v1/me/credits", "/sash/api/v1/me/campaigns"];
           });
           var Pf = {};
           tt(Pf, {
@@ -24110,10 +24110,10 @@ data: [DONE]
             return `http://127.0.0.1:${18080 + Math.floor(Math.random() * 120)}${jb}`;
           }
           async function tC() {
-            let e = Ja(crypto.getRandomValues(new Uint8Array(48))), t = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(e));
+            let e = Ya(crypto.getRandomValues(new Uint8Array(48))), t = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(e));
             return {
               verifier: e,
-              challenge: Ja(new Uint8Array(t))
+              challenge: Ya(new Uint8Array(t))
             };
           }
           async function Sf(e, t) {
@@ -24128,7 +24128,7 @@ data: [DONE]
               callbackUrl: u,
               createdAt: Date.now()
             };
-            return await G(e).put(_f + s, JSON.stringify(p), {
+            return await V(e).put(_f + s, JSON.stringify(p), {
               expirationTtl: ZA
             }).catch((y) => {
               throw console.error("[trae] flow store failed", s.slice(0, 8), String(y)), new Error("\u6388\u6743\u4F1A\u8BDD\u5199\u5165\u5931\u8D25\uFF08\u5B58\u50A8\u5F02\u5E38\uFF09\uFF0C\u8BF7\u91CD\u8BD5");
@@ -24399,7 +24399,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
           async function Cf(e, t, n, r) {
             let a = null;
             try {
-              let g = await G(e).get(_f + n);
+              let g = await V(e).get(_f + n);
               g && (a = JSON.parse(g));
             } catch {
             }
@@ -24445,7 +24445,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
               clientId: o.clientId,
               issuedAt: Date.now()
             };
-            return await G(e).delete(_f + n).catch(() => {
+            return await V(e).delete(_f + n).catch(() => {
             }), {
               refreshToken: Ib(d),
               email: m || y || void 0,
@@ -24804,15 +24804,15 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
             var _a, _b2;
             let n = js(((_a = e.refreshTokens) == null ? void 0 : _a[0]) || "", t);
             if (!n)
-              return J("\u8BE5 Trae \u6E20\u9053\u672A\u914D\u7F6E\u6709\u6548\u51ED\u636E\uFF1A\u8BF7\u70B9\u300C\u7528 Trae \u8D26\u53F7\u6388\u6743\u300D\u5B8C\u6210\u6388\u6743\uFF0C\u6216\u7C98\u8D34\u542B refreshToken \u7684\u56DE\u8C03 URL", 400, "configuration_error");
+              return Y("\u8BE5 Trae \u6E20\u9053\u672A\u914D\u7F6E\u6709\u6548\u51ED\u636E\uFF1A\u8BF7\u70B9\u300C\u7528 Trae \u8D26\u53F7\u6388\u6743\u300D\u5B8C\u6210\u6388\u6743\uFF0C\u6216\u7C98\u8D34\u542B refreshToken \u7684\u56DE\u8C03 URL", 400, "configuration_error");
             let r = Xo(t, n), a = Ln(e.env, r), s = Tf(e.modelId || "");
             if (s.forcedRegion && s.forcedRegion !== r)
-              return J(`\u6A21\u578B\u524D\u7F00\u4E0E\u672C\u6E20\u9053\u533A\u57DF\u4E0D\u4E00\u81F4\uFF1A\u8BE5\u6E20\u9053\u662F${a.label}\uFF0C\u6A21\u578B ${e.modelId} \u6307\u5411${s.forcedRegion === "cn" ? "\u56FD\u5185\u7248" : "\u56FD\u9645\u7248"}\u3002\u8BF7\u6539\u8D70\u5BF9\u5E94\u533A\u57DF\u7684\u6E20\u9053`, 400, "invalid_request_error");
+              return Y(`\u6A21\u578B\u524D\u7F00\u4E0E\u672C\u6E20\u9053\u533A\u57DF\u4E0D\u4E00\u81F4\uFF1A\u8BE5\u6E20\u9053\u662F${a.label}\uFF0C\u6A21\u578B ${e.modelId} \u6307\u5411${s.forcedRegion === "cn" ? "\u56FD\u5185\u7248" : "\u56FD\u9645\u7248"}\u3002\u8BF7\u6539\u8D70\u5BF9\u5E94\u533A\u57DF\u7684\u6E20\u9053`, 400, "invalid_request_error");
             let i = s.model || e.modelId, o = ((_b2 = e.body) == null ? void 0 : _b2.stream) === true, c = "";
             try {
               c = await Zo(e.env, n);
             } catch (m) {
-              return J(m.message || "Trae \u51ED\u636E\u5237\u65B0\u5931\u8D25", 401, "authentication_error");
+              return Y(m.message || "Trae \u51ED\u636E\u5237\u65B0\u5931\u8D25", 401, "authentication_error");
             }
             let u = ec(a, n, c, true), l = e.requestedModel, p = "", y = 502;
             for (let m of ["raw", "utils"]) {
@@ -24830,7 +24830,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
                 } = await Bb(g), w = Os(v, k, g.status);
                 if (y = w.status, p = w.message, (g.status === 404 || g.status === 405) && m === "raw" || m === "raw" && v === "4001")
                   continue;
-                return J(w.message, w.status, w.type);
+                return Y(w.message, w.status, w.type);
               }
               if (!g.body) {
                 p = "\u4E0A\u6E38\u65E0\u54CD\u5E94\u4F53";
@@ -24850,7 +24850,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
               });
               if (h.error && !h.content) {
                 let v = Os(h.error.code, h.error.message);
-                return J(v.message, v.status, v.type);
+                return Y(v.message, v.status, v.type);
               }
               let b = h.usage || {
                 prompt_tokens: 0,
@@ -24891,7 +24891,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
                 }
               });
             }
-            return J(`Trae \u6240\u6709\u901A\u9053\u5747\u5931\u8D25\uFF1A${p || "\u672A\u77E5\u9519\u8BEF"}`, y, "upstream_error");
+            return Y(`Trae \u6240\u6709\u901A\u9053\u5747\u5931\u8D25\uFF1A${p || "\u672A\u77E5\u9519\u8BEF"}`, y, "upstream_error");
           }
           function Fb(e) {
             var _a, _b2, _c2;
@@ -25058,7 +25058,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
           var uC;
           var nc = F(() => {
             "use strict";
-            Ye();
+            Je();
             bt();
             Ab = {
               cn: {
@@ -25167,7 +25167,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
               };
             }
             if (t === "codebuddy") {
-              let a = await Gd(e, n);
+              let a = await Vd(e, n);
               return {
                 mode: "redirect-poll",
                 url: a.authUrl,
@@ -25243,7 +25243,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
             if (t === "grok")
               return Iy(e, n);
             if (t === "codebuddy")
-              return Jd(e, n);
+              return Yd(e, n);
             if (t === "zcode")
               return zd(e, n);
             if (t === "qoder")
@@ -25531,7 +25531,7 @@ ${(n.match(/.{1,64}/g) || [n]).join(`
                 mode: "redirect-poll",
                 regionSelect: true,
                 desc: "Qoder \u8D26\u53F7\u8BBE\u5907\u6388\u6743\uFF08\u56FD\u5185/\u56FD\u9645\u53CC\u533A\uFF09\uFF0CCOSY \u7B7E\u540D\u53CD\u4EE3\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\uFF1B\u652F\u6301\u6BCF\u65E5\u7B7E\u5230\u9886 Credits\u3002",
-                defaultModels: Jo.slice(0, 6)
+                defaultModels: Yo.slice(0, 6)
               },
               trae: {
                 type: "trae",
@@ -25920,7 +25920,7 @@ You should be concise, direct, and to the point. When you run a non-trivial bash
           }
           function _C(e, t = false) {
             let n = Date.now();
-            n !== Gb && (Gb = n, Df = 0), Df++;
+            n !== Vb && (Vb = n, Df = 0), Df++;
             let r = BigInt(n) * BigInt(4096) + BigInt(Df), a = t ? ~r : r, s = "";
             for (let i = 0; i < 6; i++) {
               let o = Number(a >> BigInt(40 - 8 * i) & BigInt(255));
@@ -25973,7 +25973,7 @@ ${Kb}`;
           function Lf(e, t, n = "") {
             return `${(/https?:\/\/opencode\.ai(?::\d+)?(?=\/|$)/i.test(e) ? e.replace(/\/zen\/v1(?=\/|$)/, "/inference/openai/v1").replace(/\/inference\/v1(?=\/|$)/, "/inference/openai/v1") : e).replace(/\/+$/, "")}/${t.replace(/^\/+/, "")}${n}`;
           }
-          function Jb(e) {
+          function Yb(e) {
             var _a, _b2;
             return `${((_a = e == null ? void 0 : e.function) == null ? void 0 : _a.name) ?? (e == null ? void 0 : e.name)}:${JSON.stringify((_b2 = e == null ? void 0 : e.function) == null ? void 0 : _b2.parameters)}`;
           }
@@ -26017,9 +26017,9 @@ ${t}`;
               let l = ((_a2 = u == null ? void 0 : u.function) == null ? void 0 : _a2.name) ?? (u == null ? void 0 : u.name);
               return a.has(l) ? false : jC(u) ? (typeof l == "string" && s.add(l), false) : true;
             }), o = ((_b2 = (_a = e == null ? void 0 : e.tool_choice) == null ? void 0 : _a.function) == null ? void 0 : _b2.name) ?? ((_c2 = e == null ? void 0 : e.tool_choice) == null ? void 0 : _c2.name);
-            typeof o == "string" && s.has(o) && (e.tool_choice = i.length > 0 ? "auto" : "none"), i.length === n.length && n.length >= Ps.length && Ps.every((u, l) => Jb(n[l]) === Jb(u)) || (e.tools = [...Ps.map((u) => JSON.parse(JSON.stringify(u))), ...i]), !r && e.tool_choice === void 0 && (e.tool_choice = "none"), OC(t, EC(Mf), NC);
+            typeof o == "string" && s.has(o) && (e.tool_choice = i.length > 0 ? "auto" : "none"), i.length === n.length && n.length >= Ps.length && Ps.every((u, l) => Yb(n[l]) === Yb(u)) || (e.tools = [...Ps.map((u) => JSON.parse(JSON.stringify(u))), ...i]), !r && e.tool_choice === void 0 && (e.tool_choice = "none"), OC(t, EC(Mf), NC);
           }
-          function Yb(e, t, n) {
+          function Jb(e, t, n) {
             let r = new Headers({
               "Content-Type": "application/json",
               Authorization: `Bearer ${e}`,
@@ -26090,7 +26090,7 @@ ${t}`;
             let i = await MC();
             if (i && !s) {
               let o = {};
-              Yb(n, a).forEach((l, p) => {
+              Jb(n, a).forEach((l, p) => {
                 o[p] = l;
               });
               let c = await i.fetch(t, {
@@ -26098,7 +26098,7 @@ ${t}`;
                 headers: o,
                 body: r.method === "GET" || r.method === "HEAD" ? void 0 : r.body,
                 transport: sx,
-                timeout: Vb
+                timeout: Gb
               }), u = new Headers();
               return c.headers && typeof c.headers.forEach == "function" && c.headers.forEach((l, p) => {
                 let y = p.toLowerCase();
@@ -26111,9 +26111,9 @@ ${t}`;
             }
             return e(t, {
               method: r.method,
-              headers: Yb(n, a, s),
+              headers: Jb(n, a, s),
               body: r.method === "GET" || r.method === "HEAD" ? void 0 : r.body,
-              signal: AbortSignal.timeout(Vb)
+              signal: AbortSignal.timeout(Gb)
             });
           }
           async function ic(e, t) {
@@ -26361,9 +26361,9 @@ ${t}`;
           var Zb;
           var xC;
           var vC;
-          var Vb;
-          var wC;
           var Gb;
+          var wC;
+          var Vb;
           var Df;
           var ex;
           var hM;
@@ -26375,8 +26375,8 @@ ${t}`;
           var $f = F(() => {
             "use strict";
             Wb();
-            Zb = "opencode", xC = "2.1.4", vC = "prod", Vb = 3e5, wC = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-            Gb = 0, Df = 0;
+            Zb = "opencode", xC = "2.1.4", vC = "prod", Gb = 3e5, wC = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+            Vb = 0, Df = 0;
             ex = "oc_relay_2f4c8a1d6b9e3f70c5a2d84b1e6f9073";
             hM = zb.slice(0, 80), NC = Mf.slice(0, 80);
             IC = ["getworkflowrun", "fillworkflowhole"];
@@ -26549,13 +26549,13 @@ ${t}`;
           function WC(e) {
             return e >= gt.UPPER_A && e <= gt.UPPER_F || e >= gt.LOWER_A && e <= gt.LOWER_F;
           }
-          function VC(e) {
+          function GC(e) {
             return e >= gt.UPPER_A && e <= gt.UPPER_Z || e >= gt.LOWER_A && e <= gt.LOWER_Z || Wf(e);
           }
-          function GC(e) {
-            return e === gt.EQUALS || VC(e);
+          function VC(e) {
+            return e === gt.EQUALS || GC(e);
           }
-          function JC(e, t, n, r) {
+          function YC(e, t, n, r) {
             let a = (t & $n.BRANCH_LENGTH) >> 7, s = t & $n.JUMP_TABLE;
             if (a === 0)
               return s !== 0 && r === s ? n : -1;
@@ -26669,8 +26669,8 @@ ${t}`;
                 } = this, a = r[this.treeIndex], s = (a & $n.VALUE_LENGTH) >> 14;
                 for (; n < t.length; n++, this.excess++) {
                   let i = t.charCodeAt(n);
-                  if (this.treeIndex = JC(r, a, this.treeIndex + Math.max(1, s), i), this.treeIndex < 0)
-                    return this.result === 0 || this.decodeMode === sn.Attribute && (s === 0 || GC(i)) ? 0 : this.emitNotTerminatedNamedEntity();
+                  if (this.treeIndex = YC(r, a, this.treeIndex + Math.max(1, s), i), this.treeIndex < 0)
+                    return this.result === 0 || this.decodeMode === sn.Attribute && (s === 0 || VC(i)) ? 0 : this.emitNotTerminatedNamedEntity();
                   if (a = r[this.treeIndex], s = (a & $n.VALUE_LENGTH) >> 14, s !== 0) {
                     if (i === gt.SEMI)
                       return this.emitNamedEntityData(this.treeIndex, s, this.consumed + this.excess);
@@ -26712,7 +26712,7 @@ ${t}`;
           });
           function vr(e) {
             var t;
-            return (t = YC.get(e)) !== null && t !== void 0 ? t : f.UNKNOWN;
+            return (t = JC.get(e)) !== null && t !== void 0 ? t : f.UNKNOWN;
           }
           function px(e, t) {
             return XC.has(e) || t && e === P.NOSCRIPT;
@@ -26722,7 +26722,7 @@ ${t}`;
           var At;
           var P;
           var f;
-          var YC;
+          var JC;
           var q;
           var fx;
           var Ds;
@@ -26743,7 +26743,7 @@ ${t}`;
             (function(e) {
               e[e.UNKNOWN = 0] = "UNKNOWN", e[e.A = 1] = "A", e[e.ADDRESS = 2] = "ADDRESS", e[e.ANNOTATION_XML = 3] = "ANNOTATION_XML", e[e.APPLET = 4] = "APPLET", e[e.AREA = 5] = "AREA", e[e.ARTICLE = 6] = "ARTICLE", e[e.ASIDE = 7] = "ASIDE", e[e.B = 8] = "B", e[e.BASE = 9] = "BASE", e[e.BASEFONT = 10] = "BASEFONT", e[e.BGSOUND = 11] = "BGSOUND", e[e.BIG = 12] = "BIG", e[e.BLOCKQUOTE = 13] = "BLOCKQUOTE", e[e.BODY = 14] = "BODY", e[e.BR = 15] = "BR", e[e.BUTTON = 16] = "BUTTON", e[e.CAPTION = 17] = "CAPTION", e[e.CENTER = 18] = "CENTER", e[e.CODE = 19] = "CODE", e[e.COL = 20] = "COL", e[e.COLGROUP = 21] = "COLGROUP", e[e.DD = 22] = "DD", e[e.DESC = 23] = "DESC", e[e.DETAILS = 24] = "DETAILS", e[e.DIALOG = 25] = "DIALOG", e[e.DIR = 26] = "DIR", e[e.DIV = 27] = "DIV", e[e.DL = 28] = "DL", e[e.DT = 29] = "DT", e[e.EM = 30] = "EM", e[e.EMBED = 31] = "EMBED", e[e.FIELDSET = 32] = "FIELDSET", e[e.FIGCAPTION = 33] = "FIGCAPTION", e[e.FIGURE = 34] = "FIGURE", e[e.FONT = 35] = "FONT", e[e.FOOTER = 36] = "FOOTER", e[e.FOREIGN_OBJECT = 37] = "FOREIGN_OBJECT", e[e.FORM = 38] = "FORM", e[e.FRAME = 39] = "FRAME", e[e.FRAMESET = 40] = "FRAMESET", e[e.H1 = 41] = "H1", e[e.H2 = 42] = "H2", e[e.H3 = 43] = "H3", e[e.H4 = 44] = "H4", e[e.H5 = 45] = "H5", e[e.H6 = 46] = "H6", e[e.HEAD = 47] = "HEAD", e[e.HEADER = 48] = "HEADER", e[e.HGROUP = 49] = "HGROUP", e[e.HR = 50] = "HR", e[e.HTML = 51] = "HTML", e[e.I = 52] = "I", e[e.IMG = 53] = "IMG", e[e.IMAGE = 54] = "IMAGE", e[e.INPUT = 55] = "INPUT", e[e.IFRAME = 56] = "IFRAME", e[e.KEYGEN = 57] = "KEYGEN", e[e.LABEL = 58] = "LABEL", e[e.LI = 59] = "LI", e[e.LINK = 60] = "LINK", e[e.LISTING = 61] = "LISTING", e[e.MAIN = 62] = "MAIN", e[e.MALIGNMARK = 63] = "MALIGNMARK", e[e.MARQUEE = 64] = "MARQUEE", e[e.MATH = 65] = "MATH", e[e.MENU = 66] = "MENU", e[e.META = 67] = "META", e[e.MGLYPH = 68] = "MGLYPH", e[e.MI = 69] = "MI", e[e.MO = 70] = "MO", e[e.MN = 71] = "MN", e[e.MS = 72] = "MS", e[e.MTEXT = 73] = "MTEXT", e[e.NAV = 74] = "NAV", e[e.NOBR = 75] = "NOBR", e[e.NOFRAMES = 76] = "NOFRAMES", e[e.NOEMBED = 77] = "NOEMBED", e[e.NOSCRIPT = 78] = "NOSCRIPT", e[e.OBJECT = 79] = "OBJECT", e[e.OL = 80] = "OL", e[e.OPTGROUP = 81] = "OPTGROUP", e[e.OPTION = 82] = "OPTION", e[e.P = 83] = "P", e[e.PARAM = 84] = "PARAM", e[e.PLAINTEXT = 85] = "PLAINTEXT", e[e.PRE = 86] = "PRE", e[e.RB = 87] = "RB", e[e.RP = 88] = "RP", e[e.RT = 89] = "RT", e[e.RTC = 90] = "RTC", e[e.RUBY = 91] = "RUBY", e[e.S = 92] = "S", e[e.SCRIPT = 93] = "SCRIPT", e[e.SEARCH = 94] = "SEARCH", e[e.SECTION = 95] = "SECTION", e[e.SELECT = 96] = "SELECT", e[e.SOURCE = 97] = "SOURCE", e[e.SMALL = 98] = "SMALL", e[e.SPAN = 99] = "SPAN", e[e.STRIKE = 100] = "STRIKE", e[e.STRONG = 101] = "STRONG", e[e.STYLE = 102] = "STYLE", e[e.SUB = 103] = "SUB", e[e.SUMMARY = 104] = "SUMMARY", e[e.SUP = 105] = "SUP", e[e.TABLE = 106] = "TABLE", e[e.TBODY = 107] = "TBODY", e[e.TEMPLATE = 108] = "TEMPLATE", e[e.TEXTAREA = 109] = "TEXTAREA", e[e.TFOOT = 110] = "TFOOT", e[e.TD = 111] = "TD", e[e.TH = 112] = "TH", e[e.THEAD = 113] = "THEAD", e[e.TITLE = 114] = "TITLE", e[e.TR = 115] = "TR", e[e.TRACK = 116] = "TRACK", e[e.TT = 117] = "TT", e[e.U = 118] = "U", e[e.UL = 119] = "UL", e[e.SVG = 120] = "SVG", e[e.VAR = 121] = "VAR", e[e.WBR = 122] = "WBR", e[e.XMP = 123] = "XMP";
             })(f || (f = {}));
-            YC = /* @__PURE__ */ new Map([[P.A, f.A], [P.ADDRESS, f.ADDRESS], [P.ANNOTATION_XML, f.ANNOTATION_XML], [P.APPLET, f.APPLET], [P.AREA, f.AREA], [P.ARTICLE, f.ARTICLE], [P.ASIDE, f.ASIDE], [P.B, f.B], [P.BASE, f.BASE], [P.BASEFONT, f.BASEFONT], [P.BGSOUND, f.BGSOUND], [P.BIG, f.BIG], [P.BLOCKQUOTE, f.BLOCKQUOTE], [P.BODY, f.BODY], [P.BR, f.BR], [P.BUTTON, f.BUTTON], [P.CAPTION, f.CAPTION], [P.CENTER, f.CENTER], [P.CODE, f.CODE], [P.COL, f.COL], [P.COLGROUP, f.COLGROUP], [P.DD, f.DD], [P.DESC, f.DESC], [P.DETAILS, f.DETAILS], [P.DIALOG, f.DIALOG], [P.DIR, f.DIR], [P.DIV, f.DIV], [P.DL, f.DL], [P.DT, f.DT], [P.EM, f.EM], [P.EMBED, f.EMBED], [P.FIELDSET, f.FIELDSET], [P.FIGCAPTION, f.FIGCAPTION], [P.FIGURE, f.FIGURE], [P.FONT, f.FONT], [P.FOOTER, f.FOOTER], [P.FOREIGN_OBJECT, f.FOREIGN_OBJECT], [P.FORM, f.FORM], [P.FRAME, f.FRAME], [P.FRAMESET, f.FRAMESET], [P.H1, f.H1], [P.H2, f.H2], [P.H3, f.H3], [P.H4, f.H4], [P.H5, f.H5], [P.H6, f.H6], [P.HEAD, f.HEAD], [P.HEADER, f.HEADER], [P.HGROUP, f.HGROUP], [P.HR, f.HR], [P.HTML, f.HTML], [P.I, f.I], [P.IMG, f.IMG], [P.IMAGE, f.IMAGE], [P.INPUT, f.INPUT], [P.IFRAME, f.IFRAME], [P.KEYGEN, f.KEYGEN], [P.LABEL, f.LABEL], [P.LI, f.LI], [P.LINK, f.LINK], [P.LISTING, f.LISTING], [P.MAIN, f.MAIN], [P.MALIGNMARK, f.MALIGNMARK], [P.MARQUEE, f.MARQUEE], [P.MATH, f.MATH], [P.MENU, f.MENU], [P.META, f.META], [P.MGLYPH, f.MGLYPH], [P.MI, f.MI], [P.MO, f.MO], [P.MN, f.MN], [P.MS, f.MS], [P.MTEXT, f.MTEXT], [P.NAV, f.NAV], [P.NOBR, f.NOBR], [P.NOFRAMES, f.NOFRAMES], [P.NOEMBED, f.NOEMBED], [P.NOSCRIPT, f.NOSCRIPT], [P.OBJECT, f.OBJECT], [P.OL, f.OL], [P.OPTGROUP, f.OPTGROUP], [P.OPTION, f.OPTION], [P.P, f.P], [P.PARAM, f.PARAM], [P.PLAINTEXT, f.PLAINTEXT], [P.PRE, f.PRE], [P.RB, f.RB], [P.RP, f.RP], [P.RT, f.RT], [P.RTC, f.RTC], [P.RUBY, f.RUBY], [P.S, f.S], [P.SCRIPT, f.SCRIPT], [P.SEARCH, f.SEARCH], [P.SECTION, f.SECTION], [P.SELECT, f.SELECT], [P.SOURCE, f.SOURCE], [P.SMALL, f.SMALL], [P.SPAN, f.SPAN], [P.STRIKE, f.STRIKE], [P.STRONG, f.STRONG], [P.STYLE, f.STYLE], [P.SUB, f.SUB], [P.SUMMARY, f.SUMMARY], [P.SUP, f.SUP], [P.TABLE, f.TABLE], [P.TBODY, f.TBODY], [P.TEMPLATE, f.TEMPLATE], [P.TEXTAREA, f.TEXTAREA], [P.TFOOT, f.TFOOT], [P.TD, f.TD], [P.TH, f.TH], [P.THEAD, f.THEAD], [P.TITLE, f.TITLE], [P.TR, f.TR], [P.TRACK, f.TRACK], [P.TT, f.TT], [P.U, f.U], [P.UL, f.UL], [P.SVG, f.SVG], [P.VAR, f.VAR], [P.WBR, f.WBR], [P.XMP, f.XMP]]);
+            JC = /* @__PURE__ */ new Map([[P.A, f.A], [P.ADDRESS, f.ADDRESS], [P.ANNOTATION_XML, f.ANNOTATION_XML], [P.APPLET, f.APPLET], [P.AREA, f.AREA], [P.ARTICLE, f.ARTICLE], [P.ASIDE, f.ASIDE], [P.B, f.B], [P.BASE, f.BASE], [P.BASEFONT, f.BASEFONT], [P.BGSOUND, f.BGSOUND], [P.BIG, f.BIG], [P.BLOCKQUOTE, f.BLOCKQUOTE], [P.BODY, f.BODY], [P.BR, f.BR], [P.BUTTON, f.BUTTON], [P.CAPTION, f.CAPTION], [P.CENTER, f.CENTER], [P.CODE, f.CODE], [P.COL, f.COL], [P.COLGROUP, f.COLGROUP], [P.DD, f.DD], [P.DESC, f.DESC], [P.DETAILS, f.DETAILS], [P.DIALOG, f.DIALOG], [P.DIR, f.DIR], [P.DIV, f.DIV], [P.DL, f.DL], [P.DT, f.DT], [P.EM, f.EM], [P.EMBED, f.EMBED], [P.FIELDSET, f.FIELDSET], [P.FIGCAPTION, f.FIGCAPTION], [P.FIGURE, f.FIGURE], [P.FONT, f.FONT], [P.FOOTER, f.FOOTER], [P.FOREIGN_OBJECT, f.FOREIGN_OBJECT], [P.FORM, f.FORM], [P.FRAME, f.FRAME], [P.FRAMESET, f.FRAMESET], [P.H1, f.H1], [P.H2, f.H2], [P.H3, f.H3], [P.H4, f.H4], [P.H5, f.H5], [P.H6, f.H6], [P.HEAD, f.HEAD], [P.HEADER, f.HEADER], [P.HGROUP, f.HGROUP], [P.HR, f.HR], [P.HTML, f.HTML], [P.I, f.I], [P.IMG, f.IMG], [P.IMAGE, f.IMAGE], [P.INPUT, f.INPUT], [P.IFRAME, f.IFRAME], [P.KEYGEN, f.KEYGEN], [P.LABEL, f.LABEL], [P.LI, f.LI], [P.LINK, f.LINK], [P.LISTING, f.LISTING], [P.MAIN, f.MAIN], [P.MALIGNMARK, f.MALIGNMARK], [P.MARQUEE, f.MARQUEE], [P.MATH, f.MATH], [P.MENU, f.MENU], [P.META, f.META], [P.MGLYPH, f.MGLYPH], [P.MI, f.MI], [P.MO, f.MO], [P.MN, f.MN], [P.MS, f.MS], [P.MTEXT, f.MTEXT], [P.NAV, f.NAV], [P.NOBR, f.NOBR], [P.NOFRAMES, f.NOFRAMES], [P.NOEMBED, f.NOEMBED], [P.NOSCRIPT, f.NOSCRIPT], [P.OBJECT, f.OBJECT], [P.OL, f.OL], [P.OPTGROUP, f.OPTGROUP], [P.OPTION, f.OPTION], [P.P, f.P], [P.PARAM, f.PARAM], [P.PLAINTEXT, f.PLAINTEXT], [P.PRE, f.PRE], [P.RB, f.RB], [P.RP, f.RP], [P.RT, f.RT], [P.RTC, f.RTC], [P.RUBY, f.RUBY], [P.S, f.S], [P.SCRIPT, f.SCRIPT], [P.SEARCH, f.SEARCH], [P.SECTION, f.SECTION], [P.SELECT, f.SELECT], [P.SOURCE, f.SOURCE], [P.SMALL, f.SMALL], [P.SPAN, f.SPAN], [P.STRIKE, f.STRIKE], [P.STRONG, f.STRONG], [P.STYLE, f.STYLE], [P.SUB, f.SUB], [P.SUMMARY, f.SUMMARY], [P.SUP, f.SUP], [P.TABLE, f.TABLE], [P.TBODY, f.TBODY], [P.TEMPLATE, f.TEMPLATE], [P.TEXTAREA, f.TEXTAREA], [P.TFOOT, f.TFOOT], [P.TD, f.TD], [P.TH, f.TH], [P.THEAD, f.THEAD], [P.TITLE, f.TITLE], [P.TR, f.TR], [P.TRACK, f.TRACK], [P.TT, f.TT], [P.U, f.U], [P.UL, f.UL], [P.SVG, f.SVG], [P.VAR, f.VAR], [P.WBR, f.WBR], [P.XMP, f.XMP]]);
             q = f, fx = {
               [$.HTML]: /* @__PURE__ */ new Set([q.ADDRESS, q.APPLET, q.AREA, q.ARTICLE, q.ASIDE, q.BASE, q.BASEFONT, q.BGSOUND, q.BLOCKQUOTE, q.BODY, q.BR, q.BUTTON, q.CAPTION, q.CENTER, q.COL, q.COLGROUP, q.DD, q.DETAILS, q.DIR, q.DIV, q.DL, q.DT, q.EMBED, q.FIELDSET, q.FIGCAPTION, q.FIGURE, q.FOOTER, q.FORM, q.FRAME, q.FRAMESET, q.H1, q.H2, q.H3, q.H4, q.H5, q.H6, q.HEAD, q.HEADER, q.HGROUP, q.HR, q.HTML, q.IFRAME, q.IMG, q.INPUT, q.LI, q.LINK, q.LISTING, q.MAIN, q.MARQUEE, q.MENU, q.META, q.NAV, q.NOEMBED, q.NOFRAMES, q.NOSCRIPT, q.OBJECT, q.OL, q.P, q.PARAM, q.PLAINTEXT, q.PRE, q.SCRIPT, q.SECTION, q.SELECT, q.SOURCE, q.STYLE, q.SUMMARY, q.TABLE, q.TBODY, q.TD, q.TEMPLATE, q.TEXTAREA, q.TFOOT, q.TH, q.THEAD, q.TITLE, q.TR, q.TRACK, q.UL, q.WBR, q.XMP]),
               [$.MATHML]: /* @__PURE__ */ new Set([q.MI, q.MO, q.MN, q.MS, q.MTEXT, q.ANNOTATION_XML]),
@@ -26783,7 +26783,7 @@ ${t}`;
           var S;
           var kt;
           var Us;
-          var Vf = F(() => {
+          var Gf = F(() => {
             lx();
             uc();
             pc();
@@ -29041,14 +29041,14 @@ ${t}`;
               name: r
             }) => r === hn.COLOR || r === hn.SIZE || r === hn.FACE) || xN.has(t);
           }
-          function Gf(e) {
+          function Vf(e) {
             for (let t = 0; t < e.attrs.length; t++)
               if (e.attrs[t].name === mN) {
                 e.attrs[t].name = hN;
                 break;
               }
           }
-          function Jf(e) {
+          function Yf(e) {
             for (let t = 0; t < e.attrs.length; t++) {
               let n = gN.get(e.attrs[t].name);
               n != null && (e.attrs[t].name = n);
@@ -29087,7 +29087,7 @@ ${t}`;
           var yN;
           var bN;
           var xN;
-          var Yf = F(() => {
+          var Jf = F(() => {
             gn();
             Ix = {
               TEXT_HTML: "text/html",
@@ -29466,16 +29466,16 @@ ${t}`;
             let n = e.openElements.tryPeekProperlyNestedBodyElement();
             e.framesetOk && n && (e.treeAdapter.detachNode(n), e.openElements.popAllUpToHtmlElement(), e._insertElement(t, $.HTML), e.insertionMode = N.IN_FRAMESET);
           }
-          function VN(e, t) {
+          function GN(e, t) {
             e.openElements.hasInButtonScope(f.P) && e._closePElement(), e._insertElement(t, $.HTML);
           }
-          function GN(e, t) {
+          function VN(e, t) {
             e.openElements.hasInButtonScope(f.P) && e._closePElement(), e.openElements.currentTagId !== void 0 && Ds.has(e.openElements.currentTagId) && e.openElements.pop(), e._insertElement(t, $.HTML);
           }
-          function JN(e, t) {
+          function YN(e, t) {
             e.openElements.hasInButtonScope(f.P) && e._closePElement(), e._insertElement(t, $.HTML), e.skipNextNewLine = true, e.framesetOk = false;
           }
-          function YN(e, t) {
+          function JN(e, t) {
             let n = e.openElements.tmplCount > 0;
             (!e.formElement || n) && (e.openElements.hasInButtonScope(f.P) && e._closePElement(), e._insertElement(t, $.HTML), n || (e.formElement = e.openElements.current));
           }
@@ -29559,10 +29559,10 @@ ${t}`;
             e.openElements.hasInScope(f.RUBY) && e.openElements.generateImpliedEndTagsWithExclusion(f.RTC), e._insertElement(t, $.HTML);
           }
           function gO(e, t) {
-            e._reconstructActiveFormattingElements(), Gf(t), wc(t), t.selfClosing ? e._appendElement(t, $.MATHML) : e._insertElement(t, $.MATHML), t.ackSelfClosing = true;
+            e._reconstructActiveFormattingElements(), Vf(t), wc(t), t.selfClosing ? e._appendElement(t, $.MATHML) : e._insertElement(t, $.MATHML), t.ackSelfClosing = true;
           }
           function yO(e, t) {
-            e._reconstructActiveFormattingElements(), Jf(t), wc(t), t.selfClosing ? e._appendElement(t, $.SVG) : e._insertElement(t, $.SVG), t.ackSelfClosing = true;
+            e._reconstructActiveFormattingElements(), Yf(t), wc(t), t.selfClosing ? e._appendElement(t, $.SVG) : e._insertElement(t, $.SVG), t.ackSelfClosing = true;
           }
           function Ux(e, t) {
             e._reconstructActiveFormattingElements(), e._insertElement(t, $.HTML);
@@ -29594,7 +29594,7 @@ ${t}`;
               case f.H4:
               case f.H5:
               case f.H6: {
-                GN(e, t);
+                VN(e, t);
                 break;
               }
               case f.P:
@@ -29622,7 +29622,7 @@ ${t}`;
               case f.FIELDSET:
               case f.BLOCKQUOTE:
               case f.FIGCAPTION: {
-                VN(e, t);
+                GN(e, t);
                 break;
               }
               case f.LI:
@@ -29656,7 +29656,7 @@ ${t}`;
               }
               case f.PRE:
               case f.LISTING: {
-                JN(e, t);
+                YN(e, t);
                 break;
               }
               case f.XMP: {
@@ -29688,7 +29688,7 @@ ${t}`;
                 break;
               }
               case f.FORM: {
-                YN(e, t);
+                JN(e, t);
                 break;
               }
               case f.NOBR: {
@@ -29943,7 +29943,7 @@ ${t}`;
             if (e.openElements.currentTagId !== void 0 && Bx.has(e.openElements.currentTagId))
               switch (e.pendingCharacterTokens.length = 0, e.hasNonWhitespacePendingCharacterToken = false, e.originalInsertionMode = e.insertionMode, e.insertionMode = N.IN_TABLE_TEXT, t.type) {
                 case $e.CHARACTER: {
-                  Vx(e, t);
+                  Gx(e, t);
                   break;
                 }
                 case $e.WHITESPACE_CHARACTER: {
@@ -29952,7 +29952,7 @@ ${t}`;
                 }
               }
             else
-              Gs(e, t);
+              Vs(e, t);
           }
           function OO(e, t) {
             e.openElements.clearBackToTableContext(), e.activeFormattingElements.insertMarker(), e._insertElement(t, $.HTML), e.insertionMode = N.IN_CAPTION;
@@ -29973,7 +29973,7 @@ ${t}`;
             e.openElements.hasInTableScope(f.TABLE) && (e.openElements.popUntilTagNamePopped(f.TABLE), e._resetInsertionMode(), e._processStartTag(t));
           }
           function DO(e, t) {
-            zx(t) ? e._appendElement(t, $.HTML) : Gs(e, t), t.ackSelfClosing = true;
+            zx(t) ? e._appendElement(t, $.HTML) : Vs(e, t), t.ackSelfClosing = true;
           }
           function LO(e, t) {
             !e.formElement && e.openElements.tmplCount === 0 && (e._insertElement(t, $.HTML), e.formElement = e.openElements.current, e.openElements.pop());
@@ -30023,10 +30023,10 @@ ${t}`;
                 break;
               }
               default:
-                Gs(e, t);
+                Vs(e, t);
             }
           }
-          function Vs(e, t) {
+          function Gs(e, t) {
             switch (t.tagID) {
               case f.TABLE: {
                 e.openElements.hasInTableScope(f.TABLE) && (e.openElements.popUntilTagNamePopped(f.TABLE), e._resetInsertionMode());
@@ -30049,24 +30049,24 @@ ${t}`;
               case f.TR:
                 break;
               default:
-                Gs(e, t);
+                Vs(e, t);
             }
           }
-          function Gs(e, t) {
+          function Vs(e, t) {
             let n = e.fosterParentingEnabled;
             e.fosterParentingEnabled = true, Tc(e, t), e.fosterParentingEnabled = n;
           }
           function Wx(e, t) {
             e.pendingCharacterTokens.push(t);
           }
-          function Vx(e, t) {
+          function Gx(e, t) {
             e.pendingCharacterTokens.push(t), e.hasNonWhitespacePendingCharacterToken = true;
           }
           function $s(e, t) {
             let n = 0;
             if (e.hasNonWhitespacePendingCharacterToken)
               for (; n < e.pendingCharacterTokens.length; n++)
-                Gs(e, e.pendingCharacterTokens[n]);
+                Vs(e, e.pendingCharacterTokens[n]);
             else
               for (; n < e.pendingCharacterTokens.length; n++)
                 e._insertCharacters(e.pendingCharacterTokens[n]);
@@ -30074,14 +30074,14 @@ ${t}`;
           }
           function UO(e, t) {
             let n = t.tagID;
-            Gx.has(n) ? e.openElements.hasInTableScope(f.CAPTION) && (e.openElements.generateImpliedEndTags(), e.openElements.popUntilTagNamePopped(f.CAPTION), e.activeFormattingElements.clearToLastMarker(), e.insertionMode = N.IN_TABLE, la(e, t)) : _t(e, t);
+            Vx.has(n) ? e.openElements.hasInTableScope(f.CAPTION) && (e.openElements.generateImpliedEndTags(), e.openElements.popUntilTagNamePopped(f.CAPTION), e.activeFormattingElements.clearToLastMarker(), e.insertionMode = N.IN_TABLE, la(e, t)) : _t(e, t);
           }
           function BO(e, t) {
             let n = t.tagID;
             switch (n) {
               case f.CAPTION:
               case f.TABLE: {
-                e.openElements.hasInTableScope(f.CAPTION) && (e.openElements.generateImpliedEndTags(), e.openElements.popUntilTagNamePopped(f.CAPTION), e.activeFormattingElements.clearToLastMarker(), e.insertionMode = N.IN_TABLE, n === f.TABLE && Vs(e, t));
+                e.openElements.hasInTableScope(f.CAPTION) && (e.openElements.generateImpliedEndTags(), e.openElements.popUntilTagNamePopped(f.CAPTION), e.activeFormattingElements.clearToLastMarker(), e.insertionMode = N.IN_TABLE, n === f.TABLE && Gs(e, t));
                 break;
               }
               case f.BODY:
@@ -30170,7 +30170,7 @@ ${t}`;
                 break;
               }
               case f.TABLE: {
-                e.openElements.hasTableBodyContextInTableScope() && (e.openElements.clearBackToTableBodyContext(), e.openElements.pop(), e.insertionMode = N.IN_TABLE, Vs(e, t));
+                e.openElements.hasTableBodyContextInTableScope() && (e.openElements.clearBackToTableBodyContext(), e.openElements.pop(), e.insertionMode = N.IN_TABLE, Gs(e, t));
                 break;
               }
               case f.BODY:
@@ -30183,7 +30183,7 @@ ${t}`;
               case f.TR:
                 break;
               default:
-                Vs(e, t);
+                Gs(e, t);
             }
           }
           function Cc(e, t) {
@@ -30207,7 +30207,7 @@ ${t}`;
                 la(e, t);
             }
           }
-          function Jx(e, t) {
+          function Yx(e, t) {
             switch (t.tagID) {
               case f.TR: {
                 e.openElements.hasInTableScope(f.TR) && (e.openElements.clearBackToTableRowContext(), e.openElements.pop(), e.insertionMode = N.IN_TABLE_BODY);
@@ -30232,12 +30232,12 @@ ${t}`;
               case f.TH:
                 break;
               default:
-                Vs(e, t);
+                Gs(e, t);
             }
           }
           function FO(e, t) {
             let n = t.tagID;
-            Gx.has(n) ? (e.openElements.hasInTableScope(f.TD) || e.openElements.hasInTableScope(f.TH)) && (e._closeTableCell(), Cc(e, t)) : _t(e, t);
+            Vx.has(n) ? (e.openElements.hasInTableScope(f.TD) || e.openElements.hasInTableScope(f.TH)) && (e._closeTableCell(), Cc(e, t)) : _t(e, t);
           }
           function HO(e, t) {
             let n = t.tagID;
@@ -30252,7 +30252,7 @@ ${t}`;
               case f.TFOOT:
               case f.THEAD:
               case f.TR: {
-                e.openElements.hasInTableScope(n) && (e._closeTableCell(), Jx(e, t));
+                e.openElements.hasInTableScope(n) && (e._closeTableCell(), Yx(e, t));
                 break;
               }
               case f.BODY:
@@ -30265,7 +30265,7 @@ ${t}`;
                 Sc(e, t);
             }
           }
-          function Yx(e, t) {
+          function Jx(e, t) {
             switch (t.tagID) {
               case f.HTML: {
                 _t(e, t);
@@ -30321,7 +30321,7 @@ ${t}`;
           }
           function zO(e, t) {
             let n = t.tagID;
-            n === f.CAPTION || n === f.TABLE || n === f.TBODY || n === f.TFOOT || n === f.THEAD || n === f.TR || n === f.TD || n === f.TH ? (e.openElements.popUntilTagNamePopped(f.SELECT), e._resetInsertionMode(), e._processStartTag(t)) : Yx(e, t);
+            n === f.CAPTION || n === f.TABLE || n === f.TBODY || n === f.TFOOT || n === f.THEAD || n === f.TR || n === f.TD || n === f.TH ? (e.openElements.popUntilTagNamePopped(f.SELECT), e._resetInsertionMode(), e._processStartTag(t)) : Jx(e, t);
           }
           function qO(e, t) {
             let n = t.tagID;
@@ -30373,7 +30373,7 @@ ${t}`;
           function Qx(e, t) {
             e.openElements.tmplCount > 0 ? (e.openElements.popUntilTagNamePopped(f.TEMPLATE), e.activeFormattingElements.clearToLastMarker(), e.tmplInsertionModeStack.shift(), e._resetInsertionMode(), e.onEof(t)) : tp(e, t);
           }
-          function VO(e, t) {
+          function GO(e, t) {
             t.tagID === f.HTML ? _t(e, t) : Ec(e, t);
           }
           function Zx(e, t) {
@@ -30390,7 +30390,7 @@ ${t}`;
           function Ec(e, t) {
             e.insertionMode = N.IN_BODY, Tc(e, t);
           }
-          function GO(e, t) {
+          function VO(e, t) {
             switch (t.tagID) {
               case f.HTML: {
                 _t(e, t);
@@ -30411,10 +30411,10 @@ ${t}`;
               default:
             }
           }
-          function JO(e, t) {
+          function YO(e, t) {
             t.tagID === f.FRAMESET && !e.openElements.isRootHtmlElementCurrent() && (e.openElements.pop(), !e.fragmentContext && e.openElements.currentTagId !== f.FRAMESET && (e.insertionMode = N.AFTER_FRAMESET));
           }
-          function YO(e, t) {
+          function JO(e, t) {
             switch (t.tagID) {
               case f.HTML: {
                 _t(e, t);
@@ -30464,7 +30464,7 @@ ${t}`;
               e1(e), e._startTagOutsideForeignContent(t);
             else {
               let n = e._getAdjustedCurrentElement(), r = e.treeAdapter.getNamespaceURI(n);
-              r === $.MATHML ? Gf(t) : r === $.SVG && (Px(t), Jf(t)), wc(t), t.selfClosing ? e._appendElement(t, r) : e._insertElement(t, r), t.ackSelfClosing = true;
+              r === $.MATHML ? Vf(t) : r === $.SVG && (Px(t), Yf(t)), wc(t), t.selfClosing ? e._appendElement(t, r) : e._insertElement(t, r), t.ackSelfClosing = true;
             }
           }
           function rI(e, t) {
@@ -30493,14 +30493,14 @@ ${t}`;
           var Bx;
           var Dx;
           var Ws;
-          var Gx;
+          var Vx;
           var rp = F(() => {
-            Vf();
+            Gf();
             wx();
             _x();
             vc();
             Ox();
-            Yf();
+            Jf();
             Ms();
             uc();
             gn();
@@ -30949,7 +30949,7 @@ ${t}`;
                     break;
                   }
                   case N.IN_TABLE_TEXT: {
-                    Vx(this, t);
+                    Gx(this, t);
                     break;
                   }
                   case N.IN_COLUMN_GROUP: {
@@ -31150,7 +31150,7 @@ ${t}`;
                     break;
                   }
                   case N.IN_SELECT: {
-                    Yx(this, t);
+                    Jx(this, t);
                     break;
                   }
                   case N.IN_SELECT_IN_TABLE: {
@@ -31162,15 +31162,15 @@ ${t}`;
                     break;
                   }
                   case N.AFTER_BODY: {
-                    VO(this, t);
-                    break;
-                  }
-                  case N.IN_FRAMESET: {
                     GO(this, t);
                     break;
                   }
+                  case N.IN_FRAMESET: {
+                    VO(this, t);
+                    break;
+                  }
                   case N.AFTER_FRAMESET: {
-                    YO(this, t);
+                    JO(this, t);
                     break;
                   }
                   case N.AFTER_AFTER_BODY: {
@@ -31222,7 +31222,7 @@ ${t}`;
                     break;
                   }
                   case N.IN_TABLE: {
-                    Vs(this, t);
+                    Gs(this, t);
                     break;
                   }
                   case N.IN_TABLE_TEXT: {
@@ -31242,7 +31242,7 @@ ${t}`;
                     break;
                   }
                   case N.IN_ROW: {
-                    Jx(this, t);
+                    Yx(this, t);
                     break;
                   }
                   case N.IN_CELL: {
@@ -31266,7 +31266,7 @@ ${t}`;
                     break;
                   }
                   case N.IN_FRAMESET: {
-                    JO(this, t);
+                    YO(this, t);
                     break;
                   }
                   case N.AFTER_FRAMESET: {
@@ -31388,7 +31388,7 @@ ${t}`;
                 }
               }
             };
-            Gx = /* @__PURE__ */ new Set([f.CAPTION, f.COL, f.COLGROUP, f.TBODY, f.TD, f.TFOOT, f.TH, f.THEAD, f.TR]);
+            Vx = /* @__PURE__ */ new Set([f.CAPTION, f.COL, f.COLGROUP, f.TBODY, f.TD, f.TFOOT, f.TH, f.THEAD, f.TR]);
           });
           function t1(e, t) {
             return function(r) {
@@ -31496,10 +31496,10 @@ ${t}`;
             rp();
             o1();
             Ms();
-            Yf();
+            Jf();
             gn();
             pc();
-            Vf();
+            Gf();
           });
           var f1 = ml((pD, Nc) => {
             "use strict";
@@ -31559,7 +31559,7 @@ ${t}`;
                 var fe, ue, ve, re, Pe, Ue, et, de, H = 0, ee, se = 8, Re = 64;
                 for (ee = 0; ee < se; ++ee) {
                   fe = D[H], ue = D[H + 1], ve = D[H + 2], re = D[H + 3], Pe = D[H + 4], Ue = D[H + 5], et = D[H + 6], de = D[H + 7];
-                  var we = fe + de, be = fe - de, Me = ue + et, he = ue - et, He = ve + Ue, ot = ve - Ue, Ge = re + Pe, Ct = re - Pe, Et = we + Ge, un = we - Ge, Ar = Me + He, Cr = Me - He;
+                  var we = fe + de, be = fe - de, Me = ue + et, he = ue - et, He = ve + Ue, ot = ve - Ue, Ve = re + Pe, Ct = re - Pe, Et = we + Ve, un = we - Ve, Ar = Me + He, Cr = Me - He;
                   D[H] = Et + Ar, D[H + 4] = Et - Ar;
                   var xa = (Cr + un) * 0.707106781;
                   D[H + 2] = un + xa, D[H + 6] = un - xa, Et = Ct + ot, Ar = ot + he, Cr = he + be;
@@ -31670,10 +31670,10 @@ ${t}`;
                 ce && ne(ce), h = new Array(), b = 0, x = 7, oe(65496), Fe(), Z(D.comments), Te(D.exifBuffer), Ae(), Se(D.width, D.height), te(), We();
                 var ue = 0, ve = 0, re = 0;
                 b = 0, x = 7, this.encode.displayName = "_encode_";
-                for (var Pe = D.data, Ue = D.width, et = D.height, de = Ue * 4, H = Ue * 3, ee, se = 0, Re, we, be, Me, he, He, ot, Ge; se < et; ) {
+                for (var Pe = D.data, Ue = D.width, et = D.height, de = Ue * 4, H = Ue * 3, ee, se = 0, Re, we, be, Me, he, He, ot, Ve; se < et; ) {
                   for (ee = 0; ee < de; ) {
-                    for (Me = de * se + ee, he = Me, He = -1, ot = 0, Ge = 0; Ge < 64; Ge++)
-                      ot = Ge >> 3, He = (Ge & 7) * 4, he = Me + ot * de + He, se + ot >= et && (he -= de * (se + 1 + ot - et)), ee + He >= de && (he -= ee + He - de + 4), Re = Pe[he++], we = Pe[he++], be = Pe[he++], v[Ge] = (T[Re] + T[we + 256 >> 0] + T[be + 512 >> 0] >> 16) - 128, k[Ge] = (T[Re + 768 >> 0] + T[we + 1024 >> 0] + T[be + 1280 >> 0] >> 16) - 128, w[Ge] = (T[Re + 1280 >> 0] + T[we + 1536 >> 0] + T[be + 1792 >> 0] >> 16) - 128;
+                    for (Me = de * se + ee, he = Me, He = -1, ot = 0, Ve = 0; Ve < 64; Ve++)
+                      ot = Ve >> 3, He = (Ve & 7) * 4, he = Me + ot * de + He, se + ot >= et && (he -= de * (se + 1 + ot - et)), ee + He >= de && (he -= ee + He - de + 4), Re = Pe[he++], we = Pe[he++], be = Pe[he++], v[Ve] = (T[Re] + T[we + 256 >> 0] + T[be + 512 >> 0] >> 16) - 128, k[Ve] = (T[Re + 768 >> 0] + T[we + 1024 >> 0] + T[be + 1280 >> 0] >> 16) - 128, w[Ve] = (T[Re + 1280 >> 0] + T[we + 1536 >> 0] + T[be + 1792 >> 0] >> 16) - 128;
                     ue = ge(v, i, ue, c, l), ve = ge(k, o, ve, u, p), re = ge(w, o, re, u, p), ee += 32;
                   }
                   se += 8;
@@ -31693,12 +31693,12 @@ ${t}`;
                   D < 50 ? ce = Math.floor(5e3 / D) : ce = Math.floor(200 - D * 2), pe(ce), O = D;
                 }
               }
-              function Je() {
+              function Ye() {
                 var D = (/* @__PURE__ */ new Date()).getTime();
                 e || (e = 50), X(), Ze(), Ce(), Oe(), ne(e);
                 var ce = (/* @__PURE__ */ new Date()).getTime() - D;
               }
-              Je();
+              Ye();
             }
             typeof Nc < "u" ? Nc.exports = u1 : typeof window < "u" && (window["jpeg-js"] = window["jpeg-js"] || {}, window["jpeg-js"].encode = u1);
             function u1(e, t) {
@@ -31863,7 +31863,7 @@ ${t}`;
                   var Re = se / H.blocksPerLine | 0, we = se % H.blocksPerLine;
                   H.blocks[Re] === void 0 && R.tolerantDecoding || ee(H, H.blocks[Re][we]);
                 }
-                var ne = w.length, Je, D, ce, fe, ue, ve;
+                var ne = w.length, Ye, D, ce, fe, ue, ve;
                 W ? T === 0 ? ve = I === 0 ? Fe : Te : ve = I === 0 ? Ae : We : ve = Le;
                 var re = 0, Pe, Ue;
                 ne == 1 ? Ue = w[0].blocksPerLine * w[0].blocksPerColumn : Ue = K * k.mcusPerColumn, _ || (_ = Ue);
@@ -31871,14 +31871,14 @@ ${t}`;
                   for (D = 0; D < ne; D++)
                     w[D].pred = 0;
                   if (Se = 0, ne == 1)
-                    for (Je = w[0], ue = 0; ue < _; ue++)
-                      X(Je, ve, re), re++;
+                    for (Ye = w[0], ue = 0; ue < _; ue++)
+                      X(Ye, ve, re), re++;
                   else
                     for (ue = 0; ue < _; ue++) {
                       for (D = 0; D < ne; D++)
-                        for (Je = w[D], et = Je.h, de = Je.v, ce = 0; ce < de; ce++)
+                        for (Ye = w[D], et = Ye.h, de = Ye.v, ce = 0; ce < de; ce++)
                           for (fe = 0; fe < et; fe++)
-                            ge(Je, ve, re, ce, fe);
+                            ge(Ye, ve, re, ce, fe);
                       if (re++, re === Ue)
                         break;
                     }
@@ -31963,21 +31963,21 @@ ${t}`;
                     return w += He.length, He;
                   }
                   function I(he) {
-                    var He = 1, ot = 1, Ge, Ct;
+                    var He = 1, ot = 1, Ve, Ct;
                     for (Ct in he.components)
-                      he.components.hasOwnProperty(Ct) && (Ge = he.components[Ct], He < Ge.h && (He = Ge.h), ot < Ge.v && (ot = Ge.v));
+                      he.components.hasOwnProperty(Ct) && (Ve = he.components[Ct], He < Ve.h && (He = Ve.h), ot < Ve.v && (ot = Ve.v));
                     var Et = Math.ceil(he.samplesPerLine / 8 / He), un = Math.ceil(he.scanLines / 8 / ot);
                     for (Ct in he.components)
                       if (he.components.hasOwnProperty(Ct)) {
-                        Ge = he.components[Ct];
-                        var Ar = Math.ceil(Math.ceil(he.samplesPerLine / 8) * Ge.h / He), Cr = Math.ceil(Math.ceil(he.scanLines / 8) * Ge.v / ot), xa = Et * Ge.h, va = un * Ge.v, gi = va * xa, wa = [];
+                        Ve = he.components[Ct];
+                        var Ar = Math.ceil(Math.ceil(he.samplesPerLine / 8) * Ve.h / He), Cr = Math.ceil(Math.ceil(he.scanLines / 8) * Ve.v / ot), xa = Et * Ve.h, va = un * Ve.v, gi = va * xa, wa = [];
                         b(gi * 256);
                         for (var ka = 0; ka < va; ka++) {
                           for (var _a = [], Ea = 0; Ea < xa; Ea++)
                             _a.push(new Int32Array(64));
                           wa.push(_a);
                         }
-                        Ge.blocksPerLine = Ar, Ge.blocksPerColumn = Cr, Ge.blocks = wa;
+                        Ve.blocksPerLine = Ar, Ve.blocksPerColumn = Cr, Ve.blocks = wa;
                       }
                     he.maxH = He, he.maxV = ot, he.mcusPerLine = Et, he.mcusPerColumn = un;
                   }
@@ -32061,11 +32061,11 @@ ${t}`;
                         var We = v[w++], ge, X = 0, ne = 0;
                         for (Ce = 0; Ce < We; Ce++) {
                           ge = v[w];
-                          var Je = v[w + 1] >> 4, D = v[w + 1] & 15, ce = v[w + 2];
-                          if (Je <= 0 || D <= 0)
+                          var Ye = v[w + 1] >> 4, D = v[w + 1] & 15, ce = v[w + 2];
+                          if (Ye <= 0 || D <= 0)
                             throw new Error("Invalid sampling factor, expected values above 0");
                           U.componentsOrder.push(ge), U.components[ge] = {
-                            h: Je,
+                            h: Ye,
                             v: D,
                             quantizationIdx: ce
                           }, w += 3;
@@ -32403,7 +32403,7 @@ ${t}`;
             y1 = Sw(g1(), 1), gI = 512, yI = 8, bI = 6 * 1024 * 1024, xI = /^data:(image\/[a-z0-9.+-]+);base64,([a-z0-9+/=]+)$/i;
             Oc = null;
           });
-          function Js(e) {
+          function Ys(e) {
             return e && typeof e == "object" && !Array.isArray(e) ? e : null;
           }
           function NI(e) {
@@ -32412,7 +32412,7 @@ ${t}`;
                 url: e,
                 title: e
               } : null;
-            let t = Js(e);
+            let t = Ys(e);
             if (!t)
               return null;
             let n = typeof t.url == "string" && t.url ? t.url : typeof t.href == "string" && t.href ? t.href : typeof t.link == "string" ? t.link : "";
@@ -32438,14 +32438,14 @@ ${t}`;
             var _a, _b2, _c2;
             let t = /* @__PURE__ */ new Map();
             for (let n of e) {
-              let r = Array.isArray(n) ? n : ((_a = Js(n)) == null ? void 0 : _a.citations) ?? ((_b2 = Js(n)) == null ? void 0 : _b2.urls) ?? ((_c2 = Js(n)) == null ? void 0 : _c2.results) ?? [];
+              let r = Array.isArray(n) ? n : ((_a = Ys(n)) == null ? void 0 : _a.citations) ?? ((_b2 = Ys(n)) == null ? void 0 : _b2.urls) ?? ((_c2 = Ys(n)) == null ? void 0 : _c2.results) ?? [];
               for (let a of Ic(r))
                 t.has(a.url) || t.set(a.url, a);
             }
             return [...t.values()].slice(0, 50);
           }
           function v1(e) {
-            let t = Js(e);
+            let t = Ys(e);
             return t ? Array.isArray(t.citations) ? Ic(t.citations) : Array.isArray(t.urls) ? Ic(t.urls) : Array.isArray(t.results) ? Ic(t.results) : [] : [];
           }
           function jc(e) {
@@ -32532,7 +32532,7 @@ ${t}`;
             }
             return null;
           }
-          function Ys(e) {
+          function Js(e) {
             let t = String(e || "").toLowerCase();
             return t === "jpg" || t === "jpeg" ? "image/jpeg" : t === "png" || t === "webp" || t === "gif" ? `image/${t}` : `image/${t || "png"}`;
           }
@@ -32556,7 +32556,7 @@ ${t}`;
             return {
               type: "image_url",
               image_url: {
-                url: `data:${Ys(t)};base64,${e.b64}`
+                url: `data:${Js(t)};base64,${e.b64}`
               }
             };
           }
@@ -33051,7 +33051,7 @@ ${g}
               let o = L1(s[1]);
               o != null && (n.ads = o);
             }
-            let i = t.match(VI);
+            let i = t.match(GI);
             if (i) {
               let o = Number(i[1]);
               Number.isFinite(o) && (n.conversation_limit_percent = o);
@@ -33070,16 +33070,16 @@ ${g}
           var qI;
           var KI;
           var WI;
-          var VI;
+          var GI;
           var U1 = F(() => {
             "use strict";
-            qI = /\[CHAT_TITLE:([\s\S]*?)\]/, KI = /\[FIXED_COST_WINDOW_USAGE:([^\]]+)\]/, WI = /\[ADS:([^\]]+)\]/, VI = /\[WARN_CONVERSATION_LIMIT:(\d+)\]/;
+            qI = /\[CHAT_TITLE:([\s\S]*?)\]/, KI = /\[FIXED_COST_WINDOW_USAGE:([^\]]+)\]/, WI = /\[ADS:([^\]]+)\]/, GI = /\[WARN_CONVERSATION_LIMIT:(\d+)\]/;
           });
           var kp = {};
           tt(kp, {
-            CHALLENGE_STUBS: () => G1,
+            CHALLENGE_STUBS: () => V1,
             DUCKAI_MODELS: () => ZI,
-            MODEL_ALIASES: () => V1,
+            MODEL_ALIASES: () => G1,
             generateDuckAiImage: () => mj,
             handleDuckAiRequest: () => dj,
             solveDuckDuckGoChallenge: () => wp
@@ -33112,11 +33112,11 @@ ${g}
             }
             return r;
           }
-          function J1(e) {
+          function Y1(e) {
             let t = 0;
             if (e.nodeName && !e.nodeName.startsWith("#") && t++, Array.isArray(e.childNodes))
               for (let n of e.childNodes)
-                t += J1(n);
+                t += Y1(n);
             return t;
           }
           function ej(e) {
@@ -33129,7 +33129,7 @@ ${g}
               let i = c1(s);
               t[s] = {
                 html: ap(i),
-                count: J1(i)
+                count: Y1(i)
               };
             }
             return t;
@@ -33140,8 +33140,8 @@ ${g}
             let n = Buffer.from(e, "base64").toString("utf8");
             if (n.length > 196608)
               throw new Error("Duck.ai challenge script too large");
-            let r = G1.replace("__DDG_REAL_UA__", JSON.stringify(t)).replace("__DDG_HTML_LOOKUP__", JSON.stringify(ej(n))), a = {};
-            GI(a), B1(r, a);
+            let r = V1.replace("__DDG_REAL_UA__", JSON.stringify(t)).replace("__DDG_HTML_LOOKUP__", JSON.stringify(ej(n))), a = {};
+            VI(a), B1(r, a);
             let s = Date.now(), o = await B1(n, a), c = Date.now() - s, u = Array.isArray(o == null ? void 0 : o.client_hashes) ? o.client_hashes : [];
             if (u.length === 0)
               throw new Error("Duck.ai challenge returned empty client_hashes");
@@ -33156,7 +33156,7 @@ at async ${l}${p}:2:1519117`,
               duration: String(c)
             }, Buffer.from(JSON.stringify(o)).toString("base64");
           }
-          async function Y1() {
+          async function J1() {
             var _a;
             if (Uc && Uc.expiresAt > Date.now())
               return Uc.version;
@@ -33167,7 +33167,7 @@ at async ${l}${p}:2:1519117`,
                 }
               }, 1e4);
               if (e.ok) {
-                let n = (_a = (await e.text()).match(JI)) == null ? void 0 : _a[0];
+                let n = (_a = (await e.text()).match(YI)) == null ? void 0 : _a[0];
                 if (n)
                   return Uc = {
                     version: n,
@@ -33176,7 +33176,7 @@ at async ${l}${p}:2:1519117`,
               }
             } catch {
             }
-            return YI;
+            return JI;
           }
           async function X1() {
             return vp || (vp = (async () => {
@@ -33226,7 +33226,7 @@ at async ${l}${p}:2:1519117`,
           }
           function Z1(e) {
             let t = e.startsWith("duckai/") ? e.slice(7) : e;
-            return V1[t] || t;
+            return G1[t] || t;
           }
           function tj(e) {
             return e === "claude-haiku-4-5" || e === "tinfoil/gpt-oss-120b" ? "low" : "none";
@@ -33690,7 +33690,7 @@ at async ${l}${p}:2:1519117`,
               let o = i.headers.get("x-vqd-hash-1");
               if (!o)
                 throw new Error("Duck.ai \u6CA1\u6709\u8FD4\u56DE\u6311\u6218\u4EE4\u724C");
-              let [c, u, l] = await Promise.all([wp(o, Hn), Y1(), X1()]), p = {
+              let [c, u, l] = await Promise.all([wp(o, Hn), J1(), X1()]), p = {
                 model: s,
                 ...a ? {
                   metadata: {
@@ -33767,7 +33767,7 @@ at async ${l}${p}:2:1519117`,
             let r = n.headers.get("x-vqd-hash-1");
             if (!r)
               throw new Error("Duck.ai \u6CA1\u6709\u8FD4\u56DE\u6311\u6218\u4EE4\u724C");
-            let [a, s, i] = await Promise.all([wp(r, Hn), Y1(), X1()]), o = {
+            let [a, s, i] = await Promise.all([wp(r, Hn), J1(), X1()]), o = {
               model: e,
               messages: [{
                 role: "user",
@@ -33896,15 +33896,15 @@ at async ${l}${p}:2:1519117`,
             let c = o.slice(0, a).map((u) => {
               let l = up(u.b64, u.format || "png");
               return s === "url" ? {
-                url: `data:${Ys(l)};base64,${u.b64}`,
+                url: `data:${Js(l)};base64,${u.b64}`,
                 revised_prompt: r,
                 format: l,
-                mime_type: Ys(l)
+                mime_type: Js(l)
               } : {
                 b64_json: u.b64,
                 revised_prompt: r,
                 format: l,
-                mime_type: Ys(l)
+                mime_type: Js(l)
               };
             });
             return {
@@ -33923,8 +33923,8 @@ at async ${l}${p}:2:1519117`,
           var F1;
           var H1;
           var MD;
-          var JI;
           var YI;
+          var JI;
           var Hn;
           var $c;
           var XI;
@@ -33935,8 +33935,8 @@ at async ${l}${p}:2:1519117`,
           var z1;
           var W1;
           var ZI;
-          var V1;
           var G1;
+          var V1;
           var Uc;
           var vp;
           var oj;
@@ -33951,7 +33951,7 @@ at async ${l}${p}:2:1519117`,
             D1();
             U1();
             Za();
-            ua = "https://duck.ai", F1 = `${ua}/duckchat/v1/status`, H1 = `${ua}/duckchat/v1/chat`, MD = `${ua}/duckchat/v1/models`, JI = /serp_\d{8}_\d{6}_[A-Z]{2}-[0-9a-f]{20,40}/, YI = "serp_20260424_180649_ET-0bdc33b2a02ebf8f235def65d887787f694720a1", Hn = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36", $c = {
+            ua = "https://duck.ai", F1 = `${ua}/duckchat/v1/status`, H1 = `${ua}/duckchat/v1/chat`, MD = `${ua}/duckchat/v1/models`, YI = /serp_\d{8}_\d{6}_[A-Z]{2}-[0-9a-f]{20,40}/, JI = "serp_20260424_180649_ET-0bdc33b2a02ebf8f235def65d887787f694720a1", Hn = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36", $c = {
               Accept: "*/*",
               "Accept-Language": "en-US,en;q=0.9",
               "Cache-Control": "no-cache",
@@ -33983,7 +33983,7 @@ at async ${l}${p}:2:1519117`,
             }, {
               id: "tinfoil/gemma4-31b",
               name: "Gemma 4 31B (Free)"
-            }], V1 = {
+            }], G1 = {
               "gpt-4o-mini": "gpt-5.4-mini",
               "gpt-5-mini": "gpt-5.4-mini",
               "claude-3-haiku-20240307": "claude-haiku-4-5",
@@ -33991,7 +33991,7 @@ at async ${l}${p}:2:1519117`,
               "mistral-small-2501": "mistral-small-2603",
               "gpt-oss-120b": "tinfoil/gpt-oss-120b",
               "gemma4-31b": "tinfoil/gemma4-31b"
-            }, G1 = String.raw`
+            }, V1 = String.raw`
 var __ua = __DDG_REAL_UA__;
 var __HTML_LOOKUP = __DDG_HTML_LOOKUP__;
 function __nativeFn(fn, name){
@@ -34156,7 +34156,7 @@ var getComputedStyle = __getComputedStyle;
             VIDEO_KEY_COOLDOWN_SECONDS: () => hv,
             buildAgnesVideoBody: () => mv,
             deleteVideoTask: () => Dp,
-            extractVideoUrl: () => Yc,
+            extractVideoUrl: () => Jc,
             getKeyCooldown: () => Rp,
             isAgnesVideoRoute: () => Xc,
             isQueueFullError: () => fa,
@@ -34185,7 +34185,7 @@ var getComputedStyle = __getComputedStyle;
             let t = (e || "").toLowerCase();
             return ["completed", "complete", "succeeded", "success", "saved", "done", "finished"].includes(t) ? "completed" : ["failed", "failure", "error", "cancelled", "canceled"].includes(t) ? t.startsWith("cancel") ? "cancelled" : "failed" : ["processing", "running", "in_progress", "generating", "started"].includes(t) ? "in_progress" : "queued";
           }
-          function Yc(e) {
+          function Jc(e) {
             var _a, _b2, _c2, _d2, _e2, _f2, _g2, _h2;
             if (!e)
               return "";
@@ -34267,7 +34267,7 @@ var getComputedStyle = __getComputedStyle;
                 };
               let o = (i == null ? void 0 : i.video_id) || ((_c2 = i == null ? void 0 : i.data) == null ? void 0 : _c2.video_id) || (i == null ? void 0 : i.task_id) || (i == null ? void 0 : i.id) || ((_d2 = i == null ? void 0 : i.data) == null ? void 0 : _d2.task_id) || ((_e2 = i == null ? void 0 : i.data) == null ? void 0 : _e2.id) || "";
               if (!o) {
-                let c = Yc(i);
+                let c = Jc(i);
                 return c ? {
                   ok: true,
                   httpStatus: 200,
@@ -34287,7 +34287,7 @@ var getComputedStyle = __getComputedStyle;
                 httpStatus: 200,
                 taskId: String(o),
                 status: Ip(i == null ? void 0 : i.status),
-                url: Yc(i),
+                url: Jc(i),
                 raw: i
               };
             } catch (a) {
@@ -34331,7 +34331,7 @@ var getComputedStyle = __getComputedStyle;
                   httpStatus: 200,
                   status: m,
                   progress: g,
-                  url: Yc(y) || void 0,
+                  url: Jc(y) || void 0,
                   error: m === "failed" ? JSON.stringify((y == null ? void 0 : y.error) || (y == null ? void 0 : y.message) || "\u4E0A\u6E38\u751F\u6210\u5931\u8D25").slice(0, 500) : void 0,
                   raw: y
                 };
@@ -34365,7 +34365,7 @@ var getComputedStyle = __getComputedStyle;
           }
           async function yn(e, t) {
             try {
-              await G(e).put(jp(t.id), JSON.stringify(t), {
+              await V(e).put(jp(t.id), JSON.stringify(t), {
                 expirationTtl: fv
               });
             } catch {
@@ -34373,7 +34373,7 @@ var getComputedStyle = __getComputedStyle;
           }
           async function Lt(e, t) {
             try {
-              let n = await G(e).get(jp(t));
+              let n = await V(e).get(jp(t));
               return n ? JSON.parse(n) : null;
             } catch {
               return null;
@@ -34390,7 +34390,7 @@ var getComputedStyle = __getComputedStyle;
           }
           async function Rp(e, t, n) {
             try {
-              let r = await G(e).get(gv(t, n));
+              let r = await V(e).get(gv(t, n));
               if (!r)
                 return 0;
               let a = Number(r);
@@ -34401,7 +34401,7 @@ var getComputedStyle = __getComputedStyle;
           }
           async function el(e, t, n, r = hv) {
             try {
-              await G(e).put(gv(t, n), String(Date.now() + r * 1e3), {
+              await V(e).put(gv(t, n), String(Date.now() + r * 1e3), {
                 expirationTtl: r + 5
               });
             } catch {
@@ -34511,7 +34511,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           async function Tr(e, t = {}) {
             let n = Math.min(200, Math.max(1, t.limit ?? 20)), r = [];
             try {
-              r = (await G(e).list({
+              r = (await V(e).list({
                 prefix: "video:task:"
               })).keys.map((o) => o.name);
             } catch {
@@ -34542,7 +34542,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             return r.ok && (t.status = r.status, t.progress = r.progress, r.url && (t.url = r.url), r.error && (t.error = r.error)), t.updatedAt = Math.floor(Date.now() / 1e3), await yn(e, t), t;
           }
           async function Dp(e, t) {
-            await G(e).delete(jp(t)).catch(() => {
+            await V(e).delete(jp(t)).catch(() => {
             });
           }
           var wj;
@@ -34555,7 +34555,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           var hv;
           var ln = F(() => {
             "use strict";
-            Ye();
+            Je();
             nt();
             Ie();
             wj = 3e4, kj = 2e4, fv = 86400;
@@ -34576,7 +34576,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             let t = e.env, r = (e.req.header("authorization") ?? "").match(/^Bearer\s+(sk-gw-\S+)$/i);
             if (!r)
               throw new C(401, A.AUTH_REQUIRED, "\u7F3A\u5C11 Bearer API Key");
-            let a = await yt(r[1]), s = Math.floor(Date.now() / 1e3), [i, o] = await Promise.all([Vt(t, a), ze(t)]);
+            let a = await yt(r[1]), s = Math.floor(Date.now() / 1e3), [i, o] = await Promise.all([Gt(t, a), ze(t)]);
             if (!i)
               throw new C(401, A.AUTH_INVALID, "API Key \u65E0\u6548");
             if (i.status === "revoked")
@@ -34905,7 +34905,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 }
               });
             } finally {
-              o && await Gt(e, o).catch(() => {
+              o && await Vt(e, o).catch(() => {
               }), await dn(e).catch(() => {
               });
             }
@@ -34922,7 +34922,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 limits: a.limits
               }, s, t, r, Date.now(), bn(e, n));
             } catch (a) {
-              return Y(e, a);
+              return J(e, a);
             }
           }
           function Sv(e, t, n) {
@@ -34995,9 +34995,9 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             qe();
             ii();
             oi();
-            Ga();
-            Jt();
-            Yi();
+            Va();
+            Yt();
+            Ji();
             fr();
             nt();
             Ie();
@@ -35028,7 +35028,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }
                 });
               } catch (n) {
-                return Y(e, n);
+                return J(e, n);
               }
             });
             rn.get("/:id", async (e) => {
@@ -35048,7 +35048,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }
                 });
               } catch (n) {
-                return Y(e, n);
+                return J(e, n);
               }
             });
             rn.get("/:id/wait", async (e) => {
@@ -35072,7 +35072,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }
                 });
               } catch (n) {
-                return Y(e, n);
+                return J(e, n);
               }
             });
             rn.post("/:id/share", async (e) => {
@@ -35094,7 +35094,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }
                 });
               } catch (n) {
-                return Y(e, n);
+                return J(e, n);
               }
             });
             rn.get("/:id/status", async (e) => {
@@ -35114,7 +35114,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }
                 });
               } catch (n) {
-                return Y(e, n);
+                return J(e, n);
               }
             });
             rn.get("/:id/watch", async (e) => {
@@ -35136,7 +35136,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }
                 });
               } catch (n) {
-                return Y(e, n);
+                return J(e, n);
               }
             });
             rn.get("/:id/content", async (e) => {
@@ -35155,7 +35155,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }
                 });
               } catch (n) {
-                return Y(e, n);
+                return J(e, n);
               }
             });
           });
@@ -35245,7 +35245,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               return [];
             let {
               checkinQoder: r
-            } = await Promise.resolve().then(() => (Cs(), Yo));
+            } = await Promise.resolve().then(() => (Cs(), Jo));
             return it(n, 2, async (a) => {
               let s = {
                 keyId: a.id,
@@ -35279,7 +35279,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           }
           async function Bp(e) {
             try {
-              let t = await V(e).get(Ov, {
+              let t = await G(e).get(Ov, {
                 type: "json",
                 consistency: "strong"
               });
@@ -35293,7 +35293,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             }
           }
           async function Uj(e, t) {
-            await V(e).setJSON(Ov, {
+            await G(e).setJSON(Ov, {
               disabled: t.disabled
             });
           }
@@ -35316,7 +35316,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 ran: false,
                 skipped: "\u6240\u6709\u6E20\u9053\u7684\u81EA\u52A8\u7B7E\u5230\u5747\u5DF2\u5173\u95ED"
               };
-            let c = await Ve(e), u = V(e), l = false;
+            let c = await Ge(e), u = G(e), l = false;
             for (let p of i) {
               let y = al[p];
               if (!t.force)
@@ -35385,7 +35385,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             Ie();
             nt();
             Ca();
-            Ye();
+            Je();
             Ov = "checkin:config", Nv = (e) => `checkin:day:${e}`;
             Pj = 9;
             al = {
@@ -35493,7 +35493,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }
                 });
               } catch (n) {
-                return Y(e, n);
+                return J(e, n);
               }
             });
             jv = "__codebuddy_checkin__";
@@ -35516,7 +35516,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }
                 });
               } catch (n) {
-                return Y(e, n);
+                return J(e, n);
               }
             });
           });
@@ -35553,7 +35553,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               if (!l)
                 continue;
               let p = await Ke(e, u.id);
-              if (l.scope === "web" && p.length === 0 && ((_a = Jr[l.type]) == null ? void 0 : _a.anonymous))
+              if (l.scope === "web" && p.length === 0 && ((_a = Yr[l.type]) == null ? void 0 : _a.anonymous))
                 continue;
               let y = await $t(e, u.id), m = p.map(() => null), d = [];
               if (n.skipQuota)
@@ -35658,7 +35658,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   } else if (l.type === "chatgptweb") {
                     let {
                       fetchChatgptWebAccountInfo: h
-                    } = await Promise.resolve().then(() => (Gr(), is)), b = p.map((k, w) => ({
+                    } = await Promise.resolve().then(() => (Vr(), is)), b = p.map((k, w) => ({
                       key: k,
                       token: d[w]
                     })).filter((k) => k.token), x = await it(b, 5, async (k) => h(e, k.token)), v = new Map(b.map((k, w) => [k.key.id, x[w]]));
@@ -35782,7 +35782,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           at();
           mt();
           qe();
-          Yi();
+          Ji();
           nt();
           Ie();
           async function Nh(e, t) {
@@ -35846,8 +35846,8 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             });
           }
           ct();
-          Ga();
-          Jt();
+          Va();
+          Yt();
           eo();
           fr();
           nt();
@@ -35939,7 +35939,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               let i = (e.req.header("authorization") ?? "").match(/^Bearer\s+(sk-gw-\S+)$/i);
               if (!i)
                 throw new C(401, A.AUTH_REQUIRED, "\u7F3A\u5C11 Bearer API Key");
-              let o = await yt(i[1]), c = Math.floor(Date.now() / 1e3), [u, l] = await Promise.all([Vt(t, o), ze(t)]);
+              let o = await yt(i[1]), c = Math.floor(Date.now() / 1e3), [u, l] = await Promise.all([Gt(t, o), ze(t)]);
               if (!u)
                 throw new C(401, A.AUTH_INVALID, "API Key \u65E0\u6548");
               if (u.status === "revoked")
@@ -35975,7 +35975,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 keyRow: u
               }, m);
             } catch (s) {
-              return Y(a, s);
+              return J(a, s);
             }
           });
           async function Tp(e, t, n) {
@@ -36005,7 +36005,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               let d = n.model, g = !!n.stream, h = d.includes("/") ? d.slice(d.indexOf("/") + 1) : d;
               if (p.modelWhitelist)
                 try {
-                  let X = JSON.parse(p.modelWhitelist), ne = Array.isArray(X) && X.some((Je) => Je === d || Je === h || Je.toLowerCase() === d.toLowerCase() || Je.toLowerCase() === h.toLowerCase());
+                  let X = JSON.parse(p.modelWhitelist), ne = Array.isArray(X) && X.some((Ye) => Ye === d || Ye === h || Ye.toLowerCase() === d.toLowerCase() || Ye.toLowerCase() === h.toLowerCase());
                   if (Array.isArray(X) && X.length && !ne)
                     throw new C(403, A.MODEL_NOT_ALLOWED, `\u8BE5 Key \u65E0\u6743\u8C03\u7528\u6A21\u578B ${d}`);
                 } catch (X) {
@@ -36013,12 +36013,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                     throw X;
                 }
               let b = n.messages.filter((X) => X.role === "user").map((X) => typeof X.content == "string" ? X.content : "").join(`
-`), x = await Cn(r, d), v = (_a = x[0]) == null ? void 0 : _a.model.publicName, k = (v ? await Tt(r, v) : null) || await Tt(r, d) || (h !== d ? await Tt(r, h) : null), w = k == null ? void 0 : k.rpmLimit, _ = !!k && (k.inputPerMillion > 0 || k.outputPerMillion > 0), T = pu(o, c), O = await ze(r), j = x.filter((X, ne) => x.findIndex((Je) => Je.provider.id === X.provider.id) === ne).map(async (X) => {
-                let [ne, Je] = await Promise.all([sr(r, X.provider.id), $t(r, X.provider.id)]);
+`), x = await Cn(r, d), v = (_a = x[0]) == null ? void 0 : _a.model.publicName, k = (v ? await Tt(r, v) : null) || await Tt(r, d) || (h !== d ? await Tt(r, h) : null), w = k == null ? void 0 : k.rpmLimit, _ = !!k && (k.inputPerMillion > 0 || k.outputPerMillion > 0), T = pu(o, c), O = await ze(r), j = x.filter((X, ne) => x.findIndex((Ye) => Ye.provider.id === X.provider.id) === ne).map(async (X) => {
+                let [ne, Ye] = await Promise.all([sr(r, X.provider.id), $t(r, X.provider.id)]);
                 return {
                   plan: X,
                   keys: ne,
-                  health: Je
+                  health: Ye
                 };
               }), R = Nh(m, {
                 settings: O,
@@ -36071,9 +36071,9 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               for (let {
                 plan: X,
                 keys: ne,
-                health: Je
+                health: Ye
               } of K)
-                Oe.push(...Br(r, X, ne, Je));
+                Oe.push(...Br(r, X, ne, Ye));
               if (!Oe.length)
                 throw new C(404, A.MODEL_NOT_FOUND, `\u6A21\u578B ${d} \u4E0D\u5B58\u5728\u6216\u6682\u65E0\u53EF\u7528\u4E0A\u6E38`);
               let xe = k || (x[0] ? await Tt(r, x[0].model.upstreamModel) : null), L = Lh(b), oe = n.max_tokens ?? 1024, Le = xe ? to(xe, L, oe) : 0, {
@@ -36083,7 +36083,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   return;
                 y = true;
                 let ne = xe ? to(xe, X.promptTokens, X.completionTokens) : 0;
-                await Gt(r, i), await bu(m, {
+                await Vt(r, i), await bu(m, {
                   scope: T,
                   holdId: Fe,
                   heldAmount: Le,
@@ -36114,8 +36114,8 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 }, i);
               }, Se = 0, Ae = "", te = 0, Z = Oe.slice(0, 5), We = async (X, ne) => {
                 if (X.providerKeyId && X.providerKeyId !== "keyless") {
-                  let Je = ne === 401 || ne === 402;
-                  await Ur(r, X.providerId, X.providerKeyId, Je).catch(() => {
+                  let Ye = ne === 401 || ne === 402;
+                  await Ur(r, X.providerId, X.providerKeyId, Ye).catch(() => {
                   });
                 }
               }, ge = async (X) => {
@@ -36125,13 +36125,13 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               for (let X = 0; X < Z.length; X++) {
                 let ne = Z[X];
                 Se++;
-                let Je = X + 1 < Z.length ? 1 : hj;
+                let Ye = X + 1 < Z.length ? 1 : hj;
                 try {
                   let D = ne.providerKind === "opencode" || ne.providerSlug === "opencode", ce = ne.providerKind === "duckai" || ne.providerSlug === "duckai", fe = ne.providerKind === "anthropic" || ne.providerSlug === "anthropic", ue = ((_d2 = ne.providerKind) == null ? void 0 : _d2.startsWith("oauth:")) ? ne.providerKind.slice(6) : "", ve = ((_e2 = ne.providerKind) == null ? void 0 : _e2.startsWith("web:")) ? ne.providerKind.slice(4) : "", re = null;
                   if (ve) {
                     let {
                       handleWebChat: de
-                    } = await Promise.resolve().then(() => (mo(), Yu)), H = ne.encryptedKey ? await Ne(r, ne.encryptedKey) : "";
+                    } = await Promise.resolve().then(() => (mo(), Ju)), H = ne.encryptedKey ? await Ne(r, ne.encryptedKey) : "";
                     re = await de({
                       env: r,
                       type: ve,
@@ -36202,7 +36202,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                       headers: Re,
                       body: JSON.stringify(H),
                       signal: AbortSignal.timeout(12e4)
-                    }), Je);
+                    }), Ye);
                   } else {
                     let {
                       url: de
@@ -36212,7 +36212,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                       headers: H,
                       body: JSON.stringify(ee),
                       signal: AbortSignal.timeout(12e4)
-                    }), Je);
+                    }), Ye);
                   }
                   if (!re)
                     throw new Error("no response from upstream");
@@ -36236,7 +36236,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                     if (Dh.has(re.status) || H && Se < Z.length)
                       continue;
                     let ee = await re.text();
-                    return y || (y = true, await Fr(m, T, Fe, Le, a), await Gt(r, i)), await Fc(r, {
+                    return y || (y = true, await Fr(m, T, Fe, Le, a), await Vt(r, i)), await Fc(r, {
                       id: ae(),
                       requestId: a,
                       userId: o,
@@ -36278,12 +36278,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                           status: "success",
                           httpStatus: 200
                         });
-                      }), [He, ot] = he.tee(), Ge = av(ot, L, async (Et, un) => {
+                      }), [He, ot] = he.tee(), Ve = av(ot, L, async (Et, un) => {
                         be = Et, Me = un;
                       }).catch(async () => {
-                        y || (y = true, await Fr(m, T, Fe, Le, a), await Gt(r, i));
+                        y || (y = true, await Fr(m, T, Fe, Le, a), await Vt(r, i));
                       });
-                      Ge.then(() => {
+                      Ve.then(() => {
                         y || Te({
                           route: ne,
                           promptTokens: be,
@@ -36295,7 +36295,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                       });
                       let Ct = new TransformStream({
                         async flush() {
-                          await Ge, await Te({
+                          await Ve, await Te({
                             route: ne,
                             promptTokens: be,
                             completionTokens: Me,
@@ -36335,7 +36335,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                     let de = L, H = oe, [ee, se] = re.body.tee(), Re = av(se, L, async (be, Me) => {
                       de = be, H = Me;
                     }).catch(async () => {
-                      y || (y = true, await Fr(m, T, Fe, Le, a), await Gt(r, i));
+                      y || (y = true, await Fr(m, T, Fe, Le, a), await Vt(r, i));
                     }), we = new TransformStream({
                       async flush() {
                         await Re, await Te({
@@ -36387,7 +36387,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   Ae = (D == null ? void 0 : D.message) || String(D), await We(ne);
                 }
               }
-              return y || (y = true, await Fr(m, T, Fe, Le, a), await Gt(r, i)), await Fc(r, {
+              return y || (y = true, await Fr(m, T, Fe, Le, a), await Vt(r, i)), await Fc(r, {
                 id: ae(),
                 requestId: a,
                 userId: o,
@@ -36409,11 +36409,11 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 retry_after: 5
               }) : ft(502, A.UPSTREAM_ERROR, `\u6240\u6709\u53EF\u7528\u4E0A\u6E38\u5747\u8C03\u7528\u5931\u8D25\uFF08\u5DF2\u5C1D\u8BD5 ${Se} \u6761\u8DEF\u7531\uFF09\uFF1A${Ae}`);
             } catch (d) {
-              return y || (dn(r), Gt(r, i)), Y(m, d);
+              return y || (dn(r), Vt(r, i)), J(m, d);
             }
           }
           at();
-          Ga();
+          Va();
           mt();
           qe();
           ct();
@@ -36434,7 +36434,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             };
             try {
               await le(t);
-              let [n, r, a] = await Promise.all([jt(e.env), Pt(e.env), Ve(e.env)]), s = new Map(a.map((l) => [l.id, l])), i = new Set(a.filter((l) => l.status === "active").map((l) => l.id)), c = n.filter((l) => i.has(l.providerId)).map((l) => {
+              let [n, r, a] = await Promise.all([jt(e.env), Pt(e.env), Ge(e.env)]), s = new Map(a.map((l) => [l.id, l])), i = new Set(a.filter((l) => l.status === "active").map((l) => l.id)), c = n.filter((l) => i.has(l.providerId)).map((l) => {
                 let p = s.get(l.providerId), y = r[l.publicName];
                 return {
                   id: l.id,
@@ -36464,7 +36464,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 providers: u
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           at();
@@ -36474,7 +36474,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           _r();
           mt();
           Ie();
-          Jt();
+          Yt();
           var da = (e) => Buffer.from(e).toString("base64");
           async function Hc(e, t) {
             let n = e.host.trim(), r = e.port || 465, a = e.username.includes("@") ? e.username : e.from || e.username, s = e.password, i = (e.from || a).trim(), o = i.match(/<([^>]+)>/) || i.match(/([^\s<]+@[^\s>]+)/), c = o ? o[1].trim() : i, u = i.match(/^([^<]+)</), l = (t.fromName || e.fromName || (u ? u[1].trim() : "") || "Relay AI").trim();
@@ -36585,7 +36585,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
 </td></tr></table>
 </body></html>`;
           }
-          Ye();
+          Je();
           var yj = {
             register: "reg"
           };
@@ -36625,12 +36625,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               ok: true
             };
           }
-          var Vc = {
+          var Gc = {
             absent: "\u9A8C\u8BC1\u7801\u5DF2\u8FC7\u671F\u6216\u672A\u83B7\u53D6\uFF0C\u8BF7\u70B9\u51FB\u91CD\u65B0\u83B7\u53D6",
             mismatch: "\u9A8C\u8BC1\u7801\u8F93\u5165\u9519\u8BEF\uFF0C\u8BF7\u4ED4\u7EC6\u6838\u5BF9\u90AE\u4EF6\u4E2D\u7684 6 \u4F4D\u6570\u5B57",
             locked: "\u9A8C\u8BC1\u7801\u9519\u8BEF\u6B21\u6570\u8FC7\u591A\uFF0C\u8BF7\u91CD\u65B0\u83B7\u53D6"
           };
-          function Gc(e) {
+          function Vc(e) {
             return (e == null ? void 0 : e.requireEmailVerification) !== false;
           }
           var zn = new ke();
@@ -36643,7 +36643,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               let r = await ze(t), a = await e.req.json();
               if (!a.email || !/^\S+@\S+\.\S+$/.test(a.email))
                 throw new C(400, A.BAD_REQUEST, "\u90AE\u7BB1\u683C\u5F0F\u4E0D\u6B63\u786E");
-              let s = a.email.trim().toLowerCase(), i = G(t), o = r.smtpEnabled && r.smtpHost && r.smtpPassEnc;
+              let s = a.email.trim().toLowerCase(), i = V(t), o = r.smtpEnabled && r.smtpHost && r.smtpPassEnc;
               if (a.action === "send-code") {
                 if (!o)
                   throw new C(503, A.INTERNAL, "\u90AE\u7BB1\u53D1\u4FE1\u670D\u52A1\u672A\u542F\u7528\u6216\u672A\u914D\u7F6E");
@@ -36691,12 +36691,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 throw new C(400, A.BAD_REQUEST, "\u5BC6\u7801\u81F3\u5C11 10 \u4F4D");
               if (kh(a, r), await Sn(t, s))
                 throw new C(409, A.BAD_REQUEST, "\u90AE\u7BB1\u5DF2\u6CE8\u518C");
-              if (Gc(r) && !!await ql(t)) {
+              if (Vc(r) && !!await ql(t)) {
                 if (!o)
                   throw new C(503, A.INTERNAL, "\u5DF2\u5F00\u542F\u6CE8\u518C\u90AE\u7BB1\u9A8C\u8BC1\uFF0C\u4F46\u90AE\u4EF6\u670D\u52A1\u5F53\u524D\u4E0D\u53EF\u7528\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458");
                 let x = await Wc(i, "register", s, a.code);
                 if (!x.ok)
-                  throw new C(400, A.BAD_REQUEST, Vc[x.reason ?? "absent"]);
+                  throw new C(400, A.BAD_REQUEST, Gc[x.reason ?? "absent"]);
               }
               let u = Math.floor(Date.now() / 1e3), l = ae(), p = {
                 id: l,
@@ -36737,7 +36737,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               }, 201);
               return await Dr(h, g, m, d);
             } catch (r) {
-              return Y(n, r);
+              return J(n, r);
             }
           });
           zn.post("/login", async (e) => {
@@ -36749,7 +36749,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               let r = await ze(t), a = await e.req.json();
               if (!a.email)
                 throw new C(400, A.BAD_REQUEST, "\u7F3A\u5C11\u90AE\u7BB1");
-              let s = a.email.trim().toLowerCase(), i = G(t), o = r.smtpEnabled && r.smtpHost && r.smtpPassEnc;
+              let s = a.email.trim().toLowerCase(), i = V(t), o = r.smtpEnabled && r.smtpHost && r.smtpPassEnc;
               if (a.action === "send-code") {
                 if (!o)
                   throw new C(503, A.INTERNAL, "\u90AE\u7BB1\u53D1\u4EF6\u670D\u52A1\u672A\u542F\u7528");
@@ -36795,7 +36795,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 let d = await Wc(i, "login", s, a.code);
                 if (!d.ok) {
                   let g = d.reason === "locked" ? 429 : 401, h = d.reason === "locked" ? A.RATE_LIMITED : A.AUTH_INVALID;
-                  throw new C(g, h, Vc[d.reason ?? "absent"]);
+                  throw new C(g, h, Gc[d.reason ?? "absent"]);
                 }
               } else if (a.password) {
                 if (!await En(a.password, c.passwordHash))
@@ -36827,7 +36827,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               });
               return await Dr(m, y, u, p);
             } catch (r) {
-              return Y(n, r);
+              return J(n, r);
             }
           });
           zn.post("/logout", async (e) => {
@@ -36864,7 +36864,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 unlimited: n.role === "superadmin"
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           zn.post("/stepup", async (e) => {
@@ -36897,7 +36897,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 stepUpUntil: i
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           zn.post("/reset", async (e) => {
@@ -36909,7 +36909,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               let r = await ze(t), a = await e.req.json();
               if (!a.email)
                 throw new C(400, A.BAD_REQUEST, "\u7F3A\u5C11\u90AE\u7BB1");
-              let s = a.email.trim().toLowerCase(), i = G(t);
+              let s = a.email.trim().toLowerCase(), i = V(t);
               if (!(r.smtpEnabled && r.smtpHost && r.smtpPassEnc))
                 throw new C(503, A.INTERNAL, "\u90AE\u4EF6\u670D\u52A1\u672A\u542F\u7528\uFF0C\u65E0\u6CD5\u91CD\u7F6E\u5BC6\u7801");
               if (a.stage === 1 || a.action === "request" || !a.code) {
@@ -36946,7 +36946,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 throw new C(400, A.BAD_REQUEST, "\u65B0\u5BC6\u7801\u81F3\u5C11 10 \u4F4D");
               let c = await Wc(i, "reset", s, a.code);
               if (!c.ok)
-                throw new C(400, A.BAD_REQUEST, Vc[c.reason ?? "absent"]);
+                throw new C(400, A.BAD_REQUEST, Gc[c.reason ?? "absent"]);
               let u = await Sn(t, s);
               if (!u)
                 throw new C(404, A.NOT_FOUND, "\u7528\u6237\u4E0D\u5B58\u5728");
@@ -36965,7 +36965,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 message: "\u5BC6\u7801\u5DF2\u6210\u529F\u91CD\u7F6E\uFF0C\u8BF7\u4F7F\u7528\u65B0\u5BC6\u7801\u767B\u5F55"
               });
             } catch (r) {
-              return Y(n, r);
+              return J(n, r);
             }
           });
           at();
@@ -37000,7 +37000,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 keys: a
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ni.post("/", async (e) => {
@@ -37047,7 +37047,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 warning: "\u8BF7\u7ACB\u5373\u4FDD\u5B58\u6B64 Key\uFF0C\u4E4B\u540E\u5C06\u65E0\u6CD5\u518D\u6B21\u67E5\u770B\u3002"
               }, 201);
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ni.post("/actions", async (e) => {
@@ -37120,14 +37120,14 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               }
               throw new C(400, A.BAD_REQUEST, `\u672A\u77E5\u64CD\u4F5C: ${a}`);
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           at();
           mt();
           qe();
           ct();
-          Jt();
+          Yt();
           Ie();
           var ri = new ke();
           ri.get("/balance", async (e) => {
@@ -37142,7 +37142,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 balance: r
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ri.get("/ledger", async (e) => {
@@ -37173,7 +37173,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 entries: i
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ri.post("/redeem", async (e) => {
@@ -37191,7 +37191,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 getUserById: o
               } = await Promise.resolve().then(() => (Ie(), Mt)), {
                 topup: c
-              } = await Promise.resolve().then(() => (Jt(), xu)), u = await s(e.env, a, n.id, n.email);
+              } = await Promise.resolve().then(() => (Yt(), xu)), u = await s(e.env, a, n.id, n.email);
               await c(t, `user:${n.id}`, u.amount, `\u4F7F\u7528\u5361\u5BC6 [${a}] \u5151\u6362\u5145\u503C`);
               let l = await $r(e.env, `user:${n.id}`), {
                 syncUserVipStatus: p
@@ -37223,19 +37223,19 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 message: `\u606D\u559C\uFF01\u5DF2\u6210\u529F\u5151\u6362\u5145\u503C \xA5${u.amount.toFixed(2)}${m ? "\uFF0C\u5E76\u5DF2\u4E3A\u60A8\u81EA\u52A8\u5347\u7EA7\u4E3A VIP \u8D26\u53F7\uFF01" : "\uFF01"}`
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           at();
           mt();
           qe();
           ct();
-          Ye();
+          Je();
           nt();
           oo();
-          Jt();
+          Yt();
           var ai = new ke();
-          var Jc = "epay:order:";
+          var Yc = "epay:order:";
           var bj = 48 * 3600;
           var xj = ["alipay", "wxpay", "qqpay"];
           function cv(e, t) {
@@ -37243,10 +37243,10 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               let a = e[r];
               return a != null && String(a) !== "";
             }).sort().map((r) => `${r}=${e[r]}`).join("&");
-            return Yt(n + t);
+            return Jt(n + t);
           }
           async function lv(e, t) {
-            let n = await G(e).get(Jc + t);
+            let n = await V(e).get(Yc + t);
             if (!n)
               return null;
             try {
@@ -37256,7 +37256,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             }
           }
           async function Np(e, t) {
-            await G(e).put(Jc + t.outTradeNo, JSON.stringify(t), {
+            await V(e).put(Yc + t.outTradeNo, JSON.stringify(t), {
               expirationTtl: bj
             });
           }
@@ -37327,11 +37327,11 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   throw new C(502, A.INTERNAL, `\u652F\u4ED8\u7F51\u5173\u8FD4\u56DE\u975E JSON\uFF1A${x.slice(0, 120)}`);
                 }
               } catch (b) {
-                throw await G(e.env).delete(Jc + m).catch(() => {
+                throw await V(e.env).delete(Yc + m).catch(() => {
                 }), b instanceof C ? b : new C(502, A.INTERNAL, `\u652F\u4ED8\u7F51\u5173\u4E0D\u53EF\u8FBE\uFF1A${b.message}`);
               }
               if (Number(h == null ? void 0 : h.code) !== 1)
-                throw await G(e.env).delete(Jc + m).catch(() => {
+                throw await V(e.env).delete(Yc + m).catch(() => {
                 }), new C(502, A.INTERNAL, (h == null ? void 0 : h.msg) ? `\u4E0B\u5355\u5931\u8D25\uFF1A${h.msg}` : "\u4E0B\u5355\u5931\u8D25");
               return z({
                 ok: true,
@@ -37343,7 +37343,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 tradeNo: h.trade_no || ""
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ai.get("/epay/notify", async (e) => {
@@ -37418,7 +37418,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 }
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           at();
@@ -37428,7 +37428,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           nt();
           ct();
           _r();
-          Jt();
+          Yt();
           eo();
           Ie();
           fr();
@@ -37466,7 +37466,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             return Dv(t, async () => {
               let p = await Ke(e, t), y = new Set(p.map((x) => x.keyFingerprint).filter(Boolean)), m = l && r.length === 1 ? [l.fingerprint] : await Hp(r);
               if (s && r.length === 1) {
-                let v = (await Ve(e)).find((w) => w.id === t), k = null;
+                let v = (await Ge(e)).find((w) => w.id === t), k = null;
                 if ((v == null ? void 0 : v.kind) === "oauth:zcode") {
                   let {
                     parseZcodeCredential: w,
@@ -37476,7 +37476,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 } else if ((v == null ? void 0 : v.kind) === "oauth:qoder") {
                   let {
                     parseQoderCredential: w
-                  } = await Promise.resolve().then(() => (Cs(), Yo));
+                  } = await Promise.resolve().then(() => (Cs(), Jo));
                   k = (_) => {
                     var _a;
                     return ((_a = w(_)) == null ? void 0 : _a.uid) || "";
@@ -37590,7 +37590,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 case "list_users": {
                   let d = await Rr(t), {
                     getBalance: g
-                  } = await Promise.resolve().then(() => (Jt(), xu)), h = await it(d, 8, async (b) => {
+                  } = await Promise.resolve().then(() => (Yt(), xu)), h = await it(d, 8, async (b) => {
                     let x = await g(t, `user:${b.id}`);
                     return {
                       id: b.id,
@@ -37692,7 +37692,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }), m(null, "api_key", String(i.keyId));
                 }
                 case "list_providers": {
-                  let d = await Ve(t), g = 500, b = (await Promise.all(d.map(async (x) => {
+                  let d = await Ge(t), g = 500, b = (await Promise.all(d.map(async (x) => {
                     let [v, k] = await Promise.all([Ke(t, x.id), $t(t, x.id)]);
                     return {
                       pr: x,
@@ -37798,7 +37798,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 case "toggle_provider": {
                   if (!i.id || !i.status)
                     throw new C(400, A.BAD_REQUEST, "\u7F3A\u5C11\u6E20\u9053 id \u6216\u72B6\u6001");
-                  let d = await Ve(t), g = d.find((h) => h.id === String(i.id));
+                  let d = await Ge(t), g = d.find((h) => h.id === String(i.id));
                   if (!g)
                     throw new C(404, A.NOT_FOUND, "\u6E20\u9053\u4E0D\u5B58\u5728");
                   return g.status = i.status, await jr(t, d), m(null, "provider", String(i.id));
@@ -37847,7 +37847,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   let b = String(i.refreshToken ?? i.key ?? "").trim();
                   if (!b)
                     throw new C(400, A.BAD_REQUEST, "\u7F3A\u5C11 refreshToken");
-                  let x = h[d], v = String(i.slug || "").trim() || x.slug, k = String(i.name || "").trim() || x.name, w = String(i.baseUrl || "").trim() || x.baseUrl, _ = typeof i.email == "string" && i.email.trim() ? i.email.trim() : void 0, T = typeof i.identity == "string" ? i.identity.trim() : "", O = await Hp([b]), I = await xt(t, b), j = await Ve(t), R = j.find((W) => W.slug === v);
+                  let x = h[d], v = String(i.slug || "").trim() || x.slug, k = String(i.name || "").trim() || x.name, w = String(i.baseUrl || "").trim() || x.baseUrl, _ = typeof i.email == "string" && i.email.trim() ? i.email.trim() : void 0, T = typeof i.identity == "string" ? i.identity.trim() : "", O = await Hp([b]), I = await xt(t, b), j = await Ge(t), R = j.find((W) => W.slug === v);
                   if (R && R.kind !== `oauth:${d}`)
                     throw new C(400, A.BAD_REQUEST, `\u6E20\u9053 slug "${v}" \u5DF2\u88AB ${R.kind} \u6E20\u9053\u5360\u7528\uFF0C\u8BF7\u6362\u4E00\u4E2A slug`);
                   let B = R ? null : {
@@ -37965,7 +37965,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   });
                 }
                 case "account_pool": {
-                  let d = await Ve(t), g = String(i.providerId || ""), h = d.filter((v) => (v.kind || "").startsWith("oauth:") || (v.kind || "").startsWith("web:")).filter((v) => !g || v.id === g || v.slug === g), {
+                  let d = await Ge(t), g = String(i.providerId || ""), h = d.filter((v) => (v.kind || "").startsWith("oauth:") || (v.kind || "").startsWith("web:")).filter((v) => !g || v.id === g || v.slug === g), {
                     buildAccountPool: b
                   } = await Promise.resolve().then(() => (Rv(), Pv)), x = await b(t, h, {
                     skipQuota: i.quota === 0 || i.quota === "0"
@@ -38096,7 +38096,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   let {
                     listCheckinChannels: d,
                     readCheckinConfig: g
-                  } = await Promise.resolve().then(() => (Wn(), Kn)), [h, b, x] = await Promise.all([Promise.resolve(d()), g(t), Ve(t)]), v = [];
+                  } = await Promise.resolve().then(() => (Wn(), Kn)), [h, b, x] = await Promise.all([Promise.resolve(d()), g(t), Ge(t)]), v = [];
                   for (let k of x) {
                     let w = (k.kind || "").replace(/^oauth:/, ""), _ = h.find((O) => O.type === w);
                     if (!_)
@@ -38124,7 +38124,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   let d = String(i.providerId || ""), g = String(i.deviceId || "").trim();
                   if (!g)
                     throw new C(400, A.BAD_REQUEST, "\u7F3A\u5C11 deviceId");
-                  let b = (await Ve(t)).find((O) => O.id === d || O.slug === d);
+                  let b = (await Ge(t)).find((O) => O.id === d || O.slug === d);
                   if (!b)
                     throw new C(404, A.NOT_FOUND, "\u6E20\u9053\u4E0D\u5B58\u5728");
                   let x = await Ke(t, b.id), v = x.find((O) => O.status === "active") || x[0];
@@ -38141,7 +38141,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   }, "oauth_account", v.id);
                 }
                 case "zcode_probe": {
-                  let d = String(i.providerId || ""), h = (await Ve(t)).find((w) => w.id === d || w.slug === d);
+                  let d = String(i.providerId || ""), h = (await Ge(t)).find((w) => w.id === d || w.slug === d);
                   if (!h)
                     throw new C(404, A.NOT_FOUND, "\u6E20\u9053\u4E0D\u5B58\u5728");
                   let b = await Ke(t, h.id), x = b.find((w) => w.status === "active") || b[0];
@@ -38153,7 +38153,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   return m(await v(t, k, h.baseUrl), "oauth_account", x.id);
                 }
                 case "qoder_probe": {
-                  let d = String(i.providerId || ""), h = (await Ve(t)).find((w) => w.id === d || w.slug === d);
+                  let d = String(i.providerId || ""), h = (await Ge(t)).find((w) => w.id === d || w.slug === d);
                   if (!h)
                     throw new C(404, A.NOT_FOUND, "\u6E20\u9053\u4E0D\u5B58\u5728");
                   let b = await Ke(t, h.id), x = b.find((w) => w.status === "active") || b[0];
@@ -38161,11 +38161,11 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                     throw new C(400, A.BAD_REQUEST, "\u8BE5\u6E20\u9053\u8FD8\u6CA1\u6709\u5DF2\u6388\u6743\u7684\u8D26\u53F7");
                   let {
                     probeQoder: v
-                  } = await Promise.resolve().then(() => (Cs(), Yo)), k = await Ne(t, x.encryptedKey);
+                  } = await Promise.resolve().then(() => (Cs(), Jo)), k = await Ne(t, x.encryptedKey);
                   return m(await v(t, k, h.baseUrl), "oauth_account", x.id);
                 }
                 case "trae_probe": {
-                  let d = String(i.providerId || ""), h = (await Ve(t)).find((w) => w.id === d || w.slug === d);
+                  let d = String(i.providerId || ""), h = (await Ge(t)).find((w) => w.id === d || w.slug === d);
                   if (!h)
                     throw new C(404, A.NOT_FOUND, "\u6E20\u9053\u4E0D\u5B58\u5728");
                   let b = await Ke(t, h.id), x = b.find((w) => w.status === "active") || b[0];
@@ -38279,7 +38279,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   });
                 }
                 case "oauth_test": {
-                  let d = String(i.providerId || ""), h = (await Ve(t)).find((R) => R.id === d || R.slug === d);
+                  let d = String(i.providerId || ""), h = (await Ge(t)).find((R) => R.id === d || R.slug === d);
                   if (!h)
                     throw new C(404, A.NOT_FOUND, "\u6E20\u9053\u4E0D\u5B58\u5728");
                   let {
@@ -38296,12 +38296,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   return m(j, "oauth_account", T.id);
                 }
                 case "list_upstream_models": {
-                  let d = String(i.providerId || ""), h = (await Ve(t)).find((v) => v.id === d || v.slug === d), b = (h == null ? void 0 : h.kind) || "";
+                  let d = String(i.providerId || ""), h = (await Ge(t)).find((v) => v.id === d || v.slug === d), b = (h == null ? void 0 : h.kind) || "";
                   if (b.startsWith("web:")) {
                     let v = b.slice(4), {
                       fetchWebModels: k,
                       WEB_PROVIDERS: w
-                    } = await Promise.resolve().then(() => (mo(), Yu)), _ = h ? await Ke(t, h.id) : [], T = _.find((I) => I.status === "active") || _[0];
+                    } = await Promise.resolve().then(() => (mo(), Ju)), _ = h ? await Ke(t, h.id) : [], T = _.find((I) => I.status === "active") || _[0];
                     if (T && v !== "geminiweb")
                       try {
                         let I = await Ne(t, T.encryptedKey), j = await k(t, v, I, h == null ? void 0 : h.baseUrl);
@@ -38429,7 +38429,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                           signal: AbortSignal.timeout(15e3)
                         });
                         if (_.ok) {
-                          let O = ((await _.json()).data ?? []).map((I) => I.id).filter((I) => !!I).map((I) => Va(h.slug, h.baseUrl, I));
+                          let O = ((await _.json()).data ?? []).map((I) => I.id).filter((I) => !!I).map((I) => Ga(h.slug, h.baseUrl, I));
                           if (O.length)
                             return z({
                               ok: true,
@@ -38445,7 +38445,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   });
                 }
                 case "list_models": {
-                  let d = await jt(t), g = await Pt(t), h = await Ve(t), b = new Map(h.map((v) => [v.id, v])), x = d.map((v) => {
+                  let d = await jt(t), g = await Pt(t), h = await Ge(t), b = new Map(h.map((v) => [v.id, v])), x = d.map((v) => {
                     let k = b.get(v.providerId), w = g[v.publicName];
                     return {
                       id: v.id,
@@ -38812,7 +38812,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                   return await qa(t, g), m(null, "announcement", String(i.id));
                 }
                 case "list_audit": {
-                  let g = (await Vi(t, Number(i.limit) || 100)).map((h) => ({
+                  let g = (await Gi(t, Number(i.limit) || 100)).map((h) => ({
                     id: h.id,
                     actor_user_id: h.actorUserId ?? void 0,
                     actor_email: null,
@@ -38877,7 +38877,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                     }, 500);
                 } catch {
                 }
-              return Y(n, a);
+              return J(n, a);
             }
           });
           ma.get("/stats", async (e) => {
@@ -38914,7 +38914,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 byModel: c
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ma.get("/usage/trend", async (e) => {
@@ -38942,7 +38942,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 points: o
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ma.get("/usage/logs", async (e) => {
@@ -38955,7 +38955,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               lt(n, ["admin", "auditor"]);
               let r = Math.min(Math.max(Number(e.req.query("limit")) || 50, 1), 200), a = (e.req.query("status") || "").trim(), s = (e.req.query("model") || "").trim(), i = (e.req.query("userId") || "").trim(), o = [];
               if (o = await ru(e.env), !o.length) {
-                let l = V(e.env), p = await l.list({
+                let l = G(e.env), p = await l.list({
                   prefix: "usage:record:",
                   paginate: false,
                   consistency: "strong"
@@ -38989,7 +38989,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 total: c.length
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           at();
@@ -38997,7 +38997,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           qe();
           ct();
           _r();
-          Ye();
+          Je();
           Ie();
           qe();
           var Uv = "edgerelay-backup";
@@ -39074,7 +39074,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             return t;
           }
           async function di(e) {
-            let t = V(e), n = (await Fv(t)).filter((a) => !$v(a)), r = (await zp(n, 10, (a) => Wj(t, a))).filter(Boolean);
+            let t = G(e), n = (await Fv(t)).filter((a) => !$v(a)), r = (await zp(n, 10, (a) => Wj(t, a))).filter(Boolean);
             return {
               format: Uv,
               version: Bv,
@@ -39089,7 +39089,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             let r = t.entries.filter((c) => !!c && typeof c.key == "string" && c.key.length > 0 && !$v(c.key));
             if (r.length === 0)
               throw new C(400, A.BAD_REQUEST, "\u5907\u4EFD\u6587\u4EF6\u4E0D\u5305\u542B\u4EFB\u4F55\u6570\u636E");
-            let a = V(e), s = n.currentUserId ? await Be(e, n.currentUserId) : null, i = n.currentSessionId ? await Ua(e, n.currentSessionId) : null, o = await Fv(a);
+            let a = G(e), s = n.currentUserId ? await Be(e, n.currentUserId) : null, i = n.currentSessionId ? await Ua(e, n.currentSessionId) : null, o = await Fv(a);
             if (await zp(o.filter((c) => !c.startsWith("backup:")), 10, (c) => ui(() => a.delete(c)).catch(() => {
             })), await zp(r, 10, (c) => ui(() => c.raw ? a.set(c.key, String(c.value)) : a.setJSON(c.key, c.value))), Li(), s) {
               let c = await Be(e, s.id), u = c ? {
@@ -39118,14 +39118,14 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             };
           }
           async function fi(e) {
-            let n = await V(e).get(qp, {
+            let n = await G(e).get(qp, {
               type: "json",
               consistency: "strong"
             });
             return Array.isArray(n) ? n.filter((r) => !!r && typeof r.id == "string" && typeof r.key == "string" && typeof r.createdAt == "string") : [];
           }
           async function zv(e) {
-            let t = V(e), n = await di(e), r = JSON.stringify(n), a = n.exportedAt.replace(/[:.]/g, "-"), s = `${qj}${a}`;
+            let t = G(e), n = await di(e), r = JSON.stringify(n), a = n.exportedAt.replace(/[:.]/g, "-"), s = `${qj}${a}`;
             await ui(() => t.set(s, r));
             let i = {
               id: a,
@@ -39150,7 +39150,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             let r = (await fi(e)).find((s) => s.id === t);
             if (!r)
               throw new C(404, A.NOT_FOUND, "\u5FEB\u7167\u4E0D\u5B58\u5728\u6216\u5DF2\u88AB\u6E05\u7406");
-            let a = await V(e).get(r.key, {
+            let a = await G(e).get(r.key, {
               type: "json",
               consistency: "strong"
             });
@@ -39161,28 +39161,28 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           async function Kv(e, t) {
             if (!t)
               throw new C(400, A.BAD_REQUEST, "\u672A\u6307\u5B9A\u8981\u5220\u9664\u7684\u5FEB\u7167");
-            let n = V(e), r = await fi(e), a = r.find((s) => s.id === t);
+            let n = G(e), r = await fi(e), a = r.find((s) => s.id === t);
             if (!a)
               throw new C(404, A.NOT_FOUND, "\u5FEB\u7167\u4E0D\u5B58\u5728\u6216\u5DF2\u88AB\u6E05\u7406");
             await ui(() => n.delete(a.key)).catch(() => {
             }), await n.setJSON(qp, r.filter((s) => s.id !== t));
           }
-          Ye();
+          Je();
           nt();
           qe();
           var Wp = "backup:telegram";
-          async function Vp(e) {
-            let t = await V(e).get(Wp, {
+          async function Gp(e) {
+            let t = await G(e).get(Wp, {
               type: "json",
               consistency: "strong"
             });
             return !t || typeof t.chatId != "string" || typeof t.botTokenEnc != "string" ? null : t;
           }
-          function Vj(e) {
+          function Gj(e) {
             return e.length <= 12 ? "\u2022\u2022\u2022\u2022\u2022\u2022" : `${e.slice(0, 6)}\u2026${e.slice(-4)}`;
           }
-          async function Gp(e) {
-            let t = await Vp(e);
+          async function Vp(e) {
+            let t = await Gp(e);
             if (!t)
               return {
                 configured: false,
@@ -39191,7 +39191,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               };
             let n = "\u2022\u2022\u2022\u2022\u2022\u2022";
             try {
-              n = Vj(await Ne(e, t.botTokenEnc));
+              n = Gj(await Ne(e, t.botTokenEnc));
             } catch {
             }
             return {
@@ -39204,23 +39204,23 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             let n = (t.chatId ?? "").trim(), r = (t.botToken ?? "").trim();
             if (!n)
               throw new C(400, A.BAD_REQUEST, "\u8BF7\u586B\u5199 Chat ID");
-            let a = await Vp(e);
+            let a = await Gp(e);
             if (!r && !a)
               throw new C(400, A.BAD_REQUEST, "\u8BF7\u586B\u5199 Bot Token");
             if (r && !r.includes(":"))
               throw new C(400, A.BAD_REQUEST, "Bot Token \u683C\u5F0F\u4E0D\u6B63\u786E\uFF0C\u5E94\u5F62\u5982 123456789:AA...");
             let s = r ? await xt(e, r) : a.botTokenEnc;
-            return await V(e).setJSON(Wp, {
+            return await G(e).setJSON(Wp, {
               chatId: n,
               botTokenEnc: s,
               updatedAt: Math.floor(Date.now() / 1e3)
-            }), await Gp(e);
+            }), await Vp(e);
           }
-          async function Vv(e) {
-            await V(e).delete(Wp);
+          async function Gv(e) {
+            await G(e).delete(Wp);
           }
-          async function Gv(e, t) {
-            let n = await Vp(e), r = "";
+          async function Vv(e, t) {
+            let n = await Gp(e), r = "";
             if (n)
               try {
                 r = await Ne(e, n.botTokenEnc);
@@ -39237,7 +39237,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               chatId: s
             };
           }
-          async function Jv(e, t, n) {
+          async function Yv(e, t, n) {
             let r;
             try {
               r = await fetch(`https://api.telegram.org/bot${e}/${t}`, {
@@ -39259,9 +39259,9 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             }
             return a;
           }
-          async function Yv(e, t) {
-            let n = await Gv(e, t);
-            return await Jv(n.botToken, "sendMessage", {
+          async function Jv(e, t) {
+            let n = await Vv(e, t);
+            return await Yv(n.botToken, "sendMessage", {
               headers: {
                 "content-type": "application/json"
               },
@@ -39274,13 +39274,13 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             }), "\u6D4B\u8BD5\u6D88\u606F\u5DF2\u53D1\u9001\uFF0C\u8BF7\u5230 Telegram \u67E5\u770B";
           }
           async function Xv(e) {
-            let t = await Gv(e), n = await di(e), r = JSON.stringify(n), a = new TextEncoder().encode(r).byteLength, s = `edgerelay-backup-${n.exportedAt.replace(/[:.]/g, "-")}.json`, i = new FormData();
+            let t = await Vv(e), n = await di(e), r = JSON.stringify(n), a = new TextEncoder().encode(r).byteLength, s = `edgerelay-backup-${n.exportedAt.replace(/[:.]/g, "-")}.json`, i = new FormData();
             return i.append("chat_id", t.chatId), i.append("caption", `Relay \u5168\u7AD9\u5907\u4EFD
 \u65F6\u95F4\uFF1A${n.exportedAt}
 \u6570\u636E\u6761\u76EE\uFF1A${n.entries.length}
 \u5927\u5C0F\uFF1A${(a / 1024).toFixed(1)} KB`), i.append("document", new Blob([r], {
               type: "application/json"
-            }), s), await Jv(t.botToken, "sendDocument", {
+            }), s), await Yv(t.botToken, "sendDocument", {
               body: i
             }), {
               message: `\u5907\u4EFD\u5DF2\u63A8\u9001\u5230 Telegram\uFF08${n.entries.length} \u9879\u6570\u636E\uFF09`,
@@ -39288,12 +39288,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             };
           }
           var Bt = new ke();
-          async function Jp(e) {
+          async function Yp(e) {
             let t = await le(e);
             return lt(t, ["superadmin"]), t;
           }
           async function xn(e) {
-            return await Jp(e), await Ka(e);
+            return await Yp(e), await Ka(e);
           }
           function Qv(e) {
             var _a;
@@ -39330,7 +39330,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 }
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           Bt.get("/list", async (e) => {
@@ -39339,14 +39339,14 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               req: e.req
             };
             try {
-              await Jp(t);
+              await Yp(t);
               let n = await fi(e.env);
               return z({
                 ok: true,
                 snapshots: n
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           Bt.post("/snapshot", async (e) => {
@@ -39375,7 +39375,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 snapshot: r
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           Bt.post("/import", async (e) => {
@@ -39403,7 +39403,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 summary: a
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           Bt.post("/restore", async (e) => {
@@ -39432,7 +39432,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 summary: a
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           Bt.post("/delete", async (e) => {
@@ -39453,7 +39453,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 message: "\u5FEB\u7167\u5DF2\u5220\u9664"
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           Bt.get("/telegram", async (e) => {
@@ -39462,12 +39462,12 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               req: e.req
             };
             try {
-              return await Jp(t), z({
+              return await Yp(t), z({
                 ok: true,
-                ...await Gp(e.env)
+                ...await Vp(e.env)
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           Bt.post("/telegram", async (e) => {
@@ -39491,7 +39491,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 status: a
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           Bt.post("/telegram/test", async (e) => {
@@ -39500,7 +39500,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               req: e.req
             };
             try {
-              let n = await xn(t), r = await pi(e), a = await Yv(e.env, r);
+              let n = await xn(t), r = await pi(e), a = await Jv(e.env, r);
               return await Qe(t, {
                 actorUserId: n.id,
                 actorIp: De(t.req),
@@ -39511,7 +39511,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 message: a
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           Bt.post("/telegram/push", async (e) => {
@@ -39535,7 +39535,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 entries: r.entries
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           Bt.post("/telegram/clear", async (e) => {
@@ -39545,7 +39545,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             };
             try {
               let n = await xn(t);
-              return await Vv(e.env), await Qe(t, {
+              return await Gv(e.env), await Qe(t, {
                 actorUserId: n.id,
                 actorIp: De(t.req),
                 action: "admin.backup_telegram_clear",
@@ -39555,7 +39555,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 message: "Telegram \u5907\u4EFD\u914D\u7F6E\u5DF2\u6E05\u9664"
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           at();
@@ -39601,7 +39601,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 byModel: y
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           mi.get("/trend", async (e) => {
@@ -39627,7 +39627,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 points: o
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           mi.get("/logs", async (e) => {
@@ -39656,7 +39656,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 logs: s
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           at();
@@ -39685,7 +39685,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 invited: i
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           hi.get("/admin", async (e) => {
@@ -39722,7 +39722,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 }
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           hi.post("/admin", async (e) => {
@@ -39744,7 +39744,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 ok: true
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           at();
@@ -39776,7 +39776,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 }
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ha.patch("/", async (e) => {
@@ -39803,7 +39803,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 ok: true
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ha.put("/", async (e) => {
@@ -39848,7 +39848,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 message: "\u5BC6\u7801\u5DF2\u66F4\u65B0"
               }), p, l, u);
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ha.post("/", async (e) => {
@@ -39860,7 +39860,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               let n = await le(t), r = await e.req.json();
               if (!r.dataBase64)
                 throw new C(400, A.BAD_REQUEST, "\u7F3A\u5C11\u56FE\u7247\u6570\u636E");
-              let a = V(e.env), s = `avatar:${n.id}`;
+              let a = G(e.env), s = `avatar:${n.id}`;
               await a.set(s, r.dataBase64);
               let i = r.dataBase64;
               return await pt(e.env, n.id, {
@@ -39870,14 +39870,14 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 avatarUrl: i
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           at();
-          Gn();
-          var Gj = /^[\w!#$%&'*.^`|~+-]+$/;
-          var Jj = /^[!#-:<>-[\]-~]+$/;
-          var Yj = /^[ !#-:<-[\]-~]*$/;
+          Vn();
+          var Vj = /^[\w!#$%&'*.^`|~+-]+$/;
+          var Yj = /^[!#-:<>-[\]-~]+$/;
+          var Jj = /^[ !#-:<-[\]-~]*$/;
           var Zv = (e) => {
             let t = 0, n = e.length;
             for (; t < n; ) {
@@ -39894,7 +39894,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             }
             return t === 0 && n === e.length ? e : e.slice(t, n);
           };
-          var Yp = (e, t) => {
+          var Jp = (e, t) => {
             if (t && e.indexOf(t) === -1)
               return {};
             let n = e.split(";"), r = /* @__PURE__ */ Object.create(null);
@@ -39903,16 +39903,16 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               if (s === -1)
                 continue;
               let i = Zv(a.substring(0, s));
-              if (t && t !== i || !Jj.test(i) || i in r)
+              if (t && t !== i || !Yj.test(i) || i in r)
                 continue;
               let o = Zv(a.substring(s + 1));
-              if (o.startsWith('"') && o.endsWith('"') && (o = o.slice(1, -1)), Yj.test(o) && (r[i] = Nr(o), t))
+              if (o.startsWith('"') && o.endsWith('"') && (o = o.slice(1, -1)), Jj.test(o) && (r[i] = Nr(o), t))
                 break;
             }
             return r;
           };
           var Xj = (e, t, n = {}) => {
-            if (!Gj.test(e))
+            if (!Vj.test(e))
               throw new Error("Invalid cookie name");
             let r = `${e}=${t}`;
             if (e.startsWith("__Secure-") && !n.secure)
@@ -39952,9 +39952,9 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               if (!r)
                 return;
               let a = t;
-              return n === "secure" ? a = "__Secure-" + t : n === "host" && (a = "__Host-" + t), Yp(r, a)[a];
+              return n === "secure" ? a = "__Secure-" + t : n === "host" && (a = "__Host-" + t), Jp(r, a)[a];
             }
-            return r ? Yp(r) : {};
+            return r ? Jp(r) : {};
           };
           var Qj = (e, t, n) => {
             let r;
@@ -40008,7 +40008,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 google: !!t.oauthGoogleEnabled
               },
               smtpEnabled: !!t.smtpEnabled,
-              emailVerificationRequired: Gc(t),
+              emailVerificationRequired: Vc(t),
               payment: {
                 epayEnabled: Op(t),
                 channels: Array.isArray(t.epayChannels) && t.epayChannels.length ? t.epayChannels : ["alipay", "wxpay", "qqpay"],
@@ -40040,7 +40040,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 appeals: a
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ga.post("/appeals", async (e) => {
@@ -40067,16 +40067,16 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 appeal: a
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ci();
           at();
           qe();
           ii();
-          Ga();
-          Jt();
-          Yi();
+          Va();
+          Yt();
+          Ji();
           fr();
           nt();
           Ie();
@@ -40179,7 +40179,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             if (a === "chatgptweb") {
               let {
                 generateChatgptWebImage: s
-              } = await Promise.resolve().then(() => (Gr(), is));
+              } = await Promise.resolve().then(() => (Vr(), is));
               return s(e, n, {
                 ...r,
                 model: t.upstreamModel || r.model
@@ -40306,7 +40306,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 attempts: m
               });
             } finally {
-              s && await Gt(e, s).catch(() => {
+              s && await Vt(e, s).catch(() => {
               }), await dn(e).catch(() => {
               });
             }
@@ -40323,7 +40323,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 limits: r.limits
               }, a, n, Date.now());
             } catch (r) {
-              return Y(e, r);
+              return J(e, r);
             }
           });
           at();
@@ -40972,7 +40972,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               let r = await e.req.json().catch(() => ({}));
               return await cl(r);
             } catch (n) {
-              return Y(e, n);
+              return J(e, n);
             }
           });
           at();
@@ -41021,7 +41021,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 throw new C(400, A.BAD_REQUEST, "\u4E0D\u652F\u6301\u7684\u6E20\u9053\u7C7B\u578B");
               if (!["bearer", "x-api-key"].includes(p))
                 throw new C(400, A.BAD_REQUEST, "\u4E0D\u652F\u6301\u7684\u9274\u6743\u65B9\u5F0F");
-              let [m, d] = await Promise.all([Ve(t), Wt(t)]);
+              let [m, d] = await Promise.all([Ge(t), Wt(t)]);
               if ((/* @__PURE__ */ new Set([...m.map((v) => v.slug), ...d.map((v) => v.slug)])).has(c))
                 throw new C(400, A.BAD_REQUEST, `\u6E20\u9053\u6807\u8BC6\u7B26 ${c} \u5DF2\u5B58\u5728\uFF0C\u8BF7\u6362\u4E00\u4E2A`);
               let h = Math.floor(Date.now() / 1e3), b = {
@@ -41057,7 +41057,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 submission: dw(b)
               });
             } catch (r) {
-              return Y(n, r);
+              return J(n, r);
             }
           });
           ya.get("/", async (e) => {
@@ -41072,7 +41072,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 submissions: s
               });
             } catch (r) {
-              return Y(n, r);
+              return J(n, r);
             }
           });
           ya.get("/:id/messages", async (e) => {
@@ -41087,7 +41087,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 messages: s
               });
             } catch (r) {
-              return Y(n, r);
+              return J(n, r);
             }
           });
           ya.post("/:id/messages", async (e) => {
@@ -41112,7 +41112,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 ok: true
               });
             } catch (r) {
-              return Y(n, r);
+              return J(n, r);
             }
           });
           sl();
@@ -41179,7 +41179,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 tasks: c.map(wP)
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           ll.delete("/tasks/:id", async (e) => {
@@ -41198,7 +41198,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 deleted: r
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           at();
@@ -41206,9 +41206,9 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
           ii();
           qe();
           ct();
-          Jt();
+          Yt();
           Ie();
-          Ye();
+          Je();
           nt();
           ci();
           ln();
@@ -41222,7 +41222,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
             var _a;
             let n = Math.floor(Date.now() / 6e4), r = `pg:rl:key:${t}:${n}`;
             try {
-              let a = V(e), i = (((_a = await a.get(r, {
+              let a = G(e), i = (((_a = await a.get(r, {
                 type: "json",
                 consistency: "strong"
               })) == null ? void 0 : _a.n) ?? 0) + 1;
@@ -41271,7 +41271,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               req: e.req
             };
             try {
-              let n = await le(t), [r, a] = await Promise.all([jt(e.env), Ve(e.env)]), s = new Map(a.filter((u) => u.status === "active").map((u) => [u.id, u])), i = /(^|[-_/])(embedding|embed|rerank|moderation|whisper|transcription)([-_/]|$)/i, o = [], c = /* @__PURE__ */ new Set();
+              let n = await le(t), [r, a] = await Promise.all([jt(e.env), Ge(e.env)]), s = new Map(a.filter((u) => u.status === "active").map((u) => [u.id, u])), i = /(^|[-_/])(embedding|embed|rerank|moderation|whisper|transcription)([-_/]|$)/i, o = [], c = /* @__PURE__ */ new Set();
               for (let u of r) {
                 if (u.enabled !== 1)
                   continue;
@@ -41297,7 +41297,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 can_use_paid: em(n.role)
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           vn.post("/chat", async (e) => {
@@ -41347,7 +41347,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               };
               return await Tp(e, g, m);
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           async function tm(e, t) {
@@ -41385,7 +41385,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               } = await tm(e, typeof r.key_id == "string" ? r.key_id : void 0);
               return delete r.key_id, await Qp(t, a, r, n, Date.now());
             } catch (r) {
-              return Y({
+              return J({
                 env: t,
                 req: e.req
               }, r);
@@ -41400,7 +41400,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
               } = await tm(e, typeof r.key_id == "string" ? r.key_id : void 0);
               return delete r.key_id, await Up(t, a, r, 0, n, Date.now(), s);
             } catch (r) {
-              return Y({
+              return J({
                 env: t,
                 req: e.req
               }, r);
@@ -41425,7 +41425,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 }
               });
             } catch (r) {
-              return Y(n, r);
+              return J(n, r);
             }
           });
           vn.post("/speech", async (e) => {
@@ -41439,7 +41439,7 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 input: r
               });
             } catch (n) {
-              return Y({
+              return J({
                 env: t,
                 req: e.req
               }, n);
@@ -41456,28 +41456,28 @@ if(state.status!=='completed'&&state.status!=='failed'&&state.status!=='cancelle
                 voices: uw
               });
             } catch (n) {
-              return Y(t, n);
+              return J(t, n);
             }
           });
           at();
           var nm = {
-            "/assets/AccountPool-nRKJqe5N.js": {
-              content: 'import{u as G,j as e,d as b,W as C,U as W,B as z,m as p,E as D,v as Q,n as v,M as j}from"./index-JGTLcmXV.js";import{r as u}from"./vendor-BbQ_LiY-.js";import{R as F}from"./refresh-cw-BY9R0tIW.js";import{C as R}from"./circle-check-CmF7WJUQ.js";import{S as H,T as I}from"./triangle-alert-V4ji6s4N.js";import{C as $}from"./clock-D3gRE-jV.js";const V=s=>s.startsWith("oauth:")?"OAuth \u6388\u6743":s.startsWith("web:")?"Web \u53CD\u4EE3":s;function J(s,m){if(m)return m;if(!s||s<=0)return"\u989D\u5EA6\u7A97\u53E3";if(s>=25920)return"\u6708\u7A97\u53E3";if(s>=1440){const a=Math.round(s/1440);return a===1?"\u65E5\u7A97\u53E3":a===7?"\u5468\u7A97\u53E3":`${a} \u5929\u7A97\u53E3`}return`${Math.max(1,Math.round(s/60))} \u5C0F\u65F6\u7A97\u53E3`}function K({a:s}){return s.status==="disabled"?e.jsx("span",{className:"rounded bg-zinc-500/10 px-1.5 py-0.5 text-[10px] text-zinc-400",children:"\u5DF2\u505C\u7528"}):s.health==="demoted"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-500",children:[e.jsx(H,{size:10}),"\u7194\u65AD\u51B7\u5374"]}):s.health==="unhealthy"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-500",children:[e.jsx(I,{size:10}),"\u5F02\u5E38(",s.failures,")"]}):e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500",children:[e.jsx(R,{size:10}),"\u5C31\u7EEA"]})}function y({value:s,label:m}){const a=s==null?null:Math.max(0,Math.min(100,Math.round(s*100)));return e.jsxs("div",{className:"min-w-[120px]",children:[e.jsxs("div",{className:"flex items-center justify-between gap-2 text-[10px] text-muted",children:[e.jsx("span",{className:"truncate",children:m}),e.jsx("span",{className:p("font-mono",a==null?"text-muted":a<=10?"text-red-500":a<=30?"text-amber-500":"text-emerald-500"),children:a==null?"\u2014":`${a}%`})]}),e.jsx("div",{className:"mt-1 h-1.5 w-full overflow-hidden rounded-full bg-line/70",children:e.jsx("div",{className:p("h-full rounded-full",a==null?"bg-muted/40":a<=10?"bg-red-500":a<=30?"bg-amber-500":"bg-emerald-500"),style:{width:`${a??0}%`}})})]})}function X({q:s,notQueried:m}){if(!s)return e.jsx("span",{className:"text-[11px] text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u989D\u5EA6\u67E5\u8BE2\u63A5\u53E3"});if(!s.ok)return e.jsx("span",{className:"text-[11px] text-err break-all",children:s.error||"\u989D\u5EA6\u67E5\u8BE2\u5931\u8D25"});if(s.type==="antigravity")return e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email&&e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.note&&e.jsx("span",{className:"text-[10px] text-amber-500",children:s.note})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-1.5 sm:grid-cols-2",children:[(s.models||[]).map(a=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:a.remaining,label:a.id}),a.resetTime&&e.jsxs("div",{className:"mt-1 flex items-center gap-1 text-[10px] text-muted",children:[e.jsx($,{size:10}),"\u91CD\u7F6E ",new Date(a.resetTime).toLocaleString("zh-CN",{hour12:!1})]})]},a.id)),(s.models||[]).length===0&&e.jsx("span",{className:"text-[11px] text-muted",children:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u6A21\u578B\u989D\u5EA6"})]})]});if(s.type==="cline")return e.jsxs("div",{className:"flex flex-wrap items-center gap-3 text-[11px] text-muted",children:[s.email&&e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}),e.jsxs("span",{className:"rounded bg-surface2 px-2 py-1",children:["Credit \u4F59\u989D ",e.jsx("b",{className:"font-mono text-ink",children:s.balance==null?"\u2014":s.balance.toLocaleString()})]}),e.jsxs("span",{className:"rounded bg-surface2 px-2 py-1",children:["\u4ECA\u65E5\u8BF7\u6C42 ",e.jsx("b",{className:"font-mono text-ink",children:s.requestsToday??0})]})]});if(s.type==="codebuddy"){const a=s.size??null,r=s.remain??null;return e.jsxs("div",{className:"space-y-1.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email&&e.jsx("span",{className:"inline-flex items-center gap-1 text-ink",children:s.email}),s.note&&e.jsx("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px]",children:s.note})]}),e.jsxs("div",{className:"flex items-center gap-3",children:[a!=null&&a>0&&r!=null?e.jsx("div",{className:"min-w-[160px] flex-1",children:e.jsx(y,{value:r/a,label:`\u5269\u4F59 ${r} / ${a}`})}):e.jsxs("span",{className:"text-[11px] text-muted",children:["\u5269\u4F59\u79EF\u5206 ",e.jsx("b",{className:"font-mono text-ink",children:r??"\u2014"})]}),s.used!=null&&e.jsxs("span",{className:"text-[10px] text-muted",children:["\u5DF2\u7528 ",e.jsx("b",{className:"font-mono text-ink",children:s.used})]})]})]})}if(s.type==="codex")return e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email?e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}):e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx(j,{size:11}),"\u672A\u8FD4\u56DE\u90AE\u7BB1"]}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.credits&&e.jsxs("span",{className:"rounded bg-surface2 px-2 py-0.5 text-[10px]",children:["Credits ",s.credits.unlimited?"\u4E0D\u9650":s.credits.hasCredits?s.credits.balance==null?"\u53EF\u7528":s.credits.balance.toLocaleString():"\u65E0"]})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-1.5 sm:grid-cols-2",children:[(s.windows||[]).map((a,r)=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:a.remainPercent/100,label:J(a.windowMinutes,a.label)}),e.jsxs("div",{className:"mt-1 flex items-center gap-1 text-[10px] text-muted",children:[e.jsx($,{size:10}),a.resetTime?`\u91CD\u7F6E ${new Date(a.resetTime).toLocaleString("zh-CN",{hour12:!1})}`:"\u672A\u8FD4\u56DE\u91CD\u7F6E\u65F6\u95F4"]})]},`${a.label}-${r}`)),(s.windows||[]).length===0&&e.jsx("span",{className:"text-[11px] text-muted",children:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u989D\u5EA6\u7A97\u53E3"})]})]});if(s.type==="chatgptweb")return e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email?e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}):e.jsx("span",{className:"text-ink",children:s.name||"\u7F51\u9875\u8D26\u53F7"}),s.name&&s.email&&e.jsx("span",{className:"text-[10px] text-muted",children:s.name}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.note&&e.jsx("span",{className:"text-[10px] text-amber-500",children:s.note}),!s.note&&e.jsx("span",{className:"text-[10px] text-muted",children:"\u7F51\u9875\u7248\u65E0\u989D\u5EA6\u63A5\u53E3"})]});if(s.type==="zcode"){const a=s.zcodeBalances||[],r=n=>n>=1e8?`${(n/1e8).toFixed(1).replace(/\\.0$/,"")}\u4EBF`:n>=1e4?`${(n/1e4).toFixed(1).replace(/\\.0$/,"")}\u4E07`:String(n);return e.jsxs("div",{className:"space-y-1.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx(C,{size:11}),"Start Plan \u989D\u5EA6"]}),(s.claimableCount??0)>0&&e.jsxs("span",{className:"rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-500",children:["\u6709 ",s.claimableCount," \u4E2A\u5305\u53EF\u9886"]}),a.length===0&&e.jsx("span",{className:"text-[10px] text-muted",children:"\u8BE5\u8EAB\u4EFD\u540D\u4E0B\u6682\u65E0\u751F\u6548\u989D\u5EA6\uFF08\u82E5\u5BA2\u6237\u7AEF\u6709\u989D\u5EA6\uFF0C\u8BF7\u5728\u7F51\u5173\u91CD\u65B0\u6388\u6743\u5BA2\u6237\u7AEF\u6B63\u5728\u4F7F\u7528\u7684\u8D26\u53F7\uFF09"})]}),a.map((n,f)=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:n.total>0?n.remaining/n.total:null,label:n.showName}),e.jsxs("div",{className:"mt-1 flex flex-wrap items-center gap-2 text-[10px] text-muted",children:[e.jsxs("span",{children:["\u5269 ",e.jsx("b",{className:"font-mono text-ink",children:r(n.remaining)}),n.total>0&&e.jsxs(e.Fragment,{children:[" / ",r(n.total)]}),n.unitType&&` ${n.unitType}`]}),n.used>0&&e.jsxs("span",{children:["\u5DF2\u7528 ",r(n.used)]}),n.expiresAt&&e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx($,{size:10}),"\u5230\u671F ",new Date(n.expiresAt*1e3).toLocaleString("zh-CN",{hour12:!1})]})]})]},`${n.showName}-${f}`))]})}return e.jsx("span",{className:"text-[11px] text-muted",children:"\u2014"})}function ae(){const[s,m]=u.useState(null),[a,r]=u.useState(!1),[n,f]=u.useState(null),[g,S]=u.useState("all"),o=G(),N=async t=>{r(!0);try{const i=await v("account_pool",t!=null&&t.skipQuota?{quota:0}:{});m(i.providers),t!=null&&t.skipQuota||M(!0),f(Date.now())}catch(i){o(i.message,"err"),f(Date.now())}finally{r(!1)}};u.useEffect(()=>{N({skipQuota:!0})},[]);const B=async t=>{var i;L(t.id);try{const c=(i=(await v("account_pool",{providerId:t.id})).providers)==null?void 0:i[0];c&&(m(x=>(x||[]).map(d=>d.id===c.id?c:d)),M(!0)),f(Date.now())}catch(l){o(l.message,"err")}finally{L("")}},E=(s||[]).reduce((t,i)=>t+(i.accountCount??i.accounts.length),0),O=(s||[]).filter(t=>g==="all"||t.id===g),[T,A]=u.useState(""),[k,L]=u.useState(""),[P,M]=u.useState(!1),U=async(t,i,l="\u7B7E\u5230")=>{A(t);try{const x=(await v("codebuddy_checkin",{type:t})).result,d=((x==null?void 0:x.channels)||[]).flatMap(w=>w.accounts),h=d.filter(w=>!w.ok);d.length?h.length?o(`${i} ${l}\uFF1A\u6210\u529F ${d.length-h.length}/${d.length}\uFF0C${h[0].message||"\u5B58\u5728\u5931\u8D25"}`,"err"):o(`${i} ${l}\u5B8C\u6210\uFF1A${d.length} \u4E2A\u8D26\u53F7\u6210\u529F`,"ok"):o((x==null?void 0:x.skipped)||`${i} \u6682\u65E0\u53EF${l}\u8D26\u53F7`,"err"),await N()}catch(c){o(c.message,"err")}finally{A("")}},_=async(t,i,l="\u7B7E\u5230")=>{try{await v("set_checkin",{type:t,enabled:i}),o(`${i?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"}\u81EA\u52A8${l}`,"ok"),await N()}catch(c){o(c.message,"err")}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs(b,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(C,{size:18})}),e.jsxs("div",{children:[e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u8D26\u53F7\u6C60"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"OAuth / Web \u53CD\u4EE3\u6E20\u9053\u7684\u8D26\u53F7\u4E0E\u989D\u5EA6\u603B\u89C8\u3002\u8FDB\u5165\u9875\u9762\u81EA\u52A8\u52A0\u8F7D\u8D26\u53F7\u5217\u8868\uFF08\u4E0D\u67E5\u4E0A\u6E38\u989D\u5EA6\uFF0C\u79D2\u5F00\uFF09\uFF1B\u989D\u5EA6\u6309\u9700\u67E5\u8BE2\u2014\u2014\u70B9\u6E20\u9053\u300C\u5237\u65B0\u300D\u53EA\u67E5\u8BE5\u6E20\u9053\uFF0C\u70B9\u300C\u5237\u65B0\u989D\u5EA6\u300D\u5168\u7AD9\u67E5\u8BE2\u3002"})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[n&&e.jsxs("span",{className:"text-xs text-muted",children:["\u4E0A\u6B21\u66F4\u65B0 ",new Date(n).toLocaleTimeString("zh-CN",{hour12:!1})]}),e.jsxs("span",{className:"text-xs text-muted",children:[e.jsx(W,{size:12,className:"mr-1 inline"}),s?`${s.length} \u4E2A\u6E20\u9053 / ${E} \u4E2A\u8D26\u53F7`:"\u672A\u67E5\u8BE2"]}),e.jsxs(z,{variant:"soft",onClick:()=>void N(),disabled:a,children:[e.jsx(F,{size:14,className:p(a&&"animate-spin")}),a?"\u67E5\u8BE2\u4E2D\u2026":"\u5237\u65B0\u989D\u5EA6"]})]})]}),e.jsx("p",{className:"mt-3 rounded-lg border border-line bg-surface2/40 px-3 py-2 text-[11px] text-muted",children:"\u8D26\u53F7\u5217\u8868\u8FDB\u9875\u5373\u8F7D\uFF1B\u4E0A\u6E38\u989D\u5EA6\u67E5\u8BE2\u6309\u6E20\u9053\u6309\u9700\u8FDB\u884C\uFF08ChatGPT \u7F51\u9875\u7248\u7B49\u6E20\u9053\u8F83\u6162\uFF0C\u5EFA\u8BAE\u7528\u5355\u6E20\u9053\u300C\u5237\u65B0\u300D\uFF09\u3002\u67E5\u8BE2\u5931\u8D25\u4E0D\u5F71\u54CD\u8D26\u53F7\u6B63\u5E38\u8C03\u7528\u3002"}),s&&s.length>0&&e.jsxs("div",{className:"mt-3 flex flex-wrap gap-1.5",children:[e.jsxs("button",{onClick:()=>S("all"),className:p("rounded-lg px-2.5 py-1 text-[11px] transition-colors",g==="all"?"bg-brand/15 text-brand":"bg-surface2/60 text-muted hover:text-ink"),children:["\u5168\u90E8 \xB7 ",s.length]}),s.map(t=>e.jsxs("button",{onClick:()=>S(t.id),className:p("rounded-lg px-2.5 py-1 text-[11px] transition-colors",g===t.id?"bg-brand/15 text-brand":"bg-surface2/60 text-muted hover:text-ink"),children:[t.name," \xB7 ",t.accounts.length]},t.id))]})]}),s===null?e.jsx(b,{children:e.jsx(D,{icon:e.jsx(Q,{size:32}),title:"\u70B9\u51FB\u5237\u65B0\u989D\u5EA6\u5F00\u59CB\u67E5\u8BE2",hint:"\u8FDB\u5165\u9875\u9762\u4E0D\u4F1A\u81EA\u52A8\u8BF7\u6C42\u4E0A\u6E38\u989D\u5EA6\uFF1B\u70B9\u51FB\u53F3\u4E0A\u89D2\u300C\u5237\u65B0\u989D\u5EA6\u300D\u83B7\u53D6\u5B9E\u65F6\u989D\u5EA6\u4E0E\u8D26\u53F7\u72B6\u6001\u3002"})}):s.length===0?e.jsx(b,{children:e.jsx(D,{icon:e.jsx(C,{size:32}),title:"\u6682\u65E0 OAuth / Web \u8D26\u53F7",hint:"\u5148\u5728\u300C\u4F9B\u5E94\u5546\u300D\u9875\u7684 OAuth \u6388\u6743\u6216 Web \u53CD\u4EE3\u9009\u9879\u5361\u63A5\u5165\u6E20\u9053\u8D26\u53F7\u3002"})}):e.jsx("div",{className:"flex flex-col gap-3.5",children:O.map(t=>{var i;return e.jsxs(b,{className:p("p-4",t.status==="disabled"&&"opacity-75 border-dashed"),children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2.5",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-xs font-bold text-brand",children:t.name[0]}),e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-1.5",children:[e.jsx("span",{className:"truncate text-sm font-semibold text-ink",children:t.name}),e.jsx("span",{className:"rounded bg-line/70 px-1.5 py-0.5 text-[10px] text-muted",children:V(t.kind)}),e.jsx("span",{className:p("rounded px-1.5 py-0.5 text-[10px] font-medium",t.status==="active"?"bg-emerald-500/10 text-emerald-500":"bg-zinc-500/10 text-zinc-400"),children:t.status==="active"?"\u542F\u7528":"\u505C\u7528"})]}),e.jsx("code",{className:"text-[10px] text-muted font-mono",children:t.slug})]})]}),e.jsxs("div",{className:"flex items-center gap-2.5",children:[((i=t.checkin)==null?void 0:i.supported)&&e.jsxs(e.Fragment,{children:[e.jsxs("label",{className:"inline-flex cursor-pointer items-center gap-1.5 text-[11px] text-muted",children:[e.jsx("input",{type:"checkbox",className:"h-3 w-3 cursor-pointer accent-[var(--brand)]",checked:t.checkin.enabled,onChange:l=>{var c;return void _(t.kind.replace(/^oauth:/,""),l.target.checked,(c=t.checkin)==null?void 0:c.action)}}),"\u81EA\u52A8",t.checkin.action||"\u7B7E\u5230"]}),e.jsxs(z,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:T===t.kind.replace(/^oauth:/,""),onClick:()=>{var l;return void U(t.kind.replace(/^oauth:/,""),t.name,(l=t.checkin)==null?void 0:l.action)},children:[e.jsx(R,{size:12}),T===t.kind.replace(/^oauth:/,"")?`${t.checkin.action||"\u7B7E\u5230"}\u4E2D\u2026`:`\u7ACB\u5373${t.checkin.action||"\u7B7E\u5230"}`]})]}),e.jsxs(z,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:k===t.id,onClick:()=>void B(t),title:"\u53EA\u5237\u65B0\u8BE5\u6E20\u9053\u7684\u989D\u5EA6\u4E0E\u72B6\u6001",children:[e.jsx(F,{size:12,className:p(k===t.id&&"animate-spin")}),k===t.id?"\u67E5\u8BE2\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-[11px] text-muted",children:[e.jsx(W,{size:11}),t.accountCount??t.accounts.length," \u4E2A\u8D26\u53F7"]})]})]}),e.jsx("div",{className:"mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-2 items-start",children:t.accounts.length===0?(t.accountCount??0)>0?e.jsxs("p",{className:"py-4 text-center text-xs text-muted",children:["\u5171 ",t.accountCount," \u4E2A\u8D26\u53F7\uFF08\u672A\u52A0\u8F7D\u8BE6\u60C5\uFF09\xB7 \u70B9\u300C\u5237\u65B0\u300D\u52A0\u8F7D\u8D26\u53F7\u4E0E\u989D\u5EA6"]}):e.jsx("p",{className:"py-4 text-center text-xs text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u8D26\u53F7\u51ED\u636E"}):t.accounts.map(l=>{var c,x,d,h;return e.jsxs("div",{className:"rounded-lg border border-line/70 bg-surface2/30 p-2.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-1.5",children:[e.jsx("code",{className:"text-[11px] font-mono font-medium text-ink",children:l.fingerprint}),e.jsx("span",{className:"rounded bg-line px-1 py-0.5 text-[10px] text-muted",children:l.label||"account"}),e.jsx(K,{a:l}),(((c=l.quota)==null?void 0:c.plan)||((x=l.quota)==null?void 0:x.email))&&e.jsxs("span",{className:"ml-auto inline-flex items-center gap-1 text-[10px] text-muted",children:[e.jsx(Q,{size:10}),((d=l.quota)==null?void 0:d.email)||((h=l.quota)==null?void 0:h.plan)]})]}),e.jsx("div",{className:"mt-2 pl-0.5",children:e.jsx(X,{q:l.quota,notQueried:!P})})]},l.id)})})]},t.id)})})]})}\n',
+            "/assets/AccountPool-H4ndr5z3.js": {
+              content: 'import{u as G,j as e,d as b,W as C,U as W,B as z,m as p,E as D,v as Q,n as v,M as j}from"./index-OWhocmiM.js";import{r as u}from"./vendor-BbQ_LiY-.js";import{R as F}from"./refresh-cw-CiqXg9A7.js";import{C as R}from"./circle-check-CIKjzwLy.js";import{S as H,T as I}from"./triangle-alert-DwdzAbbD.js";import{C as $}from"./clock-I44wVmzv.js";const V=s=>s.startsWith("oauth:")?"OAuth \u6388\u6743":s.startsWith("web:")?"Web \u53CD\u4EE3":s;function J(s,m){if(m)return m;if(!s||s<=0)return"\u989D\u5EA6\u7A97\u53E3";if(s>=25920)return"\u6708\u7A97\u53E3";if(s>=1440){const a=Math.round(s/1440);return a===1?"\u65E5\u7A97\u53E3":a===7?"\u5468\u7A97\u53E3":`${a} \u5929\u7A97\u53E3`}return`${Math.max(1,Math.round(s/60))} \u5C0F\u65F6\u7A97\u53E3`}function K({a:s}){return s.status==="disabled"?e.jsx("span",{className:"rounded bg-zinc-500/10 px-1.5 py-0.5 text-[10px] text-zinc-400",children:"\u5DF2\u505C\u7528"}):s.health==="demoted"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-500",children:[e.jsx(H,{size:10}),"\u7194\u65AD\u51B7\u5374"]}):s.health==="unhealthy"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-500",children:[e.jsx(I,{size:10}),"\u5F02\u5E38(",s.failures,")"]}):e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500",children:[e.jsx(R,{size:10}),"\u5C31\u7EEA"]})}function y({value:s,label:m}){const a=s==null?null:Math.max(0,Math.min(100,Math.round(s*100)));return e.jsxs("div",{className:"min-w-[120px]",children:[e.jsxs("div",{className:"flex items-center justify-between gap-2 text-[10px] text-muted",children:[e.jsx("span",{className:"truncate",children:m}),e.jsx("span",{className:p("font-mono",a==null?"text-muted":a<=10?"text-red-500":a<=30?"text-amber-500":"text-emerald-500"),children:a==null?"\u2014":`${a}%`})]}),e.jsx("div",{className:"mt-1 h-1.5 w-full overflow-hidden rounded-full bg-line/70",children:e.jsx("div",{className:p("h-full rounded-full",a==null?"bg-muted/40":a<=10?"bg-red-500":a<=30?"bg-amber-500":"bg-emerald-500"),style:{width:`${a??0}%`}})})]})}function X({q:s,notQueried:m}){if(!s)return e.jsx("span",{className:"text-[11px] text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u989D\u5EA6\u67E5\u8BE2\u63A5\u53E3"});if(!s.ok)return e.jsx("span",{className:"text-[11px] text-err break-all",children:s.error||"\u989D\u5EA6\u67E5\u8BE2\u5931\u8D25"});if(s.type==="antigravity")return e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email&&e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.note&&e.jsx("span",{className:"text-[10px] text-amber-500",children:s.note})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-1.5 sm:grid-cols-2",children:[(s.models||[]).map(a=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:a.remaining,label:a.id}),a.resetTime&&e.jsxs("div",{className:"mt-1 flex items-center gap-1 text-[10px] text-muted",children:[e.jsx($,{size:10}),"\u91CD\u7F6E ",new Date(a.resetTime).toLocaleString("zh-CN",{hour12:!1})]})]},a.id)),(s.models||[]).length===0&&e.jsx("span",{className:"text-[11px] text-muted",children:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u6A21\u578B\u989D\u5EA6"})]})]});if(s.type==="cline")return e.jsxs("div",{className:"flex flex-wrap items-center gap-3 text-[11px] text-muted",children:[s.email&&e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}),e.jsxs("span",{className:"rounded bg-surface2 px-2 py-1",children:["Credit \u4F59\u989D ",e.jsx("b",{className:"font-mono text-ink",children:s.balance==null?"\u2014":s.balance.toLocaleString()})]}),e.jsxs("span",{className:"rounded bg-surface2 px-2 py-1",children:["\u4ECA\u65E5\u8BF7\u6C42 ",e.jsx("b",{className:"font-mono text-ink",children:s.requestsToday??0})]})]});if(s.type==="codebuddy"){const a=s.size??null,r=s.remain??null;return e.jsxs("div",{className:"space-y-1.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email&&e.jsx("span",{className:"inline-flex items-center gap-1 text-ink",children:s.email}),s.note&&e.jsx("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px]",children:s.note})]}),e.jsxs("div",{className:"flex items-center gap-3",children:[a!=null&&a>0&&r!=null?e.jsx("div",{className:"min-w-[160px] flex-1",children:e.jsx(y,{value:r/a,label:`\u5269\u4F59 ${r} / ${a}`})}):e.jsxs("span",{className:"text-[11px] text-muted",children:["\u5269\u4F59\u79EF\u5206 ",e.jsx("b",{className:"font-mono text-ink",children:r??"\u2014"})]}),s.used!=null&&e.jsxs("span",{className:"text-[10px] text-muted",children:["\u5DF2\u7528 ",e.jsx("b",{className:"font-mono text-ink",children:s.used})]})]})]})}if(s.type==="codex")return e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email?e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}):e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx(j,{size:11}),"\u672A\u8FD4\u56DE\u90AE\u7BB1"]}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.credits&&e.jsxs("span",{className:"rounded bg-surface2 px-2 py-0.5 text-[10px]",children:["Credits ",s.credits.unlimited?"\u4E0D\u9650":s.credits.hasCredits?s.credits.balance==null?"\u53EF\u7528":s.credits.balance.toLocaleString():"\u65E0"]})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-1.5 sm:grid-cols-2",children:[(s.windows||[]).map((a,r)=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:a.remainPercent/100,label:J(a.windowMinutes,a.label)}),e.jsxs("div",{className:"mt-1 flex items-center gap-1 text-[10px] text-muted",children:[e.jsx($,{size:10}),a.resetTime?`\u91CD\u7F6E ${new Date(a.resetTime).toLocaleString("zh-CN",{hour12:!1})}`:"\u672A\u8FD4\u56DE\u91CD\u7F6E\u65F6\u95F4"]})]},`${a.label}-${r}`)),(s.windows||[]).length===0&&e.jsx("span",{className:"text-[11px] text-muted",children:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u989D\u5EA6\u7A97\u53E3"})]})]});if(s.type==="chatgptweb")return e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[s.email?e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(j,{size:11}),s.email]}):e.jsx("span",{className:"text-ink",children:s.name||"\u7F51\u9875\u8D26\u53F7"}),s.name&&s.email&&e.jsx("span",{className:"text-[10px] text-muted",children:s.name}),s.plan&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand",children:s.plan}),s.note&&e.jsx("span",{className:"text-[10px] text-amber-500",children:s.note}),!s.note&&e.jsx("span",{className:"text-[10px] text-muted",children:"\u7F51\u9875\u7248\u65E0\u989D\u5EA6\u63A5\u53E3"})]});if(s.type==="zcode"){const a=s.zcodeBalances||[],r=n=>n>=1e8?`${(n/1e8).toFixed(1).replace(/\\.0$/,"")}\u4EBF`:n>=1e4?`${(n/1e4).toFixed(1).replace(/\\.0$/,"")}\u4E07`:String(n);return e.jsxs("div",{className:"space-y-1.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2 text-[11px] text-muted",children:[e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx(C,{size:11}),"Start Plan \u989D\u5EA6"]}),(s.claimableCount??0)>0&&e.jsxs("span",{className:"rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-500",children:["\u6709 ",s.claimableCount," \u4E2A\u5305\u53EF\u9886"]}),a.length===0&&e.jsx("span",{className:"text-[10px] text-muted",children:"\u8BE5\u8EAB\u4EFD\u540D\u4E0B\u6682\u65E0\u751F\u6548\u989D\u5EA6\uFF08\u82E5\u5BA2\u6237\u7AEF\u6709\u989D\u5EA6\uFF0C\u8BF7\u5728\u7F51\u5173\u91CD\u65B0\u6388\u6743\u5BA2\u6237\u7AEF\u6B63\u5728\u4F7F\u7528\u7684\u8D26\u53F7\uFF09"})]}),a.map((n,f)=>e.jsxs("div",{className:"rounded-lg bg-surface2/50 px-2.5 py-1.5",children:[e.jsx(y,{value:n.total>0?n.remaining/n.total:null,label:n.showName}),e.jsxs("div",{className:"mt-1 flex flex-wrap items-center gap-2 text-[10px] text-muted",children:[e.jsxs("span",{children:["\u5269 ",e.jsx("b",{className:"font-mono text-ink",children:r(n.remaining)}),n.total>0&&e.jsxs(e.Fragment,{children:[" / ",r(n.total)]}),n.unitType&&` ${n.unitType}`]}),n.used>0&&e.jsxs("span",{children:["\u5DF2\u7528 ",r(n.used)]}),n.expiresAt&&e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx($,{size:10}),"\u5230\u671F ",new Date(n.expiresAt*1e3).toLocaleString("zh-CN",{hour12:!1})]})]})]},`${n.showName}-${f}`))]})}return e.jsx("span",{className:"text-[11px] text-muted",children:"\u2014"})}function ae(){const[s,m]=u.useState(null),[a,r]=u.useState(!1),[n,f]=u.useState(null),[g,S]=u.useState("all"),o=G(),N=async t=>{r(!0);try{const i=await v("account_pool",t!=null&&t.skipQuota?{quota:0}:{});m(i.providers),t!=null&&t.skipQuota||M(!0),f(Date.now())}catch(i){o(i.message,"err"),f(Date.now())}finally{r(!1)}};u.useEffect(()=>{N({skipQuota:!0})},[]);const B=async t=>{var i;L(t.id);try{const c=(i=(await v("account_pool",{providerId:t.id})).providers)==null?void 0:i[0];c&&(m(x=>(x||[]).map(d=>d.id===c.id?c:d)),M(!0)),f(Date.now())}catch(l){o(l.message,"err")}finally{L("")}},E=(s||[]).reduce((t,i)=>t+(i.accountCount??i.accounts.length),0),O=(s||[]).filter(t=>g==="all"||t.id===g),[T,A]=u.useState(""),[k,L]=u.useState(""),[P,M]=u.useState(!1),U=async(t,i,l="\u7B7E\u5230")=>{A(t);try{const x=(await v("codebuddy_checkin",{type:t})).result,d=((x==null?void 0:x.channels)||[]).flatMap(w=>w.accounts),h=d.filter(w=>!w.ok);d.length?h.length?o(`${i} ${l}\uFF1A\u6210\u529F ${d.length-h.length}/${d.length}\uFF0C${h[0].message||"\u5B58\u5728\u5931\u8D25"}`,"err"):o(`${i} ${l}\u5B8C\u6210\uFF1A${d.length} \u4E2A\u8D26\u53F7\u6210\u529F`,"ok"):o((x==null?void 0:x.skipped)||`${i} \u6682\u65E0\u53EF${l}\u8D26\u53F7`,"err"),await N()}catch(c){o(c.message,"err")}finally{A("")}},_=async(t,i,l="\u7B7E\u5230")=>{try{await v("set_checkin",{type:t,enabled:i}),o(`${i?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"}\u81EA\u52A8${l}`,"ok"),await N()}catch(c){o(c.message,"err")}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs(b,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(C,{size:18})}),e.jsxs("div",{children:[e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u8D26\u53F7\u6C60"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"OAuth / Web \u53CD\u4EE3\u6E20\u9053\u7684\u8D26\u53F7\u4E0E\u989D\u5EA6\u603B\u89C8\u3002\u8FDB\u5165\u9875\u9762\u81EA\u52A8\u52A0\u8F7D\u8D26\u53F7\u5217\u8868\uFF08\u4E0D\u67E5\u4E0A\u6E38\u989D\u5EA6\uFF0C\u79D2\u5F00\uFF09\uFF1B\u989D\u5EA6\u6309\u9700\u67E5\u8BE2\u2014\u2014\u70B9\u6E20\u9053\u300C\u5237\u65B0\u300D\u53EA\u67E5\u8BE5\u6E20\u9053\uFF0C\u70B9\u300C\u5237\u65B0\u989D\u5EA6\u300D\u5168\u7AD9\u67E5\u8BE2\u3002"})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[n&&e.jsxs("span",{className:"text-xs text-muted",children:["\u4E0A\u6B21\u66F4\u65B0 ",new Date(n).toLocaleTimeString("zh-CN",{hour12:!1})]}),e.jsxs("span",{className:"text-xs text-muted",children:[e.jsx(W,{size:12,className:"mr-1 inline"}),s?`${s.length} \u4E2A\u6E20\u9053 / ${E} \u4E2A\u8D26\u53F7`:"\u672A\u67E5\u8BE2"]}),e.jsxs(z,{variant:"soft",onClick:()=>void N(),disabled:a,children:[e.jsx(F,{size:14,className:p(a&&"animate-spin")}),a?"\u67E5\u8BE2\u4E2D\u2026":"\u5237\u65B0\u989D\u5EA6"]})]})]}),e.jsx("p",{className:"mt-3 rounded-lg border border-line bg-surface2/40 px-3 py-2 text-[11px] text-muted",children:"\u8D26\u53F7\u5217\u8868\u8FDB\u9875\u5373\u8F7D\uFF1B\u4E0A\u6E38\u989D\u5EA6\u67E5\u8BE2\u6309\u6E20\u9053\u6309\u9700\u8FDB\u884C\uFF08ChatGPT \u7F51\u9875\u7248\u7B49\u6E20\u9053\u8F83\u6162\uFF0C\u5EFA\u8BAE\u7528\u5355\u6E20\u9053\u300C\u5237\u65B0\u300D\uFF09\u3002\u67E5\u8BE2\u5931\u8D25\u4E0D\u5F71\u54CD\u8D26\u53F7\u6B63\u5E38\u8C03\u7528\u3002"}),s&&s.length>0&&e.jsxs("div",{className:"mt-3 flex flex-wrap gap-1.5",children:[e.jsxs("button",{onClick:()=>S("all"),className:p("rounded-lg px-2.5 py-1 text-[11px] transition-colors",g==="all"?"bg-brand/15 text-brand":"bg-surface2/60 text-muted hover:text-ink"),children:["\u5168\u90E8 \xB7 ",s.length]}),s.map(t=>e.jsxs("button",{onClick:()=>S(t.id),className:p("rounded-lg px-2.5 py-1 text-[11px] transition-colors",g===t.id?"bg-brand/15 text-brand":"bg-surface2/60 text-muted hover:text-ink"),children:[t.name," \xB7 ",t.accounts.length]},t.id))]})]}),s===null?e.jsx(b,{children:e.jsx(D,{icon:e.jsx(Q,{size:32}),title:"\u70B9\u51FB\u5237\u65B0\u989D\u5EA6\u5F00\u59CB\u67E5\u8BE2",hint:"\u8FDB\u5165\u9875\u9762\u4E0D\u4F1A\u81EA\u52A8\u8BF7\u6C42\u4E0A\u6E38\u989D\u5EA6\uFF1B\u70B9\u51FB\u53F3\u4E0A\u89D2\u300C\u5237\u65B0\u989D\u5EA6\u300D\u83B7\u53D6\u5B9E\u65F6\u989D\u5EA6\u4E0E\u8D26\u53F7\u72B6\u6001\u3002"})}):s.length===0?e.jsx(b,{children:e.jsx(D,{icon:e.jsx(C,{size:32}),title:"\u6682\u65E0 OAuth / Web \u8D26\u53F7",hint:"\u5148\u5728\u300C\u4F9B\u5E94\u5546\u300D\u9875\u7684 OAuth \u6388\u6743\u6216 Web \u53CD\u4EE3\u9009\u9879\u5361\u63A5\u5165\u6E20\u9053\u8D26\u53F7\u3002"})}):e.jsx("div",{className:"flex flex-col gap-3.5",children:O.map(t=>{var i;return e.jsxs(b,{className:p("p-4",t.status==="disabled"&&"opacity-75 border-dashed"),children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2.5",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-xs font-bold text-brand",children:t.name[0]}),e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-1.5",children:[e.jsx("span",{className:"truncate text-sm font-semibold text-ink",children:t.name}),e.jsx("span",{className:"rounded bg-line/70 px-1.5 py-0.5 text-[10px] text-muted",children:V(t.kind)}),e.jsx("span",{className:p("rounded px-1.5 py-0.5 text-[10px] font-medium",t.status==="active"?"bg-emerald-500/10 text-emerald-500":"bg-zinc-500/10 text-zinc-400"),children:t.status==="active"?"\u542F\u7528":"\u505C\u7528"})]}),e.jsx("code",{className:"text-[10px] text-muted font-mono",children:t.slug})]})]}),e.jsxs("div",{className:"flex items-center gap-2.5",children:[((i=t.checkin)==null?void 0:i.supported)&&e.jsxs(e.Fragment,{children:[e.jsxs("label",{className:"inline-flex cursor-pointer items-center gap-1.5 text-[11px] text-muted",children:[e.jsx("input",{type:"checkbox",className:"h-3 w-3 cursor-pointer accent-[var(--brand)]",checked:t.checkin.enabled,onChange:l=>{var c;return void _(t.kind.replace(/^oauth:/,""),l.target.checked,(c=t.checkin)==null?void 0:c.action)}}),"\u81EA\u52A8",t.checkin.action||"\u7B7E\u5230"]}),e.jsxs(z,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:T===t.kind.replace(/^oauth:/,""),onClick:()=>{var l;return void U(t.kind.replace(/^oauth:/,""),t.name,(l=t.checkin)==null?void 0:l.action)},children:[e.jsx(R,{size:12}),T===t.kind.replace(/^oauth:/,"")?`${t.checkin.action||"\u7B7E\u5230"}\u4E2D\u2026`:`\u7ACB\u5373${t.checkin.action||"\u7B7E\u5230"}`]})]}),e.jsxs(z,{variant:"soft",className:"!h-7 !px-2 text-[11px]",disabled:k===t.id,onClick:()=>void B(t),title:"\u53EA\u5237\u65B0\u8BE5\u6E20\u9053\u7684\u989D\u5EA6\u4E0E\u72B6\u6001",children:[e.jsx(F,{size:12,className:p(k===t.id&&"animate-spin")}),k===t.id?"\u67E5\u8BE2\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-[11px] text-muted",children:[e.jsx(W,{size:11}),t.accountCount??t.accounts.length," \u4E2A\u8D26\u53F7"]})]})]}),e.jsx("div",{className:"mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-2 items-start",children:t.accounts.length===0?(t.accountCount??0)>0?e.jsxs("p",{className:"py-4 text-center text-xs text-muted",children:["\u5171 ",t.accountCount," \u4E2A\u8D26\u53F7\uFF08\u672A\u52A0\u8F7D\u8BE6\u60C5\uFF09\xB7 \u70B9\u300C\u5237\u65B0\u300D\u52A0\u8F7D\u8D26\u53F7\u4E0E\u989D\u5EA6"]}):e.jsx("p",{className:"py-4 text-center text-xs text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u8D26\u53F7\u51ED\u636E"}):t.accounts.map(l=>{var c,x,d,h;return e.jsxs("div",{className:"rounded-lg border border-line/70 bg-surface2/30 p-2.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-1.5",children:[e.jsx("code",{className:"text-[11px] font-mono font-medium text-ink",children:l.fingerprint}),e.jsx("span",{className:"rounded bg-line px-1 py-0.5 text-[10px] text-muted",children:l.label||"account"}),e.jsx(K,{a:l}),(((c=l.quota)==null?void 0:c.plan)||((x=l.quota)==null?void 0:x.email))&&e.jsxs("span",{className:"ml-auto inline-flex items-center gap-1 text-[10px] text-muted",children:[e.jsx(Q,{size:10}),((d=l.quota)==null?void 0:d.email)||((h=l.quota)==null?void 0:h.plan)]})]}),e.jsx("div",{className:"mt-2 pl-0.5",children:e.jsx(X,{q:l.quota,notQueried:!P})})]},l.id)})})]},t.id)})})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Backup-CYl2Spyg.js": {
-              content: 'import{c as P,u as G,i as Q,j as e,d as C,y as W,B as l,z as X,F as S,I as z,m as Z,a as o}from"./index-JGTLcmXV.js";import{r as h}from"./vendor-BbQ_LiY-.js";import{D as ee}from"./download-D7etkHHV.js";import{R as O}from"./refresh-cw-BY9R0tIW.js";import{T as E}from"./trash-2-DuK1uChF.js";import{B as ae,S as se}from"./send-itasS0aM.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const R=P("Save",[["path",{d:"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z",key:"1c8476"}],["path",{d:"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7",key:"1ydtos"}],["path",{d:"M7 3v4a1 1 0 0 0 1 1h7",key:"t51u73"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const D=P("Upload",[["path",{d:"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",key:"ih7n3h"}],["polyline",{points:"17 8 12 3 7 8",key:"t8dd8p"}],["line",{x1:"12",x2:"12",y1:"3",y2:"15",key:"widbto"}]]);function oe(){const[g,I]=h.useState(null),[i,c]=h.useState(""),[s,k]=h.useState(null),[d,b]=h.useState({botToken:"",chatId:""}),[m,x]=h.useState(""),[j,A]=h.useState("local"),w=h.useRef(null),t=G(),{confirm:v,confirmEl:L}=Q(),u=async()=>{try{const a=await o("/api/admin/backup/list");I(a.snapshots??[])}catch{I([])}},$=async()=>{try{const a=await o("/api/admin/backup/telegram");k(a),b(r=>({...r,chatId:a.chatId??""}))}catch{k({configured:!1,chatId:"",botTokenMasked:""})}};h.useEffect(()=>{u(),$()},[]);const M=async()=>{var a,r;if(!i){c("export");try{const n=await fetch("/api/admin/backup/export",{credentials:"same-origin"});if(!n.ok){const f=await n.json().catch(()=>null);throw((a=f==null?void 0:f.error)==null?void 0:a.code)==="step_up_required"&&window.dispatchEvent(new CustomEvent("gw:stepup")),new Error(((r=f==null?void 0:f.error)==null?void 0:r.message)||"\u5BFC\u51FA\u5931\u8D25")}const p=await n.blob(),T=((n.headers.get("content-disposition")||"").match(/filename="?([^";]+)/)||[])[1]||`edgerelay-backup-${Date.now()}.json`,B=URL.createObjectURL(p),y=document.createElement("a");y.href=B,y.download=T,document.body.appendChild(y),y.click(),y.remove(),setTimeout(()=>URL.revokeObjectURL(B),1e3),t("\u5907\u4EFD\u6587\u4EF6\u5DF2\u5F00\u59CB\u4E0B\u8F7D")}catch(n){t(n.message,"err")}finally{c("")}}},U=async a=>{if(!(!a||i))try{const r=await a.text();let n;try{n=JSON.parse(r)}catch{throw new Error("\u5907\u4EFD\u6587\u4EF6\u4E0D\u662F\u5408\u6CD5 JSON")}const p=n;if((p==null?void 0:p.format)!=="edgerelay-backup"||p.version!==1||!Array.isArray(p.entries))throw new Error("\u4E0D\u662F\u6709\u6548\u7684 EdgeRelay \u5907\u4EFD\u6587\u4EF6");if(!await v(`\u786E\u8BA4\u7528\u300C${a.name}\u300D\u8986\u76D6\u5F53\u524D\u5168\u90E8\u6570\u636E\uFF1F\u5176\u4ED6\u8BBE\u5907\u4F1A\u88AB\u9000\u51FA\u767B\u5F55\u3002`))return;c("import");const T=await o("/api/admin/backup/import","POST",p);t(T.message),await u()}catch(r){t(r.message,"err")}finally{c(""),w.current&&(w.current.value="")}},F=async()=>{if(!i){c("snapshot");try{const a=await o("/api/admin/backup/snapshot","POST",{});t(a.message),await u()}catch(a){t(a.message,"err")}finally{c("")}}},J=async a=>{if(i)return;const r=new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1});if(await v(`\u786E\u8BA4\u6062\u590D\u5230 ${r} \u7684\u5FEB\u7167\uFF1F\u5F53\u524D\u6570\u636E\u5C06\u88AB\u8986\u76D6\uFF0C\u5176\u4ED6\u8BBE\u5907\u4F1A\u88AB\u9000\u51FA\u767B\u5F55\u3002`)){c("restore");try{const n=await o("/api/admin/backup/restore","POST",{id:a.id});t(n.message),await u()}catch(n){t(n.message,"err")}finally{c("")}}},H=async a=>{if(i)return;const r=new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1});if(await v(`\u786E\u8BA4\u5220\u9664 ${r} \u7684\u5FEB\u7167\uFF1F\u5220\u9664\u540E\u4E0D\u53EF\u6062\u590D\u3002`)){c("delete");try{await o("/api/admin/backup/delete","POST",{id:a.id}),t("\u5FEB\u7167\u5DF2\u5220\u9664"),await u()}catch(n){t(n.message,"err")}finally{c("")}}},_=async()=>{if(!m){x("save");try{const a=await o("/api/admin/backup/telegram","POST",{botToken:d.botToken.trim()||void 0,chatId:d.chatId.trim()});k(a.status),b({botToken:"",chatId:a.status.chatId}),t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},K=async()=>{if(!m){x("test");try{const a=await o("/api/admin/backup/telegram/test","POST",{botToken:d.botToken.trim()||void 0,chatId:d.chatId.trim()||void 0});t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},V=async()=>{if(!(m||!(s!=null&&s.configured))){x("push");try{const a=await o("/api/admin/backup/telegram/push","POST",{});t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},Y=async()=>{if(!m&&await v("\u786E\u8BA4\u6E05\u9664 Telegram \u673A\u5668\u4EBA\u914D\u7F6E\uFF1F\u6E05\u9664\u540E\u9700\u8981\u91CD\u65B0\u586B\u5199 Bot Token \u548C Chat ID\u3002")){x("clear");try{await o("/api/admin/backup/telegram/clear","POST",{}),k({configured:!1,chatId:"",botTokenMasked:""}),b({botToken:"",chatId:""}),t("Telegram \u914D\u7F6E\u5DF2\u6E05\u9664")}catch(a){t(a.message,"err")}finally{x("")}}},N=!!m;return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["local","\u672C\u5730\u5907\u4EFD"],["snapshots","\u7AD9\u5185\u5FEB\u7167"],["telegram","Telegram \u5907\u4EFD"]].map(([a,r])=>e.jsx("button",{role:"tab","aria-selected":j===a,onClick:()=>A(a),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${j===a?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:r},a))}),j==="local"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(W,{size:15}),"\u672C\u5730\u5907\u4EFD"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u5BFC\u51FA\u5168\u7AD9\u6570\u636E\u4E3A JSON \u6587\u4EF6\uFF0C\u6216\u7528\u5907\u4EFD\u6587\u4EF6\u8986\u76D6\u6062\u590D\u3002\u5907\u4EFD\u5305\u542B\u7528\u6237\u3001\u5BC6\u94A5\u3001\u6E20\u9053\u3001\u6A21\u578B\u3001\u8BA1\u8D39\u3001\u7528\u91CF\u4E0E\u5BA1\u8BA1\u65E5\u5FD7\uFF0C\u4E0D\u542B\u767B\u5F55\u4F1A\u8BDD\u3002"}),e.jsxs("div",{className:"flex flex-wrap gap-2",children:[e.jsxs(l,{onClick:M,disabled:!!i,children:[e.jsx(ee,{size:14}),i==="export"?"\u5BFC\u51FA\u4E2D\u2026":"\u5BFC\u51FA\u6570\u636E\u5E93"]}),e.jsxs(l,{variant:"ghost",onClick:()=>{var a;return(a=w.current)==null?void 0:a.click()},disabled:!!i,children:[e.jsx(D,{size:14}),"\u5BFC\u5165\u6570\u636E\u5E93\u6587\u4EF6"]}),e.jsx("input",{ref:w,type:"file",accept:".json,application/json",className:"hidden",onChange:a=>{var r;return U((r=a.target.files)==null?void 0:r[0])}})]}),e.jsxs("div",{className:"mt-4 rounded-lg border border-warn/30 bg-warn/5 px-3.5 py-2.5 text-[11px] leading-relaxed text-muted",children:["\u5BFC\u5165\u4F1A\u8986\u76D6\u73B0\u6709\u6570\u636E\uFF0C\u5176\u4ED6\u8BBE\u5907\u5C06\u88AB\u9000\u51FA\u767B\u5F55\uFF1B\u5F53\u524D\u767B\u5F55\u7684\u8D85\u7EA7\u7BA1\u7406\u5458\u8D26\u53F7\u4E0E\u5DF2\u4FDD\u5B58\u7684\u7AD9\u5185\u5FEB\u7167\u4F1A\u81EA\u52A8\u4FDD\u7559\u3002 \u5907\u4EFD\u5305\u542B\u5BC6\u7801\u54C8\u5E0C\u3001API Key \u54C8\u5E0C\u4E0E\u4F9B\u5E94\u5546\u5BC6\u94A5\u5BC6\u6587\uFF0C\u8BF7\u59A5\u5584\u4FDD\u7BA1\uFF1B\u8DE8\u73AF\u5883\u6062\u590D\u65F6\u9700\u4FDD\u6301\u76F8\u540C\u7684",e.jsx("code",{className:"mx-1 font-mono text-ink",children:"ENCRYPTION_KEY"}),"\u3002"]})]}),j==="snapshots"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(O,{size:15}),"\u7AD9\u5185\u5FEB\u7167"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u5FEB\u7167\u4FDD\u5B58\u5728 EdgeOne Blob \u5185\uFF0C\u6700\u591A\u4FDD\u7559 10 \u4EFD\uFF0C\u4E0D\u4F9D\u8D56 R2 \u7B49\u5916\u90E8\u5BF9\u8C61\u5B58\u50A8\u3002"}),e.jsxs("div",{className:"flex flex-wrap gap-2",children:[e.jsxs(l,{variant:"soft",onClick:F,disabled:!!i,children:[e.jsx(R,{size:14}),i==="snapshot"?"\u751F\u6210\u4E2D\u2026":"\u7ACB\u5373\u751F\u6210\u5FEB\u7167"]}),e.jsxs(l,{variant:"ghost",onClick:u,disabled:!!i,children:[e.jsx(O,{size:14}),"\u5237\u65B0\u5FEB\u7167"]})]}),e.jsxs("div",{className:"mt-5 border-t border-line pt-4",children:[e.jsxs("div",{className:"mb-2 flex items-center justify-between text-xs text-muted",children:[e.jsx("span",{children:"\u5FEB\u7167\u5217\u8868"}),e.jsx("span",{children:g===null?"\u52A0\u8F7D\u4E2D\u2026":`${g.length} / 10 \u4EFD`})]}),g===null?e.jsx("div",{className:"flex flex-col gap-2",children:[0,1].map(a=>e.jsx("div",{className:"skeleton h-12"},a))}):g.length===0?e.jsx("p",{className:"rounded-lg border border-dashed border-line px-3 py-4 text-center text-xs text-muted",children:"\u8FD8\u6CA1\u6709\u5FEB\u7167\uFF0C\u70B9\u51FB\u300C\u7ACB\u5373\u751F\u6210\u5FEB\u7167\u300D\u521B\u5EFA\u7B2C\u4E00\u4EFD\u3002"}):e.jsx("div",{className:"flex flex-col gap-2",children:g.map(a=>e.jsxs("div",{className:"flex flex-col gap-2 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-[12px] font-medium",children:new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1})}),e.jsxs("div",{className:"text-[11px] text-muted",children:[a.entries," \u9879 \xB7 ",X(a.size)]})]}),e.jsxs("div",{className:"flex shrink-0 gap-2",children:[e.jsx(l,{variant:"ghost",className:"!px-2.5 !py-1 !text-xs",onClick:()=>J(a),disabled:!!i,children:"\u6062\u590D"}),e.jsx(l,{variant:"danger",className:"!px-2.5 !py-1 !text-xs",onClick:()=>H(a),disabled:!!i,"aria-label":"\u5220\u9664\u5FEB\u7167",children:e.jsx(E,{size:12})})]})]},a.id))})]})]}),j==="telegram"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(ae,{size:15}),"Telegram \u673A\u5668\u4EBA\u5907\u4EFD"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u914D\u7F6E Telegram Bot \u540E\uFF0C\u53EF\u628A\u5B8C\u6574 JSON \u5907\u4EFD\u4F5C\u4E3A\u6587\u4EF6\u63A8\u9001\u5230\u6307\u5B9A\u4F1A\u8BDD\u3002Bot Token \u4F1A\u52A0\u5BC6\u4FDD\u5B58\uFF0C\u9875\u9762\u53EA\u663E\u793A\u63A9\u7801\u3002"}),e.jsxs("div",{className:"grid gap-3 sm:grid-cols-2",children:[e.jsx(S,{label:"Bot Token",hint:s!=null&&s.configured?`\u5DF2\u914D\u7F6E\uFF1A${s.botTokenMasked}`:"\u5411 @BotFather \u83B7\u53D6",children:e.jsx(z,{type:"password",value:d.botToken,onChange:a=>b({...d,botToken:a.target.value}),placeholder:s!=null&&s.configured?"\u7559\u7A7A\u5219\u4FDD\u6301\u73B0\u6709 Token":"123456789:AA...",autoComplete:"off",spellCheck:!1})}),e.jsx(S,{label:"Chat ID",hint:"\u79C1\u804A / \u7FA4\u7EC4 / \u9891\u9053\u7684\u6570\u5B57 ID",children:e.jsx(z,{value:d.chatId,onChange:a=>b({...d,chatId:a.target.value}),placeholder:"-1001234567890"})})]}),e.jsxs("div",{className:"mt-3 flex items-center gap-2 text-[11px] text-muted",children:[e.jsx("span",{className:Z("h-2 w-2 rounded-full",s!=null&&s.configured?"bg-ok":"bg-muted/40")}),s!=null&&s.configured?`\u5DF2\u914D\u7F6E\uFF08Chat ID\uFF1A${s.chatId}\uFF09`:"\u5C1A\u672A\u914D\u7F6E"]}),e.jsxs("div",{className:"mt-4 flex flex-wrap gap-2",children:[e.jsxs(l,{onClick:_,disabled:N,children:[e.jsx(R,{size:14}),m==="save"?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u914D\u7F6E"]}),e.jsxs(l,{variant:"ghost",onClick:K,disabled:N,children:[e.jsx(se,{size:14}),m==="test"?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001\u6D4B\u8BD5\u6D88\u606F"]}),e.jsxs(l,{variant:"soft",onClick:V,disabled:N||!(s!=null&&s.configured),children:[e.jsx(D,{size:14}),m==="push"?"\u63A8\u9001\u4E2D\u2026":"\u63A8\u9001\u5907\u4EFD\u5230 Telegram"]}),(s==null?void 0:s.configured)&&e.jsxs(l,{variant:"danger",onClick:Y,disabled:N,children:[e.jsx(E,{size:14}),"\u6E05\u9664\u914D\u7F6E"]})]}),e.jsx("p",{className:"mt-3 text-[11px] leading-relaxed text-muted",children:"\u63A8\u9001\u5185\u5BB9\u4E0E\u300C\u5BFC\u51FA\u6570\u636E\u5E93\u300D\u4E0B\u8F7D\u7684 JSON \u6587\u4EF6\u4E00\u81F4\u3002Telegram \u914D\u7F6E\u4FDD\u5B58\u5728\u7AD9\u5185\u4E14\u4E0D\u4F1A\u5199\u8FDB\u5907\u4EFD\u6587\u4EF6\uFF1B\u63A8\u9001\u524D\u8BF7\u5148\u4FDD\u5B58\u914D\u7F6E\u3002"})]}),L]})}\n',
+            "/assets/Backup-c98MuXhX.js": {
+              content: 'import{c as P,u as G,i as Q,j as e,d as C,y as W,B as l,z as X,F as S,I as z,m as Z,a as o}from"./index-OWhocmiM.js";import{r as h}from"./vendor-BbQ_LiY-.js";import{D as ee}from"./download-BtYvvPCG.js";import{R as O}from"./refresh-cw-CiqXg9A7.js";import{T as E}from"./trash-2-BAKVuXGI.js";import{B as ae,S as se}from"./send-Ck83dgZo.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const R=P("Save",[["path",{d:"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z",key:"1c8476"}],["path",{d:"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7",key:"1ydtos"}],["path",{d:"M7 3v4a1 1 0 0 0 1 1h7",key:"t51u73"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const D=P("Upload",[["path",{d:"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",key:"ih7n3h"}],["polyline",{points:"17 8 12 3 7 8",key:"t8dd8p"}],["line",{x1:"12",x2:"12",y1:"3",y2:"15",key:"widbto"}]]);function oe(){const[g,I]=h.useState(null),[i,c]=h.useState(""),[s,k]=h.useState(null),[d,b]=h.useState({botToken:"",chatId:""}),[m,x]=h.useState(""),[j,A]=h.useState("local"),w=h.useRef(null),t=G(),{confirm:v,confirmEl:L}=Q(),u=async()=>{try{const a=await o("/api/admin/backup/list");I(a.snapshots??[])}catch{I([])}},$=async()=>{try{const a=await o("/api/admin/backup/telegram");k(a),b(r=>({...r,chatId:a.chatId??""}))}catch{k({configured:!1,chatId:"",botTokenMasked:""})}};h.useEffect(()=>{u(),$()},[]);const M=async()=>{var a,r;if(!i){c("export");try{const n=await fetch("/api/admin/backup/export",{credentials:"same-origin"});if(!n.ok){const f=await n.json().catch(()=>null);throw((a=f==null?void 0:f.error)==null?void 0:a.code)==="step_up_required"&&window.dispatchEvent(new CustomEvent("gw:stepup")),new Error(((r=f==null?void 0:f.error)==null?void 0:r.message)||"\u5BFC\u51FA\u5931\u8D25")}const p=await n.blob(),T=((n.headers.get("content-disposition")||"").match(/filename="?([^";]+)/)||[])[1]||`edgerelay-backup-${Date.now()}.json`,B=URL.createObjectURL(p),y=document.createElement("a");y.href=B,y.download=T,document.body.appendChild(y),y.click(),y.remove(),setTimeout(()=>URL.revokeObjectURL(B),1e3),t("\u5907\u4EFD\u6587\u4EF6\u5DF2\u5F00\u59CB\u4E0B\u8F7D")}catch(n){t(n.message,"err")}finally{c("")}}},U=async a=>{if(!(!a||i))try{const r=await a.text();let n;try{n=JSON.parse(r)}catch{throw new Error("\u5907\u4EFD\u6587\u4EF6\u4E0D\u662F\u5408\u6CD5 JSON")}const p=n;if((p==null?void 0:p.format)!=="edgerelay-backup"||p.version!==1||!Array.isArray(p.entries))throw new Error("\u4E0D\u662F\u6709\u6548\u7684 EdgeRelay \u5907\u4EFD\u6587\u4EF6");if(!await v(`\u786E\u8BA4\u7528\u300C${a.name}\u300D\u8986\u76D6\u5F53\u524D\u5168\u90E8\u6570\u636E\uFF1F\u5176\u4ED6\u8BBE\u5907\u4F1A\u88AB\u9000\u51FA\u767B\u5F55\u3002`))return;c("import");const T=await o("/api/admin/backup/import","POST",p);t(T.message),await u()}catch(r){t(r.message,"err")}finally{c(""),w.current&&(w.current.value="")}},F=async()=>{if(!i){c("snapshot");try{const a=await o("/api/admin/backup/snapshot","POST",{});t(a.message),await u()}catch(a){t(a.message,"err")}finally{c("")}}},J=async a=>{if(i)return;const r=new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1});if(await v(`\u786E\u8BA4\u6062\u590D\u5230 ${r} \u7684\u5FEB\u7167\uFF1F\u5F53\u524D\u6570\u636E\u5C06\u88AB\u8986\u76D6\uFF0C\u5176\u4ED6\u8BBE\u5907\u4F1A\u88AB\u9000\u51FA\u767B\u5F55\u3002`)){c("restore");try{const n=await o("/api/admin/backup/restore","POST",{id:a.id});t(n.message),await u()}catch(n){t(n.message,"err")}finally{c("")}}},H=async a=>{if(i)return;const r=new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1});if(await v(`\u786E\u8BA4\u5220\u9664 ${r} \u7684\u5FEB\u7167\uFF1F\u5220\u9664\u540E\u4E0D\u53EF\u6062\u590D\u3002`)){c("delete");try{await o("/api/admin/backup/delete","POST",{id:a.id}),t("\u5FEB\u7167\u5DF2\u5220\u9664"),await u()}catch(n){t(n.message,"err")}finally{c("")}}},_=async()=>{if(!m){x("save");try{const a=await o("/api/admin/backup/telegram","POST",{botToken:d.botToken.trim()||void 0,chatId:d.chatId.trim()});k(a.status),b({botToken:"",chatId:a.status.chatId}),t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},K=async()=>{if(!m){x("test");try{const a=await o("/api/admin/backup/telegram/test","POST",{botToken:d.botToken.trim()||void 0,chatId:d.chatId.trim()||void 0});t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},V=async()=>{if(!(m||!(s!=null&&s.configured))){x("push");try{const a=await o("/api/admin/backup/telegram/push","POST",{});t(a.message)}catch(a){t(a.message,"err")}finally{x("")}}},Y=async()=>{if(!m&&await v("\u786E\u8BA4\u6E05\u9664 Telegram \u673A\u5668\u4EBA\u914D\u7F6E\uFF1F\u6E05\u9664\u540E\u9700\u8981\u91CD\u65B0\u586B\u5199 Bot Token \u548C Chat ID\u3002")){x("clear");try{await o("/api/admin/backup/telegram/clear","POST",{}),k({configured:!1,chatId:"",botTokenMasked:""}),b({botToken:"",chatId:""}),t("Telegram \u914D\u7F6E\u5DF2\u6E05\u9664")}catch(a){t(a.message,"err")}finally{x("")}}},N=!!m;return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["local","\u672C\u5730\u5907\u4EFD"],["snapshots","\u7AD9\u5185\u5FEB\u7167"],["telegram","Telegram \u5907\u4EFD"]].map(([a,r])=>e.jsx("button",{role:"tab","aria-selected":j===a,onClick:()=>A(a),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${j===a?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:r},a))}),j==="local"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(W,{size:15}),"\u672C\u5730\u5907\u4EFD"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u5BFC\u51FA\u5168\u7AD9\u6570\u636E\u4E3A JSON \u6587\u4EF6\uFF0C\u6216\u7528\u5907\u4EFD\u6587\u4EF6\u8986\u76D6\u6062\u590D\u3002\u5907\u4EFD\u5305\u542B\u7528\u6237\u3001\u5BC6\u94A5\u3001\u6E20\u9053\u3001\u6A21\u578B\u3001\u8BA1\u8D39\u3001\u7528\u91CF\u4E0E\u5BA1\u8BA1\u65E5\u5FD7\uFF0C\u4E0D\u542B\u767B\u5F55\u4F1A\u8BDD\u3002"}),e.jsxs("div",{className:"flex flex-wrap gap-2",children:[e.jsxs(l,{onClick:M,disabled:!!i,children:[e.jsx(ee,{size:14}),i==="export"?"\u5BFC\u51FA\u4E2D\u2026":"\u5BFC\u51FA\u6570\u636E\u5E93"]}),e.jsxs(l,{variant:"ghost",onClick:()=>{var a;return(a=w.current)==null?void 0:a.click()},disabled:!!i,children:[e.jsx(D,{size:14}),"\u5BFC\u5165\u6570\u636E\u5E93\u6587\u4EF6"]}),e.jsx("input",{ref:w,type:"file",accept:".json,application/json",className:"hidden",onChange:a=>{var r;return U((r=a.target.files)==null?void 0:r[0])}})]}),e.jsxs("div",{className:"mt-4 rounded-lg border border-warn/30 bg-warn/5 px-3.5 py-2.5 text-[11px] leading-relaxed text-muted",children:["\u5BFC\u5165\u4F1A\u8986\u76D6\u73B0\u6709\u6570\u636E\uFF0C\u5176\u4ED6\u8BBE\u5907\u5C06\u88AB\u9000\u51FA\u767B\u5F55\uFF1B\u5F53\u524D\u767B\u5F55\u7684\u8D85\u7EA7\u7BA1\u7406\u5458\u8D26\u53F7\u4E0E\u5DF2\u4FDD\u5B58\u7684\u7AD9\u5185\u5FEB\u7167\u4F1A\u81EA\u52A8\u4FDD\u7559\u3002 \u5907\u4EFD\u5305\u542B\u5BC6\u7801\u54C8\u5E0C\u3001API Key \u54C8\u5E0C\u4E0E\u4F9B\u5E94\u5546\u5BC6\u94A5\u5BC6\u6587\uFF0C\u8BF7\u59A5\u5584\u4FDD\u7BA1\uFF1B\u8DE8\u73AF\u5883\u6062\u590D\u65F6\u9700\u4FDD\u6301\u76F8\u540C\u7684",e.jsx("code",{className:"mx-1 font-mono text-ink",children:"ENCRYPTION_KEY"}),"\u3002"]})]}),j==="snapshots"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(O,{size:15}),"\u7AD9\u5185\u5FEB\u7167"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u5FEB\u7167\u4FDD\u5B58\u5728 EdgeOne Blob \u5185\uFF0C\u6700\u591A\u4FDD\u7559 10 \u4EFD\uFF0C\u4E0D\u4F9D\u8D56 R2 \u7B49\u5916\u90E8\u5BF9\u8C61\u5B58\u50A8\u3002"}),e.jsxs("div",{className:"flex flex-wrap gap-2",children:[e.jsxs(l,{variant:"soft",onClick:F,disabled:!!i,children:[e.jsx(R,{size:14}),i==="snapshot"?"\u751F\u6210\u4E2D\u2026":"\u7ACB\u5373\u751F\u6210\u5FEB\u7167"]}),e.jsxs(l,{variant:"ghost",onClick:u,disabled:!!i,children:[e.jsx(O,{size:14}),"\u5237\u65B0\u5FEB\u7167"]})]}),e.jsxs("div",{className:"mt-5 border-t border-line pt-4",children:[e.jsxs("div",{className:"mb-2 flex items-center justify-between text-xs text-muted",children:[e.jsx("span",{children:"\u5FEB\u7167\u5217\u8868"}),e.jsx("span",{children:g===null?"\u52A0\u8F7D\u4E2D\u2026":`${g.length} / 10 \u4EFD`})]}),g===null?e.jsx("div",{className:"flex flex-col gap-2",children:[0,1].map(a=>e.jsx("div",{className:"skeleton h-12"},a))}):g.length===0?e.jsx("p",{className:"rounded-lg border border-dashed border-line px-3 py-4 text-center text-xs text-muted",children:"\u8FD8\u6CA1\u6709\u5FEB\u7167\uFF0C\u70B9\u51FB\u300C\u7ACB\u5373\u751F\u6210\u5FEB\u7167\u300D\u521B\u5EFA\u7B2C\u4E00\u4EFD\u3002"}):e.jsx("div",{className:"flex flex-col gap-2",children:g.map(a=>e.jsxs("div",{className:"flex flex-col gap-2 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-[12px] font-medium",children:new Date(a.createdAt).toLocaleString("zh-CN",{hour12:!1})}),e.jsxs("div",{className:"text-[11px] text-muted",children:[a.entries," \u9879 \xB7 ",X(a.size)]})]}),e.jsxs("div",{className:"flex shrink-0 gap-2",children:[e.jsx(l,{variant:"ghost",className:"!px-2.5 !py-1 !text-xs",onClick:()=>J(a),disabled:!!i,children:"\u6062\u590D"}),e.jsx(l,{variant:"danger",className:"!px-2.5 !py-1 !text-xs",onClick:()=>H(a),disabled:!!i,"aria-label":"\u5220\u9664\u5FEB\u7167",children:e.jsx(E,{size:12})})]})]},a.id))})]})]}),j==="telegram"&&e.jsxs(C,{className:"p-4 sm:p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(ae,{size:15}),"Telegram \u673A\u5668\u4EBA\u5907\u4EFD"]}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u914D\u7F6E Telegram Bot \u540E\uFF0C\u53EF\u628A\u5B8C\u6574 JSON \u5907\u4EFD\u4F5C\u4E3A\u6587\u4EF6\u63A8\u9001\u5230\u6307\u5B9A\u4F1A\u8BDD\u3002Bot Token \u4F1A\u52A0\u5BC6\u4FDD\u5B58\uFF0C\u9875\u9762\u53EA\u663E\u793A\u63A9\u7801\u3002"}),e.jsxs("div",{className:"grid gap-3 sm:grid-cols-2",children:[e.jsx(S,{label:"Bot Token",hint:s!=null&&s.configured?`\u5DF2\u914D\u7F6E\uFF1A${s.botTokenMasked}`:"\u5411 @BotFather \u83B7\u53D6",children:e.jsx(z,{type:"password",value:d.botToken,onChange:a=>b({...d,botToken:a.target.value}),placeholder:s!=null&&s.configured?"\u7559\u7A7A\u5219\u4FDD\u6301\u73B0\u6709 Token":"123456789:AA...",autoComplete:"off",spellCheck:!1})}),e.jsx(S,{label:"Chat ID",hint:"\u79C1\u804A / \u7FA4\u7EC4 / \u9891\u9053\u7684\u6570\u5B57 ID",children:e.jsx(z,{value:d.chatId,onChange:a=>b({...d,chatId:a.target.value}),placeholder:"-1001234567890"})})]}),e.jsxs("div",{className:"mt-3 flex items-center gap-2 text-[11px] text-muted",children:[e.jsx("span",{className:Z("h-2 w-2 rounded-full",s!=null&&s.configured?"bg-ok":"bg-muted/40")}),s!=null&&s.configured?`\u5DF2\u914D\u7F6E\uFF08Chat ID\uFF1A${s.chatId}\uFF09`:"\u5C1A\u672A\u914D\u7F6E"]}),e.jsxs("div",{className:"mt-4 flex flex-wrap gap-2",children:[e.jsxs(l,{onClick:_,disabled:N,children:[e.jsx(R,{size:14}),m==="save"?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u914D\u7F6E"]}),e.jsxs(l,{variant:"ghost",onClick:K,disabled:N,children:[e.jsx(se,{size:14}),m==="test"?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001\u6D4B\u8BD5\u6D88\u606F"]}),e.jsxs(l,{variant:"soft",onClick:V,disabled:N||!(s!=null&&s.configured),children:[e.jsx(D,{size:14}),m==="push"?"\u63A8\u9001\u4E2D\u2026":"\u63A8\u9001\u5907\u4EFD\u5230 Telegram"]}),(s==null?void 0:s.configured)&&e.jsxs(l,{variant:"danger",onClick:Y,disabled:N,children:[e.jsx(E,{size:14}),"\u6E05\u9664\u914D\u7F6E"]})]}),e.jsx("p",{className:"mt-3 text-[11px] leading-relaxed text-muted",children:"\u63A8\u9001\u5185\u5BB9\u4E0E\u300C\u5BFC\u51FA\u6570\u636E\u5E93\u300D\u4E0B\u8F7D\u7684 JSON \u6587\u4EF6\u4E00\u81F4\u3002Telegram \u914D\u7F6E\u4FDD\u5B58\u5728\u7AD9\u5185\u4E14\u4E0D\u4F1A\u5199\u8FDB\u5907\u4EFD\u6587\u4EF6\uFF1B\u63A8\u9001\u524D\u8BF7\u5148\u4FDD\u5B58\u914D\u7F6E\u3002"})]}),L]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Dashboard-FzUkn96H.js": {
-              content: 'import{c as Y,u as re,a as o,Z as ie,C as oe,f as P,b as w,j as e,d as y,S as g,D as ce,e as U,F as A,I as K,B as u,g as de,h as xe}from"./index-JGTLcmXV.js";import{h as me,r as a}from"./vendor-BbQ_LiY-.js";import{R as Q,A as ue,C as V,X as G,Y as H,T as W,a as X,B as pe,b as he}from"./charts-mu_46IqZ.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const fe=Y("Activity",[["path",{d:"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",key:"169zse"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const be=Y("ShieldQuestion",[["path",{d:"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",key:"oel41y"}],["path",{d:"M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3",key:"mhlwft"}],["path",{d:"M12 17h.01",key:"p32p05"}]]),je=[{key:1,label:"24h"},{key:7,label:"7d"},{key:30,label:"30d"}],ye=l=>l>=1e6?`${+(l/1e6).toFixed(1)}M`:l>=1e3?`${+(l/1e3).toFixed(1)}k`:String(l),ge=l=>l.length>18?`${l.slice(0,17)}\u2026`:l;function Ce(){const{me:l}=me(),m=l.user.role==="superadmin",d=["superadmin","admin","auditor"].includes(l.user.role),[i,T]=a.useState(null),[F,k]=a.useState(null),[p,Z]=a.useState(7),[$,_]=a.useState(null),[N,R]=a.useState(l.balance.available),[J,h]=a.useState(!1),[f,E]=a.useState(""),[O,L]=a.useState(!1),[n,v]=a.useState(null),[ee,b]=a.useState(!1),[C,q]=a.useState(""),[B,z]=a.useState(""),[D,I]=a.useState(!1),[r,j]=a.useState(null),x=re(),te={alipay:"\u652F\u4ED8\u5B9D",wxpay:"\u5FAE\u4FE1\u652F\u4ED8",qqpay:"QQ \u94B1\u5305",usdt:"USDT"};a.useEffect(()=>{o("/api/site").then(t=>{var s;if(!((s=t.payment)!=null&&s.epayEnabled))return v(null);v(t.payment),z(c=>c||t.payment.channels[0]||"alipay"),q(c=>c||String(t.payment.minAmount||10))}).catch(()=>v(null))},[]);const se=async()=>{if(!n)return;const t=Number(C);if(!Number.isFinite(t)||t<n.minAmount||t>n.maxAmount)return x(`\u91D1\u989D\u9700\u5728 \xA5${n.minAmount} ~ \xA5${n.maxAmount} \u4E4B\u95F4`,"err");I(!0);try{const s=await o("/api/pay/epay/create","POST",{amount:t,type:B});j({outTradeNo:s.outTradeNo,amount:s.amount,payUrl:s.payUrl,qrCode:s.qrCode}),s.payUrl&&window.open(s.payUrl,"_blank","noopener")}catch(s){x(s.message,"err")}finally{I(!1)}};a.useEffect(()=>{if(!r)return;let t=!1;const s=async()=>{try{const S=await o(`/api/pay/epay/order/${r.outTradeNo}`);if(t)return;if(S.order.status==="paid"){t=!0;const M=await o("/api/billing/balance").catch(()=>null);M&&R(M.balance.available),x(`\u5145\u503C\u6210\u529F\uFF0C\u5DF2\u5230\u8D26 \xA5${r.amount.toFixed(2)}`),j(null),b(!1)}}catch{}},c=window.setInterval(s,3e3);return s(),()=>{t=!0,window.clearInterval(c)}},[r]);const ae=async()=>{if(!f.trim())return x("\u8BF7\u8F93\u5165\u5361\u5BC6\u5151\u6362\u7801","err");L(!0);try{const t=await o("/api/billing/redeem","POST",{code:f.trim()});x(t.message||`\u6210\u529F\u5145\u503C \xA5${t.amount.toFixed(2)}\uFF01`),R(t.balance),E(""),h(!1)}catch(t){x(t.message,"err")}finally{L(!1)}};a.useEffect(()=>{o(d?"/api/admin/stats":"/api/usage/summary").then(T).catch(()=>T(null))},[d]),a.useEffect(()=>{k(null),o(`${d?"/api/admin/usage/trend":"/api/usage/trend"}?days=${p}`).then(t=>k(t.points)).catch(()=>k([]))},[p,d]),a.useEffect(()=>{o(`${d?"/api/admin/usage/logs":"/api/usage/logs"}?limit=10`).then(t=>_(t.logs)).catch(()=>_([]))},[d]);const ne=[{label:"\u6211\u7684\u8BF7\u6C42\u6570\uFF0824h\uFF09",value:i?P(i.requests):"",icon:ie,color:"text-brand bg-brand/10"},{label:"\u6211\u7684 Token \u6D88\u8017\uFF0824h\uFF09",value:i?P(i.promptTokens+i.completionTokens):"",icon:oe,color:"text-info bg-info/10"},{label:"\u6211\u7684\u6210\u529F\u7387\uFF0824h\uFF09",value:i?`${((1-i.errorRate)*100).toFixed(2)}%`:"",icon:fe,color:"text-ok bg-ok/10"},{label:m?"\u5F53\u524D\u4F59\u989D (\u8D85\u7BA1\u65E0\u9650)":"\u5F53\u524D\u4F59\u989D",value:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency),icon:be,color:"text-brand bg-brand/10"}],le=[{key:"time",label:"\u65F6\u95F4",sortVal:t=>t.created_at,render:t=>e.jsx("span",{className:"text-xs text-muted",children:de(t.created_at)})},{key:"user",label:"\u7528\u6237",render:t=>e.jsxs("code",{className:"text-xs",children:[t.user_id.slice(0,8),"\u2026"]})},{key:"model",label:"\u6A21\u578B",render:t=>e.jsx("span",{className:"font-medium",children:t.public_model})},{key:"status",label:"\u72B6\u6001",render:t=>e.jsx(xe,{value:t.status})},{key:"latency",label:"\u8017\u65F6",sortVal:t=>t.latency_ms,render:t=>`${t.latency_ms} ms`},{key:"tokens",label:"Tokens",sortVal:t=>t.prompt_tokens+t.completion_tokens,render:t=>`${t.prompt_tokens} + ${t.completion_tokens}`},{key:"cost",label:"\u8D39\u7528",render:t=>t.cost_usd.toFixed(4)}];return e.jsxs("div",{className:"flex flex-col gap-5",children:[e.jsx("div",{className:"grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4",children:ne.map(({label:t,value:s,icon:c,color:S})=>e.jsxs(y,{className:"p-4",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:t}),e.jsx("span",{className:`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${S}`,children:e.jsx(c,{size:16})})]}),i||t==="\u5F53\u524D\u4F59\u989D"?e.jsx("div",{className:"mt-2 truncate text-xl font-bold tabular-nums sm:text-2xl",title:String(s),children:s}):e.jsx(g,{className:"mt-3 h-7 w-24"}),e.jsxs("div",{className:"mt-1 text-[11px] text-muted flex items-center justify-between",children:[e.jsx("span",{children:t.includes("\u4F59\u989D")?m?"\u8D85\u7BA1\u4E0D\u5361\u989D\u5EA6 \xB7 \u771F\u5B9E\u6263\u8D39\u8BB0\u8D26":"\u6309\u91CF\u771F\u5B9E\u7ED3\u7B97":"\u8F83\u6628\u65E5 \u2014"}),t.includes("\u4F59\u989D")&&e.jsxs("span",{className:"flex items-center gap-1",children:[(n==null?void 0:n.epayEnabled)&&e.jsx("button",{type:"button",onClick:()=>b(!0),className:"rounded bg-ok/10 hover:bg-ok/20 px-2 py-0.5 text-[11px] font-semibold text-ok transition-colors cursor-pointer",children:"\u5728\u7EBF\u5145\u503C"}),e.jsx("button",{type:"button",onClick:()=>h(!0),className:"rounded bg-brand/10 hover:bg-brand/20 px-2 py-0.5 text-[11px] font-semibold text-brand transition-colors cursor-pointer",children:"\u5361\u5BC6\u5145\u503C"})]})]})]},t))}),e.jsxs(y,{className:"p-5",children:[e.jsxs("div",{className:"mb-4 flex items-center justify-between",children:[e.jsx("h2",{className:"text-sm font-semibold",children:"\u8BF7\u6C42\u91CF\u4E0E Token \u8D8B\u52BF"}),e.jsx("div",{className:"flex gap-1 rounded-lg bg-surface2 p-0.5",role:"tablist","aria-label":"\u65F6\u95F4\u8303\u56F4",children:je.map(t=>e.jsx("button",{role:"tab","aria-selected":p===t.key,onClick:()=>Z(t.key),className:`rounded-md px-3 py-1 text-xs font-medium transition-colors ${p===t.key?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:t.label},t.key))})]}),e.jsx("div",{className:"h-64",children:F===null?e.jsx(g,{className:"h-full"}):e.jsx(Q,{width:"100%",height:"100%",children:e.jsxs(ue,{data:F,margin:{top:4,right:8,bottom:0,left:0},children:[e.jsxs("defs",{children:[e.jsxs("linearGradient",{id:"gReq",x1:"0",y1:"0",x2:"0",y2:"1",children:[e.jsx("stop",{offset:"0%",stopColor:"#F38020",stopOpacity:.35}),e.jsx("stop",{offset:"100%",stopColor:"#F38020",stopOpacity:0})]}),e.jsxs("linearGradient",{id:"gTok",x1:"0",y1:"0",x2:"0",y2:"1",children:[e.jsx("stop",{offset:"0%",stopColor:"#2563EB",stopOpacity:.3}),e.jsx("stop",{offset:"100%",stopColor:"#2563EB",stopOpacity:0})]})]}),e.jsx(V,{strokeDasharray:"3 3",stroke:"rgb(var(--c-line))",vertical:!1}),e.jsx(G,{dataKey:"date",tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(H,{width:44,tickFormatter:ye,tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(W,{contentStyle:{background:"rgb(var(--c-surface))",border:"1px solid rgb(var(--c-line))",borderRadius:10,fontSize:12}}),e.jsx(X,{type:"monotone",dataKey:"requests",name:"\u8BF7\u6C42\u6570",stroke:"#F38020",strokeWidth:2,fill:"url(#gReq)"}),e.jsx(X,{type:"monotone",dataKey:"tokens",name:"Tokens",stroke:"#2563EB",strokeWidth:2,fill:"url(#gTok)"})]})})})]}),e.jsxs("div",{className:"grid gap-5 xl:grid-cols-5",children:[e.jsxs(y,{className:"min-w-0 p-5 xl:col-span-2",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6211\u7684\u5404\u6A21\u578B\u8C03\u7528\u5360\u6BD4\uFF0824h\uFF09"}),e.jsx("div",{className:"h-56",children:i===null?e.jsx(g,{className:"h-full"}):i.byModel.length===0?e.jsx("div",{className:"flex h-full items-center justify-center text-xs text-muted",children:"\u6682\u65E0\u8C03\u7528\u6570\u636E"}):e.jsx(Q,{width:"100%",height:"100%",children:e.jsxs(pe,{data:i.byModel,layout:"vertical",margin:{left:8,right:16},children:[e.jsx(V,{strokeDasharray:"3 3",stroke:"rgb(var(--c-line))",horizontal:!1}),e.jsx(G,{type:"number",tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(H,{type:"category",dataKey:"public_model",width:128,tickFormatter:ge,tick:{fontSize:10,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(W,{contentStyle:{background:"rgb(var(--c-surface))",border:"1px solid rgb(var(--c-line))",borderRadius:10,fontSize:12}}),e.jsx(he,{dataKey:"n",name:"\u8BF7\u6C42\u6570",radius:[0,6,6,0],fill:"#F38020"})]})})})]}),e.jsxs(y,{className:"min-w-0 p-5 xl:col-span-3",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6211\u7684\u6700\u8FD1\u8BF7\u6C42"}),$===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((t,s)=>e.jsx(g,{className:"h-9"},s))}):e.jsx(ce,{cols:le,rows:$.map(t=>({...t,id:t.id})),page:10,expand:t=>e.jsxs("div",{className:"grid grid-cols-2 gap-2 text-xs text-muted",children:[e.jsxs("span",{children:["\u8BF7\u6C42 ID\uFF1A",e.jsx("code",{children:t.request_id})]}),e.jsxs("span",{children:["\u4E0A\u6E38\u5C1D\u8BD5\uFF1A",t.attempts," \u6B21",t.stream?"\uFF08\u6D41\u5F0F\uFF09":""]}),e.jsxs("span",{children:["HTTP ",t.http_status," \xB7 ",t.error_code??"\u2014"]}),e.jsxs("span",{children:["IP\uFF1A",t.ip]})]})})]})]}),e.jsx(U,{open:J,onClose:()=>h(!1),title:"\u5361\u5BC6\u5151\u6362\u5145\u503C",width:440,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsx("span",{className:"font-mono text-sm font-bold text-emerald-500",children:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency)})]}),e.jsx(A,{label:"\u5361\u5BC6\u5151\u6362\u7801",hint:"\u8F93\u5165\u83B7\u5F97\u7684 16~20 \u4F4D\u5361\u5BC6\u4EE3\u7801",children:e.jsx(K,{value:f,onChange:t=>E(t.target.value),placeholder:"\u4F8B\u5982: CARD-7K9A-2X4B-9PQW",autoFocus:!0})}),e.jsx("p",{className:"text-xs text-muted",children:"\u8F93\u5165\u6709\u6548\u5361\u5BC6\u540E\u70B9\u51FB\u5151\u6362\uFF0C\u7CFB\u7EDF\u5C06\u5B9E\u65F6\u4E3A\u60A8\u7684\u8D26\u6237\u589E\u52A0\u5BF9\u5E94\u9762\u989D\u8D44\u91D1\uFF1B\u82E5\u60A8\u5F53\u524D\u4E3A\u666E\u901A\u7528\u6237\uFF0C\u652F\u6301\u7684\u5361\u5BC6\u8FD8\u5C06\u81EA\u52A8\u4E3A\u60A8\u5347\u7EA7\u4E3A VIP \u8D26\u53F7\uFF01"}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(u,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>h(!1),children:"\u53D6\u6D88"}),e.jsx(u,{className:"flex-1 sm:flex-initial",disabled:O||!f.trim(),onClick:ae,children:O?"\u6838\u9500\u4E2D\u2026":"\u7ACB\u5373\u5151\u6362\u52A0\u6B3E"})]})]})}),e.jsx(U,{open:ee,onClose:()=>{b(!1),j(null)},title:"\u5728\u7EBF\u5145\u503C",width:480,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsx("span",{className:"font-mono text-sm font-bold text-emerald-500",children:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency)})]}),r?e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"rounded-lg border border-line p-4 text-center",children:[e.jsxs("p",{className:"text-xs text-muted",children:["\u8BA2\u5355\u53F7 ",r.outTradeNo," \xB7 \u5E94\u4ED8 \xA5",r.amount.toFixed(2)]}),r.qrCode&&/^https?:\\/\\//i.test(r.qrCode)?e.jsx("img",{src:r.qrCode,alt:"\u652F\u4ED8\u4E8C\u7EF4\u7801",className:"mx-auto mt-3 h-44 w-44 rounded-lg bg-white p-1"}):null,e.jsx("p",{className:"mt-3 text-xs text-muted",children:"\u5DF2\u5728\u65B0\u7A97\u53E3\u6253\u5F00\u6536\u94F6\u53F0\uFF0C\u652F\u4ED8\u5B8C\u6210\u540E\u672C\u9875\u4F1A\u81EA\u52A8\u5230\u8D26\uFF0C\u8BF7\u52FF\u5173\u95ED\u3002"}),r.payUrl?e.jsx("a",{href:r.payUrl,target:"_blank",rel:"noopener noreferrer",className:"mt-2 inline-block text-xs font-medium text-brand underline",children:"\u6536\u94F6\u53F0\u6CA1\u80FD\u6253\u5F00\uFF1F\u70B9\u6B64\u91CD\u65B0\u524D\u5F80"}):null,e.jsxs("div",{className:"mt-3 flex items-center justify-center gap-1.5 text-[11px] text-muted",children:[e.jsx("span",{className:"h-1.5 w-1.5 animate-pulse rounded-full bg-ok"}),"\u7B49\u5F85\u652F\u4ED8\u7ED3\u679C\u2026"]})]}),e.jsx("div",{className:"flex justify-end gap-2 pt-2 border-t border-line",children:e.jsx(u,{variant:"ghost",onClick:()=>{j(null)},children:"\u6362\u4E2A\u91D1\u989D\u91CD\u4E0B"})})]}):e.jsxs(e.Fragment,{children:[e.jsx(A,{label:`\u5145\u503C\u91D1\u989D\uFF08\xA5${(n==null?void 0:n.minAmount)??1} ~ \xA5${(n==null?void 0:n.maxAmount)??5e3}\uFF09`,hint:"\u5230\u8D26\u540E\u53EF\u7528\u4E8E\u6240\u6709\u6309\u91CF\u8BA1\u8D39\u6A21\u578B",children:e.jsx(K,{type:"number",value:C,onChange:t=>q(t.target.value),placeholder:"10",autoFocus:!0})}),e.jsx(A,{label:"\u652F\u4ED8\u65B9\u5F0F",children:e.jsx("div",{className:"flex flex-wrap gap-2 pt-1",children:((n==null?void 0:n.channels)??[]).map(t=>e.jsx("button",{type:"button",onClick:()=>z(t),className:`cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${B===t?"border-brand/40 bg-brand/10 text-brand":"border-line text-muted hover:text-ink"}`,children:te[t]??t},t))})}),e.jsx("p",{className:"text-xs text-muted",children:"\u7531\u7B2C\u4E09\u65B9\u6613\u652F\u4ED8\u5E73\u53F0\u6536\u6B3E\uFF0C\u652F\u4ED8\u6210\u529F\u540E\u7531\u5E73\u53F0\u5F02\u6B65\u56DE\u8C03\u5165\u8D26\uFF1B\u82E5\u957F\u65F6\u95F4\u672A\u5230\u8D26\uFF0C\u8BF7\u643A\u5E26\u8BA2\u5355\u53F7\u8054\u7CFB\u5BA2\u670D\u3002"}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(u,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>b(!1),children:"\u53D6\u6D88"}),e.jsx(u,{className:"flex-1 sm:flex-initial",disabled:D||!C,onClick:se,children:D?"\u4E0B\u5355\u4E2D\u2026":"\u524D\u5F80\u652F\u4ED8"})]})]})]})})]})}\n',
+            "/assets/Dashboard-CLfQzMok.js": {
+              content: 'import{c as Y,u as re,a as o,Z as ie,C as oe,f as P,b as w,j as e,d as y,S as g,D as ce,e as U,F as A,I as K,B as u,g as de,h as xe}from"./index-OWhocmiM.js";import{h as me,r as a}from"./vendor-BbQ_LiY-.js";import{R as Q,A as ue,C as V,X as G,Y as H,T as W,a as X,B as pe,b as he}from"./charts-mu_46IqZ.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const fe=Y("Activity",[["path",{d:"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",key:"169zse"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const be=Y("ShieldQuestion",[["path",{d:"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",key:"oel41y"}],["path",{d:"M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3",key:"mhlwft"}],["path",{d:"M12 17h.01",key:"p32p05"}]]),je=[{key:1,label:"24h"},{key:7,label:"7d"},{key:30,label:"30d"}],ye=l=>l>=1e6?`${+(l/1e6).toFixed(1)}M`:l>=1e3?`${+(l/1e3).toFixed(1)}k`:String(l),ge=l=>l.length>18?`${l.slice(0,17)}\u2026`:l;function Ce(){const{me:l}=me(),m=l.user.role==="superadmin",d=["superadmin","admin","auditor"].includes(l.user.role),[i,T]=a.useState(null),[F,k]=a.useState(null),[p,Z]=a.useState(7),[$,_]=a.useState(null),[N,R]=a.useState(l.balance.available),[J,h]=a.useState(!1),[f,E]=a.useState(""),[O,L]=a.useState(!1),[n,v]=a.useState(null),[ee,b]=a.useState(!1),[C,q]=a.useState(""),[B,z]=a.useState(""),[D,I]=a.useState(!1),[r,j]=a.useState(null),x=re(),te={alipay:"\u652F\u4ED8\u5B9D",wxpay:"\u5FAE\u4FE1\u652F\u4ED8",qqpay:"QQ \u94B1\u5305",usdt:"USDT"};a.useEffect(()=>{o("/api/site").then(t=>{var s;if(!((s=t.payment)!=null&&s.epayEnabled))return v(null);v(t.payment),z(c=>c||t.payment.channels[0]||"alipay"),q(c=>c||String(t.payment.minAmount||10))}).catch(()=>v(null))},[]);const se=async()=>{if(!n)return;const t=Number(C);if(!Number.isFinite(t)||t<n.minAmount||t>n.maxAmount)return x(`\u91D1\u989D\u9700\u5728 \xA5${n.minAmount} ~ \xA5${n.maxAmount} \u4E4B\u95F4`,"err");I(!0);try{const s=await o("/api/pay/epay/create","POST",{amount:t,type:B});j({outTradeNo:s.outTradeNo,amount:s.amount,payUrl:s.payUrl,qrCode:s.qrCode}),s.payUrl&&window.open(s.payUrl,"_blank","noopener")}catch(s){x(s.message,"err")}finally{I(!1)}};a.useEffect(()=>{if(!r)return;let t=!1;const s=async()=>{try{const S=await o(`/api/pay/epay/order/${r.outTradeNo}`);if(t)return;if(S.order.status==="paid"){t=!0;const M=await o("/api/billing/balance").catch(()=>null);M&&R(M.balance.available),x(`\u5145\u503C\u6210\u529F\uFF0C\u5DF2\u5230\u8D26 \xA5${r.amount.toFixed(2)}`),j(null),b(!1)}}catch{}},c=window.setInterval(s,3e3);return s(),()=>{t=!0,window.clearInterval(c)}},[r]);const ae=async()=>{if(!f.trim())return x("\u8BF7\u8F93\u5165\u5361\u5BC6\u5151\u6362\u7801","err");L(!0);try{const t=await o("/api/billing/redeem","POST",{code:f.trim()});x(t.message||`\u6210\u529F\u5145\u503C \xA5${t.amount.toFixed(2)}\uFF01`),R(t.balance),E(""),h(!1)}catch(t){x(t.message,"err")}finally{L(!1)}};a.useEffect(()=>{o(d?"/api/admin/stats":"/api/usage/summary").then(T).catch(()=>T(null))},[d]),a.useEffect(()=>{k(null),o(`${d?"/api/admin/usage/trend":"/api/usage/trend"}?days=${p}`).then(t=>k(t.points)).catch(()=>k([]))},[p,d]),a.useEffect(()=>{o(`${d?"/api/admin/usage/logs":"/api/usage/logs"}?limit=10`).then(t=>_(t.logs)).catch(()=>_([]))},[d]);const ne=[{label:"\u6211\u7684\u8BF7\u6C42\u6570\uFF0824h\uFF09",value:i?P(i.requests):"",icon:ie,color:"text-brand bg-brand/10"},{label:"\u6211\u7684 Token \u6D88\u8017\uFF0824h\uFF09",value:i?P(i.promptTokens+i.completionTokens):"",icon:oe,color:"text-info bg-info/10"},{label:"\u6211\u7684\u6210\u529F\u7387\uFF0824h\uFF09",value:i?`${((1-i.errorRate)*100).toFixed(2)}%`:"",icon:fe,color:"text-ok bg-ok/10"},{label:m?"\u5F53\u524D\u4F59\u989D (\u8D85\u7BA1\u65E0\u9650)":"\u5F53\u524D\u4F59\u989D",value:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency),icon:be,color:"text-brand bg-brand/10"}],le=[{key:"time",label:"\u65F6\u95F4",sortVal:t=>t.created_at,render:t=>e.jsx("span",{className:"text-xs text-muted",children:de(t.created_at)})},{key:"user",label:"\u7528\u6237",render:t=>e.jsxs("code",{className:"text-xs",children:[t.user_id.slice(0,8),"\u2026"]})},{key:"model",label:"\u6A21\u578B",render:t=>e.jsx("span",{className:"font-medium",children:t.public_model})},{key:"status",label:"\u72B6\u6001",render:t=>e.jsx(xe,{value:t.status})},{key:"latency",label:"\u8017\u65F6",sortVal:t=>t.latency_ms,render:t=>`${t.latency_ms} ms`},{key:"tokens",label:"Tokens",sortVal:t=>t.prompt_tokens+t.completion_tokens,render:t=>`${t.prompt_tokens} + ${t.completion_tokens}`},{key:"cost",label:"\u8D39\u7528",render:t=>t.cost_usd.toFixed(4)}];return e.jsxs("div",{className:"flex flex-col gap-5",children:[e.jsx("div",{className:"grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4",children:ne.map(({label:t,value:s,icon:c,color:S})=>e.jsxs(y,{className:"p-4",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:t}),e.jsx("span",{className:`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${S}`,children:e.jsx(c,{size:16})})]}),i||t==="\u5F53\u524D\u4F59\u989D"?e.jsx("div",{className:"mt-2 truncate text-xl font-bold tabular-nums sm:text-2xl",title:String(s),children:s}):e.jsx(g,{className:"mt-3 h-7 w-24"}),e.jsxs("div",{className:"mt-1 text-[11px] text-muted flex items-center justify-between",children:[e.jsx("span",{children:t.includes("\u4F59\u989D")?m?"\u8D85\u7BA1\u4E0D\u5361\u989D\u5EA6 \xB7 \u771F\u5B9E\u6263\u8D39\u8BB0\u8D26":"\u6309\u91CF\u771F\u5B9E\u7ED3\u7B97":"\u8F83\u6628\u65E5 \u2014"}),t.includes("\u4F59\u989D")&&e.jsxs("span",{className:"flex items-center gap-1",children:[(n==null?void 0:n.epayEnabled)&&e.jsx("button",{type:"button",onClick:()=>b(!0),className:"rounded bg-ok/10 hover:bg-ok/20 px-2 py-0.5 text-[11px] font-semibold text-ok transition-colors cursor-pointer",children:"\u5728\u7EBF\u5145\u503C"}),e.jsx("button",{type:"button",onClick:()=>h(!0),className:"rounded bg-brand/10 hover:bg-brand/20 px-2 py-0.5 text-[11px] font-semibold text-brand transition-colors cursor-pointer",children:"\u5361\u5BC6\u5145\u503C"})]})]})]},t))}),e.jsxs(y,{className:"p-5",children:[e.jsxs("div",{className:"mb-4 flex items-center justify-between",children:[e.jsx("h2",{className:"text-sm font-semibold",children:"\u8BF7\u6C42\u91CF\u4E0E Token \u8D8B\u52BF"}),e.jsx("div",{className:"flex gap-1 rounded-lg bg-surface2 p-0.5",role:"tablist","aria-label":"\u65F6\u95F4\u8303\u56F4",children:je.map(t=>e.jsx("button",{role:"tab","aria-selected":p===t.key,onClick:()=>Z(t.key),className:`rounded-md px-3 py-1 text-xs font-medium transition-colors ${p===t.key?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:t.label},t.key))})]}),e.jsx("div",{className:"h-64",children:F===null?e.jsx(g,{className:"h-full"}):e.jsx(Q,{width:"100%",height:"100%",children:e.jsxs(ue,{data:F,margin:{top:4,right:8,bottom:0,left:0},children:[e.jsxs("defs",{children:[e.jsxs("linearGradient",{id:"gReq",x1:"0",y1:"0",x2:"0",y2:"1",children:[e.jsx("stop",{offset:"0%",stopColor:"#F38020",stopOpacity:.35}),e.jsx("stop",{offset:"100%",stopColor:"#F38020",stopOpacity:0})]}),e.jsxs("linearGradient",{id:"gTok",x1:"0",y1:"0",x2:"0",y2:"1",children:[e.jsx("stop",{offset:"0%",stopColor:"#2563EB",stopOpacity:.3}),e.jsx("stop",{offset:"100%",stopColor:"#2563EB",stopOpacity:0})]})]}),e.jsx(V,{strokeDasharray:"3 3",stroke:"rgb(var(--c-line))",vertical:!1}),e.jsx(G,{dataKey:"date",tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(H,{width:44,tickFormatter:ye,tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(W,{contentStyle:{background:"rgb(var(--c-surface))",border:"1px solid rgb(var(--c-line))",borderRadius:10,fontSize:12}}),e.jsx(X,{type:"monotone",dataKey:"requests",name:"\u8BF7\u6C42\u6570",stroke:"#F38020",strokeWidth:2,fill:"url(#gReq)"}),e.jsx(X,{type:"monotone",dataKey:"tokens",name:"Tokens",stroke:"#2563EB",strokeWidth:2,fill:"url(#gTok)"})]})})})]}),e.jsxs("div",{className:"grid gap-5 xl:grid-cols-5",children:[e.jsxs(y,{className:"min-w-0 p-5 xl:col-span-2",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6211\u7684\u5404\u6A21\u578B\u8C03\u7528\u5360\u6BD4\uFF0824h\uFF09"}),e.jsx("div",{className:"h-56",children:i===null?e.jsx(g,{className:"h-full"}):i.byModel.length===0?e.jsx("div",{className:"flex h-full items-center justify-center text-xs text-muted",children:"\u6682\u65E0\u8C03\u7528\u6570\u636E"}):e.jsx(Q,{width:"100%",height:"100%",children:e.jsxs(pe,{data:i.byModel,layout:"vertical",margin:{left:8,right:16},children:[e.jsx(V,{strokeDasharray:"3 3",stroke:"rgb(var(--c-line))",horizontal:!1}),e.jsx(G,{type:"number",tick:{fontSize:11,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(H,{type:"category",dataKey:"public_model",width:128,tickFormatter:ge,tick:{fontSize:10,fill:"rgb(var(--c-muted))"},tickLine:!1,axisLine:!1}),e.jsx(W,{contentStyle:{background:"rgb(var(--c-surface))",border:"1px solid rgb(var(--c-line))",borderRadius:10,fontSize:12}}),e.jsx(he,{dataKey:"n",name:"\u8BF7\u6C42\u6570",radius:[0,6,6,0],fill:"#F38020"})]})})})]}),e.jsxs(y,{className:"min-w-0 p-5 xl:col-span-3",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6211\u7684\u6700\u8FD1\u8BF7\u6C42"}),$===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((t,s)=>e.jsx(g,{className:"h-9"},s))}):e.jsx(ce,{cols:le,rows:$.map(t=>({...t,id:t.id})),page:10,expand:t=>e.jsxs("div",{className:"grid grid-cols-2 gap-2 text-xs text-muted",children:[e.jsxs("span",{children:["\u8BF7\u6C42 ID\uFF1A",e.jsx("code",{children:t.request_id})]}),e.jsxs("span",{children:["\u4E0A\u6E38\u5C1D\u8BD5\uFF1A",t.attempts," \u6B21",t.stream?"\uFF08\u6D41\u5F0F\uFF09":""]}),e.jsxs("span",{children:["HTTP ",t.http_status," \xB7 ",t.error_code??"\u2014"]}),e.jsxs("span",{children:["IP\uFF1A",t.ip]})]})})]})]}),e.jsx(U,{open:J,onClose:()=>h(!1),title:"\u5361\u5BC6\u5151\u6362\u5145\u503C",width:440,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsx("span",{className:"font-mono text-sm font-bold text-emerald-500",children:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency)})]}),e.jsx(A,{label:"\u5361\u5BC6\u5151\u6362\u7801",hint:"\u8F93\u5165\u83B7\u5F97\u7684 16~20 \u4F4D\u5361\u5BC6\u4EE3\u7801",children:e.jsx(K,{value:f,onChange:t=>E(t.target.value),placeholder:"\u4F8B\u5982: CARD-7K9A-2X4B-9PQW",autoFocus:!0})}),e.jsx("p",{className:"text-xs text-muted",children:"\u8F93\u5165\u6709\u6548\u5361\u5BC6\u540E\u70B9\u51FB\u5151\u6362\uFF0C\u7CFB\u7EDF\u5C06\u5B9E\u65F6\u4E3A\u60A8\u7684\u8D26\u6237\u589E\u52A0\u5BF9\u5E94\u9762\u989D\u8D44\u91D1\uFF1B\u82E5\u60A8\u5F53\u524D\u4E3A\u666E\u901A\u7528\u6237\uFF0C\u652F\u6301\u7684\u5361\u5BC6\u8FD8\u5C06\u81EA\u52A8\u4E3A\u60A8\u5347\u7EA7\u4E3A VIP \u8D26\u53F7\uFF01"}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(u,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>h(!1),children:"\u53D6\u6D88"}),e.jsx(u,{className:"flex-1 sm:flex-initial",disabled:O||!f.trim(),onClick:ae,children:O?"\u6838\u9500\u4E2D\u2026":"\u7ACB\u5373\u5151\u6362\u52A0\u6B3E"})]})]})}),e.jsx(U,{open:ee,onClose:()=>{b(!1),j(null)},title:"\u5728\u7EBF\u5145\u503C",width:480,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsx("span",{className:"font-mono text-sm font-bold text-emerald-500",children:m?"\u221E \u65E0\u9650\u989D\u5EA6":w(N,l.balance.currency)})]}),r?e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"rounded-lg border border-line p-4 text-center",children:[e.jsxs("p",{className:"text-xs text-muted",children:["\u8BA2\u5355\u53F7 ",r.outTradeNo," \xB7 \u5E94\u4ED8 \xA5",r.amount.toFixed(2)]}),r.qrCode&&/^https?:\\/\\//i.test(r.qrCode)?e.jsx("img",{src:r.qrCode,alt:"\u652F\u4ED8\u4E8C\u7EF4\u7801",className:"mx-auto mt-3 h-44 w-44 rounded-lg bg-white p-1"}):null,e.jsx("p",{className:"mt-3 text-xs text-muted",children:"\u5DF2\u5728\u65B0\u7A97\u53E3\u6253\u5F00\u6536\u94F6\u53F0\uFF0C\u652F\u4ED8\u5B8C\u6210\u540E\u672C\u9875\u4F1A\u81EA\u52A8\u5230\u8D26\uFF0C\u8BF7\u52FF\u5173\u95ED\u3002"}),r.payUrl?e.jsx("a",{href:r.payUrl,target:"_blank",rel:"noopener noreferrer",className:"mt-2 inline-block text-xs font-medium text-brand underline",children:"\u6536\u94F6\u53F0\u6CA1\u80FD\u6253\u5F00\uFF1F\u70B9\u6B64\u91CD\u65B0\u524D\u5F80"}):null,e.jsxs("div",{className:"mt-3 flex items-center justify-center gap-1.5 text-[11px] text-muted",children:[e.jsx("span",{className:"h-1.5 w-1.5 animate-pulse rounded-full bg-ok"}),"\u7B49\u5F85\u652F\u4ED8\u7ED3\u679C\u2026"]})]}),e.jsx("div",{className:"flex justify-end gap-2 pt-2 border-t border-line",children:e.jsx(u,{variant:"ghost",onClick:()=>{j(null)},children:"\u6362\u4E2A\u91D1\u989D\u91CD\u4E0B"})})]}):e.jsxs(e.Fragment,{children:[e.jsx(A,{label:`\u5145\u503C\u91D1\u989D\uFF08\xA5${(n==null?void 0:n.minAmount)??1} ~ \xA5${(n==null?void 0:n.maxAmount)??5e3}\uFF09`,hint:"\u5230\u8D26\u540E\u53EF\u7528\u4E8E\u6240\u6709\u6309\u91CF\u8BA1\u8D39\u6A21\u578B",children:e.jsx(K,{type:"number",value:C,onChange:t=>q(t.target.value),placeholder:"10",autoFocus:!0})}),e.jsx(A,{label:"\u652F\u4ED8\u65B9\u5F0F",children:e.jsx("div",{className:"flex flex-wrap gap-2 pt-1",children:((n==null?void 0:n.channels)??[]).map(t=>e.jsx("button",{type:"button",onClick:()=>z(t),className:`cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${B===t?"border-brand/40 bg-brand/10 text-brand":"border-line text-muted hover:text-ink"}`,children:te[t]??t},t))})}),e.jsx("p",{className:"text-xs text-muted",children:"\u7531\u7B2C\u4E09\u65B9\u6613\u652F\u4ED8\u5E73\u53F0\u6536\u6B3E\uFF0C\u652F\u4ED8\u6210\u529F\u540E\u7531\u5E73\u53F0\u5F02\u6B65\u56DE\u8C03\u5165\u8D26\uFF1B\u82E5\u957F\u65F6\u95F4\u672A\u5230\u8D26\uFF0C\u8BF7\u643A\u5E26\u8BA2\u5355\u53F7\u8054\u7CFB\u5BA2\u670D\u3002"}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(u,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>b(!1),children:"\u53D6\u6D88"}),e.jsx(u,{className:"flex-1 sm:flex-initial",disabled:D||!C,onClick:se,children:D?"\u4E0B\u5355\u4E2D\u2026":"\u524D\u5F80\u652F\u4ED8"})]})]})]})})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Invite-ieRMYJHX.js": {
-              content: `import{c as xt,u as _t,a as tt,j as u,d as et,F as L,I as P,x as Ut,B as nt,g as zt,n as Ht}from"./index-JGTLcmXV.js";import{r as k}from"./vendor-BbQ_LiY-.js";import{D as Vt}from"./download-D7etkHHV.js";/**
+            "/assets/Invite-CbRAI9tf.js": {
+              content: `import{c as xt,u as _t,a as tt,j as u,d as et,F as L,I as P,x as Ut,B as nt,g as zt,n as Ht}from"./index-OWhocmiM.js";import{r as k}from"./vendor-BbQ_LiY-.js";import{D as Vt}from"./download-BtYvvPCG.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41499,53 +41499,53 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Keys-hYc0wvAM.js": {
-              content: 'import{i as S,u as _,j as s,B as n,d as K,D as P,e as g,F as i,I as r,k as T,l as I,a as u,g as y,b as B,h as D}from"./index-JGTLcmXV.js";import{r as o}from"./vendor-BbQ_LiY-.js";import{P as E}from"./plus-v0UXhlLi.js";function V(){const[h,k]=o.useState(null),[v,c]=o.useState(!1),[f,d]=o.useState(null),[a,l]=o.useState({name:"default",quota:"",expires:"",ip:"",models:"",sign:!1}),{confirm:j,confirmEl:b}=S(),p=_(),x=()=>u("/api/keys").then(e=>k(e.keys)).catch(e=>p(e.message,"err"));o.useEffect(()=>{x()},[]);const C=async()=>{try{const e={name:a.name||"default",requiresSigning:a.sign};a.quota&&(e.quotaUsd=parseFloat(a.quota)),a.expires&&(e.expiresAt=Math.floor(new Date(a.expires).getTime()/1e3)),a.ip.trim()&&(e.ipWhitelist=a.ip.split(",").map(m=>m.trim()).filter(Boolean)),a.models.trim()&&(e.modelWhitelist=a.models.split(",").map(m=>m.trim()).filter(Boolean));const t=await u("/api/keys","POST",e);c(!1),d(t.key),x()}catch(e){p(e.message,"err")}},N=async e=>{await j("\u64A4\u9500\u540E\u8BE5 Key \u7ACB\u5373\u5931\u6548\u4E14\u4E0D\u53EF\u6062\u590D\uFF0C\u786E\u8BA4\u64A4\u9500\uFF1F")&&(await u("/api/keys/actions","POST",{action:"revoke",keyId:e}),p("\u5DF2\u64A4\u9500"),x())},w=async e=>{if(!await j("\u8F6E\u6362\u5C06\u64A4\u9500\u65E7 Key \u5E76\u751F\u6210\u65B0 Key\uFF0C\u786E\u8BA4\uFF1F"))return;const t=await u("/api/keys/actions","POST",{action:"rotate",keyId:e});d(t.created.key),x()},q=[{key:"name",label:"\u540D\u79F0",sortVal:e=>e.name,render:e=>s.jsx("span",{className:"font-medium",children:e.name})},{key:"prefix",label:"Key \u524D\u7F00",render:e=>s.jsxs("code",{className:"rounded bg-surface2 px-1.5 py-0.5 text-xs",children:[e.prefix,"\u2026"]})},{key:"created",label:"\u521B\u5EFA\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:y(e.created_at)})},{key:"used",label:"\u6700\u540E\u4F7F\u7528",sortVal:e=>e.last_used_at??0,render:e=>s.jsx("span",{className:"text-xs text-muted",children:y(e.last_used_at)})},{key:"quota",label:"\u989D\u5EA6",render:e=>e.quota_usd===null?"\u4E0D\u9650":`${B(e.spent_usd)} / ${e.quota_usd}`},{key:"status",label:"\u72B6\u6001",render:e=>s.jsx(D,{value:e.status})},{key:"ops",label:"\u64CD\u4F5C",render:e=>s.jsxs("span",{className:"flex gap-1.5",children:[s.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:t=>{t.stopPropagation(),w(e.id)},children:"\u8F6E\u6362"}),s.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:t=>{t.stopPropagation(),N(e.id)},children:"\u64A4\u9500"})]})}];return s.jsxs("div",{className:"flex flex-col gap-4",children:[s.jsx("div",{className:"flex justify-end",children:s.jsxs(n,{onClick:()=>{l({name:"default",quota:"",expires:"",ip:"",models:"",sign:!1}),c(!0)},children:[s.jsx(E,{size:14}),"\u521B\u5EFA Key"]})}),s.jsx(K,{className:"p-4",children:h===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(4)].map((e,t)=>s.jsx("div",{className:"skeleton h-9"},t))}):s.jsx(P,{cols:q,rows:h.filter(e=>e.status==="active")})}),s.jsxs(g,{open:v,onClose:()=>c(!1),title:"\u521B\u5EFA API Key",children:[s.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[s.jsx(i,{label:"\u540D\u79F0",children:s.jsx(r,{value:a.name,onChange:e=>l({...a,name:e.target.value})})}),s.jsx(i,{label:"\u989D\u5EA6\uFF08\u7559\u7A7A\u4E0D\u9650\uFF09",children:s.jsx(r,{type:"number",step:"0.01",value:a.quota,onChange:e=>l({...a,quota:e.target.value})})}),s.jsx(i,{label:"\u8FC7\u671F\u65F6\u95F4",children:s.jsx(r,{type:"datetime-local",value:a.expires,onChange:e=>l({...a,expires:e.target.value})})}),s.jsx(i,{label:"\u5F3A\u5236\u7B7E\u540D\uFF08\u9632\u91CD\u653E\uFF09",children:s.jsxs(T,{value:a.sign?"1":"0",onChange:e=>l({...a,sign:e.target.value==="1"}),children:[s.jsx("option",{value:"0",children:"\u5173\u95ED"}),s.jsx("option",{value:"1",children:"\u5F00\u542F"})]})}),s.jsx(i,{label:"IP \u767D\u540D\u5355\uFF08\u9017\u53F7\u5206\u9694\uFF09",children:s.jsx(r,{value:a.ip,onChange:e=>l({...a,ip:e.target.value}),placeholder:"1.2.3.4,5.6.7.8"})}),s.jsx(i,{label:"\u6A21\u578B\u767D\u540D\u5355\uFF08\u9017\u53F7\u5206\u9694\uFF09",children:s.jsx(r,{value:a.models,onChange:e=>l({...a,models:e.target.value}),placeholder:"deepseek-chat,gpt-4o"})})]}),s.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[s.jsx(n,{variant:"ghost",onClick:()=>c(!1),children:"\u53D6\u6D88"}),s.jsx(n,{onClick:C,children:"\u521B\u5EFA"})]})]}),s.jsxs(g,{open:!!f,onClose:()=>d(null),title:"Key \u521B\u5EFA\u6210\u529F",width:560,children:[s.jsx("p",{className:"mb-3 rounded-lg bg-warn/10 px-3 py-2 text-xs text-warn",children:"\u26A0\uFE0F \u5B8C\u6574 Key \u53EA\u663E\u793A\u8FD9\u4E00\u6B21\uFF0C\u8BF7\u7ACB\u5373\u590D\u5236\u4FDD\u5B58\u3002\u670D\u52A1\u7AEF\u53EA\u5B58\u54C8\u5E0C\uFF0C\u4E22\u5931\u540E\u53EA\u80FD\u8F6E\u6362\u91CD\u5EFA\u3002"}),s.jsx(I,{text:f??""}),s.jsx("div",{className:"mt-4 flex justify-end",children:s.jsx(n,{onClick:()=>d(null),children:"\u6211\u5DF2\u4FDD\u5B58"})})]}),b]})}\n',
+            "/assets/Keys-DU1VqEBm.js": {
+              content: 'import{i as S,u as _,j as s,B as n,d as K,D as P,e as g,F as i,I as r,k as T,l as I,a as u,g as y,b as B,h as D}from"./index-OWhocmiM.js";import{r as o}from"./vendor-BbQ_LiY-.js";import{P as E}from"./plus-DjGDWRHo.js";function V(){const[h,k]=o.useState(null),[v,c]=o.useState(!1),[f,d]=o.useState(null),[a,l]=o.useState({name:"default",quota:"",expires:"",ip:"",models:"",sign:!1}),{confirm:j,confirmEl:b}=S(),p=_(),x=()=>u("/api/keys").then(e=>k(e.keys)).catch(e=>p(e.message,"err"));o.useEffect(()=>{x()},[]);const C=async()=>{try{const e={name:a.name||"default",requiresSigning:a.sign};a.quota&&(e.quotaUsd=parseFloat(a.quota)),a.expires&&(e.expiresAt=Math.floor(new Date(a.expires).getTime()/1e3)),a.ip.trim()&&(e.ipWhitelist=a.ip.split(",").map(m=>m.trim()).filter(Boolean)),a.models.trim()&&(e.modelWhitelist=a.models.split(",").map(m=>m.trim()).filter(Boolean));const t=await u("/api/keys","POST",e);c(!1),d(t.key),x()}catch(e){p(e.message,"err")}},N=async e=>{await j("\u64A4\u9500\u540E\u8BE5 Key \u7ACB\u5373\u5931\u6548\u4E14\u4E0D\u53EF\u6062\u590D\uFF0C\u786E\u8BA4\u64A4\u9500\uFF1F")&&(await u("/api/keys/actions","POST",{action:"revoke",keyId:e}),p("\u5DF2\u64A4\u9500"),x())},w=async e=>{if(!await j("\u8F6E\u6362\u5C06\u64A4\u9500\u65E7 Key \u5E76\u751F\u6210\u65B0 Key\uFF0C\u786E\u8BA4\uFF1F"))return;const t=await u("/api/keys/actions","POST",{action:"rotate",keyId:e});d(t.created.key),x()},q=[{key:"name",label:"\u540D\u79F0",sortVal:e=>e.name,render:e=>s.jsx("span",{className:"font-medium",children:e.name})},{key:"prefix",label:"Key \u524D\u7F00",render:e=>s.jsxs("code",{className:"rounded bg-surface2 px-1.5 py-0.5 text-xs",children:[e.prefix,"\u2026"]})},{key:"created",label:"\u521B\u5EFA\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:y(e.created_at)})},{key:"used",label:"\u6700\u540E\u4F7F\u7528",sortVal:e=>e.last_used_at??0,render:e=>s.jsx("span",{className:"text-xs text-muted",children:y(e.last_used_at)})},{key:"quota",label:"\u989D\u5EA6",render:e=>e.quota_usd===null?"\u4E0D\u9650":`${B(e.spent_usd)} / ${e.quota_usd}`},{key:"status",label:"\u72B6\u6001",render:e=>s.jsx(D,{value:e.status})},{key:"ops",label:"\u64CD\u4F5C",render:e=>s.jsxs("span",{className:"flex gap-1.5",children:[s.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:t=>{t.stopPropagation(),w(e.id)},children:"\u8F6E\u6362"}),s.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:t=>{t.stopPropagation(),N(e.id)},children:"\u64A4\u9500"})]})}];return s.jsxs("div",{className:"flex flex-col gap-4",children:[s.jsx("div",{className:"flex justify-end",children:s.jsxs(n,{onClick:()=>{l({name:"default",quota:"",expires:"",ip:"",models:"",sign:!1}),c(!0)},children:[s.jsx(E,{size:14}),"\u521B\u5EFA Key"]})}),s.jsx(K,{className:"p-4",children:h===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(4)].map((e,t)=>s.jsx("div",{className:"skeleton h-9"},t))}):s.jsx(P,{cols:q,rows:h.filter(e=>e.status==="active")})}),s.jsxs(g,{open:v,onClose:()=>c(!1),title:"\u521B\u5EFA API Key",children:[s.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[s.jsx(i,{label:"\u540D\u79F0",children:s.jsx(r,{value:a.name,onChange:e=>l({...a,name:e.target.value})})}),s.jsx(i,{label:"\u989D\u5EA6\uFF08\u7559\u7A7A\u4E0D\u9650\uFF09",children:s.jsx(r,{type:"number",step:"0.01",value:a.quota,onChange:e=>l({...a,quota:e.target.value})})}),s.jsx(i,{label:"\u8FC7\u671F\u65F6\u95F4",children:s.jsx(r,{type:"datetime-local",value:a.expires,onChange:e=>l({...a,expires:e.target.value})})}),s.jsx(i,{label:"\u5F3A\u5236\u7B7E\u540D\uFF08\u9632\u91CD\u653E\uFF09",children:s.jsxs(T,{value:a.sign?"1":"0",onChange:e=>l({...a,sign:e.target.value==="1"}),children:[s.jsx("option",{value:"0",children:"\u5173\u95ED"}),s.jsx("option",{value:"1",children:"\u5F00\u542F"})]})}),s.jsx(i,{label:"IP \u767D\u540D\u5355\uFF08\u9017\u53F7\u5206\u9694\uFF09",children:s.jsx(r,{value:a.ip,onChange:e=>l({...a,ip:e.target.value}),placeholder:"1.2.3.4,5.6.7.8"})}),s.jsx(i,{label:"\u6A21\u578B\u767D\u540D\u5355\uFF08\u9017\u53F7\u5206\u9694\uFF09",children:s.jsx(r,{value:a.models,onChange:e=>l({...a,models:e.target.value}),placeholder:"deepseek-chat,gpt-4o"})})]}),s.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[s.jsx(n,{variant:"ghost",onClick:()=>c(!1),children:"\u53D6\u6D88"}),s.jsx(n,{onClick:C,children:"\u521B\u5EFA"})]})]}),s.jsxs(g,{open:!!f,onClose:()=>d(null),title:"Key \u521B\u5EFA\u6210\u529F",width:560,children:[s.jsx("p",{className:"mb-3 rounded-lg bg-warn/10 px-3 py-2 text-xs text-warn",children:"\u26A0\uFE0F \u5B8C\u6574 Key \u53EA\u663E\u793A\u8FD9\u4E00\u6B21\uFF0C\u8BF7\u7ACB\u5373\u590D\u5236\u4FDD\u5B58\u3002\u670D\u52A1\u7AEF\u53EA\u5B58\u54C8\u5E0C\uFF0C\u4E22\u5931\u540E\u53EA\u80FD\u8F6E\u6362\u91CD\u5EFA\u3002"}),s.jsx(I,{text:f??""}),s.jsx("div",{className:"mt-4 flex justify-end",children:s.jsx(n,{onClick:()=>d(null),children:"\u6211\u5DF2\u4FDD\u5B58"})})]}),b]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Logs-DM6UBkca.js": {
-              content: 'import{i as L,u as R,j as s,d as v,B as i,w as U,g,F as u,k as N,I as w,D as C,s as B,n as m,a as J,h as K}from"./index-JGTLcmXV.js";import{r as l}from"./vendor-BbQ_LiY-.js";import{D as O}from"./download-D7etkHHV.js";import{R as G}from"./refresh-cw-BY9R0tIW.js";import{T as S}from"./trash-2-DuK1uChF.js";function Y({me:p}){const f=p.user.role==="superadmin"||p.user.role==="auditor",h=p.user.role==="superadmin",[n,I]=l.useState("usage"),[c,j]=l.useState(null),[T,A]=l.useState(0),[_,k]=l.useState(null),[D,E]=l.useState(!1),[t,d]=l.useState({status:"",model:"",userId:"",days:"7"}),{confirm:y,confirmEl:V}=L(),r=R(),b=()=>{j(null);const e=Math.floor(Date.now()/1e3)-parseInt(t.days,10)*86400,a=new URLSearchParams({limit:"200",...t.status&&{status:t.status},...t.model&&{model:t.model},...t.userId&&{userId:t.userId}});J(`/api/admin/usage/logs?${a}`).then(x=>{A(x.total),j(x.logs.filter(q=>q.created_at>e))}).catch(()=>j([]))},o=()=>{k(null),m("list_audit",{limit:300}).then(e=>{k(e.logs),E(!0)}).catch(e=>r(e.message,"err"))};l.useEffect(()=>{b()},[]),l.useEffect(()=>{n==="audit"&&!D&&o()},[n]);const P=async()=>{try{const e=await m("verify_audit_chain");r(e.result.ok?"\u2713 \u54C8\u5E0C\u94FE\u5B8C\u6574\uFF0C\u672A\u68C0\u6D4B\u5230\u7BE1\u6539":`\u2717 \u94FE\u65AD\u88C2\u4E8E ${e.result.brokenAt}`,e.result.ok?"ok":"err")}catch(e){r(e.message,"err")}},$=[{key:"time",label:"\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:g(e.created_at)})},{key:"user",label:"\u7528\u6237",render:e=>s.jsxs("code",{className:"text-xs",children:[e.user_id.slice(0,8),"\u2026"]})},{key:"key",label:"API Key",render:e=>{var a;return s.jsxs("code",{className:"text-xs text-muted",children:[((a=e.api_key_id)==null?void 0:a.slice(0,8))??"\u2014","\u2026"]})}},{key:"model",label:"\u6A21\u578B",sortVal:e=>e.public_model,render:e=>s.jsx("span",{className:"font-medium",children:e.public_model})},{key:"status",label:"\u72B6\u6001",render:e=>s.jsx(K,{value:e.status})},{key:"http",label:"HTTP",render:e=>s.jsx("span",{className:"text-xs",children:e.http_status})},{key:"latency",label:"\u8017\u65F6",sortVal:e=>e.latency_ms,render:e=>s.jsxs("span",{className:"tabular-nums",children:[e.latency_ms," ms"]})},{key:"tokens",label:"Tokens",sortVal:e=>e.prompt_tokens+e.completion_tokens,render:e=>s.jsxs("span",{className:"tabular-nums",children:[e.prompt_tokens," + ",e.completion_tokens]})},{key:"cost",label:"\u8D39\u7528",sortVal:e=>e.cost_usd,render:e=>e.cost_usd.toFixed(4)}],z=[{key:"time",label:"\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:g(e.created_at)})},{key:"actor",label:"\u64CD\u4F5C\u4EBA",render:e=>e.actor_email??s.jsx("code",{className:"text-xs",children:e.actor_user_id??"\u7CFB\u7EDF"})},{key:"action",label:"\u52A8\u4F5C",render:e=>s.jsx("code",{className:"rounded bg-surface2 px-1.5 py-0.5 text-xs",children:e.action})},{key:"target",label:"\u76EE\u6807",render:e=>s.jsx("code",{className:"text-xs text-muted",children:e.target_type?`${e.target_type}:${(e.target_id??"").slice(0,12)}`:"\u2014"})},{key:"ip",label:"IP",render:e=>s.jsx("code",{className:"text-xs",children:e.actor_ip??"\u2014"})},{key:"ops",label:"\u64CD\u4F5C",render:e=>h?s.jsxs(i,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async a=>{if(a.stopPropagation(),!!await y("\u5220\u9664\u8FD9\u6761\u5BA1\u8BA1\u65E5\u5FD7\uFF1F\u5220\u9664\u540E\u5C06\u81EA\u52A8\u91CD\u5EFA\u54C8\u5E0C\u94FE\u3002"))try{await m("delete_audit_log",{id:e.id}),r("\u5DF2\u5220\u9664\u5E76\u91CD\u5EFA\u54C8\u5E0C\u94FE"),o()}catch(x){r(x.message,"err")}},children:[s.jsx(S,{size:12}),"\u5220\u9664"]}):s.jsx("span",{className:"text-xs text-muted",children:"\u2014"})}],F=f?[["usage","\u7528\u91CF\u65E5\u5FD7"],["audit","\u5BA1\u8BA1\u65E5\u5FD7"]]:[["usage","\u7528\u91CF\u65E5\u5FD7"]];return s.jsxs("div",{className:"flex flex-col gap-4",children:[s.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:F.map(([e,a])=>s.jsx("button",{role:"tab","aria-selected":n===e,onClick:()=>I(e),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${n===e?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:a},e))}),n==="usage"&&s.jsxs(v,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[s.jsxs("div",{className:"flex flex-wrap items-start justify-between gap-3",children:[s.jsxs("div",{children:[s.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u7528\u91CF\u65E5\u5FD7"}),s.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u6309\u8BF7\u6C42\u8BB0\u5F55\u6A21\u578B\u8C03\u7528\u3001Token \u4E0E\u8D39\u7528\u660E\u7EC6\uFF0C\u652F\u6301\u7B5B\u9009\u4E0E\u5BFC\u51FA\u3002"})]}),s.jsxs("div",{className:"flex flex-wrap gap-2",children:[s.jsx(i,{onClick:b,children:"\u67E5\u8BE2"}),s.jsxs(i,{variant:"ghost",onClick:()=>c&&U(`usage-${Date.now()}.csv`,["time","user","model","status","http","latency_ms","prompt_tokens","completion_tokens","cost","request_id"],c.map(e=>[g(e.created_at),e.user_id,e.public_model,e.status,e.http_status,e.latency_ms,e.prompt_tokens,e.completion_tokens,e.cost_usd,e.request_id])),children:[s.jsx(O,{size:14}),"\u5BFC\u51FA CSV"]})]})]}),s.jsxs("div",{className:"grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4",children:[s.jsx(u,{label:"\u65F6\u95F4\u8303\u56F4",children:s.jsxs(N,{value:t.days,onChange:e=>d({...t,days:e.target.value}),children:[s.jsx("option",{value:"1",children:"\u8FD1 24 \u5C0F\u65F6"}),s.jsx("option",{value:"7",children:"\u8FD1 7 \u5929"}),s.jsx("option",{value:"30",children:"\u8FD1 30 \u5929"})]})}),s.jsx(u,{label:"\u72B6\u6001",children:s.jsxs(N,{value:t.status,onChange:e=>d({...t,status:e.target.value}),children:[s.jsx("option",{value:"",children:"\u5168\u90E8"}),["success","upstream_error","content_blocked","no_route","insufficient_balance"].map(e=>s.jsx("option",{children:e},e))]})}),s.jsx(u,{label:"\u6A21\u578B\u540D",children:s.jsx(w,{value:t.model,onChange:e=>d({...t,model:e.target.value}),placeholder:"deepseek-chat"})}),s.jsx(u,{label:"\u7528\u6237 ID",children:s.jsx(w,{value:t.userId,onChange:e=>d({...t,userId:e.target.value}),placeholder:"\u7528\u6237 ID"})})]}),c===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(8)].map((e,a)=>s.jsx("div",{className:"skeleton h-9"},a))}):s.jsxs(s.Fragment,{children:[s.jsxs("div",{className:"text-xs text-muted",children:["\u6700\u8FD1 ",c.length," \u6761 / \u547D\u4E2D ",T," \u6761\uFF08\u65F6\u95F4\u5012\u5E8F\uFF09"]}),s.jsx(C,{cols:$,rows:c,page:14,expand:e=>s.jsxs("div",{className:"grid grid-cols-2 gap-2 font-mono text-xs text-muted",children:[s.jsxs("span",{children:["\u8BF7\u6C42 ID\uFF1A",s.jsx("span",{className:"text-ink",children:e.request_id})]}),s.jsxs("span",{children:["Key\uFF1A",e.api_key_id??"\u2014"]}),s.jsxs("span",{children:["\u9519\u8BEF\u7801\uFF1A",e.error_code??"\u2014"]}),s.jsxs("span",{children:["\u91CD\u8BD5/\u5207\u6362\uFF1A",e.attempts," \u6B21",e.stream?" \xB7 \u6D41\u5F0F":""]}),s.jsxs("span",{children:["IP\uFF1A",e.ip]}),s.jsxs("span",{children:["\u4F9B\u5E94\u5546\uFF1A",e.provider_id??"\u2014"]})]})})]})]}),n==="audit"&&f&&s.jsxs(v,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[s.jsxs("div",{className:"flex flex-wrap items-start justify-between gap-3",children:[s.jsxs("div",{children:[s.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u5BA1\u8BA1\u65E5\u5FD7"}),s.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u8BB0\u5F55\u540E\u53F0\u654F\u611F\u64CD\u4F5C\uFF0C\u54C8\u5E0C\u94FE\u53EF\u6821\u9A8C\u5B8C\u6574\u6027\uFF1B\u4EC5\u5C55\u793A\u4FDD\u7559\u671F\u5185\u7684\u65E5\u5FD7\uFF0830\u2013180 \u5929\uFF0C\u9ED8\u8BA4 30 \u5929\uFF09\u3002"})]}),s.jsxs("div",{className:"flex flex-wrap gap-2",children:[s.jsxs(i,{variant:"ghost",onClick:o,children:[s.jsx(G,{size:14}),"\u5237\u65B0"]}),h&&s.jsxs(i,{variant:"ghost",onClick:P,children:[s.jsx(B,{size:14}),"\u6821\u9A8C\u94FE\u5B8C\u6574\u6027"]}),h&&s.jsxs(i,{variant:"ghost",className:"!text-err",onClick:async()=>{if(await y("\u6E05\u7A7A\u5168\u90E8\u5BA1\u8BA1\u65E5\u5FD7\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\uFF08\u54C8\u5E0C\u94FE\u5C06\u91CD\u65B0\u4ECE GENESIS \u5F00\u59CB\uFF09\u3002"))try{await m("clear_audit_logs",{}),r("\u5DF2\u6E05\u7A7A"),o()}catch(e){r(e.message,"err")}},children:[s.jsx(S,{size:14}),"\u6E05\u7A7A\u5168\u90E8"]})]})]}),_===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(8)].map((e,a)=>s.jsx("div",{className:"skeleton h-9"},a))}):s.jsx(C,{cols:z,rows:_,page:20,expand:e=>s.jsx("pre",{className:"max-h-40 overflow-auto text-xs",children:JSON.stringify(JSON.parse(e.meta??"{}"),null,2)})})]}),V]})}\n',
+            "/assets/Logs-DC-adhq4.js": {
+              content: 'import{i as L,u as R,j as s,d as v,B as i,w as U,g,F as u,k as N,I as w,D as C,s as B,n as m,a as J,h as K}from"./index-OWhocmiM.js";import{r as l}from"./vendor-BbQ_LiY-.js";import{D as O}from"./download-BtYvvPCG.js";import{R as G}from"./refresh-cw-CiqXg9A7.js";import{T as S}from"./trash-2-BAKVuXGI.js";function Y({me:p}){const f=p.user.role==="superadmin"||p.user.role==="auditor",h=p.user.role==="superadmin",[n,I]=l.useState("usage"),[c,j]=l.useState(null),[T,A]=l.useState(0),[_,k]=l.useState(null),[D,E]=l.useState(!1),[t,d]=l.useState({status:"",model:"",userId:"",days:"7"}),{confirm:y,confirmEl:V}=L(),r=R(),b=()=>{j(null);const e=Math.floor(Date.now()/1e3)-parseInt(t.days,10)*86400,a=new URLSearchParams({limit:"200",...t.status&&{status:t.status},...t.model&&{model:t.model},...t.userId&&{userId:t.userId}});J(`/api/admin/usage/logs?${a}`).then(x=>{A(x.total),j(x.logs.filter(q=>q.created_at>e))}).catch(()=>j([]))},o=()=>{k(null),m("list_audit",{limit:300}).then(e=>{k(e.logs),E(!0)}).catch(e=>r(e.message,"err"))};l.useEffect(()=>{b()},[]),l.useEffect(()=>{n==="audit"&&!D&&o()},[n]);const P=async()=>{try{const e=await m("verify_audit_chain");r(e.result.ok?"\u2713 \u54C8\u5E0C\u94FE\u5B8C\u6574\uFF0C\u672A\u68C0\u6D4B\u5230\u7BE1\u6539":`\u2717 \u94FE\u65AD\u88C2\u4E8E ${e.result.brokenAt}`,e.result.ok?"ok":"err")}catch(e){r(e.message,"err")}},$=[{key:"time",label:"\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:g(e.created_at)})},{key:"user",label:"\u7528\u6237",render:e=>s.jsxs("code",{className:"text-xs",children:[e.user_id.slice(0,8),"\u2026"]})},{key:"key",label:"API Key",render:e=>{var a;return s.jsxs("code",{className:"text-xs text-muted",children:[((a=e.api_key_id)==null?void 0:a.slice(0,8))??"\u2014","\u2026"]})}},{key:"model",label:"\u6A21\u578B",sortVal:e=>e.public_model,render:e=>s.jsx("span",{className:"font-medium",children:e.public_model})},{key:"status",label:"\u72B6\u6001",render:e=>s.jsx(K,{value:e.status})},{key:"http",label:"HTTP",render:e=>s.jsx("span",{className:"text-xs",children:e.http_status})},{key:"latency",label:"\u8017\u65F6",sortVal:e=>e.latency_ms,render:e=>s.jsxs("span",{className:"tabular-nums",children:[e.latency_ms," ms"]})},{key:"tokens",label:"Tokens",sortVal:e=>e.prompt_tokens+e.completion_tokens,render:e=>s.jsxs("span",{className:"tabular-nums",children:[e.prompt_tokens," + ",e.completion_tokens]})},{key:"cost",label:"\u8D39\u7528",sortVal:e=>e.cost_usd,render:e=>e.cost_usd.toFixed(4)}],z=[{key:"time",label:"\u65F6\u95F4",sortVal:e=>e.created_at,render:e=>s.jsx("span",{className:"text-xs text-muted",children:g(e.created_at)})},{key:"actor",label:"\u64CD\u4F5C\u4EBA",render:e=>e.actor_email??s.jsx("code",{className:"text-xs",children:e.actor_user_id??"\u7CFB\u7EDF"})},{key:"action",label:"\u52A8\u4F5C",render:e=>s.jsx("code",{className:"rounded bg-surface2 px-1.5 py-0.5 text-xs",children:e.action})},{key:"target",label:"\u76EE\u6807",render:e=>s.jsx("code",{className:"text-xs text-muted",children:e.target_type?`${e.target_type}:${(e.target_id??"").slice(0,12)}`:"\u2014"})},{key:"ip",label:"IP",render:e=>s.jsx("code",{className:"text-xs",children:e.actor_ip??"\u2014"})},{key:"ops",label:"\u64CD\u4F5C",render:e=>h?s.jsxs(i,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async a=>{if(a.stopPropagation(),!!await y("\u5220\u9664\u8FD9\u6761\u5BA1\u8BA1\u65E5\u5FD7\uFF1F\u5220\u9664\u540E\u5C06\u81EA\u52A8\u91CD\u5EFA\u54C8\u5E0C\u94FE\u3002"))try{await m("delete_audit_log",{id:e.id}),r("\u5DF2\u5220\u9664\u5E76\u91CD\u5EFA\u54C8\u5E0C\u94FE"),o()}catch(x){r(x.message,"err")}},children:[s.jsx(S,{size:12}),"\u5220\u9664"]}):s.jsx("span",{className:"text-xs text-muted",children:"\u2014"})}],F=f?[["usage","\u7528\u91CF\u65E5\u5FD7"],["audit","\u5BA1\u8BA1\u65E5\u5FD7"]]:[["usage","\u7528\u91CF\u65E5\u5FD7"]];return s.jsxs("div",{className:"flex flex-col gap-4",children:[s.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:F.map(([e,a])=>s.jsx("button",{role:"tab","aria-selected":n===e,onClick:()=>I(e),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${n===e?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:a},e))}),n==="usage"&&s.jsxs(v,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[s.jsxs("div",{className:"flex flex-wrap items-start justify-between gap-3",children:[s.jsxs("div",{children:[s.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u7528\u91CF\u65E5\u5FD7"}),s.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u6309\u8BF7\u6C42\u8BB0\u5F55\u6A21\u578B\u8C03\u7528\u3001Token \u4E0E\u8D39\u7528\u660E\u7EC6\uFF0C\u652F\u6301\u7B5B\u9009\u4E0E\u5BFC\u51FA\u3002"})]}),s.jsxs("div",{className:"flex flex-wrap gap-2",children:[s.jsx(i,{onClick:b,children:"\u67E5\u8BE2"}),s.jsxs(i,{variant:"ghost",onClick:()=>c&&U(`usage-${Date.now()}.csv`,["time","user","model","status","http","latency_ms","prompt_tokens","completion_tokens","cost","request_id"],c.map(e=>[g(e.created_at),e.user_id,e.public_model,e.status,e.http_status,e.latency_ms,e.prompt_tokens,e.completion_tokens,e.cost_usd,e.request_id])),children:[s.jsx(O,{size:14}),"\u5BFC\u51FA CSV"]})]})]}),s.jsxs("div",{className:"grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4",children:[s.jsx(u,{label:"\u65F6\u95F4\u8303\u56F4",children:s.jsxs(N,{value:t.days,onChange:e=>d({...t,days:e.target.value}),children:[s.jsx("option",{value:"1",children:"\u8FD1 24 \u5C0F\u65F6"}),s.jsx("option",{value:"7",children:"\u8FD1 7 \u5929"}),s.jsx("option",{value:"30",children:"\u8FD1 30 \u5929"})]})}),s.jsx(u,{label:"\u72B6\u6001",children:s.jsxs(N,{value:t.status,onChange:e=>d({...t,status:e.target.value}),children:[s.jsx("option",{value:"",children:"\u5168\u90E8"}),["success","upstream_error","content_blocked","no_route","insufficient_balance"].map(e=>s.jsx("option",{children:e},e))]})}),s.jsx(u,{label:"\u6A21\u578B\u540D",children:s.jsx(w,{value:t.model,onChange:e=>d({...t,model:e.target.value}),placeholder:"deepseek-chat"})}),s.jsx(u,{label:"\u7528\u6237 ID",children:s.jsx(w,{value:t.userId,onChange:e=>d({...t,userId:e.target.value}),placeholder:"\u7528\u6237 ID"})})]}),c===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(8)].map((e,a)=>s.jsx("div",{className:"skeleton h-9"},a))}):s.jsxs(s.Fragment,{children:[s.jsxs("div",{className:"text-xs text-muted",children:["\u6700\u8FD1 ",c.length," \u6761 / \u547D\u4E2D ",T," \u6761\uFF08\u65F6\u95F4\u5012\u5E8F\uFF09"]}),s.jsx(C,{cols:$,rows:c,page:14,expand:e=>s.jsxs("div",{className:"grid grid-cols-2 gap-2 font-mono text-xs text-muted",children:[s.jsxs("span",{children:["\u8BF7\u6C42 ID\uFF1A",s.jsx("span",{className:"text-ink",children:e.request_id})]}),s.jsxs("span",{children:["Key\uFF1A",e.api_key_id??"\u2014"]}),s.jsxs("span",{children:["\u9519\u8BEF\u7801\uFF1A",e.error_code??"\u2014"]}),s.jsxs("span",{children:["\u91CD\u8BD5/\u5207\u6362\uFF1A",e.attempts," \u6B21",e.stream?" \xB7 \u6D41\u5F0F":""]}),s.jsxs("span",{children:["IP\uFF1A",e.ip]}),s.jsxs("span",{children:["\u4F9B\u5E94\u5546\uFF1A",e.provider_id??"\u2014"]})]})})]})]}),n==="audit"&&f&&s.jsxs(v,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[s.jsxs("div",{className:"flex flex-wrap items-start justify-between gap-3",children:[s.jsxs("div",{children:[s.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u5BA1\u8BA1\u65E5\u5FD7"}),s.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u8BB0\u5F55\u540E\u53F0\u654F\u611F\u64CD\u4F5C\uFF0C\u54C8\u5E0C\u94FE\u53EF\u6821\u9A8C\u5B8C\u6574\u6027\uFF1B\u4EC5\u5C55\u793A\u4FDD\u7559\u671F\u5185\u7684\u65E5\u5FD7\uFF0830\u2013180 \u5929\uFF0C\u9ED8\u8BA4 30 \u5929\uFF09\u3002"})]}),s.jsxs("div",{className:"flex flex-wrap gap-2",children:[s.jsxs(i,{variant:"ghost",onClick:o,children:[s.jsx(G,{size:14}),"\u5237\u65B0"]}),h&&s.jsxs(i,{variant:"ghost",onClick:P,children:[s.jsx(B,{size:14}),"\u6821\u9A8C\u94FE\u5B8C\u6574\u6027"]}),h&&s.jsxs(i,{variant:"ghost",className:"!text-err",onClick:async()=>{if(await y("\u6E05\u7A7A\u5168\u90E8\u5BA1\u8BA1\u65E5\u5FD7\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\uFF08\u54C8\u5E0C\u94FE\u5C06\u91CD\u65B0\u4ECE GENESIS \u5F00\u59CB\uFF09\u3002"))try{await m("clear_audit_logs",{}),r("\u5DF2\u6E05\u7A7A"),o()}catch(e){r(e.message,"err")}},children:[s.jsx(S,{size:14}),"\u6E05\u7A7A\u5168\u90E8"]})]})]}),_===null?s.jsx("div",{className:"flex flex-col gap-2",children:[...Array(8)].map((e,a)=>s.jsx("div",{className:"skeleton h-9"},a))}):s.jsx(C,{cols:z,rows:_,page:20,expand:e=>s.jsx("pre",{className:"max-h-40 overflow-auto text-xs",children:JSON.stringify(JSON.parse(e.meta??"{}"),null,2)})})]}),V]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/ModelsPricing-CjxHlu3Y.js": {
-              content: 'import{c as R,u as V,a as q,j as e,d as A,L as B,q as T,o as z,I as o,E as K,r as O,m as G,i as U,n as E,B as w,D as H,e as D,F as n,k as W,h as J}from"./index-JGTLcmXV.js";import{r as d,h as Q}from"./vendor-BbQ_LiY-.js";import{P as X}from"./plus-v0UXhlLi.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Y=R("Cpu",[["rect",{width:"16",height:"16",x:"4",y:"4",rx:"2",key:"14l7u7"}],["rect",{width:"6",height:"6",x:"9",y:"9",rx:"1",key:"5aljv4"}],["path",{d:"M15 2v2",key:"13l42r"}],["path",{d:"M15 20v2",key:"15mkzm"}],["path",{d:"M2 15h2",key:"1gxd5l"}],["path",{d:"M2 9h2",key:"1bbxkp"}],["path",{d:"M20 15h2",key:"19e6y8"}],["path",{d:"M20 9h2",key:"19tzq7"}],["path",{d:"M9 2v2",key:"165o2o"}],["path",{d:"M9 20v2",key:"i2bqo8"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Z=R("Search",[["circle",{cx:"11",cy:"11",r:"8",key:"4ej97u"}],["path",{d:"m21 21-4.3-4.3",key:"1qie3q"}]]);function ee({me:k}){const[x,h]=d.useState(null),[_,M]=d.useState([]),[f,C]=d.useState(""),[j,i]=d.useState(null),c=V(),b=`${window.location.origin}/v1`;d.useEffect(()=>{q("/api/models").then(t=>{h(t.models),t.providers&&M(t.providers)}).catch(t=>c(t.message,"err"))},[]);const N=async(t,r)=>{try{await navigator.clipboard.writeText(t),i(t),c(`\u5DF2\u590D\u5236 ${r}: ${t}`),setTimeout(()=>i(null),1800)}catch{c("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u957F\u6309\u590D\u5236","err")}},v=(x??[]).filter(t=>t.enabled===1),u=f.trim().toLowerCase(),l=[],m=new Set;for(const t of _){m.add(t.id);const r=v.filter(p=>p.provider_id===t.id||p.provider_slug===t.slug);l.push({provider:t,models:r})}for(const t of v)t.provider_id&&!m.has(t.provider_id)&&(m.add(t.provider_id),l.push({provider:{id:t.provider_id,name:t.provider_name||t.provider_id,slug:t.provider_slug||t.provider_id,kind:"openai_compat",status:"active"},models:v.filter(r=>r.provider_id===t.provider_id)}));const I=l.map(t=>{const r=t.provider.name.toLowerCase().includes(u)||t.provider.slug.toLowerCase().includes(u),p=t.models.filter(y=>r||y.public_name.toLowerCase().includes(u)||y.upstream_model.toLowerCase().includes(u)||`${t.provider.slug}/${y.public_name}`.toLowerCase().includes(u));return{...t,models:p,matches:r||p.length>0}}).filter(t=>u?t.matches:!0);return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs(A,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-4 md:flex-row md:items-center md:justify-between",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"flex h-7 w-7 items-center justify-center rounded-lg bg-brand/10 text-brand",children:e.jsx(B,{size:16})}),e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u6A21\u578B\u6C60 (Model Pool)"})]}),e.jsxs("p",{className:"mt-1 text-xs text-muted max-w-2xl",children:["\u5DF2\u5C31\u7EEA\u7684\u6240\u6709\u4E0A\u6E38\u5927\u6A21\u578B\u76EE\u5F55\u3002\u6A21\u578B\u8C03\u7528\u683C\u5F0F\u7EDF\u4E00\u89C4\u8303\u4E3A",e.jsx("code",{className:"mx-1 rounded bg-surface2 px-1 text-ink font-mono font-medium",children:"\u63D0\u4F9B\u5546ID/\u6A21\u578BID"}),"\uFF08\u4F8B\u5982 ",e.jsx("span",{className:"font-mono text-ink",children:"deepseek/deepseek-chat"})," \u6216 ",e.jsx("span",{className:"font-mono text-ink",children:"kilo/kilo-auto/free"}),"\uFF09\u3002\u70B9\u51FB\u4EFB\u610F\u6A21\u578B\u80F6\u56CA\u5373\u53EF\u4E00\u952E\u590D\u5236\u5E76\u586B\u5165\u5BA2\u6237\u7AEF\u3002"]})]}),e.jsxs("div",{className:"flex w-full md:w-auto items-center flex-nowrap gap-2 rounded-xl border border-line bg-surface2/60 px-2.5 py-1.5 text-xs min-w-0 shrink-0",children:[e.jsx("span",{className:"shrink-0 rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand font-mono",children:"API BASE"}),e.jsx("code",{className:"flex-1 min-w-0 font-mono text-xs text-ink truncate whitespace-nowrap max-w-[200px] sm:max-w-[280px]",children:b}),e.jsxs("button",{type:"button",onClick:()=>N(b,"API Base"),className:"shrink-0 flex items-center gap-1 rounded-md bg-brand/10 hover:bg-brand/20 text-brand px-2 py-1 text-[11px] font-medium transition-colors whitespace-nowrap",title:"\u590D\u5236 API \u6839\u5730\u5740",children:[j===b?e.jsx(T,{size:12,className:"text-emerald-500"}):e.jsx(z,{size:12}),e.jsx("span",{children:j===b?"\u5DF2\u590D\u5236":"\u590D\u5236"})]})]})]}),e.jsxs("div",{className:"mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-line/70 pt-3.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-4 text-xs text-muted",children:[e.jsxs("div",{children:["\u6E20\u9053\u603B\u8BA1\uFF1A",e.jsx("span",{className:"font-semibold text-ink font-mono",children:_.length})]}),e.jsxs("div",{children:["\u53EF\u7528\u6A21\u578B\uFF1A",e.jsx("span",{className:"font-semibold text-emerald-500 font-mono",children:v.length})," \u4E2A"]}),e.jsx("div",{className:"hidden sm:inline text-muted/60",children:"\xB7"}),e.jsxs("div",{className:"hidden sm:inline",children:["\u8C03\u7528\u683C\u5F0F\uFF1A",e.jsx("code",{className:"font-mono text-ink",children:"model"})," \u6216 ",e.jsx("code",{className:"font-mono text-ink",children:"provider/model"})]})]}),e.jsxs("div",{className:"relative w-full sm:w-72",children:[e.jsx(Z,{size:14,className:"absolute left-3 top-1/2 -translate-y-1/2 text-muted"}),e.jsx(o,{value:f,onChange:t=>C(t.target.value),placeholder:"\u641C\u7D22\u6E20\u9053\u6216\u6A21\u578B\u540D\u79F0...",className:"!pl-8 !py-1.5 text-xs"})]})]})]}),x===null?e.jsx("div",{className:"flex flex-col gap-3",children:[...Array(4)].map((t,r)=>e.jsx("div",{className:"skeleton h-28 rounded-xl2"},r))}):I.length===0?e.jsx(A,{children:e.jsx(K,{icon:e.jsx(Y,{size:32}),title:"\u672A\u53D1\u73B0\u5339\u914D\u7684\u6A21\u578B",hint:u?"\u8BF7\u5C1D\u8BD5\u66F4\u6362\u5173\u952E\u8BCD\u641C\u7D22\u5176\u5B83\u6E20\u9053\u6216\u6A21\u578B":"\u6682\u65E0\u53EF\u7528\u6A21\u578B\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458\u5728\u300C\u63D0\u4F9B\u5546\u300D\u6216\u300C\u5B9A\u4EF7\u300D\u4E0A\u67B6\u6A21\u578B"})}):e.jsx("div",{className:"flex flex-col gap-3",children:I.map(({provider:t,models:r})=>{var S,L,$;const p=t.slug==="opencode"||t.slug==="duckai"||t.slug==="kilo"||t.kind==="kilo"||t.kind==="opencode"||t.kind==="duckai",y=(S=t.kind)!=null&&S.startsWith("oauth:")?"OAuth \u6388\u6743":(L=t.kind)!=null&&L.startsWith("web:")?"Web \u53CD\u4EE3":t.slug==="anthropic"||t.kind==="anthropic"?"Anthropic \u5B98\u65B9\u534F\u8BAE":p?"\u514D Key \u76F4\u8FDE":"OpenAI \u517C\u5BB9";return e.jsxs(A,{className:"p-4 sm:p-4.5 flex flex-col gap-3",children:[e.jsxs("div",{className:"flex items-center justify-between gap-2 sm:gap-3 flex-nowrap border-b border-line/60 pb-2.5 min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1",children:[e.jsx("div",{className:"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-xs font-bold text-brand",children:(($=t.name[0])==null?void 0:$.toUpperCase())||e.jsx(O,{size:14})}),e.jsxs("div",{className:"flex items-center gap-1.5 sm:gap-2 min-w-0",children:[e.jsx("span",{className:"text-xs font-bold text-ink truncate",children:t.name}),e.jsx("code",{className:"text-[10px] text-muted rounded bg-surface2 px-1.5 py-0.5 font-mono shrink-0",children:t.slug})]})]}),e.jsxs("div",{className:"flex items-center gap-1.5 sm:gap-2 shrink-0",children:[e.jsx("span",{className:"rounded bg-line/70 px-2 py-0.5 text-[10px] text-muted font-medium whitespace-nowrap",children:y}),e.jsxs("span",{className:"flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-500 whitespace-nowrap",children:[e.jsx("span",{className:"h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0"}),r.length," \u4E2A\u5C31\u7EEA"]})]})]}),r.length===0?e.jsx("div",{className:"py-2 text-xs text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u5DF2\u542F\u7528\u6A21\u578B"}):e.jsx("div",{className:"flex flex-wrap gap-2",children:r.map(P=>{const s=P.public_name.startsWith(`${t.slug}/`)?P.public_name:`${t.slug}/${P.public_name}`,a=j===s;return e.jsxs("button",{type:"button",onClick:()=>N(s,"\u6A21\u578B ID"),className:G("group inline-flex items-center flex-nowrap shrink-0 max-w-full gap-1.5 rounded-lg border border-line bg-surface2/60 px-2.5 py-1.5 text-xs font-mono transition-all hover:border-brand/40 hover:bg-brand/5 hover:text-brand",a&&"!border-emerald-500/80 !bg-emerald-500/10 !text-emerald-500 font-semibold"),title:"\u70B9\u51FB\u590D\u5236\u6A21\u578B ID (\u63D0\u4F9B\u5546ID/\u6A21\u578BID)",children:[e.jsx("code",{className:"text-xs font-mono font-medium truncate max-w-[190px] sm:max-w-none whitespace-nowrap",children:s}),a?e.jsx(T,{size:12,className:"text-emerald-500 shrink-0"}):e.jsx(z,{size:12,className:"text-muted/60 group-hover:text-brand shrink-0 transition-colors"}),a&&e.jsx("span",{className:"text-[10px] font-sans font-medium text-emerald-500 shrink-0 whitespace-nowrap",children:"\u5DF2\u590D\u5236"})]},P.id)})})]},t.id)})})]})}function se({me:k}){const x=k.user.role==="superadmin",[h,_]=d.useState(null),[M,f]=d.useState([]),[C,j]=d.useState(!1),[i,c]=d.useState({publicName:"",providerId:"",upstream:"",priority:"10",cost:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",password:""}),[b,N]=d.useState(null),[v,u]=d.useState(""),[l,m]=d.useState({id:"",publicName:"",oldPublicName:"",providerId:"",upstreamModel:"",priority:"10",costWeight:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",enabled:!0}),{confirm:I,confirmEl:t}=U(),r=V(),p=()=>q("/api/models").then(s=>_(s.models)).catch(s=>r(s.message,"err"));d.useEffect(()=>{p(),x&&E("list_providers").then(s=>f(s.providers)).catch(()=>{})},[x]);const y=async()=>{if(!i.publicName.trim())return r("\u8BF7\u586B\u5199\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D","err");if(!i.providerId)return r("\u8BF7\u9009\u62E9\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053","err");if(!i.upstream.trim())return r("\u8BF7\u586B\u5199\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D","err");if(!i.password.trim())return r("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u64CD\u4F5C","err");const s=parseFloat(i.inputPerMillion),a=parseFloat(i.outputPerMillion);if(isNaN(s)||isNaN(a)||s<0||a<0)return r("\u8BF7\u8F93\u5165\u5408\u6CD5\u7684\u8F93\u5165/\u8F93\u51FA\u4EF7\u683C","err");const g=i.rpmLimit.trim()===""?null:parseInt(i.rpmLimit.trim(),10);if(g!==null&&(isNaN(g)||g<0))return r("RPM \u9650\u6D41\u8BF7\u8F93\u5165\u5927\u4E8E\u7B49\u4E8E 0 \u7684\u6574\u6570\uFF080 \u4EE3\u8868\u4E0D\u9650\uFF09","err");try{await E("upsert_model",{publicName:i.publicName.trim(),providerId:i.providerId,upstreamModel:i.upstream.trim(),priority:+i.priority||10,costWeight:+i.cost||1,inputPerMillion:s,outputPerMillion:a,rpmLimit:g,password:i.password.trim()}),r("\u6A21\u578B\u6620\u5C04\u5DF2\u4FDD\u5B58\u5E76\u4E0A\u67B6"),j(!1),c({publicName:"",providerId:"",upstream:"",priority:"10",cost:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",password:""}),p()}catch(F){r(F.message,"err")}},S=s=>{N(s),u(""),m({id:s.id,publicName:s.public_name,oldPublicName:s.public_name,providerId:s.provider_id||"",upstreamModel:s.upstream_model,priority:String(s.priority??10),costWeight:String(s.cost_weight??1),inputPerMillion:String(s.input_per_million??0),outputPerMillion:String(s.output_per_million??0),rpmLimit:s.rpm_limit!=null?String(s.rpm_limit):"",enabled:s.enabled===1})},L=async()=>{if(!l.publicName.trim())return r("\u8BF7\u586B\u5199\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D","err");if(!l.providerId)return r("\u8BF7\u9009\u62E9\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053","err");if(!l.upstreamModel.trim())return r("\u8BF7\u586B\u5199\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D","err");if(!v.trim())return r("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u4FEE\u6539","err");const s=parseFloat(l.inputPerMillion),a=parseFloat(l.outputPerMillion);if(isNaN(s)||isNaN(a)||s<0||a<0)return r("\u8BF7\u8F93\u5165\u5408\u6CD5\u7684\u8F93\u5165/\u8F93\u51FA\u4EF7\u683C","err");const g=l.rpmLimit.trim()===""?null:parseInt(l.rpmLimit.trim(),10);if(g!==null&&(isNaN(g)||g<0))return r("RPM \u9650\u6D41\u8BF7\u8F93\u5165\u5927\u4E8E\u7B49\u4E8E 0 \u7684\u6574\u6570\uFF080 \u4EE3\u8868\u4E0D\u9650\uFF09","err");try{await E("upsert_model",{id:l.id,publicName:l.publicName.trim(),oldPublicName:l.oldPublicName,providerId:l.providerId,upstreamModel:l.upstreamModel.trim(),priority:+l.priority||10,costWeight:+l.costWeight||1,inputPerMillion:s,outputPerMillion:a,rpmLimit:g,enabled:l.enabled,password:v.trim()}),r(`\u300C${l.publicName}\u300D\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7\u5DF2\u66F4\u65B0`),N(null),u(""),p()}catch(F){r(F.message,"err")}},$=async s=>{if(await I(`\u5220\u9664\u6A21\u578B\u6620\u5C04\u300C${s.public_name} \u2192 ${s.upstream_model}\u300D\uFF1F`))try{await E("delete_model",{id:s.id}),r("\u5DF2\u5220\u9664"),p()}catch(a){r(a.message,"err")}},P=[{key:"public",label:"\u5BF9\u5916\u6A21\u578B\u540D",sortVal:s=>s.public_name,render:s=>e.jsx("span",{className:"font-medium text-ink truncate max-w-[140px] sm:max-w-[200px] inline-block",title:s.public_name,children:s.public_name})},{key:"upstream",label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B",sortVal:s=>`${s.provider_slug||""}/${s.upstream_model}`,render:s=>{const a=s.provider_slug&&!s.upstream_model.startsWith(`${s.provider_slug}/`)?`${s.provider_slug}/${s.upstream_model}`:s.upstream_model;return e.jsx("code",{className:"text-xs font-mono text-muted hover:text-ink truncate max-w-[140px] sm:max-w-[200px] md:max-w-[260px] inline-block",title:a,children:a})}},{key:"provider",label:"\u4F9B\u5E94\u5546\u6E20\u9053",render:s=>s.provider_name??"\u2014"},{key:"priority",label:"\u4F18\u5148\u7EA7",sortVal:s=>s.priority,render:s=>e.jsxs("span",{className:"text-xs",children:[s.priority,"\uFF08\u5C0F=\u4F18\u5148\uFF09"]})},{key:"in",label:"\u8F93\u5165\u4EF7 / 1M",sortVal:s=>s.input_per_million??0,render:s=>e.jsx("span",{className:"font-mono text-xs font-medium text-ink",children:s.input_per_million!=null?`\xA5${Number(s.input_per_million).toFixed(2)}`:"\u672A\u5B9A\u4EF7"})},{key:"out",label:"\u8F93\u51FA\u4EF7 / 1M",sortVal:s=>s.output_per_million??0,render:s=>e.jsx("span",{className:"font-mono text-xs font-medium text-ink",children:s.output_per_million!=null?`\xA5${Number(s.output_per_million).toFixed(2)}`:"\u672A\u5B9A\u4EF7"})},{key:"rpm",label:"RPM \u9650\u6D41",sortVal:s=>s.rpm_limit===0?-1:s.rpm_limit??999999,render:s=>s.rpm_limit===0?e.jsx("span",{className:"rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500 whitespace-nowrap",children:"\u4E0D\u9650\u6D41"}):typeof s.rpm_limit=="number"&&s.rpm_limit>0?e.jsxs("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-mono font-medium text-brand whitespace-nowrap",children:[s.rpm_limit," RPM"]}):e.jsx("span",{className:"text-[11px] text-muted whitespace-nowrap",children:"\u7EE7\u627F\u5168\u5C40"})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(J,{value:s.enabled?"active":"pending"})},...x?[{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsx(w,{variant:"soft",className:"!h-7 !px-2.5 text-xs",onClick:()=>S(s),children:"\u7F16\u8F91"}),e.jsx(w,{variant:"ghost",className:"!h-7 !px-2 text-xs !text-err",onClick:()=>$(s),children:"\u5220\u9664"})]})}]:[]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[x&&e.jsx("div",{className:"flex justify-end",children:e.jsxs(w,{onClick:()=>j(!0),children:[e.jsx(X,{size:14}),"\u65B0\u589E\u6620\u5C04\u4E0E\u5B9A\u4EF7"]})}),e.jsx(A,{className:"p-4",children:h===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,a)=>e.jsx("div",{className:"skeleton h-9"},a))}):e.jsx(H,{cols:P,rows:h})}),e.jsx(D,{open:C,onClose:()=>j(!1),title:"\u65B0\u589E\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7",width:540,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:"\u4E3A\u4E0A\u6E38\u4F9B\u5E94\u5546\u5173\u8054\u5BF9\u5916\u6A21\u578B\u540D\u5E76\u8BBE\u5B9A\u8C03\u7528\u5355\u4EF7\u4E0E\u9650\u6D41\u3002\u591A\u4E2A\u4F9B\u5E94\u5546\u53EF\u914D\u7F6E\u76F8\u540C\u7684\u5BF9\u5916\u6A21\u578B\u540D\uFF0C\u7F51\u5173\u5C06\u6309\u4F18\u5148\u7EA7\u81EA\u52A8\u6545\u969C\u8F6C\u79FB\u4E0E\u5BB9\u707E\u3002"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(n,{label:"\u6240\u5C5E\u4F9B\u5E94\u5546",children:e.jsxs(W,{value:i.providerId,onChange:s=>c({...i,providerId:s.target.value}),children:[e.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u4F9B\u5E94\u5546"}),M.map(s=>e.jsxs("option",{value:s.id,children:[s.name,"\uFF08",s.slug,"\uFF09"]},s.id))]})}),e.jsx(n,{label:"\u4F18\u5148\u7EA7\uFF08\u6570\u5B57\u8D8A\u5C0F\u8D8A\u4F18\u5148\uFF09",children:e.jsx(o,{type:"number",value:i.priority,onChange:s=>c({...i,priority:s.target.value}),placeholder:"10"})}),e.jsx(n,{label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D",children:e.jsx(o,{value:i.upstream,onChange:s=>{const a=s.target.value;c({...i,upstream:a,publicName:i.publicName?i.publicName:a})},placeholder:"\u4F8B\u5982: deepseek-chat \u6216 gpt-4o"})}),e.jsx(n,{label:"\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D",children:e.jsx(o,{value:i.publicName,onChange:s=>c({...i,publicName:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u8F93\u5165\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:i.inputPerMillion,onChange:s=>c({...i,inputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx(n,{label:"\u8F93\u51FA\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:i.outputPerMillion,onChange:s=>c({...i,outputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u6A21\u578B\u72EC\u7ACB RPM \u9650\u6D41",hint:"\u586B 0 \u4E3A\u8BE5\u6A21\u578B\u7EDD\u5BF9\u4E0D\u9650\uFF1B\u7559\u7A7A\u81EA\u52A8\u7EE7\u627F\u5168\u5C40\u8BBE\u7F6E",children:e.jsx(o,{type:"number",min:"0",value:i.rpmLimit,onChange:s=>c({...i,rpmLimit:s.target.value}),placeholder:"\u7559\u7A7A\u7EE7\u627F\u5168\u5C40\u9ED8\u8BA4\uFF08\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF09"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u521B\u5EFA\u65B0\u6A21\u578B\u6620\u5C04\u9700\u6838\u9A8C\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u8EAB\u4EFD",children:e.jsx(o,{type:"password",value:i.password,onChange:s=>c({...i,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-line",children:[e.jsx(w,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>j(!1),children:"\u53D6\u6D88"}),e.jsx(w,{className:"flex-1 sm:flex-initial",onClick:y,children:"\u4FDD\u5B58\u5E76\u4E0A\u67B6"})]})]})}),e.jsx(D,{open:!!b,onClose:()=>N(null),title:`\u7F16\u8F91\u6A21\u578B\u4E0E\u5B9A\u4EF7 \u2014 ${(b==null?void 0:b.public_name)??""}`,width:540,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:"\u4FEE\u6539\u6A21\u578B\u6620\u5C04\u4E0E\u8C03\u7528\u5B9A\u4EF7\u3002\u4FEE\u6539\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D\u540E\uFF0C\u7CFB\u7EDF\u4F1A\u81EA\u52A8\u540C\u6B65\u66F4\u65B0\u5BF9\u5E94\u5B9A\u4EF7\u914D\u7F6E\u5E76\u70ED\u91CD\u8F7D\u8DEF\u7531\u3002"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(n,{label:"\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053",children:e.jsxs(W,{value:l.providerId,onChange:s=>m({...l,providerId:s.target.value}),children:[e.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u4F9B\u5E94\u5546"}),M.map(s=>e.jsxs("option",{value:s.id,children:[s.name,"\uFF08",s.slug,"\uFF09"]},s.id))]})}),e.jsx(n,{label:"\u4F18\u5148\u7EA7\uFF08\u6570\u5B57\u8D8A\u5C0F\u8D8A\u4F18\u5148\uFF09",children:e.jsx(o,{type:"number",value:l.priority,onChange:s=>m({...l,priority:s.target.value}),placeholder:"10"})}),e.jsx(n,{label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D",children:e.jsx(o,{value:l.upstreamModel,onChange:s=>m({...l,upstreamModel:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D",children:e.jsx(o,{value:l.publicName,onChange:s=>m({...l,publicName:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u8F93\u5165\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:l.inputPerMillion,onChange:s=>m({...l,inputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx(n,{label:"\u8F93\u51FA\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:l.outputPerMillion,onChange:s=>m({...l,outputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u6A21\u578B\u72EC\u7ACB RPM \u9650\u6D41",hint:"\u586B 0 \u4E3A\u8BE5\u6A21\u578B\u7EDD\u5BF9\u4E0D\u9650\uFF1B\u7559\u7A7A\u81EA\u52A8\u7EE7\u627F\u5168\u5C40\u8BBE\u7F6E",children:e.jsx(o,{type:"number",min:"0",value:l.rpmLimit,onChange:s=>m({...l,rpmLimit:s.target.value}),placeholder:"\u7559\u7A7A\u7EE7\u627F\u5168\u5C40\u9ED8\u8BA4\uFF08\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF09"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u4FEE\u6539\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7\u5C5E\u6838\u5FC3\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u9A8C\u8BC1\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u8EAB\u4EFD",children:e.jsx(o,{type:"password",value:v,onChange:s=>u(s.target.value),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsx("div",{className:"flex items-center gap-2 pt-1",children:e.jsxs("label",{className:"flex items-center gap-2 text-xs font-medium cursor-pointer",children:[e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:l.enabled,onChange:s=>m({...l,enabled:s.target.checked})}),"\u542F\u7528\u8BE5\u6A21\u578B\u4E0A\u67B6\u8C03\u5EA6"]})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-line",children:[e.jsx(w,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>N(null),children:"\u53D6\u6D88"}),e.jsx(w,{className:"flex-1 sm:flex-initial",onClick:L,children:"\u4FDD\u5B58\u4FEE\u6539"})]})]})}),t]})}function re(){const{me:k}=Q(),x=k.user.role==="superadmin",[h,_]=d.useState("models"),M=x?[["models","\u6A21\u578B\u6C60"],["pricing","\u5B9A\u4EF7"]]:[["models","\u6A21\u578B\u6C60"]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:M.map(([f,C])=>e.jsx("button",{role:"tab","aria-selected":h===f,onClick:()=>_(f),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${h===f?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:C},f))}),h==="models"&&e.jsx(ee,{me:k}),h==="pricing"&&x&&e.jsx(se,{me:k})]})}\n',
+            "/assets/ModelsPricing-D3r_Eoea.js": {
+              content: 'import{c as R,u as V,a as q,j as e,d as A,L as B,q as T,o as z,I as o,E as K,r as O,m as G,i as U,n as E,B as w,D as H,e as D,F as n,k as W,h as J}from"./index-OWhocmiM.js";import{r as d,h as Q}from"./vendor-BbQ_LiY-.js";import{P as X}from"./plus-DjGDWRHo.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Y=R("Cpu",[["rect",{width:"16",height:"16",x:"4",y:"4",rx:"2",key:"14l7u7"}],["rect",{width:"6",height:"6",x:"9",y:"9",rx:"1",key:"5aljv4"}],["path",{d:"M15 2v2",key:"13l42r"}],["path",{d:"M15 20v2",key:"15mkzm"}],["path",{d:"M2 15h2",key:"1gxd5l"}],["path",{d:"M2 9h2",key:"1bbxkp"}],["path",{d:"M20 15h2",key:"19e6y8"}],["path",{d:"M20 9h2",key:"19tzq7"}],["path",{d:"M9 2v2",key:"165o2o"}],["path",{d:"M9 20v2",key:"i2bqo8"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Z=R("Search",[["circle",{cx:"11",cy:"11",r:"8",key:"4ej97u"}],["path",{d:"m21 21-4.3-4.3",key:"1qie3q"}]]);function ee({me:k}){const[x,h]=d.useState(null),[_,M]=d.useState([]),[f,C]=d.useState(""),[j,i]=d.useState(null),c=V(),b=`${window.location.origin}/v1`;d.useEffect(()=>{q("/api/models").then(t=>{h(t.models),t.providers&&M(t.providers)}).catch(t=>c(t.message,"err"))},[]);const N=async(t,r)=>{try{await navigator.clipboard.writeText(t),i(t),c(`\u5DF2\u590D\u5236 ${r}: ${t}`),setTimeout(()=>i(null),1800)}catch{c("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u957F\u6309\u590D\u5236","err")}},v=(x??[]).filter(t=>t.enabled===1),u=f.trim().toLowerCase(),l=[],m=new Set;for(const t of _){m.add(t.id);const r=v.filter(p=>p.provider_id===t.id||p.provider_slug===t.slug);l.push({provider:t,models:r})}for(const t of v)t.provider_id&&!m.has(t.provider_id)&&(m.add(t.provider_id),l.push({provider:{id:t.provider_id,name:t.provider_name||t.provider_id,slug:t.provider_slug||t.provider_id,kind:"openai_compat",status:"active"},models:v.filter(r=>r.provider_id===t.provider_id)}));const I=l.map(t=>{const r=t.provider.name.toLowerCase().includes(u)||t.provider.slug.toLowerCase().includes(u),p=t.models.filter(y=>r||y.public_name.toLowerCase().includes(u)||y.upstream_model.toLowerCase().includes(u)||`${t.provider.slug}/${y.public_name}`.toLowerCase().includes(u));return{...t,models:p,matches:r||p.length>0}}).filter(t=>u?t.matches:!0);return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs(A,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-4 md:flex-row md:items-center md:justify-between",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"flex h-7 w-7 items-center justify-center rounded-lg bg-brand/10 text-brand",children:e.jsx(B,{size:16})}),e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u6A21\u578B\u6C60 (Model Pool)"})]}),e.jsxs("p",{className:"mt-1 text-xs text-muted max-w-2xl",children:["\u5DF2\u5C31\u7EEA\u7684\u6240\u6709\u4E0A\u6E38\u5927\u6A21\u578B\u76EE\u5F55\u3002\u6A21\u578B\u8C03\u7528\u683C\u5F0F\u7EDF\u4E00\u89C4\u8303\u4E3A",e.jsx("code",{className:"mx-1 rounded bg-surface2 px-1 text-ink font-mono font-medium",children:"\u63D0\u4F9B\u5546ID/\u6A21\u578BID"}),"\uFF08\u4F8B\u5982 ",e.jsx("span",{className:"font-mono text-ink",children:"deepseek/deepseek-chat"})," \u6216 ",e.jsx("span",{className:"font-mono text-ink",children:"kilo/kilo-auto/free"}),"\uFF09\u3002\u70B9\u51FB\u4EFB\u610F\u6A21\u578B\u80F6\u56CA\u5373\u53EF\u4E00\u952E\u590D\u5236\u5E76\u586B\u5165\u5BA2\u6237\u7AEF\u3002"]})]}),e.jsxs("div",{className:"flex w-full md:w-auto items-center flex-nowrap gap-2 rounded-xl border border-line bg-surface2/60 px-2.5 py-1.5 text-xs min-w-0 shrink-0",children:[e.jsx("span",{className:"shrink-0 rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand font-mono",children:"API BASE"}),e.jsx("code",{className:"flex-1 min-w-0 font-mono text-xs text-ink truncate whitespace-nowrap max-w-[200px] sm:max-w-[280px]",children:b}),e.jsxs("button",{type:"button",onClick:()=>N(b,"API Base"),className:"shrink-0 flex items-center gap-1 rounded-md bg-brand/10 hover:bg-brand/20 text-brand px-2 py-1 text-[11px] font-medium transition-colors whitespace-nowrap",title:"\u590D\u5236 API \u6839\u5730\u5740",children:[j===b?e.jsx(T,{size:12,className:"text-emerald-500"}):e.jsx(z,{size:12}),e.jsx("span",{children:j===b?"\u5DF2\u590D\u5236":"\u590D\u5236"})]})]})]}),e.jsxs("div",{className:"mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-line/70 pt-3.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-4 text-xs text-muted",children:[e.jsxs("div",{children:["\u6E20\u9053\u603B\u8BA1\uFF1A",e.jsx("span",{className:"font-semibold text-ink font-mono",children:_.length})]}),e.jsxs("div",{children:["\u53EF\u7528\u6A21\u578B\uFF1A",e.jsx("span",{className:"font-semibold text-emerald-500 font-mono",children:v.length})," \u4E2A"]}),e.jsx("div",{className:"hidden sm:inline text-muted/60",children:"\xB7"}),e.jsxs("div",{className:"hidden sm:inline",children:["\u8C03\u7528\u683C\u5F0F\uFF1A",e.jsx("code",{className:"font-mono text-ink",children:"model"})," \u6216 ",e.jsx("code",{className:"font-mono text-ink",children:"provider/model"})]})]}),e.jsxs("div",{className:"relative w-full sm:w-72",children:[e.jsx(Z,{size:14,className:"absolute left-3 top-1/2 -translate-y-1/2 text-muted"}),e.jsx(o,{value:f,onChange:t=>C(t.target.value),placeholder:"\u641C\u7D22\u6E20\u9053\u6216\u6A21\u578B\u540D\u79F0...",className:"!pl-8 !py-1.5 text-xs"})]})]})]}),x===null?e.jsx("div",{className:"flex flex-col gap-3",children:[...Array(4)].map((t,r)=>e.jsx("div",{className:"skeleton h-28 rounded-xl2"},r))}):I.length===0?e.jsx(A,{children:e.jsx(K,{icon:e.jsx(Y,{size:32}),title:"\u672A\u53D1\u73B0\u5339\u914D\u7684\u6A21\u578B",hint:u?"\u8BF7\u5C1D\u8BD5\u66F4\u6362\u5173\u952E\u8BCD\u641C\u7D22\u5176\u5B83\u6E20\u9053\u6216\u6A21\u578B":"\u6682\u65E0\u53EF\u7528\u6A21\u578B\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458\u5728\u300C\u63D0\u4F9B\u5546\u300D\u6216\u300C\u5B9A\u4EF7\u300D\u4E0A\u67B6\u6A21\u578B"})}):e.jsx("div",{className:"flex flex-col gap-3",children:I.map(({provider:t,models:r})=>{var S,L,$;const p=t.slug==="opencode"||t.slug==="duckai"||t.slug==="kilo"||t.kind==="kilo"||t.kind==="opencode"||t.kind==="duckai",y=(S=t.kind)!=null&&S.startsWith("oauth:")?"OAuth \u6388\u6743":(L=t.kind)!=null&&L.startsWith("web:")?"Web \u53CD\u4EE3":t.slug==="anthropic"||t.kind==="anthropic"?"Anthropic \u5B98\u65B9\u534F\u8BAE":p?"\u514D Key \u76F4\u8FDE":"OpenAI \u517C\u5BB9";return e.jsxs(A,{className:"p-4 sm:p-4.5 flex flex-col gap-3",children:[e.jsxs("div",{className:"flex items-center justify-between gap-2 sm:gap-3 flex-nowrap border-b border-line/60 pb-2.5 min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1",children:[e.jsx("div",{className:"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-xs font-bold text-brand",children:(($=t.name[0])==null?void 0:$.toUpperCase())||e.jsx(O,{size:14})}),e.jsxs("div",{className:"flex items-center gap-1.5 sm:gap-2 min-w-0",children:[e.jsx("span",{className:"text-xs font-bold text-ink truncate",children:t.name}),e.jsx("code",{className:"text-[10px] text-muted rounded bg-surface2 px-1.5 py-0.5 font-mono shrink-0",children:t.slug})]})]}),e.jsxs("div",{className:"flex items-center gap-1.5 sm:gap-2 shrink-0",children:[e.jsx("span",{className:"rounded bg-line/70 px-2 py-0.5 text-[10px] text-muted font-medium whitespace-nowrap",children:y}),e.jsxs("span",{className:"flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-500 whitespace-nowrap",children:[e.jsx("span",{className:"h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0"}),r.length," \u4E2A\u5C31\u7EEA"]})]})]}),r.length===0?e.jsx("div",{className:"py-2 text-xs text-muted",children:"\u8BE5\u6E20\u9053\u6682\u65E0\u5DF2\u542F\u7528\u6A21\u578B"}):e.jsx("div",{className:"flex flex-wrap gap-2",children:r.map(P=>{const s=P.public_name.startsWith(`${t.slug}/`)?P.public_name:`${t.slug}/${P.public_name}`,a=j===s;return e.jsxs("button",{type:"button",onClick:()=>N(s,"\u6A21\u578B ID"),className:G("group inline-flex items-center flex-nowrap shrink-0 max-w-full gap-1.5 rounded-lg border border-line bg-surface2/60 px-2.5 py-1.5 text-xs font-mono transition-all hover:border-brand/40 hover:bg-brand/5 hover:text-brand",a&&"!border-emerald-500/80 !bg-emerald-500/10 !text-emerald-500 font-semibold"),title:"\u70B9\u51FB\u590D\u5236\u6A21\u578B ID (\u63D0\u4F9B\u5546ID/\u6A21\u578BID)",children:[e.jsx("code",{className:"text-xs font-mono font-medium truncate max-w-[190px] sm:max-w-none whitespace-nowrap",children:s}),a?e.jsx(T,{size:12,className:"text-emerald-500 shrink-0"}):e.jsx(z,{size:12,className:"text-muted/60 group-hover:text-brand shrink-0 transition-colors"}),a&&e.jsx("span",{className:"text-[10px] font-sans font-medium text-emerald-500 shrink-0 whitespace-nowrap",children:"\u5DF2\u590D\u5236"})]},P.id)})})]},t.id)})})]})}function se({me:k}){const x=k.user.role==="superadmin",[h,_]=d.useState(null),[M,f]=d.useState([]),[C,j]=d.useState(!1),[i,c]=d.useState({publicName:"",providerId:"",upstream:"",priority:"10",cost:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",password:""}),[b,N]=d.useState(null),[v,u]=d.useState(""),[l,m]=d.useState({id:"",publicName:"",oldPublicName:"",providerId:"",upstreamModel:"",priority:"10",costWeight:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",enabled:!0}),{confirm:I,confirmEl:t}=U(),r=V(),p=()=>q("/api/models").then(s=>_(s.models)).catch(s=>r(s.message,"err"));d.useEffect(()=>{p(),x&&E("list_providers").then(s=>f(s.providers)).catch(()=>{})},[x]);const y=async()=>{if(!i.publicName.trim())return r("\u8BF7\u586B\u5199\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D","err");if(!i.providerId)return r("\u8BF7\u9009\u62E9\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053","err");if(!i.upstream.trim())return r("\u8BF7\u586B\u5199\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D","err");if(!i.password.trim())return r("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u64CD\u4F5C","err");const s=parseFloat(i.inputPerMillion),a=parseFloat(i.outputPerMillion);if(isNaN(s)||isNaN(a)||s<0||a<0)return r("\u8BF7\u8F93\u5165\u5408\u6CD5\u7684\u8F93\u5165/\u8F93\u51FA\u4EF7\u683C","err");const g=i.rpmLimit.trim()===""?null:parseInt(i.rpmLimit.trim(),10);if(g!==null&&(isNaN(g)||g<0))return r("RPM \u9650\u6D41\u8BF7\u8F93\u5165\u5927\u4E8E\u7B49\u4E8E 0 \u7684\u6574\u6570\uFF080 \u4EE3\u8868\u4E0D\u9650\uFF09","err");try{await E("upsert_model",{publicName:i.publicName.trim(),providerId:i.providerId,upstreamModel:i.upstream.trim(),priority:+i.priority||10,costWeight:+i.cost||1,inputPerMillion:s,outputPerMillion:a,rpmLimit:g,password:i.password.trim()}),r("\u6A21\u578B\u6620\u5C04\u5DF2\u4FDD\u5B58\u5E76\u4E0A\u67B6"),j(!1),c({publicName:"",providerId:"",upstream:"",priority:"10",cost:"1",inputPerMillion:"0",outputPerMillion:"0",rpmLimit:"",password:""}),p()}catch(F){r(F.message,"err")}},S=s=>{N(s),u(""),m({id:s.id,publicName:s.public_name,oldPublicName:s.public_name,providerId:s.provider_id||"",upstreamModel:s.upstream_model,priority:String(s.priority??10),costWeight:String(s.cost_weight??1),inputPerMillion:String(s.input_per_million??0),outputPerMillion:String(s.output_per_million??0),rpmLimit:s.rpm_limit!=null?String(s.rpm_limit):"",enabled:s.enabled===1})},L=async()=>{if(!l.publicName.trim())return r("\u8BF7\u586B\u5199\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D","err");if(!l.providerId)return r("\u8BF7\u9009\u62E9\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053","err");if(!l.upstreamModel.trim())return r("\u8BF7\u586B\u5199\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D","err");if(!v.trim())return r("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u4FEE\u6539","err");const s=parseFloat(l.inputPerMillion),a=parseFloat(l.outputPerMillion);if(isNaN(s)||isNaN(a)||s<0||a<0)return r("\u8BF7\u8F93\u5165\u5408\u6CD5\u7684\u8F93\u5165/\u8F93\u51FA\u4EF7\u683C","err");const g=l.rpmLimit.trim()===""?null:parseInt(l.rpmLimit.trim(),10);if(g!==null&&(isNaN(g)||g<0))return r("RPM \u9650\u6D41\u8BF7\u8F93\u5165\u5927\u4E8E\u7B49\u4E8E 0 \u7684\u6574\u6570\uFF080 \u4EE3\u8868\u4E0D\u9650\uFF09","err");try{await E("upsert_model",{id:l.id,publicName:l.publicName.trim(),oldPublicName:l.oldPublicName,providerId:l.providerId,upstreamModel:l.upstreamModel.trim(),priority:+l.priority||10,costWeight:+l.costWeight||1,inputPerMillion:s,outputPerMillion:a,rpmLimit:g,enabled:l.enabled,password:v.trim()}),r(`\u300C${l.publicName}\u300D\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7\u5DF2\u66F4\u65B0`),N(null),u(""),p()}catch(F){r(F.message,"err")}},$=async s=>{if(await I(`\u5220\u9664\u6A21\u578B\u6620\u5C04\u300C${s.public_name} \u2192 ${s.upstream_model}\u300D\uFF1F`))try{await E("delete_model",{id:s.id}),r("\u5DF2\u5220\u9664"),p()}catch(a){r(a.message,"err")}},P=[{key:"public",label:"\u5BF9\u5916\u6A21\u578B\u540D",sortVal:s=>s.public_name,render:s=>e.jsx("span",{className:"font-medium text-ink truncate max-w-[140px] sm:max-w-[200px] inline-block",title:s.public_name,children:s.public_name})},{key:"upstream",label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B",sortVal:s=>`${s.provider_slug||""}/${s.upstream_model}`,render:s=>{const a=s.provider_slug&&!s.upstream_model.startsWith(`${s.provider_slug}/`)?`${s.provider_slug}/${s.upstream_model}`:s.upstream_model;return e.jsx("code",{className:"text-xs font-mono text-muted hover:text-ink truncate max-w-[140px] sm:max-w-[200px] md:max-w-[260px] inline-block",title:a,children:a})}},{key:"provider",label:"\u4F9B\u5E94\u5546\u6E20\u9053",render:s=>s.provider_name??"\u2014"},{key:"priority",label:"\u4F18\u5148\u7EA7",sortVal:s=>s.priority,render:s=>e.jsxs("span",{className:"text-xs",children:[s.priority,"\uFF08\u5C0F=\u4F18\u5148\uFF09"]})},{key:"in",label:"\u8F93\u5165\u4EF7 / 1M",sortVal:s=>s.input_per_million??0,render:s=>e.jsx("span",{className:"font-mono text-xs font-medium text-ink",children:s.input_per_million!=null?`\xA5${Number(s.input_per_million).toFixed(2)}`:"\u672A\u5B9A\u4EF7"})},{key:"out",label:"\u8F93\u51FA\u4EF7 / 1M",sortVal:s=>s.output_per_million??0,render:s=>e.jsx("span",{className:"font-mono text-xs font-medium text-ink",children:s.output_per_million!=null?`\xA5${Number(s.output_per_million).toFixed(2)}`:"\u672A\u5B9A\u4EF7"})},{key:"rpm",label:"RPM \u9650\u6D41",sortVal:s=>s.rpm_limit===0?-1:s.rpm_limit??999999,render:s=>s.rpm_limit===0?e.jsx("span",{className:"rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500 whitespace-nowrap",children:"\u4E0D\u9650\u6D41"}):typeof s.rpm_limit=="number"&&s.rpm_limit>0?e.jsxs("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-mono font-medium text-brand whitespace-nowrap",children:[s.rpm_limit," RPM"]}):e.jsx("span",{className:"text-[11px] text-muted whitespace-nowrap",children:"\u7EE7\u627F\u5168\u5C40"})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(J,{value:s.enabled?"active":"pending"})},...x?[{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsx(w,{variant:"soft",className:"!h-7 !px-2.5 text-xs",onClick:()=>S(s),children:"\u7F16\u8F91"}),e.jsx(w,{variant:"ghost",className:"!h-7 !px-2 text-xs !text-err",onClick:()=>$(s),children:"\u5220\u9664"})]})}]:[]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[x&&e.jsx("div",{className:"flex justify-end",children:e.jsxs(w,{onClick:()=>j(!0),children:[e.jsx(X,{size:14}),"\u65B0\u589E\u6620\u5C04\u4E0E\u5B9A\u4EF7"]})}),e.jsx(A,{className:"p-4",children:h===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,a)=>e.jsx("div",{className:"skeleton h-9"},a))}):e.jsx(H,{cols:P,rows:h})}),e.jsx(D,{open:C,onClose:()=>j(!1),title:"\u65B0\u589E\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7",width:540,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:"\u4E3A\u4E0A\u6E38\u4F9B\u5E94\u5546\u5173\u8054\u5BF9\u5916\u6A21\u578B\u540D\u5E76\u8BBE\u5B9A\u8C03\u7528\u5355\u4EF7\u4E0E\u9650\u6D41\u3002\u591A\u4E2A\u4F9B\u5E94\u5546\u53EF\u914D\u7F6E\u76F8\u540C\u7684\u5BF9\u5916\u6A21\u578B\u540D\uFF0C\u7F51\u5173\u5C06\u6309\u4F18\u5148\u7EA7\u81EA\u52A8\u6545\u969C\u8F6C\u79FB\u4E0E\u5BB9\u707E\u3002"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(n,{label:"\u6240\u5C5E\u4F9B\u5E94\u5546",children:e.jsxs(W,{value:i.providerId,onChange:s=>c({...i,providerId:s.target.value}),children:[e.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u4F9B\u5E94\u5546"}),M.map(s=>e.jsxs("option",{value:s.id,children:[s.name,"\uFF08",s.slug,"\uFF09"]},s.id))]})}),e.jsx(n,{label:"\u4F18\u5148\u7EA7\uFF08\u6570\u5B57\u8D8A\u5C0F\u8D8A\u4F18\u5148\uFF09",children:e.jsx(o,{type:"number",value:i.priority,onChange:s=>c({...i,priority:s.target.value}),placeholder:"10"})}),e.jsx(n,{label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D",children:e.jsx(o,{value:i.upstream,onChange:s=>{const a=s.target.value;c({...i,upstream:a,publicName:i.publicName?i.publicName:a})},placeholder:"\u4F8B\u5982: deepseek-chat \u6216 gpt-4o"})}),e.jsx(n,{label:"\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D",children:e.jsx(o,{value:i.publicName,onChange:s=>c({...i,publicName:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u8F93\u5165\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:i.inputPerMillion,onChange:s=>c({...i,inputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx(n,{label:"\u8F93\u51FA\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:i.outputPerMillion,onChange:s=>c({...i,outputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u6A21\u578B\u72EC\u7ACB RPM \u9650\u6D41",hint:"\u586B 0 \u4E3A\u8BE5\u6A21\u578B\u7EDD\u5BF9\u4E0D\u9650\uFF1B\u7559\u7A7A\u81EA\u52A8\u7EE7\u627F\u5168\u5C40\u8BBE\u7F6E",children:e.jsx(o,{type:"number",min:"0",value:i.rpmLimit,onChange:s=>c({...i,rpmLimit:s.target.value}),placeholder:"\u7559\u7A7A\u7EE7\u627F\u5168\u5C40\u9ED8\u8BA4\uFF08\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF09"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u521B\u5EFA\u65B0\u6A21\u578B\u6620\u5C04\u9700\u6838\u9A8C\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u8EAB\u4EFD",children:e.jsx(o,{type:"password",value:i.password,onChange:s=>c({...i,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-line",children:[e.jsx(w,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>j(!1),children:"\u53D6\u6D88"}),e.jsx(w,{className:"flex-1 sm:flex-initial",onClick:y,children:"\u4FDD\u5B58\u5E76\u4E0A\u67B6"})]})]})}),e.jsx(D,{open:!!b,onClose:()=>N(null),title:`\u7F16\u8F91\u6A21\u578B\u4E0E\u5B9A\u4EF7 \u2014 ${(b==null?void 0:b.public_name)??""}`,width:540,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:"\u4FEE\u6539\u6A21\u578B\u6620\u5C04\u4E0E\u8C03\u7528\u5B9A\u4EF7\u3002\u4FEE\u6539\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D\u540E\uFF0C\u7CFB\u7EDF\u4F1A\u81EA\u52A8\u540C\u6B65\u66F4\u65B0\u5BF9\u5E94\u5B9A\u4EF7\u914D\u7F6E\u5E76\u70ED\u91CD\u8F7D\u8DEF\u7531\u3002"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(n,{label:"\u6240\u5C5E\u4F9B\u5E94\u5546\u6E20\u9053",children:e.jsxs(W,{value:l.providerId,onChange:s=>m({...l,providerId:s.target.value}),children:[e.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u4F9B\u5E94\u5546"}),M.map(s=>e.jsxs("option",{value:s.id,children:[s.name,"\uFF08",s.slug,"\uFF09"]},s.id))]})}),e.jsx(n,{label:"\u4F18\u5148\u7EA7\uFF08\u6570\u5B57\u8D8A\u5C0F\u8D8A\u4F18\u5148\uFF09",children:e.jsx(o,{type:"number",value:l.priority,onChange:s=>m({...l,priority:s.target.value}),placeholder:"10"})}),e.jsx(n,{label:"\u4E0A\u6E38\u771F\u5B9E\u6A21\u578B\u540D",children:e.jsx(o,{value:l.upstreamModel,onChange:s=>m({...l,upstreamModel:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u5BF9\u5916\u7EDF\u4E00\u6A21\u578B\u540D",children:e.jsx(o,{value:l.publicName,onChange:s=>m({...l,publicName:s.target.value}),placeholder:"\u4F8B\u5982: deepseek-chat"})}),e.jsx(n,{label:"\u8F93\u5165\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:l.inputPerMillion,onChange:s=>m({...l,inputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx(n,{label:"\u8F93\u51FA\u4EF7\u683C (\u5143 / 1M Tokens)",children:e.jsx(o,{type:"number",step:"0.01",value:l.outputPerMillion,onChange:s=>m({...l,outputPerMillion:s.target.value}),placeholder:"0"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u6A21\u578B\u72EC\u7ACB RPM \u9650\u6D41",hint:"\u586B 0 \u4E3A\u8BE5\u6A21\u578B\u7EDD\u5BF9\u4E0D\u9650\uFF1B\u7559\u7A7A\u81EA\u52A8\u7EE7\u627F\u5168\u5C40\u8BBE\u7F6E",children:e.jsx(o,{type:"number",min:"0",value:l.rpmLimit,onChange:s=>m({...l,rpmLimit:s.target.value}),placeholder:"\u7559\u7A7A\u7EE7\u627F\u5168\u5C40\u9ED8\u8BA4\uFF08\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF09"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(n,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u4FEE\u6539\u6A21\u578B\u6620\u5C04\u4E0E\u5B9A\u4EF7\u5C5E\u6838\u5FC3\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u9A8C\u8BC1\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u8EAB\u4EFD",children:e.jsx(o,{type:"password",value:v,onChange:s=>u(s.target.value),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsx("div",{className:"flex items-center gap-2 pt-1",children:e.jsxs("label",{className:"flex items-center gap-2 text-xs font-medium cursor-pointer",children:[e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:l.enabled,onChange:s=>m({...l,enabled:s.target.checked})}),"\u542F\u7528\u8BE5\u6A21\u578B\u4E0A\u67B6\u8C03\u5EA6"]})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-line",children:[e.jsx(w,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>N(null),children:"\u53D6\u6D88"}),e.jsx(w,{className:"flex-1 sm:flex-initial",onClick:L,children:"\u4FDD\u5B58\u4FEE\u6539"})]})]})}),t]})}function re(){const{me:k}=Q(),x=k.user.role==="superadmin",[h,_]=d.useState("models"),M=x?[["models","\u6A21\u578B\u6C60"],["pricing","\u5B9A\u4EF7"]]:[["models","\u6A21\u578B\u6C60"]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:M.map(([f,C])=>e.jsx("button",{role:"tab","aria-selected":h===f,onClick:()=>_(f),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${h===f?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:C},f))}),h==="models"&&e.jsx(ee,{me:k}),h==="pricing"&&x&&e.jsx(se,{me:k})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Playground-BFItBA0T.js": {
-              content: 'import{c as A,u as tt,a as D,j as t,d as Z,p as ke,B as ee,m as P,k as w,o as st}from"./index-JGTLcmXV.js";import{r as o,L as at}from"./vendor-BbQ_LiY-.js";import{B as nt,S as rt}from"./send-itasS0aM.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const it=A("AudioLines",[["path",{d:"M2 10v3",key:"1fnikh"}],["path",{d:"M6 6v11",key:"11sgs0"}],["path",{d:"M10 3v18",key:"yhl04a"}],["path",{d:"M14 8v7",key:"3a1oy3"}],["path",{d:"M18 5v13",key:"123xd1"}],["path",{d:"M22 10v3",key:"154ddg"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ot=A("Eraser",[["path",{d:"m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21",key:"182aya"}],["path",{d:"M22 21H7",key:"t4ddhn"}],["path",{d:"m5 11 9 9",key:"1mo9qw"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const lt=A("Image",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",ry:"2",key:"1m3agn"}],["circle",{cx:"9",cy:"9",r:"2",key:"af1f0g"}],["path",{d:"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21",key:"1xmnt7"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ct=A("Square",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",key:"afitv7"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const dt=A("User",[["path",{d:"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2",key:"975kel"}],["circle",{cx:"12",cy:"7",r:"4",key:"17ys0d"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ut=A("Video",[["path",{d:"m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5",key:"ftymec"}],["rect",{x:"2",y:"6",width:"14",height:"12",rx:"2",key:"158x01"}]]),z=[{key:"chat",label:"\u5BF9\u8BDD",path:"/v1/chat/completions",icon:nt,hint:"OpenAI Chat Completions \xB7 \u6D41\u5F0F\u8F93\u51FA"},{key:"image",label:"\u56FE\u7247",path:"/v1/images/generations",icon:lt,hint:"OpenAI Images API \xB7 \u540C\u6B65\u8FD4\u56DE\u56FE\u7247"},{key:"video",label:"\u89C6\u9891",path:"/v1/videos/generations",icon:ut,hint:"\u5F02\u6B65\u4EFB\u52A1 \xB7 \u63D0\u4EA4\u540E\u81EA\u52A8\u8F6E\u8BE2\u5230\u5B8C\u6210"},{key:"audio",label:"\u97F3\u9891",path:"/v1/audio/speech",icon:it,hint:"\u5185\u7F6E Edge TTS\uFF08\u514D\u8D39\uFF09\xB7 \u6587\u672C\u8F6C\u8BED\u97F3"}],xt={chat:"\u6682\u65E0\u53EF\u7528\u5BF9\u8BDD\u6A21\u578B",image:"\u5F53\u524D\u6CA1\u6709\u5206\u7C7B\u5230\u56FE\u7247\u7AEF\u70B9\u7684\u6A21\u578B\uFF08\u652F\u6301 agnes-image / Codex / ChatGPT / Duck.ai \u6E20\u9053\uFF09",video:"\u5F53\u524D\u6CA1\u6709\u53EF\u7528\u7684\u89C6\u9891\u6A21\u578B\uFF08\u652F\u6301 agnes-video \u7CFB\u5217\uFF09",audio:"\u97F3\u9891\u8D70\u5185\u7F6E Edge TTS\uFF0C\u4EFB\u610F\u8D26\u53F7\u53EF\u7528\uFF0C\u65E0\u9700\u9009\u62E9\u6A21\u578B"},S=()=>Math.random().toString(36).slice(2,10);function gt({me:te}){var fe,be,ye;const[_,Ne]=o.useState([]),[d,se]=o.useState("chat"),[p,ae]=o.useState(""),[ne,we]=o.useState(""),[F,Se]=o.useState(.7),[re,Ie]=o.useState(1024),[ie,Me]=o.useState("1024x1024"),[oe,Ce]=o.useState(1),[le,Pe]=o.useState("1280x720"),[ce,_e]=o.useState("5"),[U,Ee]=o.useState([]),[k,de]=o.useState("zh-CN-XiaoxiaoNeural"),[R,Te]=o.useState("+0%"),[J,ze]=o.useState("+0%"),[B,Ae]=o.useState("+0Hz"),[H,ue]=o.useState(!1),[Oe,$e]=o.useState(!1),[E,T]=o.useState([]),[W,O]=o.useState(""),[$,h]=o.useState(!1),[xe,Le]=o.useState([]),[f,me]=o.useState(""),[Ue,Re]=o.useState(!1),K=o.useRef(null),b=o.useRef(null),V=o.useRef(null),y=tt();o.useEffect(()=>{D("/api/playground/models").then(e=>{Ne(e.models);const r=e.models.find(s=>s.kind==="chat");ae(s=>s||(r?I(r):e.models[0]?I(e.models[0]):""))}).catch(e=>y(e.message,"err")),D("/api/playground/voices").then(e=>{Ee(e.voices||[]),de(r=>{var s,n;return r||((n=(s=e.voices)==null?void 0:s[0])==null?void 0:n.id)||"zh-CN-XiaoxiaoNeural"})}).catch(()=>{})},[]),o.useEffect(()=>{D("/api/keys").then(e=>{const r=e.keys.filter(a=>a.status==="active").sort((a,l)=>l.created_at-a.created_at);Le(r);const s=Date.now()/1e3,n=r.find(a=>(!a.expires_at||a.expires_at>s)&&(a.quota_usd===null||a.spent_usd<a.quota_usd));me(a=>{var l;return a||(n==null?void 0:n.id)||((l=r[0])==null?void 0:l.id)||""})}).catch(e=>y(e.message,"err")).finally(()=>Re(!0))},[]),o.useEffect(()=>{V.current&&(V.current.scrollTop=V.current.scrollHeight)},[E]),o.useEffect(()=>()=>{b.current&&window.clearInterval(b.current)},[]);const I=e=>`${e.slug}/${e.id}`,Ke=o.useMemo(()=>{const e=new Map;for(const s of _){const n=e.get(s.provider)||[];n.push(s),e.set(s.provider,n)}const r=[...e.entries()].map(([s,n])=>{const a=n.filter(c=>c.kind===d),l=n.filter(c=>c.kind!==d);return{prov:s,list:[...a,...l],recN:a.length}});return r.sort((s,n)=>(n.recN>0?1:0)-(s.recN>0?1:0)||s.prov.localeCompare(n.prov)),r.map(s=>[s.prov,s.list])},[_,d]),Ve=o.useMemo(()=>{const e=new Map;for(const r of U){const s=e.get(r.group)||[];s.push(r),e.set(r.group,s)}return[...e.entries()]},[U]),q=d!=="audio",L=_.find(e=>I(e)===p),qe=q&&!!L&&L.kind!==d,De=e=>{$e(!0),se(e)},Fe=e=>{var s;ae(e);const r=_.find(n=>I(n)===e);if(r&&r.kind!==d){if(Oe)return;se(r.kind),y(`\u5DF2\u81EA\u52A8\u5207\u6362\u5230\u300C${(s=z.find(n=>n.key===r.kind))==null?void 0:s.label}\u300D\u7AEF\u70B9`)}},pe=()=>{var e;(e=K.current)==null||e.abort(),K.current=null,b.current&&(window.clearInterval(b.current),b.current=null),h(!1)},Je=()=>{pe(),T([])},x=(e,r)=>T(s=>s.map(n=>n.id===e?r(n):n)),Be=async()=>{var e;if(!H){ue(!0);try{const r=await fetch("/api/playground/speech",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:"edge-tts",input:"\u4F60\u597D\uFF0C\u8FD9\u662F\u5F53\u524D\u97F3\u8272\u7684\u8BD5\u542C\u6548\u679C\u3002",voice:k,rate:R,volume:J,pitch:B,key_id:f})}),s=(r.headers.get("content-type")||"").toLowerCase();if(!r.ok||!s.startsWith("audio")){const l=await r.json().catch(()=>null);y(((e=l==null?void 0:l.error)==null?void 0:e.message)??"\u8BD5\u542C\u5931\u8D25","err");return}const n=await r.blob();new Audio(URL.createObjectURL(n)).play()}catch(r){y(r.message||"\u8BD5\u542C\u5931\u8D25","err")}finally{ue(!1)}}},He=e=>!e||$?!1:f?q&&!p?(y("\u8BF7\u5148\u9009\u62E9\u6A21\u578B","err"),!1):!0:(y("\u5F53\u524D\u8D26\u6237\u6CA1\u6709\u53EF\u7528\u7684 API Key\uFF0C\u8BF7\u5148\u5230\u300CAPI \u5BC6\u94A5\u300D\u9875\u521B\u5EFA","err"),!1),We=async e=>{var l,c,j,m;const r={id:S(),role:"user",endpoint:"chat",content:e},s=S(),n=[...E.filter(i=>i.endpoint==="chat"),r].map(i=>({role:i.role,content:i.content}));T(i=>[...i,r,{id:s,role:"assistant",endpoint:"chat",content:"",model:p}]),O(""),h(!0);const a=new AbortController;K.current=a;try{const i=await fetch("/api/playground/chat",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,messages:n,system:ne,temperature:F,max_tokens:re,stream:!0,key_id:f}),signal:a.signal});if(!i.ok){const M=await i.json().catch(()=>null);x(s,X=>{var C;return{...X,error:((C=M==null?void 0:M.error)==null?void 0:C.message)??`\u8BF7\u6C42\u5931\u8D25 (${i.status})`}});return}const u=(l=i.body)==null?void 0:l.getReader();if(!u)throw new Error("\u6D4F\u89C8\u5668\u4E0D\u652F\u6301\u6D41\u5F0F\u8BFB\u53D6");const N=new TextDecoder;let v="",G=0;for(;;){const{done:M,value:X}=await u.read();if(M)break;v+=N.decode(X,{stream:!0});let C=v.indexOf(`\n`);for(;C>=0;){const je=v.slice(0,C).trim();if(v=v.slice(C+1),je.startsWith("data:")){const Y=je.slice(5).trim();if(Y&&Y!=="[DONE]")try{const g=JSON.parse(Y),Q=(m=(j=(c=g==null?void 0:g.choices)==null?void 0:c[0])==null?void 0:j.delta)==null?void 0:m.content;typeof Q=="string"&&Q&&x(s,ve=>({...ve,content:ve.content+Q})),g!=null&&g.usage&&(G=typeof g.usage.total_tokens=="number"?g.usage.total_tokens:(g.usage.prompt_tokens||0)+(g.usage.completion_tokens||0))}catch{}}C=v.indexOf(`\n`)}}G&&x(s,M=>({...M,tokens:G}))}catch(i){i.name!=="AbortError"&&x(s,u=>({...u,error:i.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1),K.current=null}},Ge=async e=>{var n;const r={id:S(),role:"user",endpoint:"image",content:e},s=S();T(a=>[...a,r,{id:s,role:"assistant",endpoint:"image",content:"",model:p}]),O(""),h(!0);try{const a=await fetch("/api/playground/images",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,prompt:e,size:ie,n:oe,key_id:f})}),l=await a.json().catch(()=>null);if(!a.ok){x(s,i=>{var u;return{...i,error:((u=l==null?void 0:l.error)==null?void 0:u.message)??`\u8BF7\u6C42\u5931\u8D25 (${a.status})`}});return}const c=(n=l==null?void 0:l.data)==null?void 0:n[0],j=typeof(c==null?void 0:c.url)=="string"?c.url:"",m=typeof(c==null?void 0:c.b64_json)=="string"?c.b64_json:"";if(!j&&!m){x(s,i=>({...i,error:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u56FE\u7247\u6570\u636E"}));return}x(s,i=>({...i,mediaUrl:j||`data:image/png;base64,${m}`,mediaMime:"image",content:""}))}catch(a){x(s,l=>({...l,error:a.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1)}},Xe=async e=>{const r={id:S(),role:"user",endpoint:"video",content:e},s=S();T(n=>[...n,r,{id:s,role:"assistant",endpoint:"video",content:"",model:p,taskStatus:"\u63D0\u4EA4\u4E2D"}]),O(""),h(!0);try{const n=await fetch("/api/playground/videos",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,prompt:e,size:le,seconds:ce,key_id:f})}),a=await n.json().catch(()=>null);if(n.ok)x(s,m=>({...m,taskId:String((a==null?void 0:a.id)??""),taskStatus:String((a==null?void 0:a.status)??"queued"),taskProgress:Number(a==null?void 0:a.progress)||0}));else{const m=typeof(a==null?void 0:a.task_id)=="string"?a.task_id:"";if(!m){x(s,i=>{var u;return{...i,error:((u=a==null?void 0:a.error)==null?void 0:u.message)??`\u8BF7\u6C42\u5931\u8D25 (${n.status})`}});return}x(s,i=>{var u;return{...i,taskId:m,taskStatus:"queued",taskWaitingSlot:!0,error:(u=a==null?void 0:a.error)==null?void 0:u.message}})}const l=String((a==null?void 0:a.task_id)||(a==null?void 0:a.id)||"");if(!l)return;let c=0;const j=window.setInterval(async()=>{c++;try{const i=(await D(`/api/playground/videos/${l}`)).task||{};x(s,N=>({...N,taskId:l,taskStatus:String(i.status??N.taskStatus),taskProgress:Number(i.progress)||N.taskProgress||0,mediaUrl:typeof i.url=="string"&&i.url?i.url:N.mediaUrl}));const u=String(i.status);(u==="completed"||u==="failed"||u==="cancelled"||c>120)&&(b.current&&(window.clearInterval(b.current),b.current=null),(u==="failed"||u==="cancelled")&&x(s,N=>{var v;return{...N,error:((v=i==null?void 0:i.error)==null?void 0:v.message)||`\u4EFB\u52A1${u==="failed"?"\u5931\u8D25":"\u5DF2\u53D6\u6D88"}`}}),h(!1))}catch{}},5e3);b.current=j}catch(n){x(s,a=>({...a,error:n.message||"\u8BF7\u6C42\u5931\u8D25"})),h(!1)}},Ye=async e=>{const r={id:S(),role:"user",endpoint:"audio",content:e},s=S();T(n=>[...n,r,{id:s,role:"assistant",endpoint:"audio",content:""}]),O(""),h(!0);try{const n=await fetch("/api/playground/speech",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:"edge-tts",input:e,voice:k,rate:R,volume:J,pitch:B,key_id:f})}),a=(n.headers.get("content-type")||"").toLowerCase();if(!n.ok||!a.startsWith("audio")){const c=await n.json().catch(()=>null);x(s,j=>{var m;return{...j,error:((m=c==null?void 0:c.error)==null?void 0:m.message)??`\u8BF7\u6C42\u5931\u8D25 (${n.status})`}});return}const l=await n.blob();x(s,c=>({...c,mediaUrl:URL.createObjectURL(l),mediaMime:"audio",model:`${k} \xB7 ${R}`}))}catch(n){x(s,a=>({...a,error:n.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1)}},he=()=>{const e=W.trim();if(He(e))return d==="chat"?We(e):d==="image"?Ge(e):d==="video"?Xe(e):Ye(e)},Qe=async e=>{try{await navigator.clipboard.writeText(e),y("\u5DF2\u590D\u5236")}catch{y("\u590D\u5236\u5931\u8D25","err")}},Ze=d==="image"?"\u63CF\u8FF0\u4F60\u60F3\u751F\u6210\u7684\u56FE\u7247\u2026":d==="video"?"\u63CF\u8FF0\u4F60\u60F3\u751F\u6210\u7684\u89C6\u9891\u2026":d==="audio"?"\u8F93\u5165\u8981\u8F6C\u6210\u8BED\u97F3\u7684\u6587\u672C\u2026":"\u8F93\u5165\u5185\u5BB9\u2026",ge=E.some(e=>e.endpoint==="video"&&!!e.taskId&&!["completed","failed","cancelled"].includes(e.taskStatus||"")&&!e.error),et=ge?"\u751F\u6210\u4E2D\u2026":$?"\u5904\u7406\u4E2D\u2026":"\u53D1\u9001";return t.jsxs("div",{className:"flex flex-col gap-4",children:[t.jsx(Z,{className:"p-4 sm:p-5",children:t.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[t.jsxs("div",{className:"flex items-start gap-3",children:[t.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:t.jsx(ke,{size:18})}),t.jsxs("div",{children:[t.jsx("h1",{className:"text-base font-bold text-ink",children:"\u64CD\u7EC3\u573A"}),t.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u4F7F\u7528\u4F60\u8D26\u6237\u81EA\u5DF1\u7684 API Key \u8C03\u7528\uFF0C\u8D70\u7F51\u5173\u540C\u4E00\u5957\u8DEF\u7531\uFF1B\u6BCF\u5206\u949F\u6700\u591A 20 \u6B21\uFF0C\u4E0D\u8BA1\u91CF\u3002"})]})]}),t.jsx("div",{className:"flex items-center gap-2",children:t.jsxs(ee,{variant:"ghost",className:"h-9",onClick:Je,disabled:!E.length,children:[t.jsx(ot,{size:14})," \u6E05\u7A7A"]})})]})}),t.jsxs("div",{className:"grid gap-4 lg:grid-cols-[320px,1fr]",children:[t.jsx(Z,{className:"h-fit p-4",children:t.jsxs("div",{className:"space-y-3",children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"API \u7AEF\u70B9"}),t.jsx("div",{className:"grid grid-cols-4 gap-1 rounded-lg bg-surface2 p-1",children:z.map(e=>{const r=e.icon;return t.jsxs("button",{type:"button",title:e.hint,onClick:()=>De(e.key),className:P("inline-flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-[11px] font-medium transition-colors",d===e.key?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:[t.jsx(r,{size:14}),e.label]},e.key)})}),t.jsx("p",{className:"mt-1 font-mono text-[10px] text-muted",children:(fe=z.find(e=>e.key===d))==null?void 0:fe.path})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"API Key"}),xe.length>0?t.jsxs(t.Fragment,{children:[t.jsx(w,{value:f,onChange:e=>me(e.target.value),className:"w-full",children:xe.map(e=>t.jsxs("option",{value:e.id,children:[e.name," \xB7 ",e.prefix]},e.id))}),t.jsx("p",{className:"mt-1 text-[10px] text-muted",children:"\u53EA\u4F7F\u7528\u5F53\u524D\u8D26\u6237\u81EA\u5DF1\u540D\u4E0B\u7684 Key"})]}):t.jsx("div",{className:"rounded-lg border border-line bg-surface2 px-2.5 py-2 text-[11px] leading-relaxed text-muted",children:Ue?t.jsxs(t.Fragment,{children:["\u5F53\u524D\u8D26\u6237\u8FD8\u6CA1\u6709\u53EF\u7528\u7684 API Key\uFF0C\u8BF7\u5148\u5230"," ",t.jsx(at,{to:"/dashboard/keys",className:"font-medium text-brand hover:underline",children:"API \u5BC6\u94A5"})," ","\u9875\u521B\u5EFA\u3002"]}):"\u6B63\u5728\u8BFB\u53D6\u4F60\u7684 API Key\u2026"})]}),q?t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u6A21\u578B"}),_.length>0?t.jsxs(w,{value:p,onChange:e=>Fe(e.target.value),className:"w-full",children:[!_.some(e=>I(e)===p)&&t.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u6A21\u578B"}),Ke.map(([e,r])=>t.jsx("optgroup",{label:`${e}\uFF08${r.length}\uFF09`,children:r.map(s=>t.jsxs("option",{value:I(s),children:[s.kind===d?"\u2713 ":"",I(s),s.paid?"\uFF08\u4ED8\u8D39\uFF09":""]},`${s.slug}/${s.id}`))},e))]}):t.jsx("div",{className:"rounded-lg border border-line bg-surface2 px-2.5 py-2 text-[11px] text-muted",children:xt[d]}),t.jsx("p",{className:"mt-1 text-[10px] text-muted",children:qe?`\u5F53\u524D\u6A21\u578B\u5206\u7C7B\u5C5E\u4E8E\u300C${(be=z.find(e=>e.key===(L==null?void 0:L.kind)))==null?void 0:be.label}\u300D\uFF0C\u5DF2\u6309\u4F60\u7684\u624B\u52A8\u9009\u62E9\u4FDD\u7559\u5728\u5F53\u524D\u7AEF\u70B9`:te.user.role==="superadmin"||te.user.role==="admin"?"\u7BA1\u7406\u5458\u53EF\u89C1\u5168\u90E8\u6A21\u578B\uFF08\u542B\u4ED8\u8D39\uFF09\uFF1B\u63A8\u8350\u7EC4\u4E3A\u8BE5\u7AEF\u70B9\u539F\u751F\u6A21\u578B":"\u666E\u901A\u7528\u6237\u4EC5\u663E\u793A\u514D\u8D39\u6A21\u578B"})]}):t.jsxs("div",{children:[t.jsxs("div",{className:"flex items-center justify-between",children:[t.jsxs("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:["\u97F3\u8272\uFF08",U.length," \u4E2A\uFF0C\u6309\u8BED\u8A00\u5206\u7EC4\uFF09"]}),t.jsx("button",{type:"button",className:"text-[11px] font-medium text-brand hover:underline disabled:opacity-50",disabled:H||!f,onClick:Be,children:H?"\u751F\u6210\u8BD5\u542C\u4E2D\u2026":"\u25B6 \u8BD5\u542C\u5F53\u524D\u97F3\u8272"})]}),t.jsxs(w,{value:k,onChange:e=>de(e.target.value),className:"w-full",children:[Ve.map(([e,r])=>t.jsx("optgroup",{label:e,children:r.map(s=>t.jsxs("option",{value:s.id,children:[s.label," \xB7 ",s.id.replace(/Neural$/,"")]},s.id))},e)),!U.some(e=>e.id===k)&&t.jsx("option",{value:k,children:k})]}),t.jsx("p",{className:"mt-1 font-mono text-[10px] text-muted",children:k}),t.jsxs("div",{className:"mt-2 grid grid-cols-3 gap-2",children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u8BED\u901F"}),t.jsx(w,{value:R,onChange:e=>Te(e.target.value),className:"w-full",children:["-50%","-25%","-10%","+0%","+10%","+25%","+50%","+100%"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u97F3\u91CF"}),t.jsx(w,{value:J,onChange:e=>ze(e.target.value),className:"w-full",children:["-50%","-25%","+0%","+25%","+50%"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u97F3\u8C03"}),t.jsx(w,{value:B,onChange:e=>Ae(e.target.value),className:"w-full",children:["-20%","-10%","+0%","+10%","+20%"].map(e=>t.jsx("option",{value:e,children:e},e))})]})]})]}),d==="chat"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u7CFB\u7EDF\u63D0\u793A\u8BCD\uFF08\u53EF\u9009\uFF09"}),t.jsx("textarea",{value:ne,onChange:e=>we(e.target.value),rows:3,placeholder:"\u4F8B\u5982\uFF1A\u4F60\u662F\u4E00\u4E2A\u7B80\u6D01\u7684\u52A9\u624B\uFF0C\u56DE\u7B54\u4E0D\u8D85\u8FC7\u4E09\u53E5\u8BDD\u3002",className:"w-full resize-y rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]}),t.jsxs("div",{className:"flex items-center justify-between gap-2",children:[t.jsx("label",{className:"text-[11px] font-medium text-muted",children:"\u6E29\u5EA6"}),t.jsx("span",{className:"font-mono text-[11px] text-ink",children:F.toFixed(1)})]}),t.jsx("input",{type:"range",min:0,max:2,step:.1,value:F,onChange:e=>Se(Number(e.target.value)),className:"w-full accent-brand"}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u6700\u5927\u8F93\u51FA tokens"}),t.jsx("input",{type:"number",min:16,max:8192,value:re,onChange:e=>Ie(Math.max(16,Math.min(8192,Number(e.target.value)||1024))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]}),d==="image"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5C3A\u5BF8"}),t.jsx(w,{value:ie,onChange:e=>Me(e.target.value),className:"w-full",children:["1024x1024","1024x1792","1792x1024","512x512","768x768"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5F20\u6570"}),t.jsx("input",{type:"number",min:1,max:4,value:oe,onChange:e=>Ce(Math.max(1,Math.min(4,Number(e.target.value)||1))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]}),d==="video"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5C3A\u5BF8"}),t.jsx(w,{value:le,onChange:e=>Pe(e.target.value),className:"w-full",children:["1280x720","720x1280","1024x1024"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u65F6\u957F\uFF08\u79D2\uFF09"}),t.jsx("input",{type:"number",min:1,max:60,value:ce,onChange:e=>_e(String(Math.max(1,Math.min(60,Number(e.target.value)||5)))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]})]})}),t.jsxs(Z,{className:"flex min-h-[520px] flex-col overflow-hidden",children:[t.jsx("div",{ref:V,className:"flex-1 space-y-3 overflow-y-auto p-4",children:E.length===0?t.jsxs("div",{className:"flex h-full flex-col items-center justify-center gap-2 py-16 text-center",children:[t.jsx(ke,{size:30,className:"text-muted"}),t.jsx("p",{className:"text-[13px] text-muted",children:d==="chat"?"\u9009\u4E2A\u6A21\u578B\uFF0C\u968F\u4FBF\u95EE\u70B9\u4EC0\u4E48":`\u8BD5\u8BD5${(ye=z.find(e=>e.key===d))==null?void 0:ye.label}\u751F\u6210`}),t.jsx("p",{className:"text-[11px] text-muted",children:"Enter \u53D1\u9001 \xB7 Shift + Enter \u6362\u884C"})]}):E.map(e=>t.jsxs("div",{className:P("flex gap-2.5",e.role==="user"&&"flex-row-reverse"),children:[t.jsx("div",{className:P("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full",e.role==="user"?"bg-brand/15 text-brand":"bg-surface2 text-muted"),children:e.role==="user"?t.jsx(dt,{size:14}):(()=>{var s;const r=(s=z.find(n=>n.key===e.endpoint))==null?void 0:s.icon;return r?t.jsx(r,{size:14}):null})()}),t.jsxs("div",{className:P("max-w-[85%] space-y-1",e.role==="user"&&"text-right"),children:[t.jsxs("div",{className:P("inline-block whitespace-pre-wrap break-words rounded-xl2 px-3.5 py-2.5 text-left text-[13px] leading-relaxed",e.role==="user"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.mediaMime==="image"&&e.mediaUrl&&t.jsx("img",{src:e.mediaUrl,alt:"\u751F\u6210\u7ED3\u679C",className:"max-h-80 rounded-lg border border-line"}),e.mediaMime==="video"&&e.mediaUrl&&t.jsx("video",{src:e.mediaUrl,controls:!0,className:"max-h-80 rounded-lg border border-line"}),e.mediaMime==="audio"&&e.mediaUrl&&t.jsx("audio",{src:e.mediaUrl,controls:!0,className:"w-72"}),e.content&&t.jsx("span",{children:e.content||($?"\u2026":"")}),e.taskId&&t.jsxs("span",{className:"mt-1 flex items-center gap-2 text-[11px] text-muted",children:["\u4EFB\u52A1 ",e.taskId.slice(0,14),"\u2026",t.jsx("span",{className:P("rounded px-1 py-0.5 text-[10px]",e.taskStatus==="completed"?"bg-emerald-500/10 text-emerald-500":e.taskStatus==="failed"||e.taskStatus==="cancelled"?"bg-red-500/10 text-red-500":"bg-amber-500/10 text-amber-500"),children:e.taskWaitingSlot?"\u5F85\u63D0\u4EA4":e.taskStatus==="in_progress"?"\u751F\u6210\u4E2D":e.taskStatus==="queued"?"\u6392\u961F\u4E2D":e.taskStatus}),typeof e.taskProgress=="number"&&e.taskProgress>0&&e.taskStatus!=="completed"&&t.jsxs("span",{className:"font-mono",children:[Math.round(e.taskProgress),"%"]})]}),e.error&&t.jsx("span",{className:"mt-1 block text-[11px] text-err",children:e.error})]}),t.jsxs("div",{className:P("flex items-center gap-2 text-[10px] text-muted",e.role==="user"&&"justify-end"),children:[e.role==="assistant"&&e.model&&t.jsx("span",{children:e.model}),e.role==="assistant"&&e.tokens?t.jsxs("span",{children:[e.tokens," tokens"]}):null,e.content&&t.jsxs("button",{type:"button",className:"hover:text-ink",onClick:()=>Qe(e.content),children:[t.jsx(st,{size:10,className:"mr-0.5 inline"}),"\u590D\u5236"]})]})]})]},e.id))}),t.jsx("div",{className:"border-t border-line p-3",children:t.jsxs("div",{className:"flex items-end gap-2",children:[t.jsx("textarea",{value:W,onChange:e=>O(e.target.value),onKeyDown:e=>{e.key==="Enter"&&!e.shiftKey&&(e.preventDefault(),he())},rows:2,placeholder:Ze,className:"max-h-40 min-h-[46px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink outline-none focus:border-brand/60"}),$&&d==="chat"?t.jsxs(ee,{variant:"danger",className:"h-11",onClick:pe,children:[t.jsx(ct,{size:14})," \u505C\u6B62"]}):t.jsxs(ee,{className:"h-11",onClick:he,disabled:!W.trim()||!f||$||ge||q&&!p,children:[t.jsx(rt,{size:14})," ",et]})]})})]})]})]})}\n',
+            "/assets/Playground-CFl2kj_K.js": {
+              content: 'import{c as A,u as tt,a as D,j as t,d as Z,p as ke,B as ee,m as P,k as w,o as st}from"./index-OWhocmiM.js";import{r as o,L as at}from"./vendor-BbQ_LiY-.js";import{B as nt,S as rt}from"./send-Ck83dgZo.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const it=A("AudioLines",[["path",{d:"M2 10v3",key:"1fnikh"}],["path",{d:"M6 6v11",key:"11sgs0"}],["path",{d:"M10 3v18",key:"yhl04a"}],["path",{d:"M14 8v7",key:"3a1oy3"}],["path",{d:"M18 5v13",key:"123xd1"}],["path",{d:"M22 10v3",key:"154ddg"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ot=A("Eraser",[["path",{d:"m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21",key:"182aya"}],["path",{d:"M22 21H7",key:"t4ddhn"}],["path",{d:"m5 11 9 9",key:"1mo9qw"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const lt=A("Image",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",ry:"2",key:"1m3agn"}],["circle",{cx:"9",cy:"9",r:"2",key:"af1f0g"}],["path",{d:"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21",key:"1xmnt7"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ct=A("Square",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",key:"afitv7"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const dt=A("User",[["path",{d:"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2",key:"975kel"}],["circle",{cx:"12",cy:"7",r:"4",key:"17ys0d"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const ut=A("Video",[["path",{d:"m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5",key:"ftymec"}],["rect",{x:"2",y:"6",width:"14",height:"12",rx:"2",key:"158x01"}]]),z=[{key:"chat",label:"\u5BF9\u8BDD",path:"/v1/chat/completions",icon:nt,hint:"OpenAI Chat Completions \xB7 \u6D41\u5F0F\u8F93\u51FA"},{key:"image",label:"\u56FE\u7247",path:"/v1/images/generations",icon:lt,hint:"OpenAI Images API \xB7 \u540C\u6B65\u8FD4\u56DE\u56FE\u7247"},{key:"video",label:"\u89C6\u9891",path:"/v1/videos/generations",icon:ut,hint:"\u5F02\u6B65\u4EFB\u52A1 \xB7 \u63D0\u4EA4\u540E\u81EA\u52A8\u8F6E\u8BE2\u5230\u5B8C\u6210"},{key:"audio",label:"\u97F3\u9891",path:"/v1/audio/speech",icon:it,hint:"\u5185\u7F6E Edge TTS\uFF08\u514D\u8D39\uFF09\xB7 \u6587\u672C\u8F6C\u8BED\u97F3"}],xt={chat:"\u6682\u65E0\u53EF\u7528\u5BF9\u8BDD\u6A21\u578B",image:"\u5F53\u524D\u6CA1\u6709\u5206\u7C7B\u5230\u56FE\u7247\u7AEF\u70B9\u7684\u6A21\u578B\uFF08\u652F\u6301 agnes-image / Codex / ChatGPT / Duck.ai \u6E20\u9053\uFF09",video:"\u5F53\u524D\u6CA1\u6709\u53EF\u7528\u7684\u89C6\u9891\u6A21\u578B\uFF08\u652F\u6301 agnes-video \u7CFB\u5217\uFF09",audio:"\u97F3\u9891\u8D70\u5185\u7F6E Edge TTS\uFF0C\u4EFB\u610F\u8D26\u53F7\u53EF\u7528\uFF0C\u65E0\u9700\u9009\u62E9\u6A21\u578B"},S=()=>Math.random().toString(36).slice(2,10);function gt({me:te}){var fe,be,ye;const[_,Ne]=o.useState([]),[d,se]=o.useState("chat"),[p,ae]=o.useState(""),[ne,we]=o.useState(""),[F,Se]=o.useState(.7),[re,Ie]=o.useState(1024),[ie,Me]=o.useState("1024x1024"),[oe,Ce]=o.useState(1),[le,Pe]=o.useState("1280x720"),[ce,_e]=o.useState("5"),[U,Ee]=o.useState([]),[k,de]=o.useState("zh-CN-XiaoxiaoNeural"),[R,Te]=o.useState("+0%"),[J,ze]=o.useState("+0%"),[B,Ae]=o.useState("+0Hz"),[H,ue]=o.useState(!1),[Oe,$e]=o.useState(!1),[E,T]=o.useState([]),[W,O]=o.useState(""),[$,h]=o.useState(!1),[xe,Le]=o.useState([]),[f,me]=o.useState(""),[Ue,Re]=o.useState(!1),K=o.useRef(null),b=o.useRef(null),V=o.useRef(null),y=tt();o.useEffect(()=>{D("/api/playground/models").then(e=>{Ne(e.models);const r=e.models.find(s=>s.kind==="chat");ae(s=>s||(r?I(r):e.models[0]?I(e.models[0]):""))}).catch(e=>y(e.message,"err")),D("/api/playground/voices").then(e=>{Ee(e.voices||[]),de(r=>{var s,n;return r||((n=(s=e.voices)==null?void 0:s[0])==null?void 0:n.id)||"zh-CN-XiaoxiaoNeural"})}).catch(()=>{})},[]),o.useEffect(()=>{D("/api/keys").then(e=>{const r=e.keys.filter(a=>a.status==="active").sort((a,l)=>l.created_at-a.created_at);Le(r);const s=Date.now()/1e3,n=r.find(a=>(!a.expires_at||a.expires_at>s)&&(a.quota_usd===null||a.spent_usd<a.quota_usd));me(a=>{var l;return a||(n==null?void 0:n.id)||((l=r[0])==null?void 0:l.id)||""})}).catch(e=>y(e.message,"err")).finally(()=>Re(!0))},[]),o.useEffect(()=>{V.current&&(V.current.scrollTop=V.current.scrollHeight)},[E]),o.useEffect(()=>()=>{b.current&&window.clearInterval(b.current)},[]);const I=e=>`${e.slug}/${e.id}`,Ke=o.useMemo(()=>{const e=new Map;for(const s of _){const n=e.get(s.provider)||[];n.push(s),e.set(s.provider,n)}const r=[...e.entries()].map(([s,n])=>{const a=n.filter(c=>c.kind===d),l=n.filter(c=>c.kind!==d);return{prov:s,list:[...a,...l],recN:a.length}});return r.sort((s,n)=>(n.recN>0?1:0)-(s.recN>0?1:0)||s.prov.localeCompare(n.prov)),r.map(s=>[s.prov,s.list])},[_,d]),Ve=o.useMemo(()=>{const e=new Map;for(const r of U){const s=e.get(r.group)||[];s.push(r),e.set(r.group,s)}return[...e.entries()]},[U]),q=d!=="audio",L=_.find(e=>I(e)===p),qe=q&&!!L&&L.kind!==d,De=e=>{$e(!0),se(e)},Fe=e=>{var s;ae(e);const r=_.find(n=>I(n)===e);if(r&&r.kind!==d){if(Oe)return;se(r.kind),y(`\u5DF2\u81EA\u52A8\u5207\u6362\u5230\u300C${(s=z.find(n=>n.key===r.kind))==null?void 0:s.label}\u300D\u7AEF\u70B9`)}},pe=()=>{var e;(e=K.current)==null||e.abort(),K.current=null,b.current&&(window.clearInterval(b.current),b.current=null),h(!1)},Je=()=>{pe(),T([])},x=(e,r)=>T(s=>s.map(n=>n.id===e?r(n):n)),Be=async()=>{var e;if(!H){ue(!0);try{const r=await fetch("/api/playground/speech",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:"edge-tts",input:"\u4F60\u597D\uFF0C\u8FD9\u662F\u5F53\u524D\u97F3\u8272\u7684\u8BD5\u542C\u6548\u679C\u3002",voice:k,rate:R,volume:J,pitch:B,key_id:f})}),s=(r.headers.get("content-type")||"").toLowerCase();if(!r.ok||!s.startsWith("audio")){const l=await r.json().catch(()=>null);y(((e=l==null?void 0:l.error)==null?void 0:e.message)??"\u8BD5\u542C\u5931\u8D25","err");return}const n=await r.blob();new Audio(URL.createObjectURL(n)).play()}catch(r){y(r.message||"\u8BD5\u542C\u5931\u8D25","err")}finally{ue(!1)}}},He=e=>!e||$?!1:f?q&&!p?(y("\u8BF7\u5148\u9009\u62E9\u6A21\u578B","err"),!1):!0:(y("\u5F53\u524D\u8D26\u6237\u6CA1\u6709\u53EF\u7528\u7684 API Key\uFF0C\u8BF7\u5148\u5230\u300CAPI \u5BC6\u94A5\u300D\u9875\u521B\u5EFA","err"),!1),We=async e=>{var l,c,j,m;const r={id:S(),role:"user",endpoint:"chat",content:e},s=S(),n=[...E.filter(i=>i.endpoint==="chat"),r].map(i=>({role:i.role,content:i.content}));T(i=>[...i,r,{id:s,role:"assistant",endpoint:"chat",content:"",model:p}]),O(""),h(!0);const a=new AbortController;K.current=a;try{const i=await fetch("/api/playground/chat",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,messages:n,system:ne,temperature:F,max_tokens:re,stream:!0,key_id:f}),signal:a.signal});if(!i.ok){const M=await i.json().catch(()=>null);x(s,X=>{var C;return{...X,error:((C=M==null?void 0:M.error)==null?void 0:C.message)??`\u8BF7\u6C42\u5931\u8D25 (${i.status})`}});return}const u=(l=i.body)==null?void 0:l.getReader();if(!u)throw new Error("\u6D4F\u89C8\u5668\u4E0D\u652F\u6301\u6D41\u5F0F\u8BFB\u53D6");const N=new TextDecoder;let v="",G=0;for(;;){const{done:M,value:X}=await u.read();if(M)break;v+=N.decode(X,{stream:!0});let C=v.indexOf(`\n`);for(;C>=0;){const je=v.slice(0,C).trim();if(v=v.slice(C+1),je.startsWith("data:")){const Y=je.slice(5).trim();if(Y&&Y!=="[DONE]")try{const g=JSON.parse(Y),Q=(m=(j=(c=g==null?void 0:g.choices)==null?void 0:c[0])==null?void 0:j.delta)==null?void 0:m.content;typeof Q=="string"&&Q&&x(s,ve=>({...ve,content:ve.content+Q})),g!=null&&g.usage&&(G=typeof g.usage.total_tokens=="number"?g.usage.total_tokens:(g.usage.prompt_tokens||0)+(g.usage.completion_tokens||0))}catch{}}C=v.indexOf(`\n`)}}G&&x(s,M=>({...M,tokens:G}))}catch(i){i.name!=="AbortError"&&x(s,u=>({...u,error:i.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1),K.current=null}},Ge=async e=>{var n;const r={id:S(),role:"user",endpoint:"image",content:e},s=S();T(a=>[...a,r,{id:s,role:"assistant",endpoint:"image",content:"",model:p}]),O(""),h(!0);try{const a=await fetch("/api/playground/images",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,prompt:e,size:ie,n:oe,key_id:f})}),l=await a.json().catch(()=>null);if(!a.ok){x(s,i=>{var u;return{...i,error:((u=l==null?void 0:l.error)==null?void 0:u.message)??`\u8BF7\u6C42\u5931\u8D25 (${a.status})`}});return}const c=(n=l==null?void 0:l.data)==null?void 0:n[0],j=typeof(c==null?void 0:c.url)=="string"?c.url:"",m=typeof(c==null?void 0:c.b64_json)=="string"?c.b64_json:"";if(!j&&!m){x(s,i=>({...i,error:"\u4E0A\u6E38\u672A\u8FD4\u56DE\u56FE\u7247\u6570\u636E"}));return}x(s,i=>({...i,mediaUrl:j||`data:image/png;base64,${m}`,mediaMime:"image",content:""}))}catch(a){x(s,l=>({...l,error:a.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1)}},Xe=async e=>{const r={id:S(),role:"user",endpoint:"video",content:e},s=S();T(n=>[...n,r,{id:s,role:"assistant",endpoint:"video",content:"",model:p,taskStatus:"\u63D0\u4EA4\u4E2D"}]),O(""),h(!0);try{const n=await fetch("/api/playground/videos",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:p,prompt:e,size:le,seconds:ce,key_id:f})}),a=await n.json().catch(()=>null);if(n.ok)x(s,m=>({...m,taskId:String((a==null?void 0:a.id)??""),taskStatus:String((a==null?void 0:a.status)??"queued"),taskProgress:Number(a==null?void 0:a.progress)||0}));else{const m=typeof(a==null?void 0:a.task_id)=="string"?a.task_id:"";if(!m){x(s,i=>{var u;return{...i,error:((u=a==null?void 0:a.error)==null?void 0:u.message)??`\u8BF7\u6C42\u5931\u8D25 (${n.status})`}});return}x(s,i=>{var u;return{...i,taskId:m,taskStatus:"queued",taskWaitingSlot:!0,error:(u=a==null?void 0:a.error)==null?void 0:u.message}})}const l=String((a==null?void 0:a.task_id)||(a==null?void 0:a.id)||"");if(!l)return;let c=0;const j=window.setInterval(async()=>{c++;try{const i=(await D(`/api/playground/videos/${l}`)).task||{};x(s,N=>({...N,taskId:l,taskStatus:String(i.status??N.taskStatus),taskProgress:Number(i.progress)||N.taskProgress||0,mediaUrl:typeof i.url=="string"&&i.url?i.url:N.mediaUrl}));const u=String(i.status);(u==="completed"||u==="failed"||u==="cancelled"||c>120)&&(b.current&&(window.clearInterval(b.current),b.current=null),(u==="failed"||u==="cancelled")&&x(s,N=>{var v;return{...N,error:((v=i==null?void 0:i.error)==null?void 0:v.message)||`\u4EFB\u52A1${u==="failed"?"\u5931\u8D25":"\u5DF2\u53D6\u6D88"}`}}),h(!1))}catch{}},5e3);b.current=j}catch(n){x(s,a=>({...a,error:n.message||"\u8BF7\u6C42\u5931\u8D25"})),h(!1)}},Ye=async e=>{const r={id:S(),role:"user",endpoint:"audio",content:e},s=S();T(n=>[...n,r,{id:s,role:"assistant",endpoint:"audio",content:""}]),O(""),h(!0);try{const n=await fetch("/api/playground/speech",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({model:"edge-tts",input:e,voice:k,rate:R,volume:J,pitch:B,key_id:f})}),a=(n.headers.get("content-type")||"").toLowerCase();if(!n.ok||!a.startsWith("audio")){const c=await n.json().catch(()=>null);x(s,j=>{var m;return{...j,error:((m=c==null?void 0:c.error)==null?void 0:m.message)??`\u8BF7\u6C42\u5931\u8D25 (${n.status})`}});return}const l=await n.blob();x(s,c=>({...c,mediaUrl:URL.createObjectURL(l),mediaMime:"audio",model:`${k} \xB7 ${R}`}))}catch(n){x(s,a=>({...a,error:n.message||"\u8BF7\u6C42\u5931\u8D25"}))}finally{h(!1)}},he=()=>{const e=W.trim();if(He(e))return d==="chat"?We(e):d==="image"?Ge(e):d==="video"?Xe(e):Ye(e)},Qe=async e=>{try{await navigator.clipboard.writeText(e),y("\u5DF2\u590D\u5236")}catch{y("\u590D\u5236\u5931\u8D25","err")}},Ze=d==="image"?"\u63CF\u8FF0\u4F60\u60F3\u751F\u6210\u7684\u56FE\u7247\u2026":d==="video"?"\u63CF\u8FF0\u4F60\u60F3\u751F\u6210\u7684\u89C6\u9891\u2026":d==="audio"?"\u8F93\u5165\u8981\u8F6C\u6210\u8BED\u97F3\u7684\u6587\u672C\u2026":"\u8F93\u5165\u5185\u5BB9\u2026",ge=E.some(e=>e.endpoint==="video"&&!!e.taskId&&!["completed","failed","cancelled"].includes(e.taskStatus||"")&&!e.error),et=ge?"\u751F\u6210\u4E2D\u2026":$?"\u5904\u7406\u4E2D\u2026":"\u53D1\u9001";return t.jsxs("div",{className:"flex flex-col gap-4",children:[t.jsx(Z,{className:"p-4 sm:p-5",children:t.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[t.jsxs("div",{className:"flex items-start gap-3",children:[t.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:t.jsx(ke,{size:18})}),t.jsxs("div",{children:[t.jsx("h1",{className:"text-base font-bold text-ink",children:"\u64CD\u7EC3\u573A"}),t.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u4F7F\u7528\u4F60\u8D26\u6237\u81EA\u5DF1\u7684 API Key \u8C03\u7528\uFF0C\u8D70\u7F51\u5173\u540C\u4E00\u5957\u8DEF\u7531\uFF1B\u6BCF\u5206\u949F\u6700\u591A 20 \u6B21\uFF0C\u4E0D\u8BA1\u91CF\u3002"})]})]}),t.jsx("div",{className:"flex items-center gap-2",children:t.jsxs(ee,{variant:"ghost",className:"h-9",onClick:Je,disabled:!E.length,children:[t.jsx(ot,{size:14})," \u6E05\u7A7A"]})})]})}),t.jsxs("div",{className:"grid gap-4 lg:grid-cols-[320px,1fr]",children:[t.jsx(Z,{className:"h-fit p-4",children:t.jsxs("div",{className:"space-y-3",children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"API \u7AEF\u70B9"}),t.jsx("div",{className:"grid grid-cols-4 gap-1 rounded-lg bg-surface2 p-1",children:z.map(e=>{const r=e.icon;return t.jsxs("button",{type:"button",title:e.hint,onClick:()=>De(e.key),className:P("inline-flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-[11px] font-medium transition-colors",d===e.key?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:[t.jsx(r,{size:14}),e.label]},e.key)})}),t.jsx("p",{className:"mt-1 font-mono text-[10px] text-muted",children:(fe=z.find(e=>e.key===d))==null?void 0:fe.path})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"API Key"}),xe.length>0?t.jsxs(t.Fragment,{children:[t.jsx(w,{value:f,onChange:e=>me(e.target.value),className:"w-full",children:xe.map(e=>t.jsxs("option",{value:e.id,children:[e.name," \xB7 ",e.prefix]},e.id))}),t.jsx("p",{className:"mt-1 text-[10px] text-muted",children:"\u53EA\u4F7F\u7528\u5F53\u524D\u8D26\u6237\u81EA\u5DF1\u540D\u4E0B\u7684 Key"})]}):t.jsx("div",{className:"rounded-lg border border-line bg-surface2 px-2.5 py-2 text-[11px] leading-relaxed text-muted",children:Ue?t.jsxs(t.Fragment,{children:["\u5F53\u524D\u8D26\u6237\u8FD8\u6CA1\u6709\u53EF\u7528\u7684 API Key\uFF0C\u8BF7\u5148\u5230"," ",t.jsx(at,{to:"/dashboard/keys",className:"font-medium text-brand hover:underline",children:"API \u5BC6\u94A5"})," ","\u9875\u521B\u5EFA\u3002"]}):"\u6B63\u5728\u8BFB\u53D6\u4F60\u7684 API Key\u2026"})]}),q?t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u6A21\u578B"}),_.length>0?t.jsxs(w,{value:p,onChange:e=>Fe(e.target.value),className:"w-full",children:[!_.some(e=>I(e)===p)&&t.jsx("option",{value:"",children:"\u8BF7\u9009\u62E9\u6A21\u578B"}),Ke.map(([e,r])=>t.jsx("optgroup",{label:`${e}\uFF08${r.length}\uFF09`,children:r.map(s=>t.jsxs("option",{value:I(s),children:[s.kind===d?"\u2713 ":"",I(s),s.paid?"\uFF08\u4ED8\u8D39\uFF09":""]},`${s.slug}/${s.id}`))},e))]}):t.jsx("div",{className:"rounded-lg border border-line bg-surface2 px-2.5 py-2 text-[11px] text-muted",children:xt[d]}),t.jsx("p",{className:"mt-1 text-[10px] text-muted",children:qe?`\u5F53\u524D\u6A21\u578B\u5206\u7C7B\u5C5E\u4E8E\u300C${(be=z.find(e=>e.key===(L==null?void 0:L.kind)))==null?void 0:be.label}\u300D\uFF0C\u5DF2\u6309\u4F60\u7684\u624B\u52A8\u9009\u62E9\u4FDD\u7559\u5728\u5F53\u524D\u7AEF\u70B9`:te.user.role==="superadmin"||te.user.role==="admin"?"\u7BA1\u7406\u5458\u53EF\u89C1\u5168\u90E8\u6A21\u578B\uFF08\u542B\u4ED8\u8D39\uFF09\uFF1B\u63A8\u8350\u7EC4\u4E3A\u8BE5\u7AEF\u70B9\u539F\u751F\u6A21\u578B":"\u666E\u901A\u7528\u6237\u4EC5\u663E\u793A\u514D\u8D39\u6A21\u578B"})]}):t.jsxs("div",{children:[t.jsxs("div",{className:"flex items-center justify-between",children:[t.jsxs("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:["\u97F3\u8272\uFF08",U.length," \u4E2A\uFF0C\u6309\u8BED\u8A00\u5206\u7EC4\uFF09"]}),t.jsx("button",{type:"button",className:"text-[11px] font-medium text-brand hover:underline disabled:opacity-50",disabled:H||!f,onClick:Be,children:H?"\u751F\u6210\u8BD5\u542C\u4E2D\u2026":"\u25B6 \u8BD5\u542C\u5F53\u524D\u97F3\u8272"})]}),t.jsxs(w,{value:k,onChange:e=>de(e.target.value),className:"w-full",children:[Ve.map(([e,r])=>t.jsx("optgroup",{label:e,children:r.map(s=>t.jsxs("option",{value:s.id,children:[s.label," \xB7 ",s.id.replace(/Neural$/,"")]},s.id))},e)),!U.some(e=>e.id===k)&&t.jsx("option",{value:k,children:k})]}),t.jsx("p",{className:"mt-1 font-mono text-[10px] text-muted",children:k}),t.jsxs("div",{className:"mt-2 grid grid-cols-3 gap-2",children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u8BED\u901F"}),t.jsx(w,{value:R,onChange:e=>Te(e.target.value),className:"w-full",children:["-50%","-25%","-10%","+0%","+10%","+25%","+50%","+100%"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u97F3\u91CF"}),t.jsx(w,{value:J,onChange:e=>ze(e.target.value),className:"w-full",children:["-50%","-25%","+0%","+25%","+50%"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[10px] font-medium text-muted",children:"\u97F3\u8C03"}),t.jsx(w,{value:B,onChange:e=>Ae(e.target.value),className:"w-full",children:["-20%","-10%","+0%","+10%","+20%"].map(e=>t.jsx("option",{value:e,children:e},e))})]})]})]}),d==="chat"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u7CFB\u7EDF\u63D0\u793A\u8BCD\uFF08\u53EF\u9009\uFF09"}),t.jsx("textarea",{value:ne,onChange:e=>we(e.target.value),rows:3,placeholder:"\u4F8B\u5982\uFF1A\u4F60\u662F\u4E00\u4E2A\u7B80\u6D01\u7684\u52A9\u624B\uFF0C\u56DE\u7B54\u4E0D\u8D85\u8FC7\u4E09\u53E5\u8BDD\u3002",className:"w-full resize-y rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]}),t.jsxs("div",{className:"flex items-center justify-between gap-2",children:[t.jsx("label",{className:"text-[11px] font-medium text-muted",children:"\u6E29\u5EA6"}),t.jsx("span",{className:"font-mono text-[11px] text-ink",children:F.toFixed(1)})]}),t.jsx("input",{type:"range",min:0,max:2,step:.1,value:F,onChange:e=>Se(Number(e.target.value)),className:"w-full accent-brand"}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u6700\u5927\u8F93\u51FA tokens"}),t.jsx("input",{type:"number",min:16,max:8192,value:re,onChange:e=>Ie(Math.max(16,Math.min(8192,Number(e.target.value)||1024))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]}),d==="image"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5C3A\u5BF8"}),t.jsx(w,{value:ie,onChange:e=>Me(e.target.value),className:"w-full",children:["1024x1024","1024x1792","1792x1024","512x512","768x768"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5F20\u6570"}),t.jsx("input",{type:"number",min:1,max:4,value:oe,onChange:e=>Ce(Math.max(1,Math.min(4,Number(e.target.value)||1))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]}),d==="video"&&t.jsxs(t.Fragment,{children:[t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u5C3A\u5BF8"}),t.jsx(w,{value:le,onChange:e=>Pe(e.target.value),className:"w-full",children:["1280x720","720x1280","1024x1024"].map(e=>t.jsx("option",{value:e,children:e},e))})]}),t.jsxs("div",{children:[t.jsx("label",{className:"mb-1 block text-[11px] font-medium text-muted",children:"\u65F6\u957F\uFF08\u79D2\uFF09"}),t.jsx("input",{type:"number",min:1,max:60,value:ce,onChange:e=>_e(String(Math.max(1,Math.min(60,Number(e.target.value)||5)))),className:"w-full rounded-lg border border-line bg-surface px-2.5 py-2 text-[12px] text-ink outline-none focus:border-brand/60"})]})]})]})}),t.jsxs(Z,{className:"flex min-h-[520px] flex-col overflow-hidden",children:[t.jsx("div",{ref:V,className:"flex-1 space-y-3 overflow-y-auto p-4",children:E.length===0?t.jsxs("div",{className:"flex h-full flex-col items-center justify-center gap-2 py-16 text-center",children:[t.jsx(ke,{size:30,className:"text-muted"}),t.jsx("p",{className:"text-[13px] text-muted",children:d==="chat"?"\u9009\u4E2A\u6A21\u578B\uFF0C\u968F\u4FBF\u95EE\u70B9\u4EC0\u4E48":`\u8BD5\u8BD5${(ye=z.find(e=>e.key===d))==null?void 0:ye.label}\u751F\u6210`}),t.jsx("p",{className:"text-[11px] text-muted",children:"Enter \u53D1\u9001 \xB7 Shift + Enter \u6362\u884C"})]}):E.map(e=>t.jsxs("div",{className:P("flex gap-2.5",e.role==="user"&&"flex-row-reverse"),children:[t.jsx("div",{className:P("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full",e.role==="user"?"bg-brand/15 text-brand":"bg-surface2 text-muted"),children:e.role==="user"?t.jsx(dt,{size:14}):(()=>{var s;const r=(s=z.find(n=>n.key===e.endpoint))==null?void 0:s.icon;return r?t.jsx(r,{size:14}):null})()}),t.jsxs("div",{className:P("max-w-[85%] space-y-1",e.role==="user"&&"text-right"),children:[t.jsxs("div",{className:P("inline-block whitespace-pre-wrap break-words rounded-xl2 px-3.5 py-2.5 text-left text-[13px] leading-relaxed",e.role==="user"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.mediaMime==="image"&&e.mediaUrl&&t.jsx("img",{src:e.mediaUrl,alt:"\u751F\u6210\u7ED3\u679C",className:"max-h-80 rounded-lg border border-line"}),e.mediaMime==="video"&&e.mediaUrl&&t.jsx("video",{src:e.mediaUrl,controls:!0,className:"max-h-80 rounded-lg border border-line"}),e.mediaMime==="audio"&&e.mediaUrl&&t.jsx("audio",{src:e.mediaUrl,controls:!0,className:"w-72"}),e.content&&t.jsx("span",{children:e.content||($?"\u2026":"")}),e.taskId&&t.jsxs("span",{className:"mt-1 flex items-center gap-2 text-[11px] text-muted",children:["\u4EFB\u52A1 ",e.taskId.slice(0,14),"\u2026",t.jsx("span",{className:P("rounded px-1 py-0.5 text-[10px]",e.taskStatus==="completed"?"bg-emerald-500/10 text-emerald-500":e.taskStatus==="failed"||e.taskStatus==="cancelled"?"bg-red-500/10 text-red-500":"bg-amber-500/10 text-amber-500"),children:e.taskWaitingSlot?"\u5F85\u63D0\u4EA4":e.taskStatus==="in_progress"?"\u751F\u6210\u4E2D":e.taskStatus==="queued"?"\u6392\u961F\u4E2D":e.taskStatus}),typeof e.taskProgress=="number"&&e.taskProgress>0&&e.taskStatus!=="completed"&&t.jsxs("span",{className:"font-mono",children:[Math.round(e.taskProgress),"%"]})]}),e.error&&t.jsx("span",{className:"mt-1 block text-[11px] text-err",children:e.error})]}),t.jsxs("div",{className:P("flex items-center gap-2 text-[10px] text-muted",e.role==="user"&&"justify-end"),children:[e.role==="assistant"&&e.model&&t.jsx("span",{children:e.model}),e.role==="assistant"&&e.tokens?t.jsxs("span",{children:[e.tokens," tokens"]}):null,e.content&&t.jsxs("button",{type:"button",className:"hover:text-ink",onClick:()=>Qe(e.content),children:[t.jsx(st,{size:10,className:"mr-0.5 inline"}),"\u590D\u5236"]})]})]})]},e.id))}),t.jsx("div",{className:"border-t border-line p-3",children:t.jsxs("div",{className:"flex items-end gap-2",children:[t.jsx("textarea",{value:W,onChange:e=>O(e.target.value),onKeyDown:e=>{e.key==="Enter"&&!e.shiftKey&&(e.preventDefault(),he())},rows:2,placeholder:Ze,className:"max-h-40 min-h-[46px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink outline-none focus:border-brand/60"}),$&&d==="chat"?t.jsxs(ee,{variant:"danger",className:"h-11",onClick:pe,children:[t.jsx(ct,{size:14})," \u505C\u6B62"]}):t.jsxs(ee,{className:"h-11",onClick:he,disabled:!W.trim()||!f||$||ge||q&&!p,children:[t.jsx(rt,{size:14})," ",et]})]})})]})]})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Profile-40VAHmIU.js": {
-              content: 'import{c as q,u as F,j as e,d as v,B as p,m as R,E as G,s as H,e as $,F as c,I as o,k as K,a as h,K as J}from"./index-JGTLcmXV.js";import{r as n}from"./vendor-BbQ_LiY-.js";import{R as V}from"./refresh-cw-BY9R0tIW.js";import{P as W}from"./plus-v0UXhlLi.js";import{M as _}from"./message-square-CYBPWetn.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Q=q("Camera",[["path",{d:"M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z",key:"1tc9qg"}],["circle",{cx:"12",cy:"13",r:"3",key:"1vg3eu"}]]),X={pending:{label:"\u5F85\u5BA1\u6838",cls:"bg-amber-500/10 text-amber-500"},approved:{label:"\u5DF2\u901A\u8FC7",cls:"bg-emerald-500/10 text-emerald-500"},rejected:{label:"\u5DF2\u9A73\u56DE",cls:"bg-red-500/10 text-red-500"}},D=l=>l?new Date(l*1e3).toLocaleString("zh-CN",{hour12:!1}):"\u2014";function Y({meEmail:l}){const[j,g]=n.useState(null),[w,N]=n.useState(!1),[L,f]=n.useState(!1),[y,C]=n.useState(!1),[r,i]=n.useState(null),[d,k]=n.useState(""),[S,U]=n.useState(!1),m=F(),[t,x]=n.useState({name:"",slug:"",baseUrl:"",kind:"openai_compat",authScheme:"bearer",key:"",password:""}),P=async(s=!1)=>{s||N(!0);try{const a=await h("/api/user/providers");g(a.submissions||[])}catch(a){s||m(a.message,"err")}finally{s||N(!1)}};n.useEffect(()=>{P()},[]);const A=async()=>{const s=t;if(!s.name.trim()||!s.slug.trim()||!s.baseUrl.trim()||!s.password)return m("\u540D\u79F0 / \u6807\u8BC6\u7B26 / Base URL / \u8D26\u6237\u5BC6\u7801 \u5747\u5FC5\u586B","err");C(!0);try{await h("/api/user/providers","POST",{...s}),m("\u5DF2\u63D0\u4EA4\uFF0C\u7B49\u5F85\u8D85\u7EA7\u7BA1\u7406\u5458\u5BA1\u6838","ok"),f(!1),x({name:"",slug:"",baseUrl:"",kind:"openai_compat",authScheme:"bearer",key:"",password:""}),await P(!0)}catch(a){m(a.message,"err")}finally{C(!1)}},M=async s=>{try{const a=await h(`/api/user/providers/${s.id}/messages`);i({sub:s,messages:a.messages||[]})}catch(a){m(a.message,"err")}},z=async()=>{if(!(!r||!d.trim())){U(!0);try{await h(`/api/user/providers/${r.sub.id}/messages`,"POST",{content:d.trim()}),k("");const s=await h(`/api/user/providers/${r.sub.id}/messages`);i({sub:r.sub,messages:s.messages||[]})}catch(s){m(s.message,"err")}finally{U(!1)}}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx(v,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{children:[e.jsx("h2",{className:"text-sm font-semibold",children:"\u6211\u7684\u4F9B\u5E94\u5546"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u63D0\u4EA4\u9700\u6821\u9A8C\u8D26\u6237\u5BC6\u7801\uFF1B\u63D0\u4EA4\u540E\u8FDB\u5165\u5F85\u5BA1\u6838\u72B6\u6001\uFF0C\u4E0D\u53EF\u81EA\u884C\u4FEE\u6539\u6216\u5220\u9664\u3002\u9700\u8981\u8C03\u6574\u65F6\u901A\u8FC7\u7AD9\u5185\u4FE1\u8054\u7CFB\u7BA1\u7406\u5458\u3002"})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs(p,{variant:"soft",className:"h-9",onClick:()=>void P(!0),disabled:w,children:[e.jsx(V,{size:14,className:R(w&&"animate-spin")}),w?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs(p,{className:"h-9",onClick:()=>f(!0),children:[e.jsx(W,{size:14}),"\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546"]})]})]})}),j===null?e.jsx(v,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):j.length===0?e.jsx(v,{children:e.jsx(G,{icon:e.jsx(H,{size:32}),title:"\u8FD8\u6CA1\u6709\u63D0\u4EA4\u8FC7\u4F9B\u5E94\u5546",hint:"\u70B9\u53F3\u4E0A\u89D2\u300C\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546\u300D\uFF0C\u5BA1\u6838\u901A\u8FC7\u540E\u4F1A\u51FA\u73B0\u5728\u5168\u7AD9\u6E20\u9053\u5217\u8868\u4E2D\u3002"})}):j.map(s=>{const a=X[s.status];return e.jsx(v,{className:"p-4",children:e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-sm font-semibold text-ink",children:s.name}),e.jsx("code",{className:"rounded bg-line px-1.5 py-0.5 text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:R("rounded px-1.5 py-0.5 text-[10px] font-medium",a.cls),children:a.label})]}),e.jsx("div",{className:"mt-1 truncate text-[11px] text-muted font-mono",children:s.baseUrl}),s.status==="rejected"&&s.rejectionReason&&e.jsxs("div",{className:"mt-1.5 rounded-lg bg-red-500/10 px-2.5 py-1.5 text-[11px] text-err",children:["\u9A73\u56DE\u539F\u56E0\uFF1A",s.rejectionReason]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-[10px] text-muted",children:D(s.createdAt)}),e.jsxs(p,{variant:"soft",className:"!h-7 !px-2 text-[11px]",onClick:()=>void M(s),children:[e.jsx(_,{size:12}),"\u5F80\u6765\u6D88\u606F"]})]})]})},s.id)}),e.jsx($,{open:L,onClose:()=>f(!1),title:"\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546\uFF08\u5BA1\u6838\u5236\uFF09",width:520,children:e.jsxs("div",{className:"space-y-3",children:[e.jsx(c,{label:"\u4F9B\u5E94\u5546\u540D\u79F0",children:e.jsx(o,{value:t.name,onChange:s=>x({...t,name:s.target.value}),placeholder:"\u4F8B\u5982\uFF1A\u6211\u7684 OpenAI \u4E2D\u8F6C"})}),e.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[e.jsx(c,{label:"\u6E20\u9053\u6807\u8BC6\u7B26\uFF08slug\uFF09",children:e.jsx(o,{value:t.slug,onChange:s=>x({...t,slug:s.target.value.toLowerCase()}),placeholder:"my-openai-relay"})}),e.jsx(c,{label:"\u6E20\u9053\u7C7B\u578B",children:e.jsxs(K,{value:t.kind,onChange:s=>x({...t,kind:s.target.value}),className:"w-full",children:[e.jsx("option",{value:"openai_compat",children:"OpenAI \u517C\u5BB9"}),e.jsx("option",{value:"anthropic",children:"Anthropic \u539F\u751F"})]})})]}),e.jsx(c,{label:"Base URL",children:e.jsx(o,{value:t.baseUrl,onChange:s=>x({...t,baseUrl:s.target.value}),placeholder:"https://api.example.com/v1"})}),e.jsx(c,{label:"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u53EF\u9009\uFF0C\u5BA1\u6838\u901A\u8FC7\u540E\u7531\u7BA1\u7406\u5458\u5F55\u5165\uFF09",children:e.jsx(o,{type:"password",value:t.key,onChange:s=>x({...t,key:s.target.value}),placeholder:"sk-\u2026"})}),e.jsx(c,{label:"\u8D26\u6237\u5BC6\u7801\uFF08\u654F\u611F\u64CD\u4F5C\u6821\u9A8C\uFF09",hint:"\u63D0\u4EA4\u5C5E\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u9A8C\u8BC1\u4F60\u7684\u767B\u5F55\u5BC6\u7801",children:e.jsx(o,{type:"password",value:t.password,onChange:s=>x({...t,password:s.target.value}),autoComplete:"current-password"})}),e.jsxs("div",{className:"flex justify-end gap-2 pt-1",children:[e.jsx(p,{variant:"ghost",onClick:()=>f(!1),children:"\u53D6\u6D88"}),e.jsx(p,{onClick:()=>void A(),disabled:y,children:y?"\u63D0\u4EA4\u4E2D\u2026":"\u63D0\u4EA4\u5BA1\u6838"})]})]})}),e.jsxs($,{open:!!r,onClose:()=>i(null),title:`\u5F80\u6765\u6D88\u606F \xB7 ${(r==null?void 0:r.sub.name)??""}`,width:560,children:[e.jsxs("div",{className:"max-h-[46vh] space-y-2.5 overflow-y-auto pr-1",children:[((r==null?void 0:r.messages)||[]).length===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u6682\u65E0\u6D88\u606F"}),((r==null?void 0:r.messages)||[]).map(s=>e.jsx("div",{className:R("flex",s.fromRole==="user"?"justify-end":"justify-start"),children:e.jsxs("div",{className:R("max-w-[80%] rounded-xl2 px-3 py-2 text-[12px] leading-relaxed",s.fromRole==="user"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.jsxs("div",{className:R("mb-1 text-[10px]",s.fromRole==="user"?"text-white/70":"text-muted"),children:[s.fromRole==="admin"?"\u7BA1\u7406\u5458":l," \xB7 ",D(s.createdAt)]}),e.jsx("div",{className:"whitespace-pre-wrap break-words",children:s.content})]})},s.id))]}),e.jsxs("div",{className:"mt-3 flex items-end gap-2 border-t border-line pt-3",children:[e.jsx("textarea",{value:d,onChange:s=>k(s.target.value),rows:2,placeholder:"\u7ED9\u7BA1\u7406\u5458\u7559\u8A00\uFF08\u5982\u9700\u4FEE\u6539\u5DF2\u63D0\u4EA4\u7684\u4FE1\u606F\uFF0C\u8BF7\u8BF4\u660E\u5185\u5BB9\uFF09\u2026",className:"max-h-28 min-h-[44px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs(p,{className:"h-11",disabled:S||!d.trim(),onClick:()=>void z(),children:[e.jsx(_,{size:14}),S?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001"]})]})]})]})}function ne({me:l,onRefresh:j}){var z;const[g,w]=n.useState("profile"),[N,L]=n.useState(l.nickname??""),[f,y]=n.useState(l.bio??""),[C,r]=n.useState(l.avatarUrl??""),[i,d]=n.useState({old:"",next:"",confirm:""}),[k,S]=n.useState(!1),[U,m]=n.useState(!1),t=F();n.useEffect(()=>{L(l.nickname??""),y(l.bio??""),r(l.avatarUrl??"")},[l]);const x=async()=>{S(!0);try{await h("/api/user/profile","PATCH",{nickname:N,bio:f}),t("\u8D44\u6599\u5DF2\u4FDD\u5B58"),j()}catch(s){t(s.message,"err")}finally{S(!1)}},P=s=>new Promise((a,b)=>{const E=URL.createObjectURL(s),u=new Image;u.onload=()=>{URL.revokeObjectURL(E);const O=Math.min(1,256/Math.max(u.width,u.height)),I=Math.max(1,Math.round(u.width*O)),B=Math.max(1,Math.round(u.height*O)),T=document.createElement("canvas");T.width=I,T.height=B,T.getContext("2d").drawImage(u,0,0,I,B),a(T.toDataURL("image/png"))},u.onerror=()=>{URL.revokeObjectURL(E),b(new Error("\u65E0\u6CD5\u8BFB\u53D6\u8BE5\u56FE\u7247\uFF0C\u8BF7\u6362\u4E00\u5F20\uFF08\u652F\u6301 JPG/PNG/WebP\uFF09"))},u.src=E}),A=async s=>{try{const a=await P(s),b=await h("/api/user/profile","POST",{dataBase64:a});r(b.avatarUrl),t("\u5934\u50CF\u5DF2\u66F4\u65B0"),j()}catch(a){t(a.message,"err")}},M=async()=>{if(i.next!==i.confirm)return t("\u4E24\u6B21\u8F93\u5165\u7684\u65B0\u5BC6\u7801\u4E0D\u4E00\u81F4","err");m(!0);try{const s=await h("/api/user/profile","PUT",{oldPassword:i.old,newPassword:i.next});t(s.message??"\u5BC6\u7801\u5DF2\u66F4\u65B0"),d({old:"",next:"",confirm:""})}catch(s){t(s.message,"err")}finally{m(!1)}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["profile","\u4E2A\u4EBA\u8D44\u6599"],["password","\u4FEE\u6539\u5BC6\u7801"],["providers","\u6211\u7684\u4F9B\u5E94\u5546"]].map(([s,a])=>e.jsx("button",{role:"tab","aria-selected":g===s,onClick:()=>w(s),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${g===s?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:a},s))}),g==="profile"&&e.jsxs(v,{className:"p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u4E2A\u4EBA\u8D44\u6599"}),e.jsx("p",{className:"mb-5 text-xs text-muted",children:"\u6635\u79F0\u4E0E\u4ECB\u7ECD\u4F1A\u5C55\u793A\u5728\u4F60\u7684\u8D26\u53F7\u4FE1\u606F\u4E2D\u3002"}),e.jsxs("div",{className:"flex items-center gap-5",children:[e.jsxs("label",{className:"group relative cursor-pointer",children:[e.jsx("span",{className:"flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-brand/15 text-xl font-semibold text-brand",children:C?e.jsx("img",{src:C,alt:"\u5934\u50CF",className:"h-full w-full object-cover"}):(z=l.user.email[0])==null?void 0:z.toUpperCase()}),e.jsx("span",{className:"absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity group-hover:opacity-100",children:e.jsx(Q,{size:18,className:"text-white"})}),e.jsx("input",{type:"file",accept:"image/png,image/jpeg,image/webp,image/svg+xml",className:"hidden",onChange:s=>{var b;const a=(b=s.target.files)==null?void 0:b[0];a&&A(a)}})]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-sm font-semibold",children:l.user.email}),e.jsxs("div",{className:"text-xs text-muted",children:["\u89D2\u8272\uFF1A",l.user.role," \xB7 \u70B9\u51FB\u5934\u50CF\u66F4\u6362\uFF08\u81EA\u52A8\u538B\u7F29\u4E3A 256\xD7256\uFF09"]})]})]}),e.jsxs("div",{className:"mt-5 grid gap-3 sm:grid-cols-2",children:[e.jsx(c,{label:"\u6635\u79F0\uFF08\u6700\u957F 32 \u5B57\uFF09",children:e.jsx(o,{value:N,onChange:s=>L(s.target.value),placeholder:"\u672A\u8BBE\u7F6E"})}),e.jsx(c,{label:"\u6CE8\u518C\u90AE\u7BB1\uFF08\u4E0D\u53EF\u4FEE\u6539\uFF09",children:e.jsx(o,{value:l.user.email,disabled:!0})}),e.jsx("div",{className:"sm:col-span-2",children:e.jsx(c,{label:"\u4E2A\u4EBA\u4ECB\u7ECD\uFF08\u6700\u957F 200 \u5B57\uFF09",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:3,value:f,onChange:s=>y(s.target.value),placeholder:"\u4ECB\u7ECD\u4E00\u4E0B\u81EA\u5DF1\u2026"})})})]}),e.jsx("div",{className:"mt-4",children:e.jsx(p,{disabled:k,onClick:x,children:k?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u8D44\u6599"})})]}),g==="providers"&&e.jsx(Y,{meEmail:l.user.email}),g==="password"&&e.jsxs(v,{className:"p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(J,{size:15}),"\u4FEE\u6539\u5BC6\u7801"]}),e.jsx("p",{className:"mb-5 text-xs text-muted",children:"\u4FEE\u6539\u6210\u529F\u540E\u5176\u4ED6\u8BBE\u5907\u5C06\u9000\u51FA\u767B\u5F55\uFF0C\u5F53\u524D\u4F1A\u8BDD\u4FDD\u6301\u3002"}),e.jsxs("div",{className:"grid gap-3 sm:grid-cols-3",children:[e.jsx(c,{label:"\u5F53\u524D\u5BC6\u7801",children:e.jsx(o,{type:"password",value:i.old,onChange:s=>d({...i,old:s.target.value}),autoComplete:"current-password"})}),e.jsx(c,{label:"\u65B0\u5BC6\u7801\uFF08\u81F3\u5C11 10 \u4F4D\uFF09",children:e.jsx(o,{type:"password",value:i.next,onChange:s=>d({...i,next:s.target.value}),autoComplete:"new-password"})}),e.jsx(c,{label:"\u786E\u8BA4\u65B0\u5BC6\u7801",children:e.jsx(o,{type:"password",value:i.confirm,onChange:s=>d({...i,confirm:s.target.value}),autoComplete:"new-password"})})]}),e.jsx("div",{className:"mt-4",children:e.jsx(p,{disabled:U,onClick:M,children:U?"\u63D0\u4EA4\u4E2D\u2026":"\u4FEE\u6539\u5BC6\u7801"})})]})]})}\n',
+            "/assets/Profile-8VMY8-5m.js": {
+              content: 'import{c as q,u as F,j as e,d as v,B as p,m as R,E as G,s as H,e as $,F as c,I as o,k as K,a as h,K as J}from"./index-OWhocmiM.js";import{r as n}from"./vendor-BbQ_LiY-.js";import{R as V}from"./refresh-cw-CiqXg9A7.js";import{P as W}from"./plus-DjGDWRHo.js";import{M as _}from"./message-square-nskUin8a.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Q=q("Camera",[["path",{d:"M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z",key:"1tc9qg"}],["circle",{cx:"12",cy:"13",r:"3",key:"1vg3eu"}]]),X={pending:{label:"\u5F85\u5BA1\u6838",cls:"bg-amber-500/10 text-amber-500"},approved:{label:"\u5DF2\u901A\u8FC7",cls:"bg-emerald-500/10 text-emerald-500"},rejected:{label:"\u5DF2\u9A73\u56DE",cls:"bg-red-500/10 text-red-500"}},D=l=>l?new Date(l*1e3).toLocaleString("zh-CN",{hour12:!1}):"\u2014";function Y({meEmail:l}){const[j,g]=n.useState(null),[w,N]=n.useState(!1),[L,f]=n.useState(!1),[y,C]=n.useState(!1),[r,i]=n.useState(null),[d,k]=n.useState(""),[S,U]=n.useState(!1),m=F(),[t,x]=n.useState({name:"",slug:"",baseUrl:"",kind:"openai_compat",authScheme:"bearer",key:"",password:""}),P=async(s=!1)=>{s||N(!0);try{const a=await h("/api/user/providers");g(a.submissions||[])}catch(a){s||m(a.message,"err")}finally{s||N(!1)}};n.useEffect(()=>{P()},[]);const A=async()=>{const s=t;if(!s.name.trim()||!s.slug.trim()||!s.baseUrl.trim()||!s.password)return m("\u540D\u79F0 / \u6807\u8BC6\u7B26 / Base URL / \u8D26\u6237\u5BC6\u7801 \u5747\u5FC5\u586B","err");C(!0);try{await h("/api/user/providers","POST",{...s}),m("\u5DF2\u63D0\u4EA4\uFF0C\u7B49\u5F85\u8D85\u7EA7\u7BA1\u7406\u5458\u5BA1\u6838","ok"),f(!1),x({name:"",slug:"",baseUrl:"",kind:"openai_compat",authScheme:"bearer",key:"",password:""}),await P(!0)}catch(a){m(a.message,"err")}finally{C(!1)}},M=async s=>{try{const a=await h(`/api/user/providers/${s.id}/messages`);i({sub:s,messages:a.messages||[]})}catch(a){m(a.message,"err")}},z=async()=>{if(!(!r||!d.trim())){U(!0);try{await h(`/api/user/providers/${r.sub.id}/messages`,"POST",{content:d.trim()}),k("");const s=await h(`/api/user/providers/${r.sub.id}/messages`);i({sub:r.sub,messages:s.messages||[]})}catch(s){m(s.message,"err")}finally{U(!1)}}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx(v,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{children:[e.jsx("h2",{className:"text-sm font-semibold",children:"\u6211\u7684\u4F9B\u5E94\u5546"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u63D0\u4EA4\u9700\u6821\u9A8C\u8D26\u6237\u5BC6\u7801\uFF1B\u63D0\u4EA4\u540E\u8FDB\u5165\u5F85\u5BA1\u6838\u72B6\u6001\uFF0C\u4E0D\u53EF\u81EA\u884C\u4FEE\u6539\u6216\u5220\u9664\u3002\u9700\u8981\u8C03\u6574\u65F6\u901A\u8FC7\u7AD9\u5185\u4FE1\u8054\u7CFB\u7BA1\u7406\u5458\u3002"})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs(p,{variant:"soft",className:"h-9",onClick:()=>void P(!0),disabled:w,children:[e.jsx(V,{size:14,className:R(w&&"animate-spin")}),w?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs(p,{className:"h-9",onClick:()=>f(!0),children:[e.jsx(W,{size:14}),"\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546"]})]})]})}),j===null?e.jsx(v,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):j.length===0?e.jsx(v,{children:e.jsx(G,{icon:e.jsx(H,{size:32}),title:"\u8FD8\u6CA1\u6709\u63D0\u4EA4\u8FC7\u4F9B\u5E94\u5546",hint:"\u70B9\u53F3\u4E0A\u89D2\u300C\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546\u300D\uFF0C\u5BA1\u6838\u901A\u8FC7\u540E\u4F1A\u51FA\u73B0\u5728\u5168\u7AD9\u6E20\u9053\u5217\u8868\u4E2D\u3002"})}):j.map(s=>{const a=X[s.status];return e.jsx(v,{className:"p-4",children:e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-sm font-semibold text-ink",children:s.name}),e.jsx("code",{className:"rounded bg-line px-1.5 py-0.5 text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:R("rounded px-1.5 py-0.5 text-[10px] font-medium",a.cls),children:a.label})]}),e.jsx("div",{className:"mt-1 truncate text-[11px] text-muted font-mono",children:s.baseUrl}),s.status==="rejected"&&s.rejectionReason&&e.jsxs("div",{className:"mt-1.5 rounded-lg bg-red-500/10 px-2.5 py-1.5 text-[11px] text-err",children:["\u9A73\u56DE\u539F\u56E0\uFF1A",s.rejectionReason]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-[10px] text-muted",children:D(s.createdAt)}),e.jsxs(p,{variant:"soft",className:"!h-7 !px-2 text-[11px]",onClick:()=>void M(s),children:[e.jsx(_,{size:12}),"\u5F80\u6765\u6D88\u606F"]})]})]})},s.id)}),e.jsx($,{open:L,onClose:()=>f(!1),title:"\u63D0\u4EA4\u65B0\u4F9B\u5E94\u5546\uFF08\u5BA1\u6838\u5236\uFF09",width:520,children:e.jsxs("div",{className:"space-y-3",children:[e.jsx(c,{label:"\u4F9B\u5E94\u5546\u540D\u79F0",children:e.jsx(o,{value:t.name,onChange:s=>x({...t,name:s.target.value}),placeholder:"\u4F8B\u5982\uFF1A\u6211\u7684 OpenAI \u4E2D\u8F6C"})}),e.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[e.jsx(c,{label:"\u6E20\u9053\u6807\u8BC6\u7B26\uFF08slug\uFF09",children:e.jsx(o,{value:t.slug,onChange:s=>x({...t,slug:s.target.value.toLowerCase()}),placeholder:"my-openai-relay"})}),e.jsx(c,{label:"\u6E20\u9053\u7C7B\u578B",children:e.jsxs(K,{value:t.kind,onChange:s=>x({...t,kind:s.target.value}),className:"w-full",children:[e.jsx("option",{value:"openai_compat",children:"OpenAI \u517C\u5BB9"}),e.jsx("option",{value:"anthropic",children:"Anthropic \u539F\u751F"})]})})]}),e.jsx(c,{label:"Base URL",children:e.jsx(o,{value:t.baseUrl,onChange:s=>x({...t,baseUrl:s.target.value}),placeholder:"https://api.example.com/v1"})}),e.jsx(c,{label:"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u53EF\u9009\uFF0C\u5BA1\u6838\u901A\u8FC7\u540E\u7531\u7BA1\u7406\u5458\u5F55\u5165\uFF09",children:e.jsx(o,{type:"password",value:t.key,onChange:s=>x({...t,key:s.target.value}),placeholder:"sk-\u2026"})}),e.jsx(c,{label:"\u8D26\u6237\u5BC6\u7801\uFF08\u654F\u611F\u64CD\u4F5C\u6821\u9A8C\uFF09",hint:"\u63D0\u4EA4\u5C5E\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u9A8C\u8BC1\u4F60\u7684\u767B\u5F55\u5BC6\u7801",children:e.jsx(o,{type:"password",value:t.password,onChange:s=>x({...t,password:s.target.value}),autoComplete:"current-password"})}),e.jsxs("div",{className:"flex justify-end gap-2 pt-1",children:[e.jsx(p,{variant:"ghost",onClick:()=>f(!1),children:"\u53D6\u6D88"}),e.jsx(p,{onClick:()=>void A(),disabled:y,children:y?"\u63D0\u4EA4\u4E2D\u2026":"\u63D0\u4EA4\u5BA1\u6838"})]})]})}),e.jsxs($,{open:!!r,onClose:()=>i(null),title:`\u5F80\u6765\u6D88\u606F \xB7 ${(r==null?void 0:r.sub.name)??""}`,width:560,children:[e.jsxs("div",{className:"max-h-[46vh] space-y-2.5 overflow-y-auto pr-1",children:[((r==null?void 0:r.messages)||[]).length===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u6682\u65E0\u6D88\u606F"}),((r==null?void 0:r.messages)||[]).map(s=>e.jsx("div",{className:R("flex",s.fromRole==="user"?"justify-end":"justify-start"),children:e.jsxs("div",{className:R("max-w-[80%] rounded-xl2 px-3 py-2 text-[12px] leading-relaxed",s.fromRole==="user"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.jsxs("div",{className:R("mb-1 text-[10px]",s.fromRole==="user"?"text-white/70":"text-muted"),children:[s.fromRole==="admin"?"\u7BA1\u7406\u5458":l," \xB7 ",D(s.createdAt)]}),e.jsx("div",{className:"whitespace-pre-wrap break-words",children:s.content})]})},s.id))]}),e.jsxs("div",{className:"mt-3 flex items-end gap-2 border-t border-line pt-3",children:[e.jsx("textarea",{value:d,onChange:s=>k(s.target.value),rows:2,placeholder:"\u7ED9\u7BA1\u7406\u5458\u7559\u8A00\uFF08\u5982\u9700\u4FEE\u6539\u5DF2\u63D0\u4EA4\u7684\u4FE1\u606F\uFF0C\u8BF7\u8BF4\u660E\u5185\u5BB9\uFF09\u2026",className:"max-h-28 min-h-[44px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs(p,{className:"h-11",disabled:S||!d.trim(),onClick:()=>void z(),children:[e.jsx(_,{size:14}),S?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001"]})]})]})]})}function ne({me:l,onRefresh:j}){var z;const[g,w]=n.useState("profile"),[N,L]=n.useState(l.nickname??""),[f,y]=n.useState(l.bio??""),[C,r]=n.useState(l.avatarUrl??""),[i,d]=n.useState({old:"",next:"",confirm:""}),[k,S]=n.useState(!1),[U,m]=n.useState(!1),t=F();n.useEffect(()=>{L(l.nickname??""),y(l.bio??""),r(l.avatarUrl??"")},[l]);const x=async()=>{S(!0);try{await h("/api/user/profile","PATCH",{nickname:N,bio:f}),t("\u8D44\u6599\u5DF2\u4FDD\u5B58"),j()}catch(s){t(s.message,"err")}finally{S(!1)}},P=s=>new Promise((a,b)=>{const E=URL.createObjectURL(s),u=new Image;u.onload=()=>{URL.revokeObjectURL(E);const O=Math.min(1,256/Math.max(u.width,u.height)),I=Math.max(1,Math.round(u.width*O)),B=Math.max(1,Math.round(u.height*O)),T=document.createElement("canvas");T.width=I,T.height=B,T.getContext("2d").drawImage(u,0,0,I,B),a(T.toDataURL("image/png"))},u.onerror=()=>{URL.revokeObjectURL(E),b(new Error("\u65E0\u6CD5\u8BFB\u53D6\u8BE5\u56FE\u7247\uFF0C\u8BF7\u6362\u4E00\u5F20\uFF08\u652F\u6301 JPG/PNG/WebP\uFF09"))},u.src=E}),A=async s=>{try{const a=await P(s),b=await h("/api/user/profile","POST",{dataBase64:a});r(b.avatarUrl),t("\u5934\u50CF\u5DF2\u66F4\u65B0"),j()}catch(a){t(a.message,"err")}},M=async()=>{if(i.next!==i.confirm)return t("\u4E24\u6B21\u8F93\u5165\u7684\u65B0\u5BC6\u7801\u4E0D\u4E00\u81F4","err");m(!0);try{const s=await h("/api/user/profile","PUT",{oldPassword:i.old,newPassword:i.next});t(s.message??"\u5BC6\u7801\u5DF2\u66F4\u65B0"),d({old:"",next:"",confirm:""})}catch(s){t(s.message,"err")}finally{m(!1)}};return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["profile","\u4E2A\u4EBA\u8D44\u6599"],["password","\u4FEE\u6539\u5BC6\u7801"],["providers","\u6211\u7684\u4F9B\u5E94\u5546"]].map(([s,a])=>e.jsx("button",{role:"tab","aria-selected":g===s,onClick:()=>w(s),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${g===s?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:a},s))}),g==="profile"&&e.jsxs(v,{className:"p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u4E2A\u4EBA\u8D44\u6599"}),e.jsx("p",{className:"mb-5 text-xs text-muted",children:"\u6635\u79F0\u4E0E\u4ECB\u7ECD\u4F1A\u5C55\u793A\u5728\u4F60\u7684\u8D26\u53F7\u4FE1\u606F\u4E2D\u3002"}),e.jsxs("div",{className:"flex items-center gap-5",children:[e.jsxs("label",{className:"group relative cursor-pointer",children:[e.jsx("span",{className:"flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-brand/15 text-xl font-semibold text-brand",children:C?e.jsx("img",{src:C,alt:"\u5934\u50CF",className:"h-full w-full object-cover"}):(z=l.user.email[0])==null?void 0:z.toUpperCase()}),e.jsx("span",{className:"absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity group-hover:opacity-100",children:e.jsx(Q,{size:18,className:"text-white"})}),e.jsx("input",{type:"file",accept:"image/png,image/jpeg,image/webp,image/svg+xml",className:"hidden",onChange:s=>{var b;const a=(b=s.target.files)==null?void 0:b[0];a&&A(a)}})]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-sm font-semibold",children:l.user.email}),e.jsxs("div",{className:"text-xs text-muted",children:["\u89D2\u8272\uFF1A",l.user.role," \xB7 \u70B9\u51FB\u5934\u50CF\u66F4\u6362\uFF08\u81EA\u52A8\u538B\u7F29\u4E3A 256\xD7256\uFF09"]})]})]}),e.jsxs("div",{className:"mt-5 grid gap-3 sm:grid-cols-2",children:[e.jsx(c,{label:"\u6635\u79F0\uFF08\u6700\u957F 32 \u5B57\uFF09",children:e.jsx(o,{value:N,onChange:s=>L(s.target.value),placeholder:"\u672A\u8BBE\u7F6E"})}),e.jsx(c,{label:"\u6CE8\u518C\u90AE\u7BB1\uFF08\u4E0D\u53EF\u4FEE\u6539\uFF09",children:e.jsx(o,{value:l.user.email,disabled:!0})}),e.jsx("div",{className:"sm:col-span-2",children:e.jsx(c,{label:"\u4E2A\u4EBA\u4ECB\u7ECD\uFF08\u6700\u957F 200 \u5B57\uFF09",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:3,value:f,onChange:s=>y(s.target.value),placeholder:"\u4ECB\u7ECD\u4E00\u4E0B\u81EA\u5DF1\u2026"})})})]}),e.jsx("div",{className:"mt-4",children:e.jsx(p,{disabled:k,onClick:x,children:k?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u8D44\u6599"})})]}),g==="providers"&&e.jsx(Y,{meEmail:l.user.email}),g==="password"&&e.jsxs(v,{className:"p-5",children:[e.jsxs("h2",{className:"mb-1 flex items-center gap-2 text-sm font-semibold",children:[e.jsx(J,{size:15}),"\u4FEE\u6539\u5BC6\u7801"]}),e.jsx("p",{className:"mb-5 text-xs text-muted",children:"\u4FEE\u6539\u6210\u529F\u540E\u5176\u4ED6\u8BBE\u5907\u5C06\u9000\u51FA\u767B\u5F55\uFF0C\u5F53\u524D\u4F1A\u8BDD\u4FDD\u6301\u3002"}),e.jsxs("div",{className:"grid gap-3 sm:grid-cols-3",children:[e.jsx(c,{label:"\u5F53\u524D\u5BC6\u7801",children:e.jsx(o,{type:"password",value:i.old,onChange:s=>d({...i,old:s.target.value}),autoComplete:"current-password"})}),e.jsx(c,{label:"\u65B0\u5BC6\u7801\uFF08\u81F3\u5C11 10 \u4F4D\uFF09",children:e.jsx(o,{type:"password",value:i.next,onChange:s=>d({...i,next:s.target.value}),autoComplete:"new-password"})}),e.jsx(c,{label:"\u786E\u8BA4\u65B0\u5BC6\u7801",children:e.jsx(o,{type:"password",value:i.confirm,onChange:s=>d({...i,confirm:s.target.value}),autoComplete:"new-password"})})]}),e.jsx("div",{className:"mt-4",children:e.jsx(p,{disabled:U,onClick:M,children:U?"\u63D0\u4EA4\u4E2D\u2026":"\u4FEE\u6539\u5BC6\u7801"})})]})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Providers-DlvpArmL.js": {
-              content: 'import{c as ue,u as He,i as Fe,j as e,d as Q,E as Qe,q as Pe,m as S,B as x,X as xs,e as F,n as y,r as ms,h as be,s as us,U as Te,G as ps,F as U,k as Re,I,o as ye,t as D}from"./index-JGTLcmXV.js";import{r as j}from"./vendor-BbQ_LiY-.js";import{M as Le}from"./message-square-CYBPWetn.js";import{R as $}from"./refresh-cw-BY9R0tIW.js";import{P as ke}from"./plus-v0UXhlLi.js";import{T as xe}from"./trash-2-DuK1uChF.js";import{S as hs,T as fs}from"./triangle-alert-V4ji6s4N.js";import{C as gs}from"./circle-check-CmF7WJUQ.js";import{E as Ne}from"./external-link-CAe9zb1u.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const me=ue("Key",[["path",{d:"m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4",key:"g0fldk"}],["path",{d:"m21 2-9.6 9.6",key:"1j0ho8"}],["circle",{cx:"7.5",cy:"15.5",r:"5.5",key:"yqb3hr"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Ee=ue("LogIn",[["path",{d:"M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4",key:"u53s6r"}],["polyline",{points:"10 17 15 12 10 7",key:"1ail0h"}],["line",{x1:"15",x2:"3",y1:"12",y2:"12",key:"v6grx8"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const js=ue("Pencil",[["path",{d:"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z",key:"1a8usu"}],["path",{d:"m15 5 4 4",key:"1mk7zo"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const we=ue("Power",[["path",{d:"M12 2v10",key:"mnfbl"}],["path",{d:"M18.4 6.6a9 9 0 1 1-12.77.04",key:"obofu9"}]]),vs={pending:{label:"\u5F85\u5BA1\u6838",cls:"bg-amber-500/10 text-amber-500"},approved:{label:"\u5DF2\u901A\u8FC7",cls:"bg-emerald-500/10 text-emerald-500"},rejected:{label:"\u5DF2\u9A73\u56DE",cls:"bg-red-500/10 text-red-500"}},Ge=f=>f?new Date(f*1e3).toLocaleString("zh-CN",{hour12:!1}):"\u2014";function bs(){const[f,M]=j.useState(null),[T,pe]=j.useState(0),[he,R]=j.useState(!1),[m,A]=j.useState(""),[b,L]=j.useState(null),[r,z]=j.useState(null),[K,E]=j.useState(""),[se,q]=j.useState(!1),G=He(),{confirm:de,confirmEl:te}=Fe(),B=async(c=!1)=>{c||R(!0);try{const a=await y("list_provider_submissions");M(a.submissions||[]),pe(a.pendingCount||0)}catch(a){c||G(a.message,"err")}finally{c||R(!1)}};j.useEffect(()=>{B()},[]);const Z=async c=>{try{const a=await y("provider_submission_thread",{id:c.id});z({sub:c,messages:a.messages||[]})}catch(a){G(a.message,"err")}},ae=async()=>{if(!(!r||!K.trim())){q(!0);try{await y("provider_submission_reply",{id:r.sub.id,content:K.trim()}),E(""),await Z(r.sub),await B(!0)}catch(c){G(c.message,"err")}finally{q(!1)}}},o=async(c,a,N)=>{A(c.id);try{await y("provider_submission_review",{id:c.id,decision:a,reason:N}),G(a==="approved"?`\u5DF2\u901A\u8FC7\uFF1A\u6E20\u9053\u300C${c.name}\u300D\u5DF2\u521B\u5EFA\u5E76\u8FDB\u5165\u5168\u7AD9\u5217\u8868`:"\u5DF2\u9A73\u56DE\u5E76\u901A\u77E5\u63D0\u4EA4\u7528\u6237","ok"),L(null),await B(!0)}catch(P){G(P.message,"err")}finally{A("")}},w=async c=>{await de(`\u901A\u8FC7\u300C${c.name}\u300D\u7684\u63D0\u4EA4\uFF1F\u5C06\u521B\u5EFA\u6B63\u5F0F\u6E20\u9053${c.hasKey?"\u5E76\u5F55\u5165\u7528\u6237\u63D0\u4EA4\u7684\u5BC6\u94A5":"\uFF08\u65E0\u5BC6\u94A5\uFF0C\u9700\u624B\u52A8\u5F55\u5165\uFF09"}\u3002`)&&await o(c,"approved")},W=(f||[]).slice().sort((c,a)=>{const N=c.status==="pending"?0:c.status==="approved"?1:2,P=a.status==="pending"?0:a.status==="approved"?1:2;return N-P||a.updatedAt-c.updatedAt});return e.jsxs("div",{className:"flex flex-col gap-4",children:[te,e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:["\u7528\u6237\u63D0\u4EA4\u7684\u4F9B\u5E94\u5546\u5728\u8FD9\u91CC\u5BA1\u6838\uFF1A\u901A\u8FC7\u540E\u521B\u5EFA\u6B63\u5F0F\u6E20\u9053\uFF08\u8FDB\u5165\u5168\u7AD9\u5217\u8868\u4E0E\u8DEF\u7531\uFF09\uFF0C\u9A73\u56DE\u5FC5\u987B\u586B\u5199\u539F\u56E0\uFF08\u5BF9\u63D0\u4EA4\u7528\u6237\u53EF\u89C1\uFF09\u3002 \u5F53\u524D\u5F85\u5BA1\u6838 ",e.jsx("b",{className:"text-amber-500",children:T})," \u6761\u3002"]}),f===null?e.jsx(Q,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):W.length===0?e.jsx(Q,{children:e.jsx(Qe,{icon:e.jsx(Pe,{size:32}),title:"\u6682\u65E0\u7528\u6237\u63D0\u4EA4",hint:"\u666E\u901A\u7528\u6237\u5728\u300C\u4E2A\u4EBA\u4E3B\u9875 \u2192 \u6211\u7684\u4F9B\u5E94\u5546\u300D\u63D0\u4EA4\u6E20\u9053\u540E\uFF0C\u8FD9\u91CC\u4F1A\u51FA\u73B0\u5F85\u5BA1\u6838\u8BB0\u5F55\u3002"})}):W.map(c=>{const a=vs[c.status];return e.jsx(Q,{className:"p-4",children:e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-sm font-semibold text-ink",children:c.name}),e.jsx("code",{className:"rounded bg-line px-1.5 py-0.5 text-[10px] text-muted font-mono",children:c.slug}),e.jsx("span",{className:S("rounded px-1.5 py-0.5 text-[10px] font-medium",a.cls),children:a.label}),c.hasKey&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] text-brand",children:"\u542B\u5BC6\u94A5"}),c.providerId&&e.jsxs("code",{className:"rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-500 font-mono",children:[c.providerId.slice(0,8),"\u2026"]})]}),e.jsx("div",{className:"mt-1 truncate text-[11px] text-muted font-mono",children:c.baseUrl}),e.jsxs("div",{className:"mt-1 text-[10px] text-muted",children:["\u63D0\u4EA4\u4EBA ",c.ownerEmail||"\u2014"," \xB7 ",Ge(c.createdAt),c.status==="rejected"&&c.rejectionReason&&e.jsxs("span",{className:"text-err",children:[" \xB7 \u9A73\u56DE\u539F\u56E0\uFF1A",c.rejectionReason]})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs(x,{variant:"soft",className:"!h-7 !px-2 text-[11px]",onClick:()=>void Z(c),children:[e.jsx(Le,{size:12}),"\u5F80\u6765"]}),c.status==="pending"&&e.jsxs(e.Fragment,{children:[e.jsxs(x,{variant:"soft",className:"!h-7 !px-2 text-[11px] !text-emerald-500",disabled:m===c.id,onClick:()=>void w(c),children:[e.jsx(Pe,{size:12}),"\u901A\u8FC7"]}),e.jsxs(x,{variant:"soft",className:"!h-7 !px-2 text-[11px] !text-err",disabled:m===c.id,onClick:()=>L({sub:c,reason:""}),children:[e.jsx(xs,{size:12}),"\u9A73\u56DE"]})]})]})]})},c.id)}),e.jsxs(F,{open:!!b,onClose:()=>L(null),title:`\u9A73\u56DE\u300C${(b==null?void 0:b.sub.name)??""}\u300D`,width:480,children:[e.jsx("p",{className:"mb-3 text-xs text-muted",children:"\u9A73\u56DE\u539F\u56E0\u5C06\u540C\u6B65\u5230\u7AD9\u5185\u4FE1\u7EBF\u7A0B\uFF0C\u5BF9\u63D0\u4EA4\u7528\u6237\u53EF\u89C1\u3002"}),e.jsx("textarea",{rows:3,value:(b==null?void 0:b.reason)??"",onChange:c=>L(a=>a&&{...a,reason:c.target.value}),placeholder:"\u4F8B\u5982\uFF1ABase URL \u4E0D\u53EF\u8FBE / \u5BC6\u94A5\u65E0\u6548 / \u4E0E\u73B0\u6709\u6E20\u9053\u91CD\u590D\u2026",className:"w-full resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs("div",{className:"mt-3 flex justify-end gap-2",children:[e.jsx(x,{variant:"ghost",onClick:()=>L(null),children:"\u53D6\u6D88"}),e.jsx(x,{variant:"danger",disabled:!(b!=null&&b.reason.trim())||m===(b==null?void 0:b.sub.id),onClick:()=>b&&void o(b.sub,"rejected",b.reason.trim()),children:m===(b==null?void 0:b.sub.id)?"\u5904\u7406\u4E2D\u2026":"\u786E\u8BA4\u9A73\u56DE"})]})]}),e.jsxs(F,{open:!!r,onClose:()=>z(null),title:`\u5F80\u6765\u6D88\u606F \xB7 ${(r==null?void 0:r.sub.name)??""}`,width:560,children:[e.jsxs("div",{className:"max-h-[46vh] space-y-2.5 overflow-y-auto pr-1",children:[((r==null?void 0:r.messages)||[]).length===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u6682\u65E0\u6D88\u606F"}),((r==null?void 0:r.messages)||[]).map(c=>e.jsx("div",{className:S("flex",c.fromRole==="admin"?"justify-end":"justify-start"),children:e.jsxs("div",{className:S("max-w-[80%] rounded-xl2 px-3 py-2 text-[12px] leading-relaxed",c.fromRole==="admin"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.jsxs("div",{className:S("mb-1 text-[10px]",c.fromRole==="admin"?"text-white/70":"text-muted"),children:[c.fromRole==="admin"?"\u7BA1\u7406\u5458\uFF08\u6211\uFF09":c.fromEmail," \xB7 ",Ge(c.createdAt)]}),e.jsx("div",{className:"whitespace-pre-wrap break-words",children:c.content})]})},c.id))]}),e.jsxs("div",{className:"mt-3 flex items-end gap-2 border-t border-line pt-3",children:[e.jsx("textarea",{value:K,onChange:c=>E(c.target.value),rows:2,placeholder:"\u56DE\u590D\u63D0\u4EA4\u7528\u6237\uFF08\u5904\u7406\u7ED3\u679C\u3001\u4FEE\u6539\u8981\u6C42\u7B49\uFF09\u2026",className:"max-h-28 min-h-[44px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs(x,{className:"h-11",disabled:se||!K.trim(),onClick:()=>void ae(),children:[e.jsx(Le,{size:14}),se?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001"]})]})]}),he&&e.jsx("div",{className:"fixed bottom-6 right-6 rounded-full bg-surface p-2 shadow-card text-muted",children:e.jsx($,{size:16,className:"animate-spin"})})]})}const qe={deepseek:{name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com"},openai:{name:"OpenAI",slug:"openai",kind:"openai_compat",url:"https://api.openai.com"},anthropic:{name:"Anthropic",slug:"anthropic",kind:"anthropic",url:"https://api.anthropic.com"},google:{name:"Google Gemini",slug:"google",kind:"openai_compat",url:"https://generativelanguage.googleapis.com/v1beta/openai"},kilo:{name:"Kilo (\u514DKey)",slug:"kilo",kind:"openai_compat",url:"https://api.kilo.ai/api/gateway"},opencode:{name:"OpenCode (\u514DKey)",slug:"opencode",kind:"openai_compat",url:"https://opencode.ai/zen/v1"},duckai:{name:"Duck.ai (\u514DKey)",slug:"duckai",kind:"openai_compat",url:"https://duck.ai"},bigmodel:{name:"\u667A\u8C31 GLM (BigModel)",slug:"bigmodel",kind:"openai_compat",url:"https://open.bigmodel.cn/api/paas/v4"},lingbao:{name:"\u7075\u5B9D UI \u6865\u63A5",slug:"lingbao",kind:"openai_compat",url:"http://127.0.0.1:20141"}},ee=f=>f==="opencode"||f==="duckai"||f==="kilo",ys=f=>!!f&&f.startsWith("oauth:"),ks=f=>!!f&&f.startsWith("web:"),C=f=>ys(f==null?void 0:f.kind),_=f=>ks(f==null?void 0:f.kind),Be=[{type:"claude",name:"Claude (Anthropic)",slug:"claude-oauth",baseUrl:"https://api.anthropic.com",mode:"redirect",desc:"Claude Code OAuth \u6388\u6743\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Anthropic Messages \u534F\u8BAE\u3002",models:["claude-sonnet-4-5","claude-opus-4-5","claude-haiku-4-5"]},{type:"codex",name:"Codex",slug:"codex-oauth",baseUrl:"https://chatgpt.com/backend-api/codex",mode:"redirect",desc:"Codex \u8D26\u53F7\u6388\u6743\uFF08Codex CLI\uFF09\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Responses \u534F\u8BAE\u3002",models:["gpt-5.5","gpt-5.4","gpt-5.3-codex"]},{type:"antigravity",name:"Antigravity (Google)",slug:"antigravity-oauth",baseUrl:"https://daily-cloudcode-pa.googleapis.com",mode:"redirect",desc:"Google \u8D26\u53F7\u6388\u6743\uFF08Antigravity \u5BA2\u6237\u7AEF\uFF09\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Gemini \u534F\u8BAE\u3002",models:["gemini-3.7-flash","gemini-3.1-pro"]},{type:"kimi",name:"Kimi (Moonshot)",slug:"kimi-oauth",baseUrl:"https://api.kimi.ai/coding",mode:"device",desc:"Kimi \u8BBE\u5907\u7801\u6388\u6743\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\uFF08\u56FD\u9645\u7AD9/\u4E2D\u56FD\u7AD9\u81EA\u52A8\u8BC6\u522B\uFF09\u3002",models:["kimi-for-coding","kimi-for-coding-highspeed"]},{type:"qwen",name:"Qwen (\u901A\u4E49\u5343\u95EE)",slug:"qwen-oauth",baseUrl:"https://portal.qwen.ai/v1",mode:"device",desc:"Qwen \u8BBE\u5907\u7801\u6388\u6743\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\u3002",models:["coder-model","qwen3-coder-plus"]},{type:"grok",name:"Grok (xAI)",slug:"grok-oauth",baseUrl:"https://cli-chat-proxy.grok.com/v1",mode:"device",desc:"xAI \u8BBE\u5907\u7801\u6388\u6743\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Responses \u534F\u8BAE\u3002",models:["grok-4.6","grok-4.5"]},{type:"codebuddy",name:"CodeBuddy / WorkBuddy (\u817E\u8BAF)",slug:"codebuddy-oauth",baseUrl:"https://copilot.tencent.com",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u5185\u7248",baseUrl:"https://copilot.tencent.com",desc:"copilot.tencent.com / codebuddy.cn\uFF0C\u817E\u8BAF\u4E91\u8D26\u53F7\u4F53\u7CFB"},{label:"\u56FD\u9645\u7248",baseUrl:"https://www.workbuddy.ai",desc:"workbuddy.ai\uFF0C\u4E0E\u56FD\u5185\u7248\u8D26\u53F7\u5B8C\u5168\u72EC\u7ACB"}],desc:"\u817E\u8BAF CodeBuddy / WorkBuddy \u8D26\u53F7\u6388\u6743\uFF0C\u56FD\u5185\u7248\u4E0E\u56FD\u9645\u7248\u5171\u7528\u540C\u4E00\u5165\u53E3\uFF0C\u6388\u6743\u65F6\u9009\u62E9\u533A\u57DF\u3002",models:["deepseek-v4.1-flash"]},{type:"zcode",name:"ZCode (\u667A\u8C31)",slug:"zcode-oauth",baseUrl:"https://zcode.z.ai",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08chat.z.ai\uFF09",baseUrl:"https://chat.z.ai",desc:"chat.z.ai OAuth\uFF08\u90AE\u7BB1\u767B\u5F55\uFF09\uFF0C\u8D70 z.ai \u7684\u4F53\u9A8C/\u7F16\u7A0B\u5957\u9910\u989D\u5EA6"},{label:"\u56FD\u5185\u7248\uFF08zchat.z.ai\uFF09",baseUrl:"https://zchat.z.ai",desc:"zchat.z.ai OAuth\uFF08\u624B\u673A\u53F7\u767B\u5F55\uFF09\uFF1B\u65E7\u7684 bigmodel \u5FAE\u4FE1\u626B\u7801\u5165\u53E3\u5DF2\u4E0B\u7EBF"}],desc:"\u667A\u8C31 ZCode \u5BA2\u6237\u7AEF\u989D\u5EA6\u901A\u9053\uFF08GLM-5.3 / GLM-5.3-Flash\uFF09\uFF0CAnthropic \u534F\u8BAE\u53CD\u4EE3\uFF1B\u767B\u5F55\u5DF2\u8FC1\u5230 Z.ai OAuth\uFF1A\u56FD\u9645 chat.z.ai\u3001\u56FD\u5185 zchat.z.ai\uFF0Cbigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0D\u53EF\u7528\u3002",models:["GLM-5.3","GLM-5.3-Flash"]},{type:"qoder",name:"Qoder",slug:"qoder-oauth",baseUrl:"https://qoder.com",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08qoder.com\uFF09",baseUrl:"https://qoder.com",desc:"api3.qoder.sh \u63A8\u7406\u96C6\u7FA4\uFF0C\u8D26\u53F7\u4E0E\u56FD\u5185\u7248\u72EC\u7ACB"},{label:"\u56FD\u5185\u7248\uFF08qoder.com.cn\uFF09",baseUrl:"https://qoder.com.cn",desc:"gateway.qoder.com.cn\uFF0CQoderWork \u8D26\u53F7\u4F53\u7CFB"}],desc:"Qoder \u8D26\u53F7\u8BBE\u5907\u6388\u6743\uFF08COSY \u7B7E\u540D\u53CD\u4EE3\uFF09\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\uFF0C\u652F\u6301\u6BCF\u65E5\u7B7E\u5230\u9886 Credits\u3002",models:["auto","qmodel_38max","qfmodel","qmodel_latest","gmodel","dmodel"]},{type:"trae",name:"Trae (\u5B57\u8282\u8DF3\u52A8)",slug:"trae-oauth",baseUrl:"https://core-normal.traeapi.us",mode:"redirect",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08trae.ai\uFF09",baseUrl:"https://core-normal.traeapi.us",desc:"core-normal.traeapi.us / coresg-normal.trae.ai\uFF0CBearer \u9274\u6743"},{label:"\u56FD\u5185\u7248\uFF08trae.cn\uFF09",baseUrl:"https://trae-api-cn.mchost.guru",desc:"trae-api-cn.mchost.guru\uFF0CCloud-IDE-JWT \u9274\u6743\uFF0C\u4E0E\u56FD\u5185\u8D26\u53F7\u7ED1\u5B9A"}],desc:"Trae IDE \u8D26\u53F7\u6388\u6743\uFF08\u56FD\u5185\u7248 / \u56FD\u9645\u7248\u8D26\u53F7\u4F53\u7CFB\u72EC\u7ACB\uFF09\u3002\u6388\u6743\u540E\u6D4F\u89C8\u5668\u4F1A\u8DF3\u5230 127.0.0.1 \u56DE\u8C03\u5730\u5740\uFF0C\u628A\u5730\u5740\u680F\u6574\u6BB5 URL \u7C98\u8D34\u56DE\u6765\u5373\u53EF\u3002",models:["Gemini-3.1-Pro-Preview","Claude-Sonnet-4.6","GPT-5.5","glm-5.3","kimi-k3","deepseek-V3"]},{type:"cline",name:"Cline",slug:"cline-oauth",baseUrl:"https://api.cline.bot",mode:"device",desc:"Cline \u8D26\u53F7 WorkOS \u8BBE\u5907\u7801\u6388\u6743\uFF0C\u81EA\u52A8\u9002\u914D\u514D\u8D39\u901A\u9053\u4E0E\u300C\u8D26\u53F7\xD7\u6A21\u578B\u300D\u51B7\u5374\u3002",models:["cline-free/mimo-v2.6-flash","cline-free/nemotron-3.5-super-vl","nvidia/nemotron-3.5-lightning:free"]}],We=[{type:"deepseek",name:"DeepSeek \u7F51\u9875\u7248",slug:"deepseek-web",baseUrl:"https://chat.deepseek.com/api/v0",desc:"\u7F51\u9875 userToken \u53CD\u4EE3\uFF0C\u81EA\u52A8\u89E3 PoW\uFF1Btoken \u7EA6 24h \u6709\u6548\u3002",credHint:"userToken\uFF08chat.deepseek.com \u767B\u5F55\u540E localStorage \u91CC\u7684 JWT\uFF09\u6216\u5B98\u65B9 API Key\uFF08sk- \u5F00\u5934\uFF09",models:["deepseek-v4-flash","deepseek-v4-pro","deepseek-v4-flash-search"]},{type:"kimiweb",name:"Kimi \u7F51\u9875\u7248",slug:"kimi-web",baseUrl:"https://www.kimi.ai",desc:"Kimi \u7F51\u9875 Connect-RPC \u534F\u8BAE\u53CD\u4EE3\uFF0Crefresh_token \u81EA\u52A8\u7EED\u671F\u3002",credHint:"access_token(JWT) \u6216 refresh_token\uFF08www.kimi.ai \u767B\u5F55\u540E Local Storage\uFF09",models:["k3","k3-agent-ultra","k2d6","k2d6-search"]},{type:"geminiweb",name:"Gemini \u7F51\u9875\u7248",slug:"gemini-web",baseUrl:"https://gemini.google.com",desc:"Gemini \u7F51\u9875 Cookie \u53CD\u4EE3\uFF08SAPISIDHASH \u9274\u6743\uFF09\uFF1B\u4E0D\u7559\u51ED\u636E\u53EF\u76F4\u63A5\u533F\u540D\u4F7F\u7528\uFF0C\u989D\u5EA6\u4E0E\u6A21\u578B\u53D7\u9650\u3002",credHint:"Cookie \u5B57\u7B26\u4E32\uFF08\u542B __Secure-1PSID / __Secure-3PSID / SAPISID\uFF09\uFF1B\u7559\u7A7A\u5373\u533F\u540D\u6A21\u5F0F",models:["gemini-3.7-flash","gemini-3.1-pro","gemini-3.5-flash-thinking"],anonymous:!0},{type:"minimaxweb",name:"MiniMax Agent \u7F51\u9875\u7248",slug:"minimax-web",baseUrl:"https://agent.minimaxi.com",desc:"MiniMax Agent \u7F51\u9875 SSE \u53CD\u4EE3\uFF0C\u9700\u8981\u7F51\u9875\u4F1A\u8BDD\u7B7E\u540D\u53C2\u6570\u3002",credHint:"token|agentId|uuid|deviceId|userId\uFF08token \u4E3A JWT\uFF0C\u5176\u4F59\u53EF\u4ECE HAR \u53D6\uFF0C\u81F3\u5C11\u586B token\uFF09",models:["MiniMax-M3","MiniMax-M3-thinking","MiniMax-M2.1"]},{type:"lingxi",name:"\u7075\u7280\u7F51\u9875\u7248\uFF08\u4E2D\u56FD\u79FB\u52A8\uFF09",slug:"lingxi-web",baseUrl:"https://ai.yun.139.com",desc:"\u4E2D\u56FD\u79FB\u52A8\u7075\u7280\u7F51\u9875\u53CD\u4EE3\uFF0CBasic \u6388\u6743 + userId\u3002",credHint:"authorization|userId|sourceChannel\uFF08authorization \u5F62\u5982 Basic xxx\uFF09",models:["lingxi-default","qwen-3.7-plus","deepseek-4.0-pro"]},{type:"chatgptweb",name:"ChatGPT \u7F51\u9875\u7248",slug:"chatgpt-web",baseUrl:"https://chatgpt.com",desc:"ChatGPT \u7F51\u9875/App \u534F\u8BAE\u53CD\u4EE3\uFF08sentinel + PoW\uFF09\uFF0C\u9002\u5408 Free \u8D26\u53F7\u3002",credHint:"refresh_token\uFF08rt_xxx / rt.1.xxx\uFF1B\u4E5F\u652F\u6301\u53D1\u8D27\u6574\u884C\u81EA\u52A8\u63D0\u53D6\uFF09",models:["gpt-5-5","gpt-5-4","gpt-5-3"]}];function Ks(){var $e,Ke,Oe,Me;const[f,M]=j.useState(null),[T,pe]=j.useState("direct"),[he,R]=j.useState(!1),[m,A]=j.useState({id:"",name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com",key:""}),[b,L]=j.useState(!1),[r,z]=j.useState(null),[K,E]=j.useState(""),[se,q]=j.useState("prod"),[G,de]=j.useState(!1),te=j.useRef(!1),B=j.useRef(!1),Z=j.useRef(!1),ae=j.useRef(!1),[o,w]=j.useState(null),[W,c]=j.useState(""),[a,N]=j.useState(null),P=j.useRef(null),[l,O]=j.useState(null),{confirm:Ce,confirmEl:Ze}=Fe(),p=He(),V=()=>y("list_providers").then(s=>M(s.providers)).catch(s=>p(s.message,"err"));j.useEffect(()=>{V()},[]),j.useEffect(()=>()=>ie(),[]);const _e=()=>{A({id:"",name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com",key:""}),R(!0)},Ve=s=>{A({id:s.id,name:s.name,slug:s.slug,kind:s.kind||(s.slug==="anthropic"?"anthropic":"openai_compat"),url:s.base_url,key:""}),R(!0)},Je=s=>{const t=qe[s];t&&A(i=>({...i,name:t.name,slug:t.slug,kind:t.kind,url:t.url}))},Ye=async()=>{var t;if(B.current)return;if(!m.name.trim())return p("\u8BF7\u586B\u5199\u4F9B\u5E94\u5546\u540D\u79F0","err");if(!m.slug.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053\u6807\u8BC6\u7B26 (Slug)","err");const s=ee(m.slug);if(!m.id&&!m.key.trim()&&!s)return p("\u6DFB\u52A0\u4F9B\u5E94\u5546\u5FC5\u987B\u5F55\u5165\u4E0A\u6E38\u5BC6\u94A5","err");B.current=!0,L(!0);try{const i={name:m.name.trim(),slug:m.slug.trim().toLowerCase(),kind:m.kind,baseUrl:m.url.trim()};m.id&&(i.id=m.id),m.key.trim()&&(i.key=m.key.trim()),await y("upsert_provider",i);const n=m.id||((t=(await y("list_providers")).providers.find(d=>d.name===m.name))==null?void 0:t.id)||"";p("\u4F9B\u5E94\u5546\u5DF2\u4FDD\u5B58"),R(!1),V(),n&&(w({providerId:n,providerName:m.name,models:[],picked:new Set,loading:!0}),await re(n,m.name,m.url,m.key.trim()))}catch(i){p(i.message,"err")}finally{B.current=!1,L(!1)}},ze=j.useRef({}),re=async(s,t,i,n)=>{n&&(ze.current[s]=n);const d=n||ze.current[s]||"";let u=null,k="";if(d&&i)try{const h=await fetch(`${i.replace(/\\/+$/,"")}/v1/models`,{headers:{authorization:`Bearer ${d}`},signal:AbortSignal.timeout(2e4)});h.ok&&(u=((await h.json()).data??[]).map(g=>g.id).filter(g=>!!g).sort())}catch{}if(u===null)try{const h=await y("list_upstream_models",{providerId:s});u=h.models,h.note&&(k=h.degraded?`\u4E0A\u6E38\u6A21\u578B\u76EE\u5F55\u4E0D\u53EF\u7528\uFF0C\u5DF2\u56DE\u9000\u515C\u5E95\u6E05\u5355\uFF1A${h.note}`:h.note)}catch(h){w({providerId:s,providerName:t,models:[],picked:new Set,loading:!1,error:h.message});return}w({providerId:s,providerName:t,models:u??[],picked:new Set(u??[]),loading:!1,note:k||void 0})},Xe=(s,t)=>{c(""),w({providerId:s,providerName:t,models:[],picked:new Set,loading:!1})},ne=async(s,t)=>{const i=(f??[]).find(n=>n.id===s);w({providerId:s,providerName:t,models:[],picked:new Set,loading:!0}),await re(s,t,(i==null?void 0:i.base_url)??"","")},Se=()=>{if(!W.trim()||!o)return;const s=W.split(/[\\r\\n,]+/).map(n=>n.trim()).filter(Boolean);if(!s.length)return;const t=Array.from(new Set([...o.models,...s])),i=new Set(o.picked);s.forEach(n=>i.add(n)),w({...o,models:t,picked:i}),c(""),p(`\u5DF2\u6DFB\u52A0 ${s.length} \u4E2A\u6A21\u578B\u5230\u52FE\u9009\u5217\u8868`)},Ae=async()=>{var t;if(!o)return;const s=[...o.picked];if(!s.length)return p("\u8BF7\u81F3\u5C11\u9009\u62E9\u4E00\u4E2A\u6A21\u578B","err");try{const i=await y("import_models",{providerId:o.providerId,models:s,priority:10});p(`\u5DF2\u5BFC\u5165 ${((t=i.result)==null?void 0:t.imported)??s.length} \u4E2A\u6A21\u578B\uFF0C\u53EF\u5728\u300C\u6A21\u578B\u4E0E\u5B9A\u4EF7\u300D\u8C03\u6574\u5B9A\u4EF7`),w(null),V()}catch(i){p(i.message,"err")}},De=async()=>{var s,t,i;if(!(!K.trim()||!r)&&!te.current){te.current=!0,de(!0);try{const n=await y("upsert_provider_key",{providerId:r.id,key:K.trim(),label:se.trim()||(C(r)||_(r)?`account-${(r.key_count??0)+1}`:"prod")}),d=(s=n.result)!=null&&s.fingerprint?`\uFF08\u6307\u7EB9 ${n.result.fingerprint}\uFF09`:"";(t=n.result)!=null&&t.duplicate&&!((i=n.result)!=null&&i.count)?p(`\u8BE5\u51ED\u636E\u5DF2\u5728\u6C60\u4E2D\uFF0C\u672A\u91CD\u590D\u6DFB\u52A0${d}`):p(C(r)||_(r)?`\u8D26\u53F7\u51ED\u636E\u5DF2\u52A0\u5BC6\u5165\u5E93${d}`:`\u5BC6\u94A5\u5DF2\u52A0\u5BC6\u5165\u5E93${d}`);const u=K.trim();E("");const k=await y("list_providers");M(k.providers);const h=k.providers.find(v=>v.id===r.id);h&&z(h),!C(r)&&(!h||h.keys&&h.keys.length<=1)&&(w({providerId:r.id,providerName:r.name,models:[],picked:new Set,loading:!0}),await re(r.id,r.name,r.base_url,_(r)?"":u))}catch(n){p(n.message,"err")}finally{te.current=!1,de(!1)}}},es=async(s,t)=>{if(await Ce("\u786E\u8BA4\u5220\u9664\u8BE5\u51ED\u636E\uFF1F\u8BE5\u51ED\u636E\u5C06\u4ECE\u591A Key \u8C03\u5EA6\u6C60\u4E2D\u5F7B\u5E95\u79FB\u9664\u3002"))try{await y("delete_provider_key",{providerId:s,keyId:t}),p("\u51ED\u636E\u5DF2\u4ECE\u6C60\u4E2D\u5220\u9664");const i=await y("list_providers");M(i.providers);const n=i.providers.find(d=>d.id===s);n&&z(n)}catch(i){p(i.message,"err")}},ss=async(s,t,i)=>{const n=i==="active"?"disabled":"active";try{await y("toggle_provider_key",{providerId:s,keyId:t,status:n}),p(`\u8D26\u53F7\u5DF2${n==="active"?"\u542F\u7528":"\u505C\u7528"}`);const d=await y("list_providers");M(d.providers);const u=d.providers.find(k=>k.id===s);u&&z(u)}catch(d){p(d.message,"err")}},J=async s=>{const t=s.status==="active"?"disabled":"active";try{await y("toggle_provider",{id:s.id,status:t}),p(`\u5DF2${t==="active"?"\u542F\u7528":"\u505C\u7528"}\u6E20\u9053\u300C${s.name}\u300D`),V()}catch(i){p(i.message,"err")}},fe=async s=>{if(await Ce(`\u5220\u9664\u4F9B\u5E94\u5546\u300C${s.name}\u300D\uFF1F\u5176\u6A21\u578B\u6620\u5C04\u4E0E\u4E0A\u6E38\u51ED\u636E\u5C06\u4E00\u5E76\u5220\u9664\uFF0C\u4E0D\u53EF\u6062\u590D\u3002`))try{await y("delete_provider",{id:s.id}),p("\u5DF2\u5220\u9664"),V()}catch(t){p(t.message,"err")}},ie=()=>{P.current!==null&&(window.clearTimeout(P.current),P.current=null)},le=()=>{ie(),N(null)},ge=async s=>{try{await navigator.clipboard.writeText(s),p("\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F")}catch{p("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u590D\u5236","err")}},ts=(s,t)=>(t==null?void 0:t.base_url)||s.baseUrl,ce=(s,t)=>s.regionSelect?s.type==="zcode"?/zchat\\.z\\.ai/i.test(t)?{slug:"zcode-cn-oauth",name:"ZCode \u56FD\u5185\u7248 (zchat)"}:/bigmodel\\.cn/i.test(t)?{slug:"zcode-bigmodel-oauth",name:"ZCode \u56FD\u5185\u7248 (bigmodel\xB7\u65E7)"}:{slug:"zcode-oauth",name:"ZCode \u56FD\u9645\u7248 (chat.z.ai)"}:s.type==="qoder"?/qoder\\.com\\.cn/i.test(t)?{slug:"qoder-cn-oauth",name:"Qoder \u56FD\u5185\u7248"}:{slug:"qoder-oauth",name:"Qoder \u56FD\u9645\u7248 (qoder.com)"}:s.type==="trae"?/trae\\.cn|trae\\.com\\.cn|mchost\\.guru/i.test(t)?{slug:"trae-cn-oauth",name:"Trae \u56FD\u5185\u7248 (trae.cn)"}:{slug:"trae-global-oauth",name:"Trae \u56FD\u9645\u7248 (trae.ai)"}:/workbuddy\\.ai/i.test(t)?{slug:"codebuddy-global-oauth",name:"CodeBuddy \u56FD\u9645\u7248"}:{slug:"codebuddy-oauth",name:"CodeBuddy \u56FD\u5185\u7248"}:null,as=s=>{const t=new Set([s.slug]);for(const i of s.regions??[]){const n=ce(s,i.baseUrl);n&&t.add(n.slug)}return s.type==="zcode"&&t.add("zcode-bigmodel-oauth"),[...t]},Ue=async(s,t,i,n,d)=>{var u,k,h,v;N(g=>g&&{...g,busy:!0,message:"\u6B63\u5728\u4FDD\u5B58\u8D26\u53F7\u51ED\u636E\u2026"});try{const g=ce(s,t),X=(g==null?void 0:g.slug)??s.slug,H=(g==null?void 0:g.name)??s.name,oe=await D("oauth_add_account",{provider:s.type,slug:X,name:H,baseUrl:t,refreshToken:i,...n?{email:n}:{},...d?{identity:d}:{}}),ve=((u=oe.result)==null?void 0:u.providerId)||"";if(!ve)throw new Error("OAuth \u6E20\u9053\u4FDD\u5B58\u5931\u8D25");p((k=oe.result)!=null&&k.duplicate&&((h=oe.result)==null?void 0:h.count)===0?"\u8BE5\u51ED\u636E\u5DF2\u5728\u6C60\u4E2D\uFF0C\u672A\u91CD\u590D\u6DFB\u52A0":`\u6388\u6743\u6210\u529F\uFF0C\u8D26\u53F7\u5DF2\u52A0\u5BC6\u5165\u5E93\uFF08\u6307\u7EB9 ${((v=oe.result)==null?void 0:v.fingerprint)??""}\uFF09`),ie(),N(null);const os=await y("list_providers");M(os.providers),w({providerId:ve,providerName:H,models:[],picked:new Set,loading:!0}),await re(ve,H,t,"")}catch(g){const X=g.message;p(X,"err"),N(H=>H&&{...H,step:"error",message:X,busy:!1})}},rs=(s,t,i,n)=>{const d=async()=>{var u;try{const k=await y("oauth_poll",{provider:s.type,state:i}),h=k.result??k,v=h.refresh_token||h.refreshToken;if(h.status==="ok"&&v){await Ue(s,t,v,h.email,(u=h.account)==null?void 0:u.uid);return}if(h.status==="error"){N(g=>g&&{...g,step:"error",message:h.message||"\u6388\u6743\u5931\u8D25"});return}N(g=>g&&{...g,message:"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026"}),P.current=window.setTimeout(d,Math.max(2,n)*1e3)}catch(k){N(h=>h&&{...h,step:"error",message:k.message})}};P.current=window.setTimeout(d,Math.max(2,n)*1e3)},je=async(s,t)=>{if(ie(),s.regionSelect){N({meta:s,provider:t??null,mode:s.mode,baseUrl:s.baseUrl,url:"",state:"",step:"region",codeInput:""});return}await Ie(s,t??null,ts(s,t??null))},Ie=async(s,t,i)=>{if(ie(),s.type==="zcode"&&/bigmodel\\.cn/i.test(i)){try{const n=await y("list_providers");let d=!1;n.providers.some(k=>k.slug==="zcode-bigmodel-oauth")||(await D("upsert_provider",{name:"ZCode \u56FD\u5185\u7248 (bigmodel\xB7\u65E7)",slug:"zcode-bigmodel-oauth",kind:"oauth:zcode",baseUrl:i}),d=!0);const u=d?await y("list_providers"):n;M(u.providers),N(null),p(d?"\u5DF2\u521B\u5EFA\u65E7\u7248\u56FD\u5185\u6E20\u9053\uFF1A\u8BF7\u7C98\u8D34\u5BA2\u6237\u7AEF access_token\u3002\u6CE8\u610F bigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0B\u7EBF\uFF0C\u5EFA\u8BAE\u6539\u7528 zchat.z.ai \u91CD\u65B0\u6388\u6743":"\u65E7\u7248\u56FD\u5185\u6E20\u9053\u5DF2\u5B58\u5728\uFF0C\u76F4\u63A5\u590D\u7528\uFF1A\u8BF7\u5728\u8BE5\u6E20\u9053\u5361\u7247\u4E0A\u7C98\u8D34\u5BA2\u6237\u7AEF access_token\u3002\u6CE8\u610F bigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0B\u7EBF\uFF0C\u5EFA\u8BAE\u6539\u7528 zchat.z.ai \u91CD\u65B0\u6388\u6743","ok")}catch(n){N(d=>d&&{...d,step:"error",message:n.message})}return}N({meta:s,provider:t,mode:s.mode,baseUrl:i,url:"",state:"",step:"loading",codeInput:""});try{const d=(await D("oauth_start",{provider:s.type,baseUrl:i})).result??{},u=d.mode||s.mode;N({meta:s,provider:t,mode:u,baseUrl:i,url:d.url??"",state:d.state??"",userCode:d.user_code,verificationUri:d.verification_uri,verificationUriComplete:d.verification_uri_complete,interval:Number(d.interval)||5,step:u==="redirect"?"ready":"polling",codeInput:"",message:u==="device"?"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026":u==="redirect-poll"?"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u5B8C\u6210\u767B\u5F55\u2026":void 0}),u!=="redirect"&&d.state&&rs(s,i,d.state,Number(d.interval)||5)}catch(n){N(d=>d&&{...d,step:"error",message:n.message})}},ns=async()=>{var s,t,i,n;if(a&&!ae.current){if(!a.codeInput.trim())return p("\u8BF7\u7C98\u8D34\u6388\u6743\u8FD4\u56DE\u7684 code \u6216\u6574\u6BB5\u56DE\u8C03\u5730\u5740","err");ae.current=!0,N({...a,busy:!0,message:"\u6B63\u5728\u6362\u53D6 access_token\u2026"});try{const d=await D("oauth_complete",{provider:a.meta.type,code:a.codeInput.trim(),state:a.state,baseUrl:a.baseUrl}),u=(s=d.result)==null?void 0:s.refreshToken;if(!u)throw new Error("\u4E0A\u6E38\u672A\u8FD4\u56DE refresh_token");await Ue(a.meta,a.baseUrl,u,(t=d.result)==null?void 0:t.email,(n=(i=d.result)==null?void 0:i.account)==null?void 0:n.uid)}catch(d){p(d.message,"err"),N(u=>u&&{...u,step:"error",message:d.message,busy:!1})}finally{ae.current=!1}}},is=()=>{a&&je(a.meta,a.provider??void 0)},ls=(s,t)=>{O({meta:s,provider:t??null,name:(t==null?void 0:t.name)??s.name,slug:(t==null?void 0:t.slug)??s.slug,baseUrl:(t==null?void 0:t.base_url)??s.baseUrl,credential:""})},ds=async()=>{var t,i,n;if(!l||Z.current)return;const s=l;if(!s.provider&&!s.credential.trim()&&!s.meta.anonymous)return p("\u8BF7\u7C98\u8D34\u8D26\u53F7\u51ED\u636E","err");if(!s.provider){if(!s.name.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053\u540D\u79F0","err");if(!s.slug.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053 Slug","err");if(!s.baseUrl.trim())return p("\u8BF7\u586B\u5199 Base URL","err")}Z.current=!0,O({...s,saving:!0});try{let d=((t=s.provider)==null?void 0:t.id)||"";if(d)await D("upsert_provider_key",{providerId:d,key:s.credential.trim(),label:`account-${(((i=s.provider)==null?void 0:i.key_count)??0)+1}`});else{await D("upsert_provider",{name:s.name.trim(),slug:s.slug.trim().toLowerCase(),kind:`web:${s.meta.type}`,baseUrl:s.baseUrl.trim(),key:s.credential.trim()||void 0});const u=await y("list_providers");d=((n=u.providers.find(k=>k.slug===s.slug.trim().toLowerCase()))==null?void 0:n.id)||"",M(u.providers)}if(!d)throw new Error("Web \u6E20\u9053\u521B\u5EFA\u5931\u8D25");p(s.credential.trim()?"Web \u6E20\u9053\u51ED\u636E\u5DF2\u52A0\u5BC6\u5165\u5E93":"Web \u6E20\u9053\u5DF2\u63A5\u5165\uFF08\u533F\u540D\u6A21\u5F0F\uFF0C\u65E0\u51ED\u636E\uFF09"),O(null),V(),w({providerId:d,providerName:s.name,models:[],picked:new Set,loading:!0}),await re(d,s.name,s.baseUrl,"")}catch(d){p(d.message,"err"),O(u=>u&&{...u,saving:!1})}finally{Z.current=!1}},cs=s=>(f??[]).find(t=>t.slug===s.slug||t.kind===`web:${s.type}`),Y=(s=>s?We.find(t=>t.slug===s.slug||s.kind===`web:${t.type}`):void 0)(r);return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["direct","API \u76F4\u8FDE"],["oauth","OAuth \u6388\u6743"],["web","Web \u53CD\u4EE3"],["subs","\u7528\u6237\u63D0\u4EA4"]].map(([s,t])=>e.jsx("button",{role:"tab","aria-selected":T===s,onClick:()=>pe(s),className:S("rounded-md px-4 py-1.5 text-xs font-medium transition-colors",T===s?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:t},s))}),T==="subs"&&e.jsx(bs,{}),T==="direct"&&e.jsxs(e.Fragment,{children:[e.jsx("div",{className:"flex justify-end",children:e.jsxs(x,{onClick:_e,children:[e.jsx(ke,{size:14}),"\u6DFB\u52A0\u4F9B\u5E94\u5546"]})}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(8)].map((s,t)=>e.jsx("div",{className:"skeleton h-36 rounded-xl2"},t))}):f.filter(s=>!C(s)&&!_(s)).length===0?e.jsx(Q,{children:e.jsx(Qe,{icon:e.jsx(ms,{size:32}),title:"\u8FD8\u6CA1\u6709\u4E0A\u6E38\u4F9B\u5E94\u5546",hint:"\u6DFB\u52A0\u4F60\u6301\u6709\u6388\u6743\u7684\u4F9B\u5E94\u5546\u5E76\u5F55\u5165\u5BC6\u94A5\uFF0C\u5373\u53EF\u4E00\u952E\u5BFC\u5165\u6A21\u578B\u5217\u8868\u3002",action:e.jsx(x,{className:"mt-2",onClick:_e,children:"\u6DFB\u52A0\u4F9B\u5E94\u5546"})})}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:f.filter(s=>!C(s)&&!_(s)).map(s=>{var t;return e.jsxs(Q,{className:S("p-4 flex flex-col justify-between transition-all",s.status==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-sm font-bold text-brand",children:s.name[0]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"flex items-center gap-1.5 mt-0.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:"text-[9px] rounded bg-line px-1 text-muted",children:s.slug==="anthropic"||s.kind==="anthropic"?"Anthropic \u539F\u751F":ee(s.slug)?"\u514D Key":"OpenAI \u517C\u5BB9"})]})]})]}),e.jsx("button",{type:"button",onClick:()=>J(s),title:`\u70B9\u51FB${s.status==="active"?"\u505C\u7528":"\u542F\u7528"}\u8BE5\u6E20\u9053\uFF08\u505C\u7528\u540E\u76F8\u5E94\u6A21\u578B\u5728\u6A21\u578B\u6C60\u4E0E\u5B9A\u4EF7\u4E2D\u9690\u85CF\uFF09`,className:"cursor-pointer transition-transform hover:scale-105 shrink-0",children:e.jsx(be,{value:s.status})})]}),e.jsxs("dl",{className:"mt-3 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0 text-muted",children:"\u7AEF\u70B9"}),e.jsx("code",{className:"truncate text-ink max-w-[140px]",title:s.base_url,children:s.base_url})]}),e.jsxs("div",{className:"flex justify-between items-center",children:[e.jsx("span",{children:"\u5BC6\u94A5"}),e.jsx("span",{className:"text-ink truncate",children:ee(s.slug)?e.jsx("span",{className:"text-emerald-500 font-medium",children:"\u514D Key"}):e.jsxs("span",{className:"inline-flex items-center gap-1",children:[s.key_count," \u4E2A",s.key_count===0?e.jsx("span",{className:"text-warn",children:"\uFF08\u672A\u5F55\uFF09"}):(t=s.keys)!=null&&t.some(i=>i.health_status==="demoted")?e.jsx("span",{className:"text-err font-medium text-[10px]",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-emerald-500 font-medium text-[10px]",children:"\u5C31\u7EEA"})]})})]}),s.authorization_expires_at&&e.jsxs("div",{className:"flex justify-between",children:[e.jsx("span",{children:"\u6388\u6743\u5230\u671F"}),e.jsx("span",{className:"text-ink",children:new Date(s.authorization_expires_at*1e3).toLocaleDateString("zh-CN")})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>ne(s.id,s.name),title:"\u4ECE\u4E0A\u6E38\u5BFC\u5165\u6216\u624B\u52A8\u6DFB\u52A0\u6A21\u578B","aria-label":"\u5BFC\u5165\u6A21\u578B",children:e.jsx($,{size:13})}),e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>Xe(s.id,s.name),title:"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B","aria-label":"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B",children:e.jsx(ke,{size:13})}),!ee(s.slug)&&e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{z(s),E(""),q("prod")},title:`\u7BA1\u7406\u591A Key \u8F6E\u6362\u6C60\uFF08\u5F53\u524D ${s.key_count} \u4E2A\uFF09`,"aria-label":"\u5BC6\u94A5\u6C60",children:e.jsx(me,{size:13})}),e.jsx(x,{variant:"ghost",className:S("!h-7 !w-7 !px-0",s.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>J(s),title:`\u5207\u6362\u6E20\u9053\u542F\u7528/\u505C\u7528\u72B6\u6001\uFF08\u5F53\u524D${s.status==="active"?"\u542F\u7528":"\u505C\u7528"}\uFF09`,"aria-label":s.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(we,{size:13})}),e.jsx(x,{variant:"ghost",className:"!h-7 !w-7 !px-0",onClick:()=>Ve(s),title:"\u7F16\u8F91\u4F9B\u5E94\u5546","aria-label":"\u7F16\u8F91\u4F9B\u5E94\u5546",children:e.jsx(js,{size:13})}),e.jsx(x,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>fe(s),title:"\u5220\u9664\u4F9B\u5E94\u5546","aria-label":`\u5220\u9664 ${s.name}`,children:e.jsx(xe,{size:13})})]})]},s.id)})})]}),T==="oauth"&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:"OAuth \u6E20\u9053\u901A\u8FC7\u8D26\u53F7\u6388\u6743\u63A5\u5165\uFF08\u5B9E\u73B0\u79FB\u690D\u81EA CLIProxyAPI\uFF09\uFF1Arefresh_token \u7ECF AES-256-GCM \u52A0\u5BC6\u540E\u5B58\u5165\u6E20\u9053\u51ED\u636E\u6C60\uFF0C access_token \u81EA\u52A8\u5237\u65B0\uFF1B\u540C\u4E00\u6E20\u9053\u53EF\u6388\u6743\u591A\u4E2A\u8D26\u53F7\uFF0C\u81EA\u52A8\u8F6E\u6362\u3001\u9047 429/401 \u81EA\u52A8\u7194\u65AD\u51B7\u5374\u3002"}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(8)].map((s,t)=>e.jsx("div",{className:"skeleton h-40 rounded-xl2"},t))}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:Be.map(s=>{const t=new Set(as(s)),i=(f??[]).filter(v=>t.has(v.slug)),n=i.find(v=>(v.key_count??0)>0)??i[0]??null,d=Math.max(0,i.length-1),u=i.reduce((v,g)=>v+(g.key_count??0),0),k=i.some(v=>{var g;return(g=v.keys)==null?void 0:g.some(X=>X.health_status==="demoted")}),h=v=>{const g=ce(s,v.base_url);return g?g.name:v.name};return e.jsxs(Q,{className:S("p-4 flex flex-col justify-between transition-all",(n==null?void 0:n.status)==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(us,{size:16})}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"mt-0.5 flex items-center gap-1.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:(n==null?void 0:n.slug)??s.slug}),e.jsx("span",{className:"rounded bg-brand/10 px-1 text-[9px] font-medium text-brand",children:"OAuth"}),d>0&&e.jsxs("span",{className:"rounded bg-line px-1 text-[9px] text-muted",title:`${s.name} \u8FD8\u6709 ${d} \u4E2A\u5176\u4ED6\u533A\u57DF\u7684\u6E20\u9053\uFF0C\u53EF\u5728\u300C\u8D26\u53F7\u6C60\u300D\u4E2D\u67E5\u770B`,children:["+",d," \u533A\u57DF"]})]})]})]}),n?e.jsx("button",{type:"button",onClick:()=>J(n),title:"\u70B9\u51FB\u5207\u6362\u542F\u7528/\u505C\u7528",className:"shrink-0 cursor-pointer transition-transform hover:scale-105",children:e.jsx(be,{value:n.status})}):e.jsx("span",{className:"shrink-0 rounded bg-line px-1.5 py-0.5 text-[10px] text-muted",children:"\u672A\u63A5\u5165"})]}),e.jsx("p",{className:"mt-2.5 text-[11px] leading-relaxed text-muted",children:s.desc}),e.jsxs("dl",{className:"mt-2.5 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u6388\u6743\u65B9\u5F0F"}),e.jsx("span",{className:"text-ink",children:s.mode==="device"?"\u8BBE\u5907\u7801\u8F6E\u8BE2":s.mode==="redirect-poll"?"\u6388\u6743\u94FE\u63A5 + \u8F6E\u8BE2":"PKCE \u6388\u6743\u94FE\u63A5"})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u8D26\u53F7"}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(Te,{size:11,className:"text-muted"}),i.length?`${u} \u4E2A`:"\u2014",u>0&&(k?e.jsx("span",{className:"text-[10px] font-medium text-err",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-[10px] font-medium text-emerald-500",children:"\u5C31\u7EEA"}))]})]}),i.length>1&&e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u533A\u57DF"}),e.jsx("span",{className:"truncate text-ink",title:i.map(v=>`${h(v)}\uFF08${v.key_count} \u4E2A\u8D26\u53F7${v.status==="disabled"?" \xB7 \u505C\u7528":""}\uFF09`).join("\uFF1B"),children:i.map(v=>`${h(v)} ${v.key_count}`).join(" / ")})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u5019\u9009\u6A21\u578B"}),e.jsxs("code",{className:"truncate text-ink max-w-[170px]",title:s.models.join(", "),children:[s.models[0]," \u7B49 ",s.models.length," \u4E2A"]})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsxs(x,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>je(s,n),children:[e.jsx(Ee,{size:12}),n?"\u6388\u6743\u65B0\u8D26\u53F7":"\u6388\u6743\u5E76\u6DFB\u52A0"]}),n&&e.jsxs(e.Fragment,{children:[e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>ne(n.id,n.name),title:"\u62C9\u53D6/\u5BFC\u5165\u6A21\u578B","aria-label":"\u6A21\u578B\u7BA1\u7406",children:e.jsx($,{size:13})}),e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{z(n),E(""),q(`account-${n.key_count+1}`)},title:"\u7BA1\u7406\u6388\u6743\u8D26\u53F7","aria-label":"\u8D26\u53F7\u7BA1\u7406",children:e.jsx(me,{size:13})}),e.jsx(x,{variant:"ghost",className:S("!h-7 !w-7 !px-0 ml-auto",n.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>J(n),title:n.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053","aria-label":n.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(we,{size:13})}),e.jsx(x,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>fe(n),title:"\u5220\u9664\u6E20\u9053","aria-label":"\u5220\u9664\u6E20\u9053",children:e.jsx(xe,{size:13})})]})]})]},s.slug)})})]}),T==="web"&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:"Web \u53CD\u4EE3\u6E20\u9053\u4F7F\u7528\u6D4F\u89C8\u5668\u7F51\u9875\u4F1A\u8BDD\u51ED\u636E\uFF08Cookie / userToken / refresh_token\uFF09\uFF0C\u65E0\u9700\u5B98\u65B9 API Key\uFF1B \u51ED\u636E\u7ECF AES-256-GCM \u52A0\u5BC6\u540E\u5B58\u5165\u6E20\u9053\u51ED\u636E\u6C60\uFF0C\u591A\u8D26\u53F7\u81EA\u52A8\u8F6E\u6362\uFF0C\u9047 401/429 \u81EA\u52A8\u7194\u65AD\u3002"}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(6)].map((s,t)=>e.jsx("div",{className:"skeleton h-40 rounded-xl2"},t))}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:We.map(s=>{var i;const t=cs(s);return e.jsxs(Q,{className:S("p-4 flex flex-col justify-between transition-all",(t==null?void 0:t.status)==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(ps,{size:16})}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"mt-0.5 flex items-center gap-1.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:"rounded bg-amber-500/10 px-1 text-[9px] font-medium text-amber-500",children:"Web"})]})]})]}),t?e.jsx("button",{type:"button",onClick:()=>J(t),title:"\u70B9\u51FB\u5207\u6362\u542F\u7528/\u505C\u7528",className:"shrink-0 cursor-pointer transition-transform hover:scale-105",children:e.jsx(be,{value:t.status})}):e.jsx("span",{className:"shrink-0 rounded bg-line px-1.5 py-0.5 text-[10px] text-muted",children:"\u672A\u63A5\u5165"})]}),e.jsx("p",{className:"mt-2.5 text-[11px] leading-relaxed text-muted",children:s.desc}),e.jsxs("dl",{className:"mt-2.5 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u51ED\u636E"}),e.jsx("code",{className:"truncate text-ink max-w-[190px]",title:s.credHint,children:s.credHint})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u8D26\u53F7"}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(Te,{size:11,className:"text-muted"}),t?`${t.key_count} \u4E2A`:"\u2014",t&&t.key_count>0&&((i=t.keys)!=null&&i.some(n=>n.health_status==="demoted")?e.jsx("span",{className:"text-[10px] font-medium text-err",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-[10px] font-medium text-emerald-500",children:"\u5C31\u7EEA"}))]})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u5019\u9009\u6A21\u578B"}),e.jsxs("code",{className:"truncate text-ink max-w-[170px]",title:s.models.join(", "),children:[s.models[0]," \u7B49 ",s.models.length," \u4E2A"]})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsxs(x,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>ls(s,t),children:[e.jsx(ke,{size:12}),t?"\u6DFB\u52A0\u8D26\u53F7":"\u63A5\u5165\u5E76\u6DFB\u52A0"]}),t&&e.jsxs(e.Fragment,{children:[e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>ne(t.id,t.name),title:"\u62C9\u53D6/\u5BFC\u5165\u6A21\u578B","aria-label":"\u6A21\u578B\u7BA1\u7406",children:e.jsx($,{size:13})}),e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{z(t),E(""),q(`account-${t.key_count+1}`)},title:"\u7BA1\u7406\u8D26\u53F7\u51ED\u636E","aria-label":"\u8D26\u53F7\u7BA1\u7406",children:e.jsx(me,{size:13})}),e.jsx(x,{variant:"ghost",className:S("!h-7 !w-7 !px-0 ml-auto",t.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>J(t),title:t.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053","aria-label":t.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(we,{size:13})}),e.jsx(x,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>fe(t),title:"\u5220\u9664\u6E20\u9053","aria-label":"\u5220\u9664\u6E20\u9053",children:e.jsx(xe,{size:13})})]})]})]},s.slug)})})]}),e.jsx(F,{open:he,onClose:()=>R(!1),title:m.id?"\u7F16\u8F91\u4F9B\u5E94\u5546":"\u6DFB\u52A0\u4F9B\u5E94\u5546",width:560,children:e.jsxs("div",{className:"space-y-3.5",children:[!m.id&&e.jsx(U,{label:"\u5FEB\u901F\u8F7D\u5165\u9884\u8BBE\u6A21\u677F\uFF08\u53EF\u9009\uFF0C\u70B9\u51FB\u5FEB\u901F\u586B\u5165\uFF09",children:e.jsxs(Re,{onChange:s=>Je(s.target.value),defaultValue:"",children:[e.jsx("option",{value:"",children:"\u81EA\u5B9A\u4E49\u6216\u9009\u62E9\u5E38\u89C1\u9884\u8BBE..."}),Object.entries(qe).map(([s,t])=>e.jsxs("option",{value:s,children:[t.name,"\uFF08",t.kind==="anthropic"?"Anthropic \u5B98\u65B9":"OpenAI \u517C\u5BB9","\uFF09"]},s))]})}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(U,{label:"\u4F9B\u5E94\u5546\u540D\u79F0",children:e.jsx(I,{value:m.name,onChange:s=>A({...m,name:s.target.value}),placeholder:"\u4F8B\u5982: DeepSeek \u6216 OpenAI"})}),e.jsx(U,{label:"\u6E20\u9053\u6807\u8BC6 (Slug)",children:e.jsx(I,{value:m.slug,onChange:s=>A({...m,slug:s.target.value}),placeholder:"\u4F8B\u5982: deepseek"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(U,{label:"\u63A5\u53E3\u534F\u8BAE\u7C7B\u578B (Protocol)",children:e.jsxs(Re,{value:m.kind,onChange:s=>{const t=s.target.value;A({...m,kind:t,url:t==="anthropic"?"https://api.anthropic.com":m.url})},children:[e.jsx("option",{value:"openai_compat",children:"OpenAI \u517C\u5BB9\u534F\u8BAE (OpenAI / DeepSeek / Kilo / OpenCode / Google \u7B49)"}),e.jsx("option",{value:"anthropic",children:"Anthropic \u5B98\u65B9\u534F\u8BAE (Claude \u539F\u751F Messages)"})]})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(U,{label:m.kind==="anthropic"?"Base URL\uFF08Anthropic \u5B98\u65B9\u7AEF\u70B9\uFF09":"Base URL\uFF08OpenAI \u517C\u5BB9\u7AEF\u70B9\uFF09",children:e.jsx(I,{value:m.url,onChange:s=>A({...m,url:s.target.value}),placeholder:m.kind==="anthropic"?"https://api.anthropic.com":"https://api.openai.com"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(U,{label:ee(m.slug)?"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u514D Key \u6E20\u9053\uFF0C\u65E0\u9700\u586B\u5199\uFF09":m.id?"\u8FFD\u52A0\u65B0\u5BC6\u94A5\uFF08\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF0C\u652F\u6301\u591A\u884C\u6279\u91CF\u5F55\u5165\uFF09":"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u5FC5\u586B\uFF0C\u652F\u6301\u7C98\u8D34\u591A\u4E2A\u4E00\u884C\u4E00\u4E2A\uFF09",children:e.jsx("textarea",{value:m.key,onChange:s=>A({...m,key:s.target.value}),placeholder:ee(m.slug)?"\u8BE5\u6E20\u9053\u5B8C\u5168\u514D\u8D39\u514D Key\uFF0C\u76F4\u63A5\u4FDD\u5B58\u5373\u53EF":`sk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy (\u652F\u6301\u7C98\u8D34\u591A\u4E2AKey\u4E00\u884C\u4E00\u4E2A\uFF0C\u81EA\u52A8\u8FDB\u5165\u591AKey\u8F6E\u6362\u6C60)`,rows:2,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(x,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>R(!1),children:"\u53D6\u6D88"}),e.jsx(x,{className:"flex-1 sm:flex-initial",disabled:b,onClick:Ye,children:b?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u5E76\u83B7\u53D6\u6A21\u578B\u5217\u8868"})]})]})}),e.jsx(F,{open:!!o,onClose:()=>w(null),title:`\u6E20\u9053\u6A21\u578B\u7BA1\u7406 \u2014 ${(o==null?void 0:o.providerName)??""}`,width:540,children:o!=null&&o.loading?e.jsxs("div",{className:"flex items-center justify-center gap-2 py-10 text-sm text-muted",children:[e.jsx($,{size:16,className:"animate-spin"}),"\u6B63\u5728\u4ECE\u4E0A\u6E38\u62C9\u53D6\u6A21\u578B\u5217\u8868\u2026"]}):o!=null&&o.error?e.jsxs("div",{className:"py-4",children:[e.jsx("p",{className:"text-[13px] text-err mb-3",children:o.error}),e.jsxs("div",{className:"rounded-lg border border-dashed border-line p-3 bg-surface2/30 mb-4",children:[e.jsx("div",{className:"text-xs font-semibold text-ink mb-1.5",children:"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B\uFF08\u8DF3\u8FC7\u81EA\u52A8\u53D1\u73B0\uFF09"}),e.jsxs("div",{className:"flex gap-2",children:[e.jsx(I,{className:"!py-1 text-xs",value:W,onChange:s=>c(s.target.value),placeholder:"\u5982: deepseek-chat, deepseek-reasoner"}),e.jsx(x,{variant:"soft",className:"!h-[34px] !px-3 shrink-0 text-xs",onClick:Se,children:"\u52A0\u5165"})]})]}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(x,{variant:"ghost",onClick:()=>w(null),children:"\u5173\u95ED"}),e.jsxs(x,{onClick:()=>ne(o.providerId,o.providerName),children:[e.jsx($,{size:14}),"\u91CD\u8BD5\u4E0A\u6E38\u53D1\u73B0"]}),o.picked.size>0&&e.jsxs(x,{onClick:Ae,children:["\u5BFC\u5165\u5DF2\u52A0\u6A21\u578B (",o.picked.size,")"]})]})]}):e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"mb-2 flex items-center justify-between gap-2",children:[e.jsxs("span",{className:"text-xs text-muted",children:["\u5019\u9009\u6A21\u578B\u6E05\u5355\uFF08\u5DF2\u52FE\u9009 ",(o==null?void 0:o.picked.size)??0," \u4E2A\uFF09\uFF1A"]}),e.jsxs("div",{className:"flex shrink-0 items-center gap-2",children:[e.jsx("button",{className:"text-xs text-brand hover:underline",onClick:()=>o&&w({...o,picked:new Set(o.models)}),children:"\u5168\u9009"}),e.jsxs(x,{variant:"ghost",className:"!h-6 !px-2 text-xs",title:"\u91CD\u65B0\u4ECE\u4E0A\u6E38\u62C9\u53D6\u6A21\u578B\u5217\u8868",onClick:()=>o&&ne(o.providerId,o.providerName),children:[e.jsx($,{size:12}),"\u91CD\u65B0\u62C9\u53D6\u6A21\u578B"]})]})]}),(o==null?void 0:o.note)&&e.jsx("p",{className:"mb-2 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-600",children:o.note}),e.jsxs("div",{className:"max-h-60 space-y-1 overflow-y-auto rounded-lg border border-line p-2",children:[(o==null?void 0:o.models.length)===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u672A\u53D1\u73B0\u4E0A\u6E38\u6A21\u578B\uFF0C\u53EF\u5728\u4E0B\u65B9\u624B\u52A8\u8F93\u5165\u6A21\u578B\u540D\u79F0\u6DFB\u52A0"}),o==null?void 0:o.models.map(s=>e.jsxs("label",{className:S("flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-colors",o.picked.has(s)?"bg-brand/10 text-ink":"hover:bg-surface2"),children:[e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:o.picked.has(s),onChange:()=>{const t=new Set(o.picked);t.has(s)?t.delete(s):t.add(s),w({...o,picked:t})}}),e.jsx("code",{className:"font-mono",children:s})]},s))]}),e.jsxs("div",{className:"mt-2.5 rounded-lg border border-dashed border-line p-2.5 bg-surface2/30",children:[e.jsx("div",{className:"text-[11px] font-semibold text-ink mb-1",children:"\u624B\u52A8\u8F93\u5165\u6A21\u578B\u540D\uFF08\u5982\u4E0A\u6E38\u672A\u8FD4\u56DE\uFF0C\u6216\u81EA\u5B9A\u4E49\u6A21\u578B\uFF09"}),e.jsxs("div",{className:"flex gap-2",children:[e.jsx(I,{className:"!py-1 text-xs",value:W,onChange:s=>c(s.target.value),placeholder:"\u4F8B\u5982: deepseek-chat \u6216 gpt-5 (\u652F\u6301\u9017\u53F7/\u6362\u884C\u8F93\u5165\u591A\u4E2A)"}),e.jsx(x,{variant:"soft",className:"!h-[34px] !px-3 shrink-0 text-xs",onClick:Se,children:"\u52A0\u5165\u6E05\u5355"})]})]}),e.jsx("p",{className:"mt-2.5 text-[11px] text-muted",children:"\u5BFC\u5165\u540E\u6A21\u578B\u5373\u523B\u4E0A\u67B6\uFF1B\u5BF9\u5916\u6A21\u578B\u540D\u9ED8\u8BA4\u4E0E\u4E0A\u6E38\u4E00\u81F4\uFF0C\u53EF\u5728\u300C\u6A21\u578B\u4E0E\u5B9A\u4EF7\u300D\u4FEE\u6539\u6216\u914D\u7F6E\u81EA\u5B9A\u4E49\u522B\u540D\u3002"}),e.jsxs("div",{className:"mt-3.5 flex justify-end gap-2",children:[e.jsx(x,{variant:"ghost",onClick:()=>w(null),children:"\u53D6\u6D88"}),e.jsxs(x,{onClick:Ae,disabled:!(o!=null&&o.picked.size),children:["\u5BFC\u5165\u6240\u9009\u6A21\u578B (",(o==null?void 0:o.picked.size)??0,")"]})]})]})}),e.jsx(F,{open:!!r,onClose:()=>z(null),title:`${C(r)?"\u6388\u6743\u8D26\u53F7\u7BA1\u7406":_(r)?"Web \u8D26\u53F7\u51ED\u636E\u7BA1\u7406":"\u5BC6\u94A5\u6C60\u7BA1\u7406"} \u2014 ${(r==null?void 0:r.name)??""}`,width:560,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:C(r)?"\u6BCF\u4E2A\u8D26\u53F7\u5BF9\u5E94\u4E00\u6761 refresh_token\uFF08AES-256-GCM \u52A0\u5BC6\u5B58\u50A8\uFF09\uFF0C\u7F51\u5173\u81EA\u52A8\u5237\u65B0 access_token \u5E76\u968F\u673A\u8F6E\u6362\uFF1B\u9047 429/401 \u81EA\u52A8\u964D\u6743\u51B7\u5374\uFF0C\u5230\u671F\u81EA\u52A8\u6062\u590D\u3002":_(r)?`${(Y==null?void 0:Y.credHint)??"\u7F51\u9875\u4F1A\u8BDD\u51ED\u636E"}\u3002\u6BCF\u4E2A\u8D26\u53F7\u4E00\u6761\u51ED\u636E\uFF08AES-256-GCM \u52A0\u5BC6\u5B58\u50A8\uFF09\uFF0C\u968F\u673A\u8F6E\u6362\uFF1B\u9047 401/429 \u81EA\u52A8\u7194\u65AD\u51B7\u5374\u3002`:"\u5DF2\u5F00\u542F\u591A Key \u8D1F\u8F7D\u5747\u8861\u4E0E\u5065\u5EB7\u7194\u65AD\u3002\u7F51\u5173\u4F7F\u7528 Fisher-Yates \u968F\u673A\u6253\u6563\u5B9E\u73B0\u5747\u5300\u8F6E\u6362\u5206\u6D41\uFF1B\u9047 429 \u81EA\u52A8\u964D\u6743\u8DF3\u8FC7\u5E76\u8F6E\u6362\u4E0B\u4E00\u4E2A Key\uFF0C60 \u79D2\u540E\u81EA\u52A8\u8BD5\u7528\u81EA\u6108\u3002"}),C(r)&&e.jsxs(x,{className:"w-full",variant:"soft",onClick:()=>{const s=r,t=Be.find(i=>i.slug===(s==null?void 0:s.slug));!s||!t||(z(null),je(t,s))},children:[e.jsx(Ee,{size:13}),"\u6388\u6743\u65B0\u8D26\u53F7"]}),e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"text-xs font-semibold text-ink flex items-center justify-between",children:[e.jsxs("span",{className:"flex items-center gap-1.5",children:[e.jsx(me,{size:13,className:"text-brand"}),C(r)?`\u5DF2\u6388\u6743\u8D26\u53F7\uFF08${(r==null?void 0:r.key_count)??(($e=r==null?void 0:r.keys)==null?void 0:$e.length)??0} \u4E2A\uFF09`:_(r)?`\u5DF2\u63A5\u5165\u8D26\u53F7\uFF08${(r==null?void 0:r.key_count)??((Ke=r==null?void 0:r.keys)==null?void 0:Ke.length)??0} \u4E2A\uFF09`:`\u5F53\u524D\u8F6E\u6362 Key \u5217\u8868\uFF08${(r==null?void 0:r.key_count)??((Oe=r==null?void 0:r.keys)==null?void 0:Oe.length)??0} \u4E2A\uFF09`]}),e.jsx("span",{className:"text-[11px] text-muted",children:r!=null&&r.keys_truncated?`\u4EC5\u5C55\u793A\u524D ${((Me=r==null?void 0:r.keys)==null?void 0:Me.length)??0} \u4E2A\uFF0C\u5171 ${(r==null?void 0:r.key_count)??0} \u4E2A`:C(r)||_(r)?"\u652F\u6301\u591A\u8D26\u53F7\u81EA\u52A8\u8F6E\u6362":"\u652F\u6301\u65E0\u7F1D\u6302\u8F7D\u4EFB\u610F\u591A\u4E2A Key"})]}),!(r!=null&&r.keys)||r.keys.length===0?e.jsx("div",{className:"rounded-lg border border-line p-3 text-center text-xs text-muted",children:C(r)?"\u6682\u65E0\u5DF2\u6388\u6743\u8D26\u53F7\uFF0C\u8BF7\u70B9\u51FB\u4E0A\u65B9\u300C\u6388\u6743\u65B0\u8D26\u53F7\u300D":_(r)?"\u6682\u65E0\u8D26\u53F7\u51ED\u636E\uFF0C\u8BF7\u5728\u4E0B\u65B9\u7C98\u8D34":"\u6682\u65E0\u5BC6\u94A5\uFF0C\u8BF7\u5728\u4E0B\u65B9\u5F55\u5165\u6216\u6279\u91CF\u7C98\u8D34 Key"}):e.jsx("div",{className:"max-h-52 space-y-1.5 overflow-y-auto rounded-lg border border-line p-2",children:r.keys.map(s=>e.jsxs("div",{className:"flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 rounded-lg bg-surface2/60 p-2 sm:px-2.5 sm:py-1.5 text-xs",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-1.5 min-w-0",children:[e.jsxs("code",{className:"text-ink font-mono font-medium truncate max-w-[120px] sm:max-w-[140px]",children:[s.fingerprint,"..."]}),e.jsx("span",{className:"rounded bg-line px-1 py-0.5 text-[10px] text-muted",children:s.label||"prod"}),s.status==="disabled"?e.jsx("span",{className:"rounded bg-zinc-500/10 px-1 py-0.5 text-[10px] text-zinc-400",children:"\u5DF2\u505C\u7528"}):s.health_status==="demoted"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-red-500/10 px-1 py-0.5 text-[10px] font-medium text-red-500",children:[e.jsx(hs,{size:10})," \u7194\u65AD\u51B7\u5374"]}):s.health_status==="unhealthy"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-amber-500/10 px-1 py-0.5 text-[10px] font-medium text-amber-500",children:[e.jsx(fs,{size:10})," \u5F02\u5E38(",s.failures,"\u6B21)"]}):e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-emerald-500/10 px-1 py-0.5 text-[10px] font-medium text-emerald-500",children:[e.jsx(gs,{size:10})," ",C(r)||_(r)?"\u8D26\u53F7\u5C31\u7EEA":"\u8F6E\u6362\u5C31\u7EEA"]})]}),e.jsxs("div",{className:"flex items-center justify-end gap-1 shrink-0 self-end sm:self-auto pt-0.5 sm:pt-0",children:[e.jsx(x,{variant:"ghost",className:"!h-6 !px-2 text-[11px]",onClick:()=>ss(r.id,s.id,s.status),children:s.status==="active"?"\u505C\u7528":"\u542F\u7528"}),e.jsxs(x,{variant:"ghost",className:"!h-6 !px-2 text-[11px] !text-err",onClick:()=>es(r.id,s.id),children:[e.jsx(xe,{size:11,className:"mr-0.5"}),"\u5220\u9664"]})]})]},s.id))})]}),e.jsxs("div",{className:"rounded-lg border border-dashed border-line p-3 space-y-2.5 bg-surface/50",children:[e.jsx("div",{className:"text-xs font-semibold text-ink",children:C(r)?"\u624B\u52A8\u8FFD\u52A0 refresh_token":_(r)?"\u8FFD\u52A0\u8D26\u53F7\u51ED\u636E":"\u6279\u91CF\u8FFD\u52A0\u65B0\u5BC6\u94A5"}),e.jsx("div",{className:"space-y-1",children:e.jsx("textarea",{value:K,onChange:s=>E(s.target.value),placeholder:C(r)?`\u7C98\u8D34 refresh_token\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF0C\u4F8B\u5982\uFF1A\nrt_xxxxxxxxxxxxxxxx\nrt_yyyyyyyyyyyyyyyy`:_(r)?`\u6BCF\u884C\u4E00\u4E2A\u8D26\u53F7\u51ED\u636E\uFF0C\u683C\u5F0F\uFF1A\n${(Y==null?void 0:Y.credHint)??""}`:`\u652F\u6301\u5355\u4E2A\u6216\u6279\u91CF\u7C98\u8D34\u591A\u4E2A Key\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF0C\u4F8B\u5982\uFF1A\nsk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy`,rows:3,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),e.jsxs("div",{className:"flex flex-col sm:flex-row sm:items-center justify-between gap-2.5",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-[11px] text-muted shrink-0",children:"\u6807\u7B7E"}),e.jsx(I,{className:"!py-1 flex-1 sm:!w-28 text-xs",value:se,onChange:s=>q(s.target.value),placeholder:C(r)?"\u5982 account-2":"\u5982 prod-2"})]}),e.jsxs("div",{className:"flex items-center justify-end gap-2",children:[e.jsx(x,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>z(null),children:"\u5173\u95ED"}),e.jsx(x,{className:"flex-1 sm:flex-initial",onClick:De,disabled:!K.trim()||G,children:G?"\u4FDD\u5B58\u4E2D\u2026":C(r)||_(r)?"\u4FDD\u5B58\u8D26\u53F7\u51ED\u636E":"\u4FDD\u5B58\u5E76\u8FFD\u52A0\u81F3\u6C60"})]})]})]})]})}),e.jsx(F,{open:!!l,onClose:()=>O(null),title:`${l!=null&&l.provider?"\u6DFB\u52A0\u8D26\u53F7":"\u63A5\u5165 Web \u53CD\u4EE3"} \u2014 ${(l==null?void 0:l.meta.name)??""}`,width:560,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"rounded-lg border border-line bg-surface2/50 p-3 text-[11px] text-muted leading-relaxed",children:["\u51ED\u636E\u4ECE\u6D4F\u89C8\u5668\u7F51\u9875\u4F1A\u8BDD\u83B7\u53D6\uFF1A",e.jsx("span",{className:"text-ink",children:l==null?void 0:l.meta.credHint}),e.jsx("br",{}),"\u6BCF\u884C\u4E00\u4E2A\u8D26\u53F7\uFF0C\u7C98\u8D34\u591A\u4E2A\u4F1A\u81EA\u52A8\u8FDB\u5165\u8F6E\u6362\u6C60\uFF1B\u51ED\u636E\u4EC5\u52A0\u5BC6\u5B58\u50A8\uFF0C\u4E0D\u4F1A\u56DE\u663E\u3002"]}),!(l!=null&&l.provider)&&e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(U,{label:"\u6E20\u9053\u540D\u79F0",children:e.jsx(I,{value:(l==null?void 0:l.name)??"",onChange:s=>l&&O({...l,name:s.target.value})})}),e.jsx(U,{label:"\u6E20\u9053 Slug",children:e.jsx(I,{value:(l==null?void 0:l.slug)??"",onChange:s=>l&&O({...l,slug:s.target.value})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(U,{label:"Base URL",children:e.jsx(I,{value:(l==null?void 0:l.baseUrl)??"",onChange:s=>l&&O({...l,baseUrl:s.target.value})})})})]}),e.jsx(U,{label:l!=null&&l.provider?"\u8FFD\u52A0\u8D26\u53F7\u51ED\u636E\uFF08\u4E00\u884C\u4E00\u4E2A\uFF09":l!=null&&l.meta.anonymous?"\u8D26\u53F7\u51ED\u636E\uFF08\u53EF\u9009\uFF0C\u7559\u7A7A\u8D70\u533F\u540D\u6A21\u5F0F\uFF09":"\u8D26\u53F7\u51ED\u636E\uFF08\u5FC5\u586B\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF09",children:e.jsx("textarea",{value:(l==null?void 0:l.credential)??"",onChange:s=>l&&O({...l,credential:s.target.value}),rows:4,placeholder:l==null?void 0:l.meta.credHint,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(x,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>O(null),children:"\u53D6\u6D88"}),e.jsx(x,{className:"flex-1 sm:flex-initial",onClick:ds,disabled:!!(l!=null&&l.saving)||!(l!=null&&l.credential.trim())&&!(l!=null&&l.meta.anonymous&&!(l!=null&&l.provider)),children:l!=null&&l.saving?"\u4FDD\u5B58\u4E2D\u2026":l!=null&&l.provider?"\u4FDD\u5B58\u5E76\u8FFD\u52A0":l!=null&&l.credential.trim()?"\u4FDD\u5B58\u5E76\u63A5\u5165":"\u533F\u540D\u63A5\u5165"})]})]})}),e.jsx(F,{open:!!a,onClose:le,title:`OAuth \u6388\u6743 \u2014 ${(a==null?void 0:a.meta.name)??""}`,width:560,children:(a==null?void 0:a.step)==="region"?e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx("p",{className:"text-xs leading-relaxed text-muted",children:"\u8BE5\u6E20\u9053\u56FD\u5185\u7248\u4E0E\u56FD\u9645\u7248\u8D26\u53F7\u4F53\u7CFB\u5B8C\u5168\u72EC\u7ACB\uFF0C\u8BF7\u9009\u62E9\u8981\u6388\u6743\u7684\u533A\u57DF\u3002\u9009\u9519\u533A\u57DF\u4F1A\u5BFC\u81F4\u6388\u6743\u6210\u529F\u4F46\u65E0\u6CD5\u8C03\u7528\u3002"}),(a.meta.regions||[]).map(s=>{const t=ce(a.meta,s.baseUrl),i=t?(f??[]).find(n=>n.slug===t.slug)??null:null;return e.jsxs("button",{onClick:()=>void Ie(a.meta,i,s.baseUrl),className:"flex flex-col gap-1 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 text-left transition-colors hover:border-brand/40 hover:bg-brand/5",children:[e.jsxs("span",{className:"flex items-center gap-2 text-sm font-semibold text-ink",children:[s.label,i&&e.jsx("span",{className:"rounded bg-brand/10 px-1 text-[10px] font-medium text-brand",children:"\u590D\u7528\u5DF2\u6709\u6E20\u9053"})]}),e.jsx("span",{className:"text-[11px] text-muted",children:s.desc})]},s.baseUrl)})]}):(a==null?void 0:a.step)==="loading"?e.jsxs("div",{className:"flex items-center justify-center gap-2 py-10 text-sm text-muted",children:[e.jsx($,{size:16,className:"animate-spin"}),"\u6B63\u5728\u5411 ",a.meta.name," \u53D1\u8D77\u6388\u6743\u8BF7\u6C42\u2026"]}):(a==null?void 0:a.step)==="error"?e.jsxs("div",{className:"space-y-4",children:[e.jsx("div",{className:"rounded-lg border border-err/30 bg-err/5 p-3 text-xs text-err leading-relaxed",children:a.message}),e.jsx("p",{className:"text-[11px] text-muted",children:"\u63D0\u793A\uFF1A\u6388\u6743\u94FE\u63A5\u6709\u6548\u671F\u7EA6 10 \u5206\u949F\uFF1B\u82E5\u4F7F\u7528\u4E86\u4EE3\u7406/\u65E0\u75D5\u7A97\u53E3\uFF0C\u8BF7\u4FDD\u6301\u540C\u4E00\u6D4F\u89C8\u5668\u5B8C\u6210\u6388\u6743\u3002\u4E5F\u53EF\u5728\u4E0B\u65B9\u624B\u52A8\u7C98\u8D34 refresh_token\u3002"}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(x,{variant:"ghost",onClick:le,children:"\u5173\u95ED"}),e.jsxs(x,{onClick:is,children:[e.jsx($,{size:14}),"\u91CD\u65B0\u53D1\u8D77\u6388\u6743"]})]})]}):(a==null?void 0:a.mode)==="redirect-poll"?e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs leading-relaxed text-muted",children:["\u8BF7\u5728\u6D4F\u89C8\u5668\u4E2D\u6253\u5F00\u4E0B\u65B9\u6388\u6743\u9875\uFF0C\u767B\u5F55 ",a.meta.name," \u8D26\u53F7\u5E76\u786E\u8BA4\u6388\u6743\u3002\u5B8C\u6210\u540E\u672C\u5F39\u7A97\u4F1A\u81EA\u52A8\u83B7\u53D6\u5E76\u4FDD\u5B58\u51ED\u636E\u3002"]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx(I,{readOnly:!0,value:a.url,className:"!py-1 flex-1 text-[11px] font-mono"}),e.jsx(x,{variant:"soft",className:"!h-[34px] !px-2.5 shrink-0",onClick:()=>ge(a.url),title:"\u590D\u5236\u6388\u6743\u94FE\u63A5",children:e.jsx(ye,{size:12})}),e.jsxs(x,{className:"!h-[34px] !px-3 shrink-0",onClick:()=>window.open(a.url,"_blank","noopener,noreferrer"),children:[e.jsx(Ne,{size:12}),"\u6253\u5F00\u6388\u6743\u9875"]})]}),e.jsxs("div",{className:"flex items-center gap-2 rounded-lg border border-line bg-surface p-3 text-xs text-muted",children:[e.jsx($,{size:13,className:"animate-spin text-brand"}),e.jsx("span",{children:a.message||"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u5B8C\u6210\u767B\u5F55\u2026"}),e.jsxs("span",{className:"ml-auto text-[10px]",children:["\u6BCF ",a.interval||5,"s \u8F6E\u8BE2"]})]}),e.jsxs("p",{className:"text-[11px] text-muted",children:["\u6388\u6743\u94FE\u63A5\u7531 ",a.meta.name," \u5B98\u65B9\u7B7E\u53D1\uFF0C\u6709\u6548\u671F\u7EA6 1 \u5C0F\u65F6\u3002\u5982\u9700\u4E3A\u540C\u4E00\u6E20\u9053\u6DFB\u52A0\u7B2C\u4E8C\u4E2A\u8D26\u53F7\uFF0C\u5EFA\u8BAE\u4F7F\u7528\u65E0\u75D5\u7A97\u53E3\u6253\u5F00\u6388\u6743\u9875\u3002"]}),e.jsx("div",{className:"flex justify-end",children:e.jsx(x,{variant:"ghost",onClick:le,children:"\u53D6\u6D88\u6388\u6743"})})]}):(a==null?void 0:a.mode)==="device"?e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs text-muted leading-relaxed",children:["\u8BF7\u5728\u6D4F\u89C8\u5668\u4E2D\u6253\u5F00\u4E0B\u65B9\u6388\u6743\u9875\uFF0C\u767B\u5F55 ",a.meta.name," \u8D26\u53F7\u5E76\u786E\u8BA4\u8BBE\u5907\u7801\uFF1A"]}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/60 p-3 text-center",children:[e.jsx("div",{className:"text-[11px] text-muted",children:"\u8BBE\u5907\u7801 / User Code"}),e.jsx("div",{className:"mt-1 font-mono text-2xl font-bold tracking-widest text-brand",children:a.userCode||"\u2014"}),e.jsxs("div",{className:"mt-2 flex flex-wrap items-center justify-center gap-2",children:[e.jsxs(x,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>ge(a.userCode||""),children:[e.jsx(ye,{size:11}),"\u590D\u5236\u8BBE\u5907\u7801"]}),e.jsxs(x,{className:"!h-7 !px-2.5 text-[11px]",onClick:()=>window.open(a.verificationUriComplete||a.verificationUri||a.url,"_blank","noopener,noreferrer"),children:[e.jsx(Ne,{size:11}),"\u6253\u5F00\u6388\u6743\u9875"]})]}),(a.verificationUriComplete||a.verificationUri)&&e.jsx("div",{className:"mt-2 truncate text-[10px] text-muted",title:a.verificationUriComplete||a.verificationUri,children:a.verificationUriComplete||a.verificationUri})]}),e.jsxs("div",{className:"flex items-center gap-2 rounded-lg border border-line bg-surface p-3 text-xs text-muted",children:[e.jsx($,{size:13,className:"animate-spin text-brand"}),e.jsx("span",{children:a.message||"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026"}),a.interval?e.jsxs("span",{className:"ml-auto text-[10px]",children:["\u6BCF ",a.interval,"s \u8F6E\u8BE2"]}):null]}),e.jsx("p",{className:"text-[11px] text-muted",children:"\u5982\u9700\u4E3A\u540C\u4E00\u6E20\u9053\u6DFB\u52A0\u7B2C\u4E8C\u4E2A\u8D26\u53F7\uFF0C\u8BF7\u4F7F\u7528\u65E0\u75D5\u7A97\u53E3\u6253\u5F00\u6388\u6743\u9875\uFF0C\u907F\u514D\u6D4F\u89C8\u5668\u590D\u7528\u5DF2\u767B\u5F55\u4F1A\u8BDD\u3002"}),e.jsx("div",{className:"flex justify-end",children:e.jsx(x,{variant:"ghost",onClick:le,children:"\u53D6\u6D88\u6388\u6743"})})]}):e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs leading-relaxed text-muted",children:["1. \u70B9\u51FB\u4E0B\u65B9\u6309\u94AE\u6253\u5F00 ",a==null?void 0:a.meta.name," \u6388\u6743\u9875\u5E76\u767B\u5F55\uFF1B",e.jsx("br",{}),"2. \u6388\u6743\u540E\u6D4F\u89C8\u5668\u4F1A\u8DF3\u8F6C\u5230 ",e.jsx("code",{className:"rounded bg-line px-1",children:"127.0.0.1"})," \u56DE\u8C03\u5730\u5740\uFF08\u9875\u9762\u6253\u4E0D\u5F00\u5C5E\u6B63\u5E38\u73B0\u8C61\uFF09\uFF1B",e.jsx("br",{}),"3. ",(a==null?void 0:a.meta.type)==="trae"?"\u76F4\u63A5\u590D\u5236\u5730\u5740\u680F\u7684\u6574\u6BB5\u56DE\u8C03 URL\uFF08\u5FC5\u987B\u542B refreshToken / authCode\uFF09\u7C98\u8D34\u5230\u4E0B\u65B9\u3002":e.jsxs(e.Fragment,{children:["\u590D\u5236\u5730\u5740\u680F ",e.jsx("code",{className:"rounded bg-line px-1",children:"code="})," \u540E\u7684\u6574\u6BB5\u5185\u5BB9\uFF08\u6216\u6574\u6BB5\u56DE\u8C03 URL\uFF09\u7C98\u8D34\u5230\u4E0B\u65B9\u3002"]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx(I,{readOnly:!0,value:(a==null?void 0:a.url)??"",className:"!py-1 flex-1 text-[11px] font-mono"}),e.jsx(x,{variant:"soft",className:"!h-[34px] !px-2.5 shrink-0",onClick:()=>ge((a==null?void 0:a.url)??""),title:"\u590D\u5236\u6388\u6743\u94FE\u63A5",children:e.jsx(ye,{size:12})}),e.jsxs(x,{className:"!h-[34px] !px-3 shrink-0",onClick:()=>window.open((a==null?void 0:a.url)??"","_blank","noopener,noreferrer"),children:[e.jsx(Ne,{size:12}),"\u6253\u5F00"]})]}),e.jsx(U,{label:"\u6388\u6743 code \u6216\u6574\u6BB5\u56DE\u8C03\u5730\u5740",children:e.jsx("textarea",{value:(a==null?void 0:a.codeInput)??"",onChange:s=>a&&N({...a,codeInput:s.target.value}),rows:3,placeholder:"\u7C98\u8D34 code \u6216 http://localhost:xxxxx/callback?code=...",className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),(a==null?void 0:a.message)&&e.jsx("div",{className:"text-[11px] text-muted",children:a.message}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(x,{variant:"ghost",onClick:le,children:"\u53D6\u6D88"}),e.jsx(x,{onClick:ns,disabled:(a==null?void 0:a.busy)||!(a!=null&&a.codeInput.trim()),children:a!=null&&a.busy?"\u6B63\u5728\u9A8C\u8BC1\u2026":"\u5B8C\u6210\u6388\u6743"})]})]})}),Ze]})}\n',
+            "/assets/Providers-BiTzce6H.js": {
+              content: 'import{c as ue,u as He,i as Fe,j as e,d as Q,E as Qe,q as Pe,m as S,B as x,X as xs,e as F,n as k,r as ms,h as be,s as us,U as Te,G as ps,F as U,k as Re,I,o as ye,t as D}from"./index-OWhocmiM.js";import{r as j}from"./vendor-BbQ_LiY-.js";import{M as Le}from"./message-square-nskUin8a.js";import{R as $}from"./refresh-cw-CiqXg9A7.js";import{P as ke}from"./plus-DjGDWRHo.js";import{T as xe}from"./trash-2-BAKVuXGI.js";import{S as hs,T as fs}from"./triangle-alert-DwdzAbbD.js";import{C as gs}from"./circle-check-CIKjzwLy.js";import{E as Ne}from"./external-link-DgYLUCQ-.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const me=ue("Key",[["path",{d:"m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4",key:"g0fldk"}],["path",{d:"m21 2-9.6 9.6",key:"1j0ho8"}],["circle",{cx:"7.5",cy:"15.5",r:"5.5",key:"yqb3hr"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Ee=ue("LogIn",[["path",{d:"M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4",key:"u53s6r"}],["polyline",{points:"10 17 15 12 10 7",key:"1ail0h"}],["line",{x1:"15",x2:"3",y1:"12",y2:"12",key:"v6grx8"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const js=ue("Pencil",[["path",{d:"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z",key:"1a8usu"}],["path",{d:"m15 5 4 4",key:"1mk7zo"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const we=ue("Power",[["path",{d:"M12 2v10",key:"mnfbl"}],["path",{d:"M18.4 6.6a9 9 0 1 1-12.77.04",key:"obofu9"}]]),vs={pending:{label:"\u5F85\u5BA1\u6838",cls:"bg-amber-500/10 text-amber-500"},approved:{label:"\u5DF2\u901A\u8FC7",cls:"bg-emerald-500/10 text-emerald-500"},rejected:{label:"\u5DF2\u9A73\u56DE",cls:"bg-red-500/10 text-red-500"}},Ge=f=>f?new Date(f*1e3).toLocaleString("zh-CN",{hour12:!1}):"\u2014";function bs(){const[f,M]=j.useState(null),[T,pe]=j.useState(0),[he,R]=j.useState(!1),[m,A]=j.useState(""),[y,L]=j.useState(null),[r,z]=j.useState(null),[K,E]=j.useState(""),[se,q]=j.useState(!1),G=He(),{confirm:de,confirmEl:te}=Fe(),B=async(c=!1)=>{c||R(!0);try{const a=await k("list_provider_submissions"),b=a.result??a;M(b.submissions||[]),pe(b.pendingCount||0)}catch(a){c||G(a.message,"err")}finally{c||R(!1)}};j.useEffect(()=>{B()},[]);const Z=async c=>{try{const a=await k("provider_submission_thread",{id:c.id}),b=a.result??a;z({sub:c,messages:b.messages||[]})}catch(a){G(a.message,"err")}},ae=async()=>{if(!(!r||!K.trim())){q(!0);try{await k("provider_submission_reply",{id:r.sub.id,content:K.trim()}),E(""),await Z(r.sub),await B(!0)}catch(c){G(c.message,"err")}finally{q(!1)}}},o=async(c,a,b)=>{A(c.id);try{await k("provider_submission_review",{id:c.id,decision:a,reason:b}),G(a==="approved"?`\u5DF2\u901A\u8FC7\uFF1A\u6E20\u9053\u300C${c.name}\u300D\u5DF2\u521B\u5EFA\u5E76\u8FDB\u5165\u5168\u7AD9\u5217\u8868`:"\u5DF2\u9A73\u56DE\u5E76\u901A\u77E5\u63D0\u4EA4\u7528\u6237","ok"),L(null),await B(!0)}catch(P){G(P.message,"err")}finally{A("")}},w=async c=>{await de(`\u901A\u8FC7\u300C${c.name}\u300D\u7684\u63D0\u4EA4\uFF1F\u5C06\u521B\u5EFA\u6B63\u5F0F\u6E20\u9053${c.hasKey?"\u5E76\u5F55\u5165\u7528\u6237\u63D0\u4EA4\u7684\u5BC6\u94A5":"\uFF08\u65E0\u5BC6\u94A5\uFF0C\u9700\u624B\u52A8\u5F55\u5165\uFF09"}\u3002`)&&await o(c,"approved")},W=(f||[]).slice().sort((c,a)=>{const b=c.status==="pending"?0:c.status==="approved"?1:2,P=a.status==="pending"?0:a.status==="approved"?1:2;return b-P||a.updatedAt-c.updatedAt});return e.jsxs("div",{className:"flex flex-col gap-4",children:[te,e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:["\u7528\u6237\u63D0\u4EA4\u7684\u4F9B\u5E94\u5546\u5728\u8FD9\u91CC\u5BA1\u6838\uFF1A\u901A\u8FC7\u540E\u521B\u5EFA\u6B63\u5F0F\u6E20\u9053\uFF08\u8FDB\u5165\u5168\u7AD9\u5217\u8868\u4E0E\u8DEF\u7531\uFF09\uFF0C\u9A73\u56DE\u5FC5\u987B\u586B\u5199\u539F\u56E0\uFF08\u5BF9\u63D0\u4EA4\u7528\u6237\u53EF\u89C1\uFF09\u3002 \u5F53\u524D\u5F85\u5BA1\u6838 ",e.jsx("b",{className:"text-amber-500",children:T})," \u6761\u3002"]}),f===null?e.jsx(Q,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):W.length===0?e.jsx(Q,{children:e.jsx(Qe,{icon:e.jsx(Pe,{size:32}),title:"\u6682\u65E0\u7528\u6237\u63D0\u4EA4",hint:"\u666E\u901A\u7528\u6237\u5728\u300C\u4E2A\u4EBA\u4E3B\u9875 \u2192 \u6211\u7684\u4F9B\u5E94\u5546\u300D\u63D0\u4EA4\u6E20\u9053\u540E\uFF0C\u8FD9\u91CC\u4F1A\u51FA\u73B0\u5F85\u5BA1\u6838\u8BB0\u5F55\u3002"})}):W.map(c=>{const a=vs[c.status];return e.jsx(Q,{className:"p-4",children:e.jsxs("div",{className:"flex flex-wrap items-center justify-between gap-2",children:[e.jsxs("div",{className:"min-w-0",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-sm font-semibold text-ink",children:c.name}),e.jsx("code",{className:"rounded bg-line px-1.5 py-0.5 text-[10px] text-muted font-mono",children:c.slug}),e.jsx("span",{className:S("rounded px-1.5 py-0.5 text-[10px] font-medium",a.cls),children:a.label}),c.hasKey&&e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 text-[10px] text-brand",children:"\u542B\u5BC6\u94A5"}),c.providerId&&e.jsxs("code",{className:"rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-500 font-mono",children:[c.providerId.slice(0,8),"\u2026"]})]}),e.jsx("div",{className:"mt-1 truncate text-[11px] text-muted font-mono",children:c.baseUrl}),e.jsxs("div",{className:"mt-1 text-[10px] text-muted",children:["\u63D0\u4EA4\u4EBA ",c.ownerEmail||"\u2014"," \xB7 ",Ge(c.createdAt),c.status==="rejected"&&c.rejectionReason&&e.jsxs("span",{className:"text-err",children:[" \xB7 \u9A73\u56DE\u539F\u56E0\uFF1A",c.rejectionReason]})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs(x,{variant:"soft",className:"!h-7 !px-2 text-[11px]",onClick:()=>void Z(c),children:[e.jsx(Le,{size:12}),"\u5F80\u6765"]}),c.status==="pending"&&e.jsxs(e.Fragment,{children:[e.jsxs(x,{variant:"soft",className:"!h-7 !px-2 text-[11px] !text-emerald-500",disabled:m===c.id,onClick:()=>void w(c),children:[e.jsx(Pe,{size:12}),"\u901A\u8FC7"]}),e.jsxs(x,{variant:"soft",className:"!h-7 !px-2 text-[11px] !text-err",disabled:m===c.id,onClick:()=>L({sub:c,reason:""}),children:[e.jsx(xs,{size:12}),"\u9A73\u56DE"]})]})]})]})},c.id)}),e.jsxs(F,{open:!!y,onClose:()=>L(null),title:`\u9A73\u56DE\u300C${(y==null?void 0:y.sub.name)??""}\u300D`,width:480,children:[e.jsx("p",{className:"mb-3 text-xs text-muted",children:"\u9A73\u56DE\u539F\u56E0\u5C06\u540C\u6B65\u5230\u7AD9\u5185\u4FE1\u7EBF\u7A0B\uFF0C\u5BF9\u63D0\u4EA4\u7528\u6237\u53EF\u89C1\u3002"}),e.jsx("textarea",{rows:3,value:(y==null?void 0:y.reason)??"",onChange:c=>L(a=>a&&{...a,reason:c.target.value}),placeholder:"\u4F8B\u5982\uFF1ABase URL \u4E0D\u53EF\u8FBE / \u5BC6\u94A5\u65E0\u6548 / \u4E0E\u73B0\u6709\u6E20\u9053\u91CD\u590D\u2026",className:"w-full resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs("div",{className:"mt-3 flex justify-end gap-2",children:[e.jsx(x,{variant:"ghost",onClick:()=>L(null),children:"\u53D6\u6D88"}),e.jsx(x,{variant:"danger",disabled:!(y!=null&&y.reason.trim())||m===(y==null?void 0:y.sub.id),onClick:()=>y&&void o(y.sub,"rejected",y.reason.trim()),children:m===(y==null?void 0:y.sub.id)?"\u5904\u7406\u4E2D\u2026":"\u786E\u8BA4\u9A73\u56DE"})]})]}),e.jsxs(F,{open:!!r,onClose:()=>z(null),title:`\u5F80\u6765\u6D88\u606F \xB7 ${(r==null?void 0:r.sub.name)??""}`,width:560,children:[e.jsxs("div",{className:"max-h-[46vh] space-y-2.5 overflow-y-auto pr-1",children:[((r==null?void 0:r.messages)||[]).length===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u6682\u65E0\u6D88\u606F"}),((r==null?void 0:r.messages)||[]).map(c=>e.jsx("div",{className:S("flex",c.fromRole==="admin"?"justify-end":"justify-start"),children:e.jsxs("div",{className:S("max-w-[80%] rounded-xl2 px-3 py-2 text-[12px] leading-relaxed",c.fromRole==="admin"?"bg-brand text-white":"bg-surface2 text-ink"),children:[e.jsxs("div",{className:S("mb-1 text-[10px]",c.fromRole==="admin"?"text-white/70":"text-muted"),children:[c.fromRole==="admin"?"\u7BA1\u7406\u5458\uFF08\u6211\uFF09":c.fromEmail," \xB7 ",Ge(c.createdAt)]}),e.jsx("div",{className:"whitespace-pre-wrap break-words",children:c.content})]})},c.id))]}),e.jsxs("div",{className:"mt-3 flex items-end gap-2 border-t border-line pt-3",children:[e.jsx("textarea",{value:K,onChange:c=>E(c.target.value),rows:2,placeholder:"\u56DE\u590D\u63D0\u4EA4\u7528\u6237\uFF08\u5904\u7406\u7ED3\u679C\u3001\u4FEE\u6539\u8981\u6C42\u7B49\uFF09\u2026",className:"max-h-28 min-h-[44px] flex-1 resize-y rounded-lg border border-line bg-surface px-3 py-2 text-[12px] text-ink outline-none focus:border-brand/60"}),e.jsxs(x,{className:"h-11",disabled:se||!K.trim(),onClick:()=>void ae(),children:[e.jsx(Le,{size:14}),se?"\u53D1\u9001\u4E2D\u2026":"\u53D1\u9001"]})]})]}),he&&e.jsx("div",{className:"fixed bottom-6 right-6 rounded-full bg-surface p-2 shadow-card text-muted",children:e.jsx($,{size:16,className:"animate-spin"})})]})}const qe={deepseek:{name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com"},openai:{name:"OpenAI",slug:"openai",kind:"openai_compat",url:"https://api.openai.com"},anthropic:{name:"Anthropic",slug:"anthropic",kind:"anthropic",url:"https://api.anthropic.com"},google:{name:"Google Gemini",slug:"google",kind:"openai_compat",url:"https://generativelanguage.googleapis.com/v1beta/openai"},kilo:{name:"Kilo (\u514DKey)",slug:"kilo",kind:"openai_compat",url:"https://api.kilo.ai/api/gateway"},opencode:{name:"OpenCode (\u514DKey)",slug:"opencode",kind:"openai_compat",url:"https://opencode.ai/zen/v1"},duckai:{name:"Duck.ai (\u514DKey)",slug:"duckai",kind:"openai_compat",url:"https://duck.ai"},bigmodel:{name:"\u667A\u8C31 GLM (BigModel)",slug:"bigmodel",kind:"openai_compat",url:"https://open.bigmodel.cn/api/paas/v4"},lingbao:{name:"\u7075\u5B9D UI \u6865\u63A5",slug:"lingbao",kind:"openai_compat",url:"http://127.0.0.1:20141"}},ee=f=>f==="opencode"||f==="duckai"||f==="kilo",ys=f=>!!f&&f.startsWith("oauth:"),ks=f=>!!f&&f.startsWith("web:"),C=f=>ys(f==null?void 0:f.kind),_=f=>ks(f==null?void 0:f.kind),Be=[{type:"claude",name:"Claude (Anthropic)",slug:"claude-oauth",baseUrl:"https://api.anthropic.com",mode:"redirect",desc:"Claude Code OAuth \u6388\u6743\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Anthropic Messages \u534F\u8BAE\u3002",models:["claude-sonnet-4-5","claude-opus-4-5","claude-haiku-4-5"]},{type:"codex",name:"Codex",slug:"codex-oauth",baseUrl:"https://chatgpt.com/backend-api/codex",mode:"redirect",desc:"Codex \u8D26\u53F7\u6388\u6743\uFF08Codex CLI\uFF09\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Responses \u534F\u8BAE\u3002",models:["gpt-5.5","gpt-5.4","gpt-5.3-codex"]},{type:"antigravity",name:"Antigravity (Google)",slug:"antigravity-oauth",baseUrl:"https://daily-cloudcode-pa.googleapis.com",mode:"redirect",desc:"Google \u8D26\u53F7\u6388\u6743\uFF08Antigravity \u5BA2\u6237\u7AEF\uFF09\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Gemini \u534F\u8BAE\u3002",models:["gemini-3.7-flash","gemini-3.1-pro"]},{type:"kimi",name:"Kimi (Moonshot)",slug:"kimi-oauth",baseUrl:"https://api.kimi.ai/coding",mode:"device",desc:"Kimi \u8BBE\u5907\u7801\u6388\u6743\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\uFF08\u56FD\u9645\u7AD9/\u4E2D\u56FD\u7AD9\u81EA\u52A8\u8BC6\u522B\uFF09\u3002",models:["kimi-for-coding","kimi-for-coding-highspeed"]},{type:"qwen",name:"Qwen (\u901A\u4E49\u5343\u95EE)",slug:"qwen-oauth",baseUrl:"https://portal.qwen.ai/v1",mode:"device",desc:"Qwen \u8BBE\u5907\u7801\u6388\u6743\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\u3002",models:["coder-model","qwen3-coder-plus"]},{type:"grok",name:"Grok (xAI)",slug:"grok-oauth",baseUrl:"https://cli-chat-proxy.grok.com/v1",mode:"device",desc:"xAI \u8BBE\u5907\u7801\u6388\u6743\uFF0C\u81EA\u52A8\u7FFB\u8BD1\u4E3A Responses \u534F\u8BAE\u3002",models:["grok-4.6","grok-4.5"]},{type:"codebuddy",name:"CodeBuddy / WorkBuddy (\u817E\u8BAF)",slug:"codebuddy-oauth",baseUrl:"https://copilot.tencent.com",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u5185\u7248",baseUrl:"https://copilot.tencent.com",desc:"copilot.tencent.com / codebuddy.cn\uFF0C\u817E\u8BAF\u4E91\u8D26\u53F7\u4F53\u7CFB"},{label:"\u56FD\u9645\u7248",baseUrl:"https://www.workbuddy.ai",desc:"workbuddy.ai\uFF0C\u4E0E\u56FD\u5185\u7248\u8D26\u53F7\u5B8C\u5168\u72EC\u7ACB"}],desc:"\u817E\u8BAF CodeBuddy / WorkBuddy \u8D26\u53F7\u6388\u6743\uFF0C\u56FD\u5185\u7248\u4E0E\u56FD\u9645\u7248\u5171\u7528\u540C\u4E00\u5165\u53E3\uFF0C\u6388\u6743\u65F6\u9009\u62E9\u533A\u57DF\u3002",models:["deepseek-v4.1-flash"]},{type:"zcode",name:"ZCode (\u667A\u8C31)",slug:"zcode-oauth",baseUrl:"https://zcode.z.ai",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08chat.z.ai\uFF09",baseUrl:"https://chat.z.ai",desc:"chat.z.ai OAuth\uFF08\u90AE\u7BB1\u767B\u5F55\uFF09\uFF0C\u8D70 z.ai \u7684\u4F53\u9A8C/\u7F16\u7A0B\u5957\u9910\u989D\u5EA6"},{label:"\u56FD\u5185\u7248\uFF08zchat.z.ai\uFF09",baseUrl:"https://zchat.z.ai",desc:"zchat.z.ai OAuth\uFF08\u624B\u673A\u53F7\u767B\u5F55\uFF09\uFF1B\u65E7\u7684 bigmodel \u5FAE\u4FE1\u626B\u7801\u5165\u53E3\u5DF2\u4E0B\u7EBF"}],desc:"\u667A\u8C31 ZCode \u5BA2\u6237\u7AEF\u989D\u5EA6\u901A\u9053\uFF08GLM-5.3 / GLM-5.3-Flash\uFF09\uFF0CAnthropic \u534F\u8BAE\u53CD\u4EE3\uFF1B\u767B\u5F55\u5DF2\u8FC1\u5230 Z.ai OAuth\uFF1A\u56FD\u9645 chat.z.ai\u3001\u56FD\u5185 zchat.z.ai\uFF0Cbigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0D\u53EF\u7528\u3002",models:["GLM-5.3","GLM-5.3-Flash"]},{type:"qoder",name:"Qoder",slug:"qoder-oauth",baseUrl:"https://qoder.com",mode:"redirect-poll",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08qoder.com\uFF09",baseUrl:"https://qoder.com",desc:"api3.qoder.sh \u63A8\u7406\u96C6\u7FA4\uFF0C\u8D26\u53F7\u4E0E\u56FD\u5185\u7248\u72EC\u7ACB"},{label:"\u56FD\u5185\u7248\uFF08qoder.com.cn\uFF09",baseUrl:"https://qoder.com.cn",desc:"gateway.qoder.com.cn\uFF0CQoderWork \u8D26\u53F7\u4F53\u7CFB"}],desc:"Qoder \u8D26\u53F7\u8BBE\u5907\u6388\u6743\uFF08COSY \u7B7E\u540D\u53CD\u4EE3\uFF09\uFF0COpenAI \u517C\u5BB9\u534F\u8BAE\u76F4\u901A\uFF0C\u652F\u6301\u6BCF\u65E5\u7B7E\u5230\u9886 Credits\u3002",models:["auto","qmodel_38max","qfmodel","qmodel_latest","gmodel","dmodel"]},{type:"trae",name:"Trae (\u5B57\u8282\u8DF3\u52A8)",slug:"trae-oauth",baseUrl:"https://core-normal.traeapi.us",mode:"redirect",regionSelect:!0,regions:[{label:"\u56FD\u9645\u7248\uFF08trae.ai\uFF09",baseUrl:"https://core-normal.traeapi.us",desc:"core-normal.traeapi.us / coresg-normal.trae.ai\uFF0CBearer \u9274\u6743"},{label:"\u56FD\u5185\u7248\uFF08trae.cn\uFF09",baseUrl:"https://trae-api-cn.mchost.guru",desc:"trae-api-cn.mchost.guru\uFF0CCloud-IDE-JWT \u9274\u6743\uFF0C\u4E0E\u56FD\u5185\u8D26\u53F7\u7ED1\u5B9A"}],desc:"Trae IDE \u8D26\u53F7\u6388\u6743\uFF08\u56FD\u5185\u7248 / \u56FD\u9645\u7248\u8D26\u53F7\u4F53\u7CFB\u72EC\u7ACB\uFF09\u3002\u6388\u6743\u540E\u6D4F\u89C8\u5668\u4F1A\u8DF3\u5230 127.0.0.1 \u56DE\u8C03\u5730\u5740\uFF0C\u628A\u5730\u5740\u680F\u6574\u6BB5 URL \u7C98\u8D34\u56DE\u6765\u5373\u53EF\u3002",models:["Gemini-3.1-Pro-Preview","Claude-Sonnet-4.6","GPT-5.5","glm-5.3","kimi-k3","deepseek-V3"]},{type:"cline",name:"Cline",slug:"cline-oauth",baseUrl:"https://api.cline.bot",mode:"device",desc:"Cline \u8D26\u53F7 WorkOS \u8BBE\u5907\u7801\u6388\u6743\uFF0C\u81EA\u52A8\u9002\u914D\u514D\u8D39\u901A\u9053\u4E0E\u300C\u8D26\u53F7\xD7\u6A21\u578B\u300D\u51B7\u5374\u3002",models:["cline-free/mimo-v2.6-flash","cline-free/nemotron-3.5-super-vl","nvidia/nemotron-3.5-lightning:free"]}],We=[{type:"deepseek",name:"DeepSeek \u7F51\u9875\u7248",slug:"deepseek-web",baseUrl:"https://chat.deepseek.com/api/v0",desc:"\u7F51\u9875 userToken \u53CD\u4EE3\uFF0C\u81EA\u52A8\u89E3 PoW\uFF1Btoken \u7EA6 24h \u6709\u6548\u3002",credHint:"userToken\uFF08chat.deepseek.com \u767B\u5F55\u540E localStorage \u91CC\u7684 JWT\uFF09\u6216\u5B98\u65B9 API Key\uFF08sk- \u5F00\u5934\uFF09",models:["deepseek-v4-flash","deepseek-v4-pro","deepseek-v4-flash-search"]},{type:"kimiweb",name:"Kimi \u7F51\u9875\u7248",slug:"kimi-web",baseUrl:"https://www.kimi.ai",desc:"Kimi \u7F51\u9875 Connect-RPC \u534F\u8BAE\u53CD\u4EE3\uFF0Crefresh_token \u81EA\u52A8\u7EED\u671F\u3002",credHint:"access_token(JWT) \u6216 refresh_token\uFF08www.kimi.ai \u767B\u5F55\u540E Local Storage\uFF09",models:["k3","k3-agent-ultra","k2d6","k2d6-search"]},{type:"geminiweb",name:"Gemini \u7F51\u9875\u7248",slug:"gemini-web",baseUrl:"https://gemini.google.com",desc:"Gemini \u7F51\u9875 Cookie \u53CD\u4EE3\uFF08SAPISIDHASH \u9274\u6743\uFF09\uFF1B\u4E0D\u7559\u51ED\u636E\u53EF\u76F4\u63A5\u533F\u540D\u4F7F\u7528\uFF0C\u989D\u5EA6\u4E0E\u6A21\u578B\u53D7\u9650\u3002",credHint:"Cookie \u5B57\u7B26\u4E32\uFF08\u542B __Secure-1PSID / __Secure-3PSID / SAPISID\uFF09\uFF1B\u7559\u7A7A\u5373\u533F\u540D\u6A21\u5F0F",models:["gemini-3.7-flash","gemini-3.1-pro","gemini-3.5-flash-thinking"],anonymous:!0},{type:"minimaxweb",name:"MiniMax Agent \u7F51\u9875\u7248",slug:"minimax-web",baseUrl:"https://agent.minimaxi.com",desc:"MiniMax Agent \u7F51\u9875 SSE \u53CD\u4EE3\uFF0C\u9700\u8981\u7F51\u9875\u4F1A\u8BDD\u7B7E\u540D\u53C2\u6570\u3002",credHint:"token|agentId|uuid|deviceId|userId\uFF08token \u4E3A JWT\uFF0C\u5176\u4F59\u53EF\u4ECE HAR \u53D6\uFF0C\u81F3\u5C11\u586B token\uFF09",models:["MiniMax-M3","MiniMax-M3-thinking","MiniMax-M2.1"]},{type:"lingxi",name:"\u7075\u7280\u7F51\u9875\u7248\uFF08\u4E2D\u56FD\u79FB\u52A8\uFF09",slug:"lingxi-web",baseUrl:"https://ai.yun.139.com",desc:"\u4E2D\u56FD\u79FB\u52A8\u7075\u7280\u7F51\u9875\u53CD\u4EE3\uFF0CBasic \u6388\u6743 + userId\u3002",credHint:"authorization|userId|sourceChannel\uFF08authorization \u5F62\u5982 Basic xxx\uFF09",models:["lingxi-default","qwen-3.7-plus","deepseek-4.0-pro"]},{type:"chatgptweb",name:"ChatGPT \u7F51\u9875\u7248",slug:"chatgpt-web",baseUrl:"https://chatgpt.com",desc:"ChatGPT \u7F51\u9875/App \u534F\u8BAE\u53CD\u4EE3\uFF08sentinel + PoW\uFF09\uFF0C\u9002\u5408 Free \u8D26\u53F7\u3002",credHint:"refresh_token\uFF08rt_xxx / rt.1.xxx\uFF1B\u4E5F\u652F\u6301\u53D1\u8D27\u6574\u884C\u81EA\u52A8\u63D0\u53D6\uFF09",models:["gpt-5-5","gpt-5-4","gpt-5-3"]}];function Ks(){var $e,Ke,Oe,Me;const[f,M]=j.useState(null),[T,pe]=j.useState("direct"),[he,R]=j.useState(!1),[m,A]=j.useState({id:"",name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com",key:""}),[y,L]=j.useState(!1),[r,z]=j.useState(null),[K,E]=j.useState(""),[se,q]=j.useState("prod"),[G,de]=j.useState(!1),te=j.useRef(!1),B=j.useRef(!1),Z=j.useRef(!1),ae=j.useRef(!1),[o,w]=j.useState(null),[W,c]=j.useState(""),[a,b]=j.useState(null),P=j.useRef(null),[l,O]=j.useState(null),{confirm:Ce,confirmEl:Ze}=Fe(),p=He(),V=()=>k("list_providers").then(s=>M(s.providers)).catch(s=>p(s.message,"err"));j.useEffect(()=>{V()},[]),j.useEffect(()=>()=>ie(),[]);const _e=()=>{A({id:"",name:"DeepSeek",slug:"deepseek",kind:"openai_compat",url:"https://api.deepseek.com",key:""}),R(!0)},Ve=s=>{A({id:s.id,name:s.name,slug:s.slug,kind:s.kind||(s.slug==="anthropic"?"anthropic":"openai_compat"),url:s.base_url,key:""}),R(!0)},Je=s=>{const t=qe[s];t&&A(i=>({...i,name:t.name,slug:t.slug,kind:t.kind,url:t.url}))},Ye=async()=>{var t;if(B.current)return;if(!m.name.trim())return p("\u8BF7\u586B\u5199\u4F9B\u5E94\u5546\u540D\u79F0","err");if(!m.slug.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053\u6807\u8BC6\u7B26 (Slug)","err");const s=ee(m.slug);if(!m.id&&!m.key.trim()&&!s)return p("\u6DFB\u52A0\u4F9B\u5E94\u5546\u5FC5\u987B\u5F55\u5165\u4E0A\u6E38\u5BC6\u94A5","err");B.current=!0,L(!0);try{const i={name:m.name.trim(),slug:m.slug.trim().toLowerCase(),kind:m.kind,baseUrl:m.url.trim()};m.id&&(i.id=m.id),m.key.trim()&&(i.key=m.key.trim()),await k("upsert_provider",i);const n=m.id||((t=(await k("list_providers")).providers.find(d=>d.name===m.name))==null?void 0:t.id)||"";p("\u4F9B\u5E94\u5546\u5DF2\u4FDD\u5B58"),R(!1),V(),n&&(w({providerId:n,providerName:m.name,models:[],picked:new Set,loading:!0}),await re(n,m.name,m.url,m.key.trim()))}catch(i){p(i.message,"err")}finally{B.current=!1,L(!1)}},ze=j.useRef({}),re=async(s,t,i,n)=>{n&&(ze.current[s]=n);const d=n||ze.current[s]||"";let u=null,N="";if(d&&i)try{const h=await fetch(`${i.replace(/\\/+$/,"")}/v1/models`,{headers:{authorization:`Bearer ${d}`},signal:AbortSignal.timeout(2e4)});h.ok&&(u=((await h.json()).data??[]).map(g=>g.id).filter(g=>!!g).sort())}catch{}if(u===null)try{const h=await k("list_upstream_models",{providerId:s});u=h.models,h.note&&(N=h.degraded?`\u4E0A\u6E38\u6A21\u578B\u76EE\u5F55\u4E0D\u53EF\u7528\uFF0C\u5DF2\u56DE\u9000\u515C\u5E95\u6E05\u5355\uFF1A${h.note}`:h.note)}catch(h){w({providerId:s,providerName:t,models:[],picked:new Set,loading:!1,error:h.message});return}w({providerId:s,providerName:t,models:u??[],picked:new Set(u??[]),loading:!1,note:N||void 0})},Xe=(s,t)=>{c(""),w({providerId:s,providerName:t,models:[],picked:new Set,loading:!1})},ne=async(s,t)=>{const i=(f??[]).find(n=>n.id===s);w({providerId:s,providerName:t,models:[],picked:new Set,loading:!0}),await re(s,t,(i==null?void 0:i.base_url)??"","")},Se=()=>{if(!W.trim()||!o)return;const s=W.split(/[\\r\\n,]+/).map(n=>n.trim()).filter(Boolean);if(!s.length)return;const t=Array.from(new Set([...o.models,...s])),i=new Set(o.picked);s.forEach(n=>i.add(n)),w({...o,models:t,picked:i}),c(""),p(`\u5DF2\u6DFB\u52A0 ${s.length} \u4E2A\u6A21\u578B\u5230\u52FE\u9009\u5217\u8868`)},Ae=async()=>{var t;if(!o)return;const s=[...o.picked];if(!s.length)return p("\u8BF7\u81F3\u5C11\u9009\u62E9\u4E00\u4E2A\u6A21\u578B","err");try{const i=await k("import_models",{providerId:o.providerId,models:s,priority:10});p(`\u5DF2\u5BFC\u5165 ${((t=i.result)==null?void 0:t.imported)??s.length} \u4E2A\u6A21\u578B\uFF0C\u53EF\u5728\u300C\u6A21\u578B\u4E0E\u5B9A\u4EF7\u300D\u8C03\u6574\u5B9A\u4EF7`),w(null),V()}catch(i){p(i.message,"err")}},De=async()=>{var s,t,i;if(!(!K.trim()||!r)&&!te.current){te.current=!0,de(!0);try{const n=await k("upsert_provider_key",{providerId:r.id,key:K.trim(),label:se.trim()||(C(r)||_(r)?`account-${(r.key_count??0)+1}`:"prod")}),d=(s=n.result)!=null&&s.fingerprint?`\uFF08\u6307\u7EB9 ${n.result.fingerprint}\uFF09`:"";(t=n.result)!=null&&t.duplicate&&!((i=n.result)!=null&&i.count)?p(`\u8BE5\u51ED\u636E\u5DF2\u5728\u6C60\u4E2D\uFF0C\u672A\u91CD\u590D\u6DFB\u52A0${d}`):p(C(r)||_(r)?`\u8D26\u53F7\u51ED\u636E\u5DF2\u52A0\u5BC6\u5165\u5E93${d}`:`\u5BC6\u94A5\u5DF2\u52A0\u5BC6\u5165\u5E93${d}`);const u=K.trim();E("");const N=await k("list_providers");M(N.providers);const h=N.providers.find(v=>v.id===r.id);h&&z(h),!C(r)&&(!h||h.keys&&h.keys.length<=1)&&(w({providerId:r.id,providerName:r.name,models:[],picked:new Set,loading:!0}),await re(r.id,r.name,r.base_url,_(r)?"":u))}catch(n){p(n.message,"err")}finally{te.current=!1,de(!1)}}},es=async(s,t)=>{if(await Ce("\u786E\u8BA4\u5220\u9664\u8BE5\u51ED\u636E\uFF1F\u8BE5\u51ED\u636E\u5C06\u4ECE\u591A Key \u8C03\u5EA6\u6C60\u4E2D\u5F7B\u5E95\u79FB\u9664\u3002"))try{await k("delete_provider_key",{providerId:s,keyId:t}),p("\u51ED\u636E\u5DF2\u4ECE\u6C60\u4E2D\u5220\u9664");const i=await k("list_providers");M(i.providers);const n=i.providers.find(d=>d.id===s);n&&z(n)}catch(i){p(i.message,"err")}},ss=async(s,t,i)=>{const n=i==="active"?"disabled":"active";try{await k("toggle_provider_key",{providerId:s,keyId:t,status:n}),p(`\u8D26\u53F7\u5DF2${n==="active"?"\u542F\u7528":"\u505C\u7528"}`);const d=await k("list_providers");M(d.providers);const u=d.providers.find(N=>N.id===s);u&&z(u)}catch(d){p(d.message,"err")}},J=async s=>{const t=s.status==="active"?"disabled":"active";try{await k("toggle_provider",{id:s.id,status:t}),p(`\u5DF2${t==="active"?"\u542F\u7528":"\u505C\u7528"}\u6E20\u9053\u300C${s.name}\u300D`),V()}catch(i){p(i.message,"err")}},fe=async s=>{if(await Ce(`\u5220\u9664\u4F9B\u5E94\u5546\u300C${s.name}\u300D\uFF1F\u5176\u6A21\u578B\u6620\u5C04\u4E0E\u4E0A\u6E38\u51ED\u636E\u5C06\u4E00\u5E76\u5220\u9664\uFF0C\u4E0D\u53EF\u6062\u590D\u3002`))try{await k("delete_provider",{id:s.id}),p("\u5DF2\u5220\u9664"),V()}catch(t){p(t.message,"err")}},ie=()=>{P.current!==null&&(window.clearTimeout(P.current),P.current=null)},le=()=>{ie(),b(null)},ge=async s=>{try{await navigator.clipboard.writeText(s),p("\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F")}catch{p("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u590D\u5236","err")}},ts=(s,t)=>(t==null?void 0:t.base_url)||s.baseUrl,ce=(s,t)=>s.regionSelect?s.type==="zcode"?/zchat\\.z\\.ai/i.test(t)?{slug:"zcode-cn-oauth",name:"ZCode \u56FD\u5185\u7248 (zchat)"}:/bigmodel\\.cn/i.test(t)?{slug:"zcode-bigmodel-oauth",name:"ZCode \u56FD\u5185\u7248 (bigmodel\xB7\u65E7)"}:{slug:"zcode-oauth",name:"ZCode \u56FD\u9645\u7248 (chat.z.ai)"}:s.type==="qoder"?/qoder\\.com\\.cn/i.test(t)?{slug:"qoder-cn-oauth",name:"Qoder \u56FD\u5185\u7248"}:{slug:"qoder-oauth",name:"Qoder \u56FD\u9645\u7248 (qoder.com)"}:s.type==="trae"?/trae\\.cn|trae\\.com\\.cn|mchost\\.guru/i.test(t)?{slug:"trae-cn-oauth",name:"Trae \u56FD\u5185\u7248 (trae.cn)"}:{slug:"trae-global-oauth",name:"Trae \u56FD\u9645\u7248 (trae.ai)"}:/workbuddy\\.ai/i.test(t)?{slug:"codebuddy-global-oauth",name:"CodeBuddy \u56FD\u9645\u7248"}:{slug:"codebuddy-oauth",name:"CodeBuddy \u56FD\u5185\u7248"}:null,as=s=>{const t=new Set([s.slug]);for(const i of s.regions??[]){const n=ce(s,i.baseUrl);n&&t.add(n.slug)}return s.type==="zcode"&&t.add("zcode-bigmodel-oauth"),[...t]},Ue=async(s,t,i,n,d)=>{var u,N,h,v;b(g=>g&&{...g,busy:!0,message:"\u6B63\u5728\u4FDD\u5B58\u8D26\u53F7\u51ED\u636E\u2026"});try{const g=ce(s,t),X=(g==null?void 0:g.slug)??s.slug,H=(g==null?void 0:g.name)??s.name,oe=await D("oauth_add_account",{provider:s.type,slug:X,name:H,baseUrl:t,refreshToken:i,...n?{email:n}:{},...d?{identity:d}:{}}),ve=((u=oe.result)==null?void 0:u.providerId)||"";if(!ve)throw new Error("OAuth \u6E20\u9053\u4FDD\u5B58\u5931\u8D25");p((N=oe.result)!=null&&N.duplicate&&((h=oe.result)==null?void 0:h.count)===0?"\u8BE5\u51ED\u636E\u5DF2\u5728\u6C60\u4E2D\uFF0C\u672A\u91CD\u590D\u6DFB\u52A0":`\u6388\u6743\u6210\u529F\uFF0C\u8D26\u53F7\u5DF2\u52A0\u5BC6\u5165\u5E93\uFF08\u6307\u7EB9 ${((v=oe.result)==null?void 0:v.fingerprint)??""}\uFF09`),ie(),b(null);const os=await k("list_providers");M(os.providers),w({providerId:ve,providerName:H,models:[],picked:new Set,loading:!0}),await re(ve,H,t,"")}catch(g){const X=g.message;p(X,"err"),b(H=>H&&{...H,step:"error",message:X,busy:!1})}},rs=(s,t,i,n)=>{const d=async()=>{var u;try{const N=await k("oauth_poll",{provider:s.type,state:i}),h=N.result??N,v=h.refresh_token||h.refreshToken;if(h.status==="ok"&&v){await Ue(s,t,v,h.email,(u=h.account)==null?void 0:u.uid);return}if(h.status==="error"){b(g=>g&&{...g,step:"error",message:h.message||"\u6388\u6743\u5931\u8D25"});return}b(g=>g&&{...g,message:"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026"}),P.current=window.setTimeout(d,Math.max(2,n)*1e3)}catch(N){b(h=>h&&{...h,step:"error",message:N.message})}};P.current=window.setTimeout(d,Math.max(2,n)*1e3)},je=async(s,t)=>{if(ie(),s.regionSelect){b({meta:s,provider:t??null,mode:s.mode,baseUrl:s.baseUrl,url:"",state:"",step:"region",codeInput:""});return}await Ie(s,t??null,ts(s,t??null))},Ie=async(s,t,i)=>{if(ie(),s.type==="zcode"&&/bigmodel\\.cn/i.test(i)){try{const n=await k("list_providers");let d=!1;n.providers.some(N=>N.slug==="zcode-bigmodel-oauth")||(await D("upsert_provider",{name:"ZCode \u56FD\u5185\u7248 (bigmodel\xB7\u65E7)",slug:"zcode-bigmodel-oauth",kind:"oauth:zcode",baseUrl:i}),d=!0);const u=d?await k("list_providers"):n;M(u.providers),b(null),p(d?"\u5DF2\u521B\u5EFA\u65E7\u7248\u56FD\u5185\u6E20\u9053\uFF1A\u8BF7\u7C98\u8D34\u5BA2\u6237\u7AEF access_token\u3002\u6CE8\u610F bigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0B\u7EBF\uFF0C\u5EFA\u8BAE\u6539\u7528 zchat.z.ai \u91CD\u65B0\u6388\u6743":"\u65E7\u7248\u56FD\u5185\u6E20\u9053\u5DF2\u5B58\u5728\uFF0C\u76F4\u63A5\u590D\u7528\uFF1A\u8BF7\u5728\u8BE5\u6E20\u9053\u5361\u7247\u4E0A\u7C98\u8D34\u5BA2\u6237\u7AEF access_token\u3002\u6CE8\u610F bigmodel \u5FAE\u4FE1\u626B\u7801\u5DF2\u4E0B\u7EBF\uFF0C\u5EFA\u8BAE\u6539\u7528 zchat.z.ai \u91CD\u65B0\u6388\u6743","ok")}catch(n){b(d=>d&&{...d,step:"error",message:n.message})}return}b({meta:s,provider:t,mode:s.mode,baseUrl:i,url:"",state:"",step:"loading",codeInput:""});try{const d=(await D("oauth_start",{provider:s.type,baseUrl:i})).result??{},u=d.mode||s.mode;b({meta:s,provider:t,mode:u,baseUrl:i,url:d.url??"",state:d.state??"",userCode:d.user_code,verificationUri:d.verification_uri,verificationUriComplete:d.verification_uri_complete,interval:Number(d.interval)||5,step:u==="redirect"?"ready":"polling",codeInput:"",message:u==="device"?"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026":u==="redirect-poll"?"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u5B8C\u6210\u767B\u5F55\u2026":void 0}),u!=="redirect"&&d.state&&rs(s,i,d.state,Number(d.interval)||5)}catch(n){b(d=>d&&{...d,step:"error",message:n.message})}},ns=async()=>{var s,t,i,n;if(a&&!ae.current){if(!a.codeInput.trim())return p("\u8BF7\u7C98\u8D34\u6388\u6743\u8FD4\u56DE\u7684 code \u6216\u6574\u6BB5\u56DE\u8C03\u5730\u5740","err");ae.current=!0,b({...a,busy:!0,message:"\u6B63\u5728\u6362\u53D6 access_token\u2026"});try{const d=await D("oauth_complete",{provider:a.meta.type,code:a.codeInput.trim(),state:a.state,baseUrl:a.baseUrl}),u=(s=d.result)==null?void 0:s.refreshToken;if(!u)throw new Error("\u4E0A\u6E38\u672A\u8FD4\u56DE refresh_token");await Ue(a.meta,a.baseUrl,u,(t=d.result)==null?void 0:t.email,(n=(i=d.result)==null?void 0:i.account)==null?void 0:n.uid)}catch(d){p(d.message,"err"),b(u=>u&&{...u,step:"error",message:d.message,busy:!1})}finally{ae.current=!1}}},is=()=>{a&&je(a.meta,a.provider??void 0)},ls=(s,t)=>{O({meta:s,provider:t??null,name:(t==null?void 0:t.name)??s.name,slug:(t==null?void 0:t.slug)??s.slug,baseUrl:(t==null?void 0:t.base_url)??s.baseUrl,credential:""})},ds=async()=>{var t,i,n;if(!l||Z.current)return;const s=l;if(!s.provider&&!s.credential.trim()&&!s.meta.anonymous)return p("\u8BF7\u7C98\u8D34\u8D26\u53F7\u51ED\u636E","err");if(!s.provider){if(!s.name.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053\u540D\u79F0","err");if(!s.slug.trim())return p("\u8BF7\u586B\u5199\u6E20\u9053 Slug","err");if(!s.baseUrl.trim())return p("\u8BF7\u586B\u5199 Base URL","err")}Z.current=!0,O({...s,saving:!0});try{let d=((t=s.provider)==null?void 0:t.id)||"";if(d)await D("upsert_provider_key",{providerId:d,key:s.credential.trim(),label:`account-${(((i=s.provider)==null?void 0:i.key_count)??0)+1}`});else{await D("upsert_provider",{name:s.name.trim(),slug:s.slug.trim().toLowerCase(),kind:`web:${s.meta.type}`,baseUrl:s.baseUrl.trim(),key:s.credential.trim()||void 0});const u=await k("list_providers");d=((n=u.providers.find(N=>N.slug===s.slug.trim().toLowerCase()))==null?void 0:n.id)||"",M(u.providers)}if(!d)throw new Error("Web \u6E20\u9053\u521B\u5EFA\u5931\u8D25");p(s.credential.trim()?"Web \u6E20\u9053\u51ED\u636E\u5DF2\u52A0\u5BC6\u5165\u5E93":"Web \u6E20\u9053\u5DF2\u63A5\u5165\uFF08\u533F\u540D\u6A21\u5F0F\uFF0C\u65E0\u51ED\u636E\uFF09"),O(null),V(),w({providerId:d,providerName:s.name,models:[],picked:new Set,loading:!0}),await re(d,s.name,s.baseUrl,"")}catch(d){p(d.message,"err"),O(u=>u&&{...u,saving:!1})}finally{Z.current=!1}},cs=s=>(f??[]).find(t=>t.slug===s.slug||t.kind===`web:${s.type}`),Y=(s=>s?We.find(t=>t.slug===s.slug||s.kind===`web:${t.type}`):void 0)(r);return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["direct","API \u76F4\u8FDE"],["oauth","OAuth \u6388\u6743"],["web","Web \u53CD\u4EE3"],["subs","\u7528\u6237\u63D0\u4EA4"]].map(([s,t])=>e.jsx("button",{role:"tab","aria-selected":T===s,onClick:()=>pe(s),className:S("rounded-md px-4 py-1.5 text-xs font-medium transition-colors",T===s?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:t},s))}),T==="subs"&&e.jsx(bs,{}),T==="direct"&&e.jsxs(e.Fragment,{children:[e.jsx("div",{className:"flex justify-end",children:e.jsxs(x,{onClick:_e,children:[e.jsx(ke,{size:14}),"\u6DFB\u52A0\u4F9B\u5E94\u5546"]})}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(8)].map((s,t)=>e.jsx("div",{className:"skeleton h-36 rounded-xl2"},t))}):f.filter(s=>!C(s)&&!_(s)).length===0?e.jsx(Q,{children:e.jsx(Qe,{icon:e.jsx(ms,{size:32}),title:"\u8FD8\u6CA1\u6709\u4E0A\u6E38\u4F9B\u5E94\u5546",hint:"\u6DFB\u52A0\u4F60\u6301\u6709\u6388\u6743\u7684\u4F9B\u5E94\u5546\u5E76\u5F55\u5165\u5BC6\u94A5\uFF0C\u5373\u53EF\u4E00\u952E\u5BFC\u5165\u6A21\u578B\u5217\u8868\u3002",action:e.jsx(x,{className:"mt-2",onClick:_e,children:"\u6DFB\u52A0\u4F9B\u5E94\u5546"})})}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:f.filter(s=>!C(s)&&!_(s)).map(s=>{var t;return e.jsxs(Q,{className:S("p-4 flex flex-col justify-between transition-all",s.status==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-sm font-bold text-brand",children:s.name[0]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"flex items-center gap-1.5 mt-0.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:"text-[9px] rounded bg-line px-1 text-muted",children:s.slug==="anthropic"||s.kind==="anthropic"?"Anthropic \u539F\u751F":ee(s.slug)?"\u514D Key":"OpenAI \u517C\u5BB9"})]})]})]}),e.jsx("button",{type:"button",onClick:()=>J(s),title:`\u70B9\u51FB${s.status==="active"?"\u505C\u7528":"\u542F\u7528"}\u8BE5\u6E20\u9053\uFF08\u505C\u7528\u540E\u76F8\u5E94\u6A21\u578B\u5728\u6A21\u578B\u6C60\u4E0E\u5B9A\u4EF7\u4E2D\u9690\u85CF\uFF09`,className:"cursor-pointer transition-transform hover:scale-105 shrink-0",children:e.jsx(be,{value:s.status})})]}),e.jsxs("dl",{className:"mt-3 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0 text-muted",children:"\u7AEF\u70B9"}),e.jsx("code",{className:"truncate text-ink max-w-[140px]",title:s.base_url,children:s.base_url})]}),e.jsxs("div",{className:"flex justify-between items-center",children:[e.jsx("span",{children:"\u5BC6\u94A5"}),e.jsx("span",{className:"text-ink truncate",children:ee(s.slug)?e.jsx("span",{className:"text-emerald-500 font-medium",children:"\u514D Key"}):e.jsxs("span",{className:"inline-flex items-center gap-1",children:[s.key_count," \u4E2A",s.key_count===0?e.jsx("span",{className:"text-warn",children:"\uFF08\u672A\u5F55\uFF09"}):(t=s.keys)!=null&&t.some(i=>i.health_status==="demoted")?e.jsx("span",{className:"text-err font-medium text-[10px]",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-emerald-500 font-medium text-[10px]",children:"\u5C31\u7EEA"})]})})]}),s.authorization_expires_at&&e.jsxs("div",{className:"flex justify-between",children:[e.jsx("span",{children:"\u6388\u6743\u5230\u671F"}),e.jsx("span",{className:"text-ink",children:new Date(s.authorization_expires_at*1e3).toLocaleDateString("zh-CN")})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>ne(s.id,s.name),title:"\u4ECE\u4E0A\u6E38\u5BFC\u5165\u6216\u624B\u52A8\u6DFB\u52A0\u6A21\u578B","aria-label":"\u5BFC\u5165\u6A21\u578B",children:e.jsx($,{size:13})}),e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>Xe(s.id,s.name),title:"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B","aria-label":"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B",children:e.jsx(ke,{size:13})}),!ee(s.slug)&&e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{z(s),E(""),q("prod")},title:`\u7BA1\u7406\u591A Key \u8F6E\u6362\u6C60\uFF08\u5F53\u524D ${s.key_count} \u4E2A\uFF09`,"aria-label":"\u5BC6\u94A5\u6C60",children:e.jsx(me,{size:13})}),e.jsx(x,{variant:"ghost",className:S("!h-7 !w-7 !px-0",s.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>J(s),title:`\u5207\u6362\u6E20\u9053\u542F\u7528/\u505C\u7528\u72B6\u6001\uFF08\u5F53\u524D${s.status==="active"?"\u542F\u7528":"\u505C\u7528"}\uFF09`,"aria-label":s.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(we,{size:13})}),e.jsx(x,{variant:"ghost",className:"!h-7 !w-7 !px-0",onClick:()=>Ve(s),title:"\u7F16\u8F91\u4F9B\u5E94\u5546","aria-label":"\u7F16\u8F91\u4F9B\u5E94\u5546",children:e.jsx(js,{size:13})}),e.jsx(x,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>fe(s),title:"\u5220\u9664\u4F9B\u5E94\u5546","aria-label":`\u5220\u9664 ${s.name}`,children:e.jsx(xe,{size:13})})]})]},s.id)})})]}),T==="oauth"&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:"OAuth \u6E20\u9053\u901A\u8FC7\u8D26\u53F7\u6388\u6743\u63A5\u5165\uFF08\u5B9E\u73B0\u79FB\u690D\u81EA CLIProxyAPI\uFF09\uFF1Arefresh_token \u7ECF AES-256-GCM \u52A0\u5BC6\u540E\u5B58\u5165\u6E20\u9053\u51ED\u636E\u6C60\uFF0C access_token \u81EA\u52A8\u5237\u65B0\uFF1B\u540C\u4E00\u6E20\u9053\u53EF\u6388\u6743\u591A\u4E2A\u8D26\u53F7\uFF0C\u81EA\u52A8\u8F6E\u6362\u3001\u9047 429/401 \u81EA\u52A8\u7194\u65AD\u51B7\u5374\u3002"}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(8)].map((s,t)=>e.jsx("div",{className:"skeleton h-40 rounded-xl2"},t))}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:Be.map(s=>{const t=new Set(as(s)),i=(f??[]).filter(v=>t.has(v.slug)),n=i.find(v=>(v.key_count??0)>0)??i[0]??null,d=Math.max(0,i.length-1),u=i.reduce((v,g)=>v+(g.key_count??0),0),N=i.some(v=>{var g;return(g=v.keys)==null?void 0:g.some(X=>X.health_status==="demoted")}),h=v=>{const g=ce(s,v.base_url);return g?g.name:v.name};return e.jsxs(Q,{className:S("p-4 flex flex-col justify-between transition-all",(n==null?void 0:n.status)==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(us,{size:16})}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"mt-0.5 flex items-center gap-1.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:(n==null?void 0:n.slug)??s.slug}),e.jsx("span",{className:"rounded bg-brand/10 px-1 text-[9px] font-medium text-brand",children:"OAuth"}),d>0&&e.jsxs("span",{className:"rounded bg-line px-1 text-[9px] text-muted",title:`${s.name} \u8FD8\u6709 ${d} \u4E2A\u5176\u4ED6\u533A\u57DF\u7684\u6E20\u9053\uFF0C\u53EF\u5728\u300C\u8D26\u53F7\u6C60\u300D\u4E2D\u67E5\u770B`,children:["+",d," \u533A\u57DF"]})]})]})]}),n?e.jsx("button",{type:"button",onClick:()=>J(n),title:"\u70B9\u51FB\u5207\u6362\u542F\u7528/\u505C\u7528",className:"shrink-0 cursor-pointer transition-transform hover:scale-105",children:e.jsx(be,{value:n.status})}):e.jsx("span",{className:"shrink-0 rounded bg-line px-1.5 py-0.5 text-[10px] text-muted",children:"\u672A\u63A5\u5165"})]}),e.jsx("p",{className:"mt-2.5 text-[11px] leading-relaxed text-muted",children:s.desc}),e.jsxs("dl",{className:"mt-2.5 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u6388\u6743\u65B9\u5F0F"}),e.jsx("span",{className:"text-ink",children:s.mode==="device"?"\u8BBE\u5907\u7801\u8F6E\u8BE2":s.mode==="redirect-poll"?"\u6388\u6743\u94FE\u63A5 + \u8F6E\u8BE2":"PKCE \u6388\u6743\u94FE\u63A5"})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u8D26\u53F7"}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(Te,{size:11,className:"text-muted"}),i.length?`${u} \u4E2A`:"\u2014",u>0&&(N?e.jsx("span",{className:"text-[10px] font-medium text-err",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-[10px] font-medium text-emerald-500",children:"\u5C31\u7EEA"}))]})]}),i.length>1&&e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u533A\u57DF"}),e.jsx("span",{className:"truncate text-ink",title:i.map(v=>`${h(v)}\uFF08${v.key_count} \u4E2A\u8D26\u53F7${v.status==="disabled"?" \xB7 \u505C\u7528":""}\uFF09`).join("\uFF1B"),children:i.map(v=>`${h(v)} ${v.key_count}`).join(" / ")})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u5019\u9009\u6A21\u578B"}),e.jsxs("code",{className:"truncate text-ink max-w-[170px]",title:s.models.join(", "),children:[s.models[0]," \u7B49 ",s.models.length," \u4E2A"]})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsxs(x,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>je(s,n),children:[e.jsx(Ee,{size:12}),n?"\u6388\u6743\u65B0\u8D26\u53F7":"\u6388\u6743\u5E76\u6DFB\u52A0"]}),n&&e.jsxs(e.Fragment,{children:[e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>ne(n.id,n.name),title:"\u62C9\u53D6/\u5BFC\u5165\u6A21\u578B","aria-label":"\u6A21\u578B\u7BA1\u7406",children:e.jsx($,{size:13})}),e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{z(n),E(""),q(`account-${n.key_count+1}`)},title:"\u7BA1\u7406\u6388\u6743\u8D26\u53F7","aria-label":"\u8D26\u53F7\u7BA1\u7406",children:e.jsx(me,{size:13})}),e.jsx(x,{variant:"ghost",className:S("!h-7 !w-7 !px-0 ml-auto",n.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>J(n),title:n.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053","aria-label":n.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(we,{size:13})}),e.jsx(x,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>fe(n),title:"\u5220\u9664\u6E20\u9053","aria-label":"\u5220\u9664\u6E20\u9053",children:e.jsx(xe,{size:13})})]})]})]},s.slug)})})]}),T==="web"&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted leading-relaxed",children:"Web \u53CD\u4EE3\u6E20\u9053\u4F7F\u7528\u6D4F\u89C8\u5668\u7F51\u9875\u4F1A\u8BDD\u51ED\u636E\uFF08Cookie / userToken / refresh_token\uFF09\uFF0C\u65E0\u9700\u5B98\u65B9 API Key\uFF1B \u51ED\u636E\u7ECF AES-256-GCM \u52A0\u5BC6\u540E\u5B58\u5165\u6E20\u9053\u51ED\u636E\u6C60\uFF0C\u591A\u8D26\u53F7\u81EA\u52A8\u8F6E\u6362\uFF0C\u9047 401/429 \u81EA\u52A8\u7194\u65AD\u3002"}),f===null?e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[...Array(6)].map((s,t)=>e.jsx("div",{className:"skeleton h-40 rounded-xl2"},t))}):e.jsx("div",{className:"grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:We.map(s=>{var i;const t=cs(s);return e.jsxs(Q,{className:S("p-4 flex flex-col justify-between transition-all",(t==null?void 0:t.status)==="disabled"&&"opacity-75 border-dashed bg-surface/50"),children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-start justify-between gap-2",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2.5",children:[e.jsx("div",{className:"flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(ps,{size:16})}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"truncate text-xs font-semibold leading-tight",children:s.name}),e.jsxs("div",{className:"mt-0.5 flex items-center gap-1.5",children:[e.jsx("code",{className:"text-[10px] text-muted font-mono",children:s.slug}),e.jsx("span",{className:"rounded bg-amber-500/10 px-1 text-[9px] font-medium text-amber-500",children:"Web"})]})]})]}),t?e.jsx("button",{type:"button",onClick:()=>J(t),title:"\u70B9\u51FB\u5207\u6362\u542F\u7528/\u505C\u7528",className:"shrink-0 cursor-pointer transition-transform hover:scale-105",children:e.jsx(be,{value:t.status})}):e.jsx("span",{className:"shrink-0 rounded bg-line px-1.5 py-0.5 text-[10px] text-muted",children:"\u672A\u63A5\u5165"})]}),e.jsx("p",{className:"mt-2.5 text-[11px] leading-relaxed text-muted",children:s.desc}),e.jsxs("dl",{className:"mt-2.5 space-y-1.5 text-[11px] text-muted",children:[e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u51ED\u636E"}),e.jsx("code",{className:"truncate text-ink max-w-[190px]",title:s.credHint,children:s.credHint})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u8D26\u53F7"}),e.jsxs("span",{className:"inline-flex items-center gap-1 text-ink",children:[e.jsx(Te,{size:11,className:"text-muted"}),t?`${t.key_count} \u4E2A`:"\u2014",t&&t.key_count>0&&((i=t.keys)!=null&&i.some(n=>n.health_status==="demoted")?e.jsx("span",{className:"text-[10px] font-medium text-err",children:"\u6709\u7194\u65AD"}):e.jsx("span",{className:"text-[10px] font-medium text-emerald-500",children:"\u5C31\u7EEA"}))]})]}),e.jsxs("div",{className:"flex min-w-0 justify-between gap-2",children:[e.jsx("span",{className:"shrink-0",children:"\u5019\u9009\u6A21\u578B"}),e.jsxs("code",{className:"truncate text-ink max-w-[170px]",title:s.models.join(", "),children:[s.models[0]," \u7B49 ",s.models.length," \u4E2A"]})]})]})]}),e.jsxs("div",{className:"mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5",children:[e.jsxs(x,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>ls(s,t),children:[e.jsx(ke,{size:12}),t?"\u6DFB\u52A0\u8D26\u53F7":"\u63A5\u5165\u5E76\u6DFB\u52A0"]}),t&&e.jsxs(e.Fragment,{children:[e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>ne(t.id,t.name),title:"\u62C9\u53D6/\u5BFC\u5165\u6A21\u578B","aria-label":"\u6A21\u578B\u7BA1\u7406",children:e.jsx($,{size:13})}),e.jsx(x,{variant:"soft",className:"!h-7 !w-7 !px-0",onClick:()=>{z(t),E(""),q(`account-${t.key_count+1}`)},title:"\u7BA1\u7406\u8D26\u53F7\u51ED\u636E","aria-label":"\u8D26\u53F7\u7BA1\u7406",children:e.jsx(me,{size:13})}),e.jsx(x,{variant:"ghost",className:S("!h-7 !w-7 !px-0 ml-auto",t.status==="active"?"!text-muted hover:!text-err":"!text-emerald-500 font-semibold"),onClick:()=>J(t),title:t.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053","aria-label":t.status==="active"?"\u505C\u7528\u6E20\u9053":"\u542F\u7528\u6E20\u9053",children:e.jsx(we,{size:13})}),e.jsx(x,{variant:"ghost",className:"!h-7 !w-7 !px-0 !text-err",onClick:()=>fe(t),title:"\u5220\u9664\u6E20\u9053","aria-label":"\u5220\u9664\u6E20\u9053",children:e.jsx(xe,{size:13})})]})]})]},s.slug)})})]}),e.jsx(F,{open:he,onClose:()=>R(!1),title:m.id?"\u7F16\u8F91\u4F9B\u5E94\u5546":"\u6DFB\u52A0\u4F9B\u5E94\u5546",width:560,children:e.jsxs("div",{className:"space-y-3.5",children:[!m.id&&e.jsx(U,{label:"\u5FEB\u901F\u8F7D\u5165\u9884\u8BBE\u6A21\u677F\uFF08\u53EF\u9009\uFF0C\u70B9\u51FB\u5FEB\u901F\u586B\u5165\uFF09",children:e.jsxs(Re,{onChange:s=>Je(s.target.value),defaultValue:"",children:[e.jsx("option",{value:"",children:"\u81EA\u5B9A\u4E49\u6216\u9009\u62E9\u5E38\u89C1\u9884\u8BBE..."}),Object.entries(qe).map(([s,t])=>e.jsxs("option",{value:s,children:[t.name,"\uFF08",t.kind==="anthropic"?"Anthropic \u5B98\u65B9":"OpenAI \u517C\u5BB9","\uFF09"]},s))]})}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(U,{label:"\u4F9B\u5E94\u5546\u540D\u79F0",children:e.jsx(I,{value:m.name,onChange:s=>A({...m,name:s.target.value}),placeholder:"\u4F8B\u5982: DeepSeek \u6216 OpenAI"})}),e.jsx(U,{label:"\u6E20\u9053\u6807\u8BC6 (Slug)",children:e.jsx(I,{value:m.slug,onChange:s=>A({...m,slug:s.target.value}),placeholder:"\u4F8B\u5982: deepseek"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(U,{label:"\u63A5\u53E3\u534F\u8BAE\u7C7B\u578B (Protocol)",children:e.jsxs(Re,{value:m.kind,onChange:s=>{const t=s.target.value;A({...m,kind:t,url:t==="anthropic"?"https://api.anthropic.com":m.url})},children:[e.jsx("option",{value:"openai_compat",children:"OpenAI \u517C\u5BB9\u534F\u8BAE (OpenAI / DeepSeek / Kilo / OpenCode / Google \u7B49)"}),e.jsx("option",{value:"anthropic",children:"Anthropic \u5B98\u65B9\u534F\u8BAE (Claude \u539F\u751F Messages)"})]})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(U,{label:m.kind==="anthropic"?"Base URL\uFF08Anthropic \u5B98\u65B9\u7AEF\u70B9\uFF09":"Base URL\uFF08OpenAI \u517C\u5BB9\u7AEF\u70B9\uFF09",children:e.jsx(I,{value:m.url,onChange:s=>A({...m,url:s.target.value}),placeholder:m.kind==="anthropic"?"https://api.anthropic.com":"https://api.openai.com"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(U,{label:ee(m.slug)?"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u514D Key \u6E20\u9053\uFF0C\u65E0\u9700\u586B\u5199\uFF09":m.id?"\u8FFD\u52A0\u65B0\u5BC6\u94A5\uFF08\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF0C\u652F\u6301\u591A\u884C\u6279\u91CF\u5F55\u5165\uFF09":"\u4E0A\u6E38\u5BC6\u94A5\uFF08\u5FC5\u586B\uFF0C\u652F\u6301\u7C98\u8D34\u591A\u4E2A\u4E00\u884C\u4E00\u4E2A\uFF09",children:e.jsx("textarea",{value:m.key,onChange:s=>A({...m,key:s.target.value}),placeholder:ee(m.slug)?"\u8BE5\u6E20\u9053\u5B8C\u5168\u514D\u8D39\u514D Key\uFF0C\u76F4\u63A5\u4FDD\u5B58\u5373\u53EF":`sk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy (\u652F\u6301\u7C98\u8D34\u591A\u4E2AKey\u4E00\u884C\u4E00\u4E2A\uFF0C\u81EA\u52A8\u8FDB\u5165\u591AKey\u8F6E\u6362\u6C60)`,rows:2,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(x,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>R(!1),children:"\u53D6\u6D88"}),e.jsx(x,{className:"flex-1 sm:flex-initial",disabled:y,onClick:Ye,children:y?"\u4FDD\u5B58\u4E2D\u2026":"\u4FDD\u5B58\u5E76\u83B7\u53D6\u6A21\u578B\u5217\u8868"})]})]})}),e.jsx(F,{open:!!o,onClose:()=>w(null),title:`\u6E20\u9053\u6A21\u578B\u7BA1\u7406 \u2014 ${(o==null?void 0:o.providerName)??""}`,width:540,children:o!=null&&o.loading?e.jsxs("div",{className:"flex items-center justify-center gap-2 py-10 text-sm text-muted",children:[e.jsx($,{size:16,className:"animate-spin"}),"\u6B63\u5728\u4ECE\u4E0A\u6E38\u62C9\u53D6\u6A21\u578B\u5217\u8868\u2026"]}):o!=null&&o.error?e.jsxs("div",{className:"py-4",children:[e.jsx("p",{className:"text-[13px] text-err mb-3",children:o.error}),e.jsxs("div",{className:"rounded-lg border border-dashed border-line p-3 bg-surface2/30 mb-4",children:[e.jsx("div",{className:"text-xs font-semibold text-ink mb-1.5",children:"\u624B\u52A8\u6DFB\u52A0\u6A21\u578B\uFF08\u8DF3\u8FC7\u81EA\u52A8\u53D1\u73B0\uFF09"}),e.jsxs("div",{className:"flex gap-2",children:[e.jsx(I,{className:"!py-1 text-xs",value:W,onChange:s=>c(s.target.value),placeholder:"\u5982: deepseek-chat, deepseek-reasoner"}),e.jsx(x,{variant:"soft",className:"!h-[34px] !px-3 shrink-0 text-xs",onClick:Se,children:"\u52A0\u5165"})]})]}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(x,{variant:"ghost",onClick:()=>w(null),children:"\u5173\u95ED"}),e.jsxs(x,{onClick:()=>ne(o.providerId,o.providerName),children:[e.jsx($,{size:14}),"\u91CD\u8BD5\u4E0A\u6E38\u53D1\u73B0"]}),o.picked.size>0&&e.jsxs(x,{onClick:Ae,children:["\u5BFC\u5165\u5DF2\u52A0\u6A21\u578B (",o.picked.size,")"]})]})]}):e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"mb-2 flex items-center justify-between gap-2",children:[e.jsxs("span",{className:"text-xs text-muted",children:["\u5019\u9009\u6A21\u578B\u6E05\u5355\uFF08\u5DF2\u52FE\u9009 ",(o==null?void 0:o.picked.size)??0," \u4E2A\uFF09\uFF1A"]}),e.jsxs("div",{className:"flex shrink-0 items-center gap-2",children:[e.jsx("button",{className:"text-xs text-brand hover:underline",onClick:()=>o&&w({...o,picked:new Set(o.models)}),children:"\u5168\u9009"}),e.jsxs(x,{variant:"ghost",className:"!h-6 !px-2 text-xs",title:"\u91CD\u65B0\u4ECE\u4E0A\u6E38\u62C9\u53D6\u6A21\u578B\u5217\u8868",onClick:()=>o&&ne(o.providerId,o.providerName),children:[e.jsx($,{size:12}),"\u91CD\u65B0\u62C9\u53D6\u6A21\u578B"]})]})]}),(o==null?void 0:o.note)&&e.jsx("p",{className:"mb-2 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-600",children:o.note}),e.jsxs("div",{className:"max-h-60 space-y-1 overflow-y-auto rounded-lg border border-line p-2",children:[(o==null?void 0:o.models.length)===0&&e.jsx("p",{className:"py-6 text-center text-xs text-muted",children:"\u672A\u53D1\u73B0\u4E0A\u6E38\u6A21\u578B\uFF0C\u53EF\u5728\u4E0B\u65B9\u624B\u52A8\u8F93\u5165\u6A21\u578B\u540D\u79F0\u6DFB\u52A0"}),o==null?void 0:o.models.map(s=>e.jsxs("label",{className:S("flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs transition-colors",o.picked.has(s)?"bg-brand/10 text-ink":"hover:bg-surface2"),children:[e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:o.picked.has(s),onChange:()=>{const t=new Set(o.picked);t.has(s)?t.delete(s):t.add(s),w({...o,picked:t})}}),e.jsx("code",{className:"font-mono",children:s})]},s))]}),e.jsxs("div",{className:"mt-2.5 rounded-lg border border-dashed border-line p-2.5 bg-surface2/30",children:[e.jsx("div",{className:"text-[11px] font-semibold text-ink mb-1",children:"\u624B\u52A8\u8F93\u5165\u6A21\u578B\u540D\uFF08\u5982\u4E0A\u6E38\u672A\u8FD4\u56DE\uFF0C\u6216\u81EA\u5B9A\u4E49\u6A21\u578B\uFF09"}),e.jsxs("div",{className:"flex gap-2",children:[e.jsx(I,{className:"!py-1 text-xs",value:W,onChange:s=>c(s.target.value),placeholder:"\u4F8B\u5982: deepseek-chat \u6216 gpt-5 (\u652F\u6301\u9017\u53F7/\u6362\u884C\u8F93\u5165\u591A\u4E2A)"}),e.jsx(x,{variant:"soft",className:"!h-[34px] !px-3 shrink-0 text-xs",onClick:Se,children:"\u52A0\u5165\u6E05\u5355"})]})]}),e.jsx("p",{className:"mt-2.5 text-[11px] text-muted",children:"\u5BFC\u5165\u540E\u6A21\u578B\u5373\u523B\u4E0A\u67B6\uFF1B\u5BF9\u5916\u6A21\u578B\u540D\u9ED8\u8BA4\u4E0E\u4E0A\u6E38\u4E00\u81F4\uFF0C\u53EF\u5728\u300C\u6A21\u578B\u4E0E\u5B9A\u4EF7\u300D\u4FEE\u6539\u6216\u914D\u7F6E\u81EA\u5B9A\u4E49\u522B\u540D\u3002"}),e.jsxs("div",{className:"mt-3.5 flex justify-end gap-2",children:[e.jsx(x,{variant:"ghost",onClick:()=>w(null),children:"\u53D6\u6D88"}),e.jsxs(x,{onClick:Ae,disabled:!(o!=null&&o.picked.size),children:["\u5BFC\u5165\u6240\u9009\u6A21\u578B (",(o==null?void 0:o.picked.size)??0,")"]})]})]})}),e.jsx(F,{open:!!r,onClose:()=>z(null),title:`${C(r)?"\u6388\u6743\u8D26\u53F7\u7BA1\u7406":_(r)?"Web \u8D26\u53F7\u51ED\u636E\u7BA1\u7406":"\u5BC6\u94A5\u6C60\u7BA1\u7406"} \u2014 ${(r==null?void 0:r.name)??""}`,width:560,children:e.jsxs("div",{className:"space-y-4",children:[e.jsx("p",{className:"text-xs text-muted",children:C(r)?"\u6BCF\u4E2A\u8D26\u53F7\u5BF9\u5E94\u4E00\u6761 refresh_token\uFF08AES-256-GCM \u52A0\u5BC6\u5B58\u50A8\uFF09\uFF0C\u7F51\u5173\u81EA\u52A8\u5237\u65B0 access_token \u5E76\u968F\u673A\u8F6E\u6362\uFF1B\u9047 429/401 \u81EA\u52A8\u964D\u6743\u51B7\u5374\uFF0C\u5230\u671F\u81EA\u52A8\u6062\u590D\u3002":_(r)?`${(Y==null?void 0:Y.credHint)??"\u7F51\u9875\u4F1A\u8BDD\u51ED\u636E"}\u3002\u6BCF\u4E2A\u8D26\u53F7\u4E00\u6761\u51ED\u636E\uFF08AES-256-GCM \u52A0\u5BC6\u5B58\u50A8\uFF09\uFF0C\u968F\u673A\u8F6E\u6362\uFF1B\u9047 401/429 \u81EA\u52A8\u7194\u65AD\u51B7\u5374\u3002`:"\u5DF2\u5F00\u542F\u591A Key \u8D1F\u8F7D\u5747\u8861\u4E0E\u5065\u5EB7\u7194\u65AD\u3002\u7F51\u5173\u4F7F\u7528 Fisher-Yates \u968F\u673A\u6253\u6563\u5B9E\u73B0\u5747\u5300\u8F6E\u6362\u5206\u6D41\uFF1B\u9047 429 \u81EA\u52A8\u964D\u6743\u8DF3\u8FC7\u5E76\u8F6E\u6362\u4E0B\u4E00\u4E2A Key\uFF0C60 \u79D2\u540E\u81EA\u52A8\u8BD5\u7528\u81EA\u6108\u3002"}),C(r)&&e.jsxs(x,{className:"w-full",variant:"soft",onClick:()=>{const s=r,t=Be.find(i=>i.slug===(s==null?void 0:s.slug));!s||!t||(z(null),je(t,s))},children:[e.jsx(Ee,{size:13}),"\u6388\u6743\u65B0\u8D26\u53F7"]}),e.jsxs("div",{className:"space-y-2",children:[e.jsxs("div",{className:"text-xs font-semibold text-ink flex items-center justify-between",children:[e.jsxs("span",{className:"flex items-center gap-1.5",children:[e.jsx(me,{size:13,className:"text-brand"}),C(r)?`\u5DF2\u6388\u6743\u8D26\u53F7\uFF08${(r==null?void 0:r.key_count)??(($e=r==null?void 0:r.keys)==null?void 0:$e.length)??0} \u4E2A\uFF09`:_(r)?`\u5DF2\u63A5\u5165\u8D26\u53F7\uFF08${(r==null?void 0:r.key_count)??((Ke=r==null?void 0:r.keys)==null?void 0:Ke.length)??0} \u4E2A\uFF09`:`\u5F53\u524D\u8F6E\u6362 Key \u5217\u8868\uFF08${(r==null?void 0:r.key_count)??((Oe=r==null?void 0:r.keys)==null?void 0:Oe.length)??0} \u4E2A\uFF09`]}),e.jsx("span",{className:"text-[11px] text-muted",children:r!=null&&r.keys_truncated?`\u4EC5\u5C55\u793A\u524D ${((Me=r==null?void 0:r.keys)==null?void 0:Me.length)??0} \u4E2A\uFF0C\u5171 ${(r==null?void 0:r.key_count)??0} \u4E2A`:C(r)||_(r)?"\u652F\u6301\u591A\u8D26\u53F7\u81EA\u52A8\u8F6E\u6362":"\u652F\u6301\u65E0\u7F1D\u6302\u8F7D\u4EFB\u610F\u591A\u4E2A Key"})]}),!(r!=null&&r.keys)||r.keys.length===0?e.jsx("div",{className:"rounded-lg border border-line p-3 text-center text-xs text-muted",children:C(r)?"\u6682\u65E0\u5DF2\u6388\u6743\u8D26\u53F7\uFF0C\u8BF7\u70B9\u51FB\u4E0A\u65B9\u300C\u6388\u6743\u65B0\u8D26\u53F7\u300D":_(r)?"\u6682\u65E0\u8D26\u53F7\u51ED\u636E\uFF0C\u8BF7\u5728\u4E0B\u65B9\u7C98\u8D34":"\u6682\u65E0\u5BC6\u94A5\uFF0C\u8BF7\u5728\u4E0B\u65B9\u5F55\u5165\u6216\u6279\u91CF\u7C98\u8D34 Key"}):e.jsx("div",{className:"max-h-52 space-y-1.5 overflow-y-auto rounded-lg border border-line p-2",children:r.keys.map(s=>e.jsxs("div",{className:"flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 rounded-lg bg-surface2/60 p-2 sm:px-2.5 sm:py-1.5 text-xs",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-1.5 min-w-0",children:[e.jsxs("code",{className:"text-ink font-mono font-medium truncate max-w-[120px] sm:max-w-[140px]",children:[s.fingerprint,"..."]}),e.jsx("span",{className:"rounded bg-line px-1 py-0.5 text-[10px] text-muted",children:s.label||"prod"}),s.status==="disabled"?e.jsx("span",{className:"rounded bg-zinc-500/10 px-1 py-0.5 text-[10px] text-zinc-400",children:"\u5DF2\u505C\u7528"}):s.health_status==="demoted"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-red-500/10 px-1 py-0.5 text-[10px] font-medium text-red-500",children:[e.jsx(hs,{size:10})," \u7194\u65AD\u51B7\u5374"]}):s.health_status==="unhealthy"?e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-amber-500/10 px-1 py-0.5 text-[10px] font-medium text-amber-500",children:[e.jsx(fs,{size:10})," \u5F02\u5E38(",s.failures,"\u6B21)"]}):e.jsxs("span",{className:"flex items-center gap-0.5 rounded bg-emerald-500/10 px-1 py-0.5 text-[10px] font-medium text-emerald-500",children:[e.jsx(gs,{size:10})," ",C(r)||_(r)?"\u8D26\u53F7\u5C31\u7EEA":"\u8F6E\u6362\u5C31\u7EEA"]})]}),e.jsxs("div",{className:"flex items-center justify-end gap-1 shrink-0 self-end sm:self-auto pt-0.5 sm:pt-0",children:[e.jsx(x,{variant:"ghost",className:"!h-6 !px-2 text-[11px]",onClick:()=>ss(r.id,s.id,s.status),children:s.status==="active"?"\u505C\u7528":"\u542F\u7528"}),e.jsxs(x,{variant:"ghost",className:"!h-6 !px-2 text-[11px] !text-err",onClick:()=>es(r.id,s.id),children:[e.jsx(xe,{size:11,className:"mr-0.5"}),"\u5220\u9664"]})]})]},s.id))})]}),e.jsxs("div",{className:"rounded-lg border border-dashed border-line p-3 space-y-2.5 bg-surface/50",children:[e.jsx("div",{className:"text-xs font-semibold text-ink",children:C(r)?"\u624B\u52A8\u8FFD\u52A0 refresh_token":_(r)?"\u8FFD\u52A0\u8D26\u53F7\u51ED\u636E":"\u6279\u91CF\u8FFD\u52A0\u65B0\u5BC6\u94A5"}),e.jsx("div",{className:"space-y-1",children:e.jsx("textarea",{value:K,onChange:s=>E(s.target.value),placeholder:C(r)?`\u7C98\u8D34 refresh_token\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF0C\u4F8B\u5982\uFF1A\nrt_xxxxxxxxxxxxxxxx\nrt_yyyyyyyyyyyyyyyy`:_(r)?`\u6BCF\u884C\u4E00\u4E2A\u8D26\u53F7\u51ED\u636E\uFF0C\u683C\u5F0F\uFF1A\n${(Y==null?void 0:Y.credHint)??""}`:`\u652F\u6301\u5355\u4E2A\u6216\u6279\u91CF\u7C98\u8D34\u591A\u4E2A Key\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF0C\u4F8B\u5982\uFF1A\nsk-xxxxxxxxxxxxxxxx\nsk-yyyyyyyyyyyyyyyy`,rows:3,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),e.jsxs("div",{className:"flex flex-col sm:flex-row sm:items-center justify-between gap-2.5",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-[11px] text-muted shrink-0",children:"\u6807\u7B7E"}),e.jsx(I,{className:"!py-1 flex-1 sm:!w-28 text-xs",value:se,onChange:s=>q(s.target.value),placeholder:C(r)?"\u5982 account-2":"\u5982 prod-2"})]}),e.jsxs("div",{className:"flex items-center justify-end gap-2",children:[e.jsx(x,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>z(null),children:"\u5173\u95ED"}),e.jsx(x,{className:"flex-1 sm:flex-initial",onClick:De,disabled:!K.trim()||G,children:G?"\u4FDD\u5B58\u4E2D\u2026":C(r)||_(r)?"\u4FDD\u5B58\u8D26\u53F7\u51ED\u636E":"\u4FDD\u5B58\u5E76\u8FFD\u52A0\u81F3\u6C60"})]})]})]})]})}),e.jsx(F,{open:!!l,onClose:()=>O(null),title:`${l!=null&&l.provider?"\u6DFB\u52A0\u8D26\u53F7":"\u63A5\u5165 Web \u53CD\u4EE3"} \u2014 ${(l==null?void 0:l.meta.name)??""}`,width:560,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"rounded-lg border border-line bg-surface2/50 p-3 text-[11px] text-muted leading-relaxed",children:["\u51ED\u636E\u4ECE\u6D4F\u89C8\u5668\u7F51\u9875\u4F1A\u8BDD\u83B7\u53D6\uFF1A",e.jsx("span",{className:"text-ink",children:l==null?void 0:l.meta.credHint}),e.jsx("br",{}),"\u6BCF\u884C\u4E00\u4E2A\u8D26\u53F7\uFF0C\u7C98\u8D34\u591A\u4E2A\u4F1A\u81EA\u52A8\u8FDB\u5165\u8F6E\u6362\u6C60\uFF1B\u51ED\u636E\u4EC5\u52A0\u5BC6\u5B58\u50A8\uFF0C\u4E0D\u4F1A\u56DE\u663E\u3002"]}),!(l!=null&&l.provider)&&e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(U,{label:"\u6E20\u9053\u540D\u79F0",children:e.jsx(I,{value:(l==null?void 0:l.name)??"",onChange:s=>l&&O({...l,name:s.target.value})})}),e.jsx(U,{label:"\u6E20\u9053 Slug",children:e.jsx(I,{value:(l==null?void 0:l.slug)??"",onChange:s=>l&&O({...l,slug:s.target.value})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(U,{label:"Base URL",children:e.jsx(I,{value:(l==null?void 0:l.baseUrl)??"",onChange:s=>l&&O({...l,baseUrl:s.target.value})})})})]}),e.jsx(U,{label:l!=null&&l.provider?"\u8FFD\u52A0\u8D26\u53F7\u51ED\u636E\uFF08\u4E00\u884C\u4E00\u4E2A\uFF09":l!=null&&l.meta.anonymous?"\u8D26\u53F7\u51ED\u636E\uFF08\u53EF\u9009\uFF0C\u7559\u7A7A\u8D70\u533F\u540D\u6A21\u5F0F\uFF09":"\u8D26\u53F7\u51ED\u636E\uFF08\u5FC5\u586B\uFF0C\u4E00\u884C\u4E00\u4E2A\uFF09",children:e.jsx("textarea",{value:(l==null?void 0:l.credential)??"",onChange:s=>l&&O({...l,credential:s.target.value}),rows:4,placeholder:l==null?void 0:l.meta.credHint,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(x,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>O(null),children:"\u53D6\u6D88"}),e.jsx(x,{className:"flex-1 sm:flex-initial",onClick:ds,disabled:!!(l!=null&&l.saving)||!(l!=null&&l.credential.trim())&&!(l!=null&&l.meta.anonymous&&!(l!=null&&l.provider)),children:l!=null&&l.saving?"\u4FDD\u5B58\u4E2D\u2026":l!=null&&l.provider?"\u4FDD\u5B58\u5E76\u8FFD\u52A0":l!=null&&l.credential.trim()?"\u4FDD\u5B58\u5E76\u63A5\u5165":"\u533F\u540D\u63A5\u5165"})]})]})}),e.jsx(F,{open:!!a,onClose:le,title:`OAuth \u6388\u6743 \u2014 ${(a==null?void 0:a.meta.name)??""}`,width:560,children:(a==null?void 0:a.step)==="region"?e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx("p",{className:"text-xs leading-relaxed text-muted",children:"\u8BE5\u6E20\u9053\u56FD\u5185\u7248\u4E0E\u56FD\u9645\u7248\u8D26\u53F7\u4F53\u7CFB\u5B8C\u5168\u72EC\u7ACB\uFF0C\u8BF7\u9009\u62E9\u8981\u6388\u6743\u7684\u533A\u57DF\u3002\u9009\u9519\u533A\u57DF\u4F1A\u5BFC\u81F4\u6388\u6743\u6210\u529F\u4F46\u65E0\u6CD5\u8C03\u7528\u3002"}),(a.meta.regions||[]).map(s=>{const t=ce(a.meta,s.baseUrl),i=t?(f??[]).find(n=>n.slug===t.slug)??null:null;return e.jsxs("button",{onClick:()=>void Ie(a.meta,i,s.baseUrl),className:"flex flex-col gap-1 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 text-left transition-colors hover:border-brand/40 hover:bg-brand/5",children:[e.jsxs("span",{className:"flex items-center gap-2 text-sm font-semibold text-ink",children:[s.label,i&&e.jsx("span",{className:"rounded bg-brand/10 px-1 text-[10px] font-medium text-brand",children:"\u590D\u7528\u5DF2\u6709\u6E20\u9053"})]}),e.jsx("span",{className:"text-[11px] text-muted",children:s.desc})]},s.baseUrl)})]}):(a==null?void 0:a.step)==="loading"?e.jsxs("div",{className:"flex items-center justify-center gap-2 py-10 text-sm text-muted",children:[e.jsx($,{size:16,className:"animate-spin"}),"\u6B63\u5728\u5411 ",a.meta.name," \u53D1\u8D77\u6388\u6743\u8BF7\u6C42\u2026"]}):(a==null?void 0:a.step)==="error"?e.jsxs("div",{className:"space-y-4",children:[e.jsx("div",{className:"rounded-lg border border-err/30 bg-err/5 p-3 text-xs text-err leading-relaxed",children:a.message}),e.jsx("p",{className:"text-[11px] text-muted",children:"\u63D0\u793A\uFF1A\u6388\u6743\u94FE\u63A5\u6709\u6548\u671F\u7EA6 10 \u5206\u949F\uFF1B\u82E5\u4F7F\u7528\u4E86\u4EE3\u7406/\u65E0\u75D5\u7A97\u53E3\uFF0C\u8BF7\u4FDD\u6301\u540C\u4E00\u6D4F\u89C8\u5668\u5B8C\u6210\u6388\u6743\u3002\u4E5F\u53EF\u5728\u4E0B\u65B9\u624B\u52A8\u7C98\u8D34 refresh_token\u3002"}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(x,{variant:"ghost",onClick:le,children:"\u5173\u95ED"}),e.jsxs(x,{onClick:is,children:[e.jsx($,{size:14}),"\u91CD\u65B0\u53D1\u8D77\u6388\u6743"]})]})]}):(a==null?void 0:a.mode)==="redirect-poll"?e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs leading-relaxed text-muted",children:["\u8BF7\u5728\u6D4F\u89C8\u5668\u4E2D\u6253\u5F00\u4E0B\u65B9\u6388\u6743\u9875\uFF0C\u767B\u5F55 ",a.meta.name," \u8D26\u53F7\u5E76\u786E\u8BA4\u6388\u6743\u3002\u5B8C\u6210\u540E\u672C\u5F39\u7A97\u4F1A\u81EA\u52A8\u83B7\u53D6\u5E76\u4FDD\u5B58\u51ED\u636E\u3002"]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx(I,{readOnly:!0,value:a.url,className:"!py-1 flex-1 text-[11px] font-mono"}),e.jsx(x,{variant:"soft",className:"!h-[34px] !px-2.5 shrink-0",onClick:()=>ge(a.url),title:"\u590D\u5236\u6388\u6743\u94FE\u63A5",children:e.jsx(ye,{size:12})}),e.jsxs(x,{className:"!h-[34px] !px-3 shrink-0",onClick:()=>window.open(a.url,"_blank","noopener,noreferrer"),children:[e.jsx(Ne,{size:12}),"\u6253\u5F00\u6388\u6743\u9875"]})]}),e.jsxs("div",{className:"flex items-center gap-2 rounded-lg border border-line bg-surface p-3 text-xs text-muted",children:[e.jsx($,{size:13,className:"animate-spin text-brand"}),e.jsx("span",{children:a.message||"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u5B8C\u6210\u767B\u5F55\u2026"}),e.jsxs("span",{className:"ml-auto text-[10px]",children:["\u6BCF ",a.interval||5,"s \u8F6E\u8BE2"]})]}),e.jsxs("p",{className:"text-[11px] text-muted",children:["\u6388\u6743\u94FE\u63A5\u7531 ",a.meta.name," \u5B98\u65B9\u7B7E\u53D1\uFF0C\u6709\u6548\u671F\u7EA6 1 \u5C0F\u65F6\u3002\u5982\u9700\u4E3A\u540C\u4E00\u6E20\u9053\u6DFB\u52A0\u7B2C\u4E8C\u4E2A\u8D26\u53F7\uFF0C\u5EFA\u8BAE\u4F7F\u7528\u65E0\u75D5\u7A97\u53E3\u6253\u5F00\u6388\u6743\u9875\u3002"]}),e.jsx("div",{className:"flex justify-end",children:e.jsx(x,{variant:"ghost",onClick:le,children:"\u53D6\u6D88\u6388\u6743"})})]}):(a==null?void 0:a.mode)==="device"?e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs text-muted leading-relaxed",children:["\u8BF7\u5728\u6D4F\u89C8\u5668\u4E2D\u6253\u5F00\u4E0B\u65B9\u6388\u6743\u9875\uFF0C\u767B\u5F55 ",a.meta.name," \u8D26\u53F7\u5E76\u786E\u8BA4\u8BBE\u5907\u7801\uFF1A"]}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/60 p-3 text-center",children:[e.jsx("div",{className:"text-[11px] text-muted",children:"\u8BBE\u5907\u7801 / User Code"}),e.jsx("div",{className:"mt-1 font-mono text-2xl font-bold tracking-widest text-brand",children:a.userCode||"\u2014"}),e.jsxs("div",{className:"mt-2 flex flex-wrap items-center justify-center gap-2",children:[e.jsxs(x,{variant:"soft",className:"!h-7 !px-2.5 text-[11px]",onClick:()=>ge(a.userCode||""),children:[e.jsx(ye,{size:11}),"\u590D\u5236\u8BBE\u5907\u7801"]}),e.jsxs(x,{className:"!h-7 !px-2.5 text-[11px]",onClick:()=>window.open(a.verificationUriComplete||a.verificationUri||a.url,"_blank","noopener,noreferrer"),children:[e.jsx(Ne,{size:11}),"\u6253\u5F00\u6388\u6743\u9875"]})]}),(a.verificationUriComplete||a.verificationUri)&&e.jsx("div",{className:"mt-2 truncate text-[10px] text-muted",title:a.verificationUriComplete||a.verificationUri,children:a.verificationUriComplete||a.verificationUri})]}),e.jsxs("div",{className:"flex items-center gap-2 rounded-lg border border-line bg-surface p-3 text-xs text-muted",children:[e.jsx($,{size:13,className:"animate-spin text-brand"}),e.jsx("span",{children:a.message||"\u7B49\u5F85\u4F60\u5728\u6D4F\u89C8\u5668\u4E2D\u786E\u8BA4\u6388\u6743\u2026"}),a.interval?e.jsxs("span",{className:"ml-auto text-[10px]",children:["\u6BCF ",a.interval,"s \u8F6E\u8BE2"]}):null]}),e.jsx("p",{className:"text-[11px] text-muted",children:"\u5982\u9700\u4E3A\u540C\u4E00\u6E20\u9053\u6DFB\u52A0\u7B2C\u4E8C\u4E2A\u8D26\u53F7\uFF0C\u8BF7\u4F7F\u7528\u65E0\u75D5\u7A97\u53E3\u6253\u5F00\u6388\u6743\u9875\uFF0C\u907F\u514D\u6D4F\u89C8\u5668\u590D\u7528\u5DF2\u767B\u5F55\u4F1A\u8BDD\u3002"}),e.jsx("div",{className:"flex justify-end",children:e.jsx(x,{variant:"ghost",onClick:le,children:"\u53D6\u6D88\u6388\u6743"})})]}):e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"text-xs leading-relaxed text-muted",children:["1. \u70B9\u51FB\u4E0B\u65B9\u6309\u94AE\u6253\u5F00 ",a==null?void 0:a.meta.name," \u6388\u6743\u9875\u5E76\u767B\u5F55\uFF1B",e.jsx("br",{}),"2. \u6388\u6743\u540E\u6D4F\u89C8\u5668\u4F1A\u8DF3\u8F6C\u5230 ",e.jsx("code",{className:"rounded bg-line px-1",children:"127.0.0.1"})," \u56DE\u8C03\u5730\u5740\uFF08\u9875\u9762\u6253\u4E0D\u5F00\u5C5E\u6B63\u5E38\u73B0\u8C61\uFF09\uFF1B",e.jsx("br",{}),"3. ",(a==null?void 0:a.meta.type)==="trae"?"\u76F4\u63A5\u590D\u5236\u5730\u5740\u680F\u7684\u6574\u6BB5\u56DE\u8C03 URL\uFF08\u5FC5\u987B\u542B refreshToken / authCode\uFF09\u7C98\u8D34\u5230\u4E0B\u65B9\u3002":e.jsxs(e.Fragment,{children:["\u590D\u5236\u5730\u5740\u680F ",e.jsx("code",{className:"rounded bg-line px-1",children:"code="})," \u540E\u7684\u6574\u6BB5\u5185\u5BB9\uFF08\u6216\u6574\u6BB5\u56DE\u8C03 URL\uFF09\u7C98\u8D34\u5230\u4E0B\u65B9\u3002"]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx(I,{readOnly:!0,value:(a==null?void 0:a.url)??"",className:"!py-1 flex-1 text-[11px] font-mono"}),e.jsx(x,{variant:"soft",className:"!h-[34px] !px-2.5 shrink-0",onClick:()=>ge((a==null?void 0:a.url)??""),title:"\u590D\u5236\u6388\u6743\u94FE\u63A5",children:e.jsx(ye,{size:12})}),e.jsxs(x,{className:"!h-[34px] !px-3 shrink-0",onClick:()=>window.open((a==null?void 0:a.url)??"","_blank","noopener,noreferrer"),children:[e.jsx(Ne,{size:12}),"\u6253\u5F00"]})]}),e.jsx(U,{label:"\u6388\u6743 code \u6216\u6574\u6BB5\u56DE\u8C03\u5730\u5740",children:e.jsx("textarea",{value:(a==null?void 0:a.codeInput)??"",onChange:s=>a&&b({...a,codeInput:s.target.value}),rows:3,placeholder:"\u7C98\u8D34 code \u6216 http://localhost:xxxxx/callback?code=...",className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"})}),(a==null?void 0:a.message)&&e.jsx("div",{className:"text-[11px] text-muted",children:a.message}),e.jsxs("div",{className:"flex justify-end gap-2",children:[e.jsx(x,{variant:"ghost",onClick:le,children:"\u53D6\u6D88"}),e.jsx(x,{onClick:ns,disabled:(a==null?void 0:a.busy)||!(a!=null&&a.codeInput.trim()),children:a!=null&&a.busy?"\u6B63\u5728\u9A8C\u8BC1\u2026":"\u5B8C\u6210\u6388\u6743"})]})]})}),Ze]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/ScheduledTasks-D8yy-VHd.js": {
-              content: 'import{c as S,u as M,j as e,d as b,B as $,m as w,E as B,n as N}from"./index-JGTLcmXV.js";import{r as h}from"./vendor-BbQ_LiY-.js";import A from"./VideoTasks-BDX3xrTh.js";import{R as P}from"./refresh-cw-BY9R0tIW.js";import"./external-link-CAe9zb1u.js";import"./trash-2-DuK1uChF.js";import"./clock-D3gRE-jV.js";import"./circle-check-CmF7WJUQ.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const C=S("CalendarCheck",[["path",{d:"M8 2v4",key:"1cmpym"}],["path",{d:"M16 2v4",key:"4m81vk"}],["rect",{width:"18",height:"18",x:"3",y:"4",rx:"2",key:"1hopcy"}],["path",{d:"M3 10h18",key:"8toen8"}],["path",{d:"m9 16 2 2 4-4",key:"19s6y9"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const R=S("Play",[["polygon",{points:"6 3 20 12 6 21 6 3",key:"1oa8hb"}]]);function _(){const[u,f]=h.useState(null),[x,k]=h.useState([]),[p,c]=h.useState(""),[j,v]=h.useState(!1),i=M(),y=async(s=!1)=>{s||v(!0);try{const t=await N("checkin_status"),a=(t.result??t)||{channels:[],providers:[]};k(a.channels||[]),f(a.providers||[])}catch(t){s||i(t.message,"err"),f([])}finally{s||v(!1)}};h.useEffect(()=>{y()},[]);const z=async(s,t,a)=>{c(`toggle-${s}`);try{await N("set_checkin",{type:s,enabled:t}),i(`${t?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"}${a}\u81EA\u52A8\u4EFB\u52A1`,"ok"),await y(!0)}catch(l){i(l.message,"err")}finally{c("")}},T=async(s,t,a)=>{var l,m;c(`run-${s}`);try{const r=(((l=(await N("codebuddy_checkin",{type:s})).result)==null?void 0:l.channels)||[]).flatMap(n=>n.accounts||[]),d=r.filter(n=>n.ok).length;r.length===0?i(`${t}\uFF1A\u6682\u65E0\u53EF\u6267\u884C${a}\u7684\u8D26\u53F7`,"err"):d===r.length?i(`${t} ${a}\uFF1A${d}/${r.length} \u5168\u90E8\u6210\u529F`,"ok"):i(`${t} ${a}\uFF1A\u6210\u529F ${d}/${r.length}\uFF0C${((m=r.find(n=>!n.ok))==null?void 0:m.message)||"\u5B58\u5728\u5931\u8D25"}`,d>0?"ok":"err")}catch(o){i(o.message,"err")}finally{c("")}},g=new Map;for(const s of u||[]){const t=g.get(s.type)||[];t.push(s),g.set(s.type,t)}return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx(b,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(C,{size:18})}),e.jsxs("div",{children:[e.jsx("h2",{className:"text-base font-bold text-ink",children:"\u7B7E\u5230\u4EFB\u52A1"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u6BCF\u65E5 09:00 \u540E\u5168\u7AD9\u9996\u6B21\u8BBF\u95EE\u65F6\u81EA\u52A8\u6267\u884C\u4E00\u6B21\uFF08\u5F53\u65E5\u53BB\u91CD\uFF09\uFF1B\u4E5F\u53EF\u5728\u6B64\u624B\u52A8\u7ACB\u5373\u6267\u884C\u3002\u5F00\u5173\u6309\u6E20\u9053\u7C7B\u578B\u5168\u5C40\u751F\u6548\u3002"})]})]}),e.jsxs($,{variant:"soft",className:"h-9",onClick:()=>y(),disabled:j,children:[e.jsx(P,{size:14,className:w(j&&"animate-spin")}),j?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]})]})}),u===null?e.jsx(b,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):g.size===0?e.jsx(b,{children:e.jsx(B,{icon:e.jsx(C,{size:30}),title:"\u6682\u65E0\u652F\u6301\u7B7E\u5230\u7684\u6E20\u9053",hint:"\u63A5\u5165 CodeBuddy / ZCode / Qoder \u7B49 OAuth \u6E20\u9053\u540E\uFF0C\u8FD9\u91CC\u4F1A\u51FA\u73B0\u5BF9\u5E94\u7684\u5B9A\u65F6\u7B7E\u5230\u4EFB\u52A1\u3002"})}):[...g.entries()].map(([s,t])=>{var d;const a=x.find(n=>n.type===s),l=((d=t[0])==null?void 0:d.enabled)??!0,m=(a==null?void 0:a.label)||s,o=(a==null?void 0:a.action)||"\u7B7E\u5230",r=t.reduce((n,E)=>n+E.accounts,0);return e.jsx(b,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs("h3",{className:"text-sm font-semibold text-ink",children:[m,"\u6BCF\u65E5",o]}),e.jsx("span",{className:w("rounded px-1.5 py-0.5 text-[10px] font-medium",l?"bg-emerald-500/10 text-emerald-500":"bg-zinc-500/10 text-zinc-400"),children:l?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"})]}),e.jsxs("p",{className:"mt-1 text-xs text-muted",children:[t.map(n=>`${n.name}\uFF08${n.accounts} \u4E2A\u8D26\u53F7${n.status==="disabled"?" \xB7 \u6E20\u9053\u505C\u7528":""}\uFF09`).join("\u3001")||"\u65E0\u8D26\u53F7",r===0&&" \u2014\u2014 \u5148\u5230\u300C\u4F9B\u5E94\u5546\u300D\u9875\u7ED9\u6E20\u9053\u6388\u6743\u8D26\u53F7"]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs("label",{className:"inline-flex cursor-pointer items-center gap-2 text-xs text-muted",children:[e.jsx("input",{type:"checkbox",className:"h-3.5 w-3.5 cursor-pointer accent-[var(--brand)]",checked:l,disabled:p===`toggle-${s}`,onChange:n=>z(s,n.target.checked,m)}),"\u81EA\u52A8\u6267\u884C"]}),e.jsxs($,{variant:"soft",className:"h-8",disabled:p===`run-${s}`,onClick:()=>T(s,m,o),children:[e.jsx(R,{size:12}),p===`run-${s}`?`${o}\u4E2D\u2026`:`\u7ACB\u5373${o}`]})]})]})},s)})]})}function F({me:u}){const f=u.user.role==="superadmin",[x,k]=h.useState("videos"),p=[["videos","\u89C6\u9891\u4EFB\u52A1"],...f?[["checkin","\u7B7E\u5230\u4EFB\u52A1"]]:[]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:p.map(([c,j])=>e.jsx("button",{role:"tab","aria-selected":x===c,onClick:()=>k(c),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${x===c?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:j},c))}),x==="videos"&&e.jsx(A,{me:u}),x==="checkin"&&f&&e.jsx(_,{})]})}\n',
+            "/assets/ScheduledTasks-_PMtXiY3.js": {
+              content: 'import{c as S,u as M,j as e,d as b,B as $,m as w,E as B,n as N}from"./index-OWhocmiM.js";import{r as h}from"./vendor-BbQ_LiY-.js";import A from"./VideoTasks-sX0jnlVr.js";import{R as P}from"./refresh-cw-CiqXg9A7.js";import"./external-link-DgYLUCQ-.js";import"./trash-2-BAKVuXGI.js";import"./clock-I44wVmzv.js";import"./circle-check-CIKjzwLy.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const C=S("CalendarCheck",[["path",{d:"M8 2v4",key:"1cmpym"}],["path",{d:"M16 2v4",key:"4m81vk"}],["rect",{width:"18",height:"18",x:"3",y:"4",rx:"2",key:"1hopcy"}],["path",{d:"M3 10h18",key:"8toen8"}],["path",{d:"m9 16 2 2 4-4",key:"19s6y9"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const R=S("Play",[["polygon",{points:"6 3 20 12 6 21 6 3",key:"1oa8hb"}]]);function _(){const[u,f]=h.useState(null),[x,k]=h.useState([]),[p,c]=h.useState(""),[j,v]=h.useState(!1),i=M(),y=async(s=!1)=>{s||v(!0);try{const t=await N("checkin_status"),a=(t.result??t)||{channels:[],providers:[]};k(a.channels||[]),f(a.providers||[])}catch(t){s||i(t.message,"err"),f([])}finally{s||v(!1)}};h.useEffect(()=>{y()},[]);const z=async(s,t,a)=>{c(`toggle-${s}`);try{await N("set_checkin",{type:s,enabled:t}),i(`${t?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"}${a}\u81EA\u52A8\u4EFB\u52A1`,"ok"),await y(!0)}catch(l){i(l.message,"err")}finally{c("")}},T=async(s,t,a)=>{var l,m;c(`run-${s}`);try{const r=(((l=(await N("codebuddy_checkin",{type:s})).result)==null?void 0:l.channels)||[]).flatMap(n=>n.accounts||[]),d=r.filter(n=>n.ok).length;r.length===0?i(`${t}\uFF1A\u6682\u65E0\u53EF\u6267\u884C${a}\u7684\u8D26\u53F7`,"err"):d===r.length?i(`${t} ${a}\uFF1A${d}/${r.length} \u5168\u90E8\u6210\u529F`,"ok"):i(`${t} ${a}\uFF1A\u6210\u529F ${d}/${r.length}\uFF0C${((m=r.find(n=>!n.ok))==null?void 0:m.message)||"\u5B58\u5728\u5931\u8D25"}`,d>0?"ok":"err")}catch(o){i(o.message,"err")}finally{c("")}},g=new Map;for(const s of u||[]){const t=g.get(s.type)||[];t.push(s),g.set(s.type,t)}return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx(b,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(C,{size:18})}),e.jsxs("div",{children:[e.jsx("h2",{className:"text-base font-bold text-ink",children:"\u7B7E\u5230\u4EFB\u52A1"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u6BCF\u65E5 09:00 \u540E\u5168\u7AD9\u9996\u6B21\u8BBF\u95EE\u65F6\u81EA\u52A8\u6267\u884C\u4E00\u6B21\uFF08\u5F53\u65E5\u53BB\u91CD\uFF09\uFF1B\u4E5F\u53EF\u5728\u6B64\u624B\u52A8\u7ACB\u5373\u6267\u884C\u3002\u5F00\u5173\u6309\u6E20\u9053\u7C7B\u578B\u5168\u5C40\u751F\u6548\u3002"})]})]}),e.jsxs($,{variant:"soft",className:"h-9",onClick:()=>y(),disabled:j,children:[e.jsx(P,{size:14,className:w(j&&"animate-spin")}),j?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]})]})}),u===null?e.jsx(b,{className:"p-6",children:e.jsx("div",{className:"skeleton h-20 rounded-xl2"})}):g.size===0?e.jsx(b,{children:e.jsx(B,{icon:e.jsx(C,{size:30}),title:"\u6682\u65E0\u652F\u6301\u7B7E\u5230\u7684\u6E20\u9053",hint:"\u63A5\u5165 CodeBuddy / ZCode / Qoder \u7B49 OAuth \u6E20\u9053\u540E\uFF0C\u8FD9\u91CC\u4F1A\u51FA\u73B0\u5BF9\u5E94\u7684\u5B9A\u65F6\u7B7E\u5230\u4EFB\u52A1\u3002"})}):[...g.entries()].map(([s,t])=>{var d;const a=x.find(n=>n.type===s),l=((d=t[0])==null?void 0:d.enabled)??!0,m=(a==null?void 0:a.label)||s,o=(a==null?void 0:a.action)||"\u7B7E\u5230",r=t.reduce((n,E)=>n+E.accounts,0);return e.jsx(b,{className:"p-4 sm:p-5",children:e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs("h3",{className:"text-sm font-semibold text-ink",children:[m,"\u6BCF\u65E5",o]}),e.jsx("span",{className:w("rounded px-1.5 py-0.5 text-[10px] font-medium",l?"bg-emerald-500/10 text-emerald-500":"bg-zinc-500/10 text-zinc-400"),children:l?"\u5DF2\u5F00\u542F":"\u5DF2\u5173\u95ED"})]}),e.jsxs("p",{className:"mt-1 text-xs text-muted",children:[t.map(n=>`${n.name}\uFF08${n.accounts} \u4E2A\u8D26\u53F7${n.status==="disabled"?" \xB7 \u6E20\u9053\u505C\u7528":""}\uFF09`).join("\u3001")||"\u65E0\u8D26\u53F7",r===0&&" \u2014\u2014 \u5148\u5230\u300C\u4F9B\u5E94\u5546\u300D\u9875\u7ED9\u6E20\u9053\u6388\u6743\u8D26\u53F7"]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsxs("label",{className:"inline-flex cursor-pointer items-center gap-2 text-xs text-muted",children:[e.jsx("input",{type:"checkbox",className:"h-3.5 w-3.5 cursor-pointer accent-[var(--brand)]",checked:l,disabled:p===`toggle-${s}`,onChange:n=>z(s,n.target.checked,m)}),"\u81EA\u52A8\u6267\u884C"]}),e.jsxs($,{variant:"soft",className:"h-8",disabled:p===`run-${s}`,onClick:()=>T(s,m,o),children:[e.jsx(R,{size:12}),p===`run-${s}`?`${o}\u4E2D\u2026`:`\u7ACB\u5373${o}`]})]})]})},s)})]})}function F({me:u}){const f=u.user.role==="superadmin",[x,k]=h.useState("videos"),p=[["videos","\u89C6\u9891\u4EFB\u52A1"],...f?[["checkin","\u7B7E\u5230\u4EFB\u52A1"]]:[]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:p.map(([c,j])=>e.jsx("button",{role:"tab","aria-selected":x===c,onClick:()=>k(c),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${x===c?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:j},c))}),x==="videos"&&e.jsx(A,{me:u}),x==="checkin"&&f&&e.jsx(_,{})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Settings-4ntRTP5e.js": {
-              content: 'import{i as H,u as M,j as e,B as g,d as f,h as K,g as B,e as G,F as l,I as c,n as u,t as q}from"./index-JGTLcmXV.js";import{r as h}from"./vendor-BbQ_LiY-.js";import{P as $}from"./plus-v0UXhlLi.js";import{T as W}from"./trash-2-DuK1uChF.js";function X(){const[s,S]=h.useState(null),[k,N]=h.useState(!1),[a,x]=h.useState({id:"",title:"",content:"",popup:!1,enabled:!0}),{confirm:C,confirmEl:A}=H(),o=M(),v=()=>u("list_announcements").then(n=>S(n.announcements)).catch(n=>o(n.message,"err"));h.useEffect(()=>{v()},[]);const j=async()=>{if(!a.title.trim()||!a.content.trim())return o("\u6807\u9898\u4E0E\u5185\u5BB9\u4E0D\u80FD\u4E3A\u7A7A","err");try{await u(a.id?"update_announcement":"create_announcement",a),o(a.id?"\u516C\u544A\u5DF2\u66F4\u65B0":"\u516C\u544A\u5DF2\u53D1\u5E03"),N(!1),v()}catch(n){o(n.message,"err")}},T=async n=>{await C(`\u5220\u9664\u516C\u544A\u300C${n.title}\u300D\uFF1F`)&&(await u("delete_announcement",{id:n.id}),o("\u5DF2\u5220\u9664"),v())};return e.jsxs("div",{className:"flex max-w-3xl flex-col gap-4",children:[e.jsx("div",{className:"flex justify-end",children:e.jsxs(g,{onClick:()=>{x({id:"",title:"",content:"",popup:!1,enabled:!0}),N(!0)},children:[e.jsx($,{size:14}),"\u53D1\u5E03\u516C\u544A"]})}),e.jsx(f,{className:"p-4",children:s===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(3)].map((n,I)=>e.jsx("div",{className:"skeleton h-12"},I))}):s.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u8FD8\u6CA1\u6709\u516C\u544A"}):s.map(n=>e.jsxs("div",{className:"border-b border-line/60 py-3 last:border-0",children:[e.jsxs("div",{className:"flex items-center justify-between gap-3",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2",children:[e.jsx("span",{className:"truncate text-sm font-medium",children:n.title}),n.popup?e.jsx("span",{className:"shrink-0 whitespace-nowrap rounded-full bg-brand/10 px-2 py-0.5 text-[11px] text-brand",children:"\u5F39\u7A97"}):null,e.jsx(K,{value:n.enabled?"active":"pending"})]}),e.jsxs("div",{className:"flex shrink-0 items-center gap-1.5",children:[e.jsx(g,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:()=>{x({id:n.id,title:n.title,content:n.content,popup:!!n.popup,enabled:!!n.enabled}),N(!0)},children:"\u7F16\u8F91"}),e.jsx(g,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:()=>T(n),children:e.jsx(W,{size:12})})]})]}),e.jsx("p",{className:"mt-1 line-clamp-2 pl-6 text-xs text-muted",children:n.content}),e.jsx("div",{className:"mt-1.5 pr-1 text-right text-[11px] text-muted",children:B(n.created_at)})]},n.id))}),e.jsxs(G,{open:k,onClose:()=>N(!1),title:a.id?"\u7F16\u8F91\u516C\u544A":"\u53D1\u5E03\u516C\u544A",width:560,children:[e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx(l,{label:"\u6807\u9898",children:e.jsx(c,{value:a.title,onChange:n=>x({...a,title:n.target.value})})}),e.jsx(l,{label:"\u5185\u5BB9",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:5,value:a.content,onChange:n=>x({...a,content:n.target.value})})}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u8FDB\u5165\u7F51\u7AD9\u65F6\u5F39\u7A97\u5C55\u793A",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:a.popup,onChange:n=>x({...a,popup:n.target.checked})})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u542F\u7528\uFF08\u5173\u95ED\u540E\u4EC5\u4FDD\u7559\u8BB0\u5F55\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:a.enabled,onChange:n=>x({...a,enabled:n.target.checked})})]})]}),e.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[e.jsx(g,{variant:"ghost",onClick:()=>N(!1),children:"\u53D6\u6D88"}),e.jsx(g,{onClick:j,children:a.id?"\u4FDD\u5B58\u4FEE\u6539":"\u53D1\u5E03"})]})]}),A]})}const z=[{key:"alipay",label:"\u652F\u4ED8\u5B9D"},{key:"wxpay",label:"\u5FAE\u4FE1\u652F\u4ED8"},{key:"qqpay",label:"QQ \u94B1\u5305"},{key:"usdt",label:"USDT"}];function Z(){const[s,S]=h.useState(null),[k,N]=h.useState(null),[a,x]=h.useState(null),[C,A]=h.useState(""),[o,v]=h.useState(null),[j,T]=h.useState({gh:"",gg:""}),[n,I]=h.useState(""),[i,b]=h.useState(null),[U,_]=h.useState(""),[p,O]=h.useState("billing"),m=M();h.useEffect(()=>{u("get_settings").then(t=>S(t.settings)).catch(t=>m(t.message,"err")),u("get_smtp").then(t=>x(t.smtp)).catch(()=>x(null)),u("get_oauth").then(t=>v(t.oauth)).catch(()=>v(null)),u("get_epay").then(t=>b(t.epay)).catch(()=>b(null)),fetch("/api/site").then(t=>t.json()).then(N).catch(()=>{})},[]);const R=async()=>{if(s)try{await u("set_settings",s),m("\u8BBE\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5DF2\u5199\u5165\u5BA1\u8BA1\u65E5\u5FD7\uFF09")}catch(t){m(t.message,"err")}},r=(t,d)=>S({...s,[t]:d});return s?e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["billing","\u8BA1\u8D39\u4E0E\u9650\u6D41"],["moderation","\u5185\u5BB9\u5B89\u5168"],["compliance","\u6CE8\u518C\u4E0E\u5408\u89C4"],["webhook","Webhook \u4E0E\u5B89\u5168"],["site","\u7AD9\u70B9\u4FE1\u606F"],["smtp","\u53D1\u4EF6\u914D\u7F6E"],["oauth","\u7B2C\u4E09\u65B9\u767B\u5F55"],["epay","\u652F\u4ED8\u914D\u7F6E"],["announcements","\u516C\u544A"]].map(([t,d])=>e.jsx("button",{role:"tab","aria-selected":p===t,onClick:()=>O(t),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${p===t?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:d},t))}),p==="billing"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u8BA1\u8D39\u4E0E\u9650\u6D41"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(l,{label:"\u9ED8\u8BA4 RPM\uFF08\u6BCF Key\uFF09",hint:"\u586B 0 \u4E3A\u5B8C\u5168\u4E0D\u9650",children:e.jsx(c,{type:"number",value:String(s.defaultRpm??60),onChange:t=>r("defaultRpm",+t.target.value),placeholder:"0 \u4E3A\u4E0D\u9650"})}),e.jsx(l,{label:"\u9ED8\u8BA4 TPM\uFF08\u6BCF Key\uFF09",hint:"\u586B 0 \u4E3A\u5B8C\u5168\u4E0D\u9650",children:e.jsx(c,{type:"number",value:String(s.defaultTpm??1e5),onChange:t=>r("defaultTpm",+t.target.value),placeholder:"0 \u4E3A\u4E0D\u9650"})})]}),e.jsx("p",{className:"mt-3 text-xs text-muted",children:"\u8D85\u51FA\u9650\u5236\u8FD4\u56DE HTTP 429 \u4E0E Retry-After\u3002\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF1B\u53EF\u5728\u300C\u5B9A\u4EF7\u300D\u9875\u9762\u4E3A\u6BCF\u4E2A\u5927\u6A21\u578B\u5355\u72EC\u8BBE\u7F6E\u72EC\u7ACB RPM \u9650\u6D41\u3002"})]}),p==="moderation"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u5185\u5BB9\u5B89\u5168"}),e.jsxs("label",{className:"mb-3 flex items-center justify-between text-[13px]",children:["\u542F\u7528\u5185\u5BB9\u5B89\u5168\u5BA1\u6838",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.contentModerationEnabled,onChange:t=>r("contentModerationEnabled",t.target.checked)})]}),e.jsxs("label",{className:"mb-3 flex items-center justify-between text-[13px]",children:["\u8BB0\u5F55\u8131\u654F\u5185\u5BB9\u7247\u6BB5\uFF08\u9ED8\u8BA4\u5173\u95ED\uFF0C\u4EC5\u5B58\u6458\u8981\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.logContentEnabled,onChange:t=>r("logContentEnabled",t.target.checked)})]}),e.jsx(l,{label:"\u5916\u90E8\u5BA1\u6838 API\uFF08\u53EF\u9009\uFF0CPOST {input} \u2192 {flagged}\uFF09",children:e.jsx(c,{value:String(s.MODERATION_API_URL??""),onChange:t=>r("MODERATION_API_URL",t.target.value),placeholder:"https://..."})})]}),p==="compliance"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6CE8\u518C\u4E0E\u5408\u89C4\u6587\u672C"}),e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u5F00\u653E\u6CE8\u518C",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.signupsEnabled,onChange:t=>r("signupsEnabled",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u6CE8\u518C\u5F3A\u5236\u90AE\u7BB1\u9A8C\u8BC1\u7801",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:s.requireEmailVerification!==!1,onChange:t=>r("requireEmailVerification",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u6CE8\u518C\u5F3A\u5236\u786E\u8BA4\u6761\u6B3E/\u9690\u79C1",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.requireTosAcceptance,onChange:t=>r("requireTosAcceptance",t.target.checked)})]}),e.jsx(l,{label:"\u670D\u52A1\u6761\u6B3E URL",children:e.jsx(c,{value:String(s.termsOfServiceUrl??""),onChange:t=>r("termsOfServiceUrl",t.target.value)})}),e.jsx(l,{label:"\u9690\u79C1\u653F\u7B56 URL",children:e.jsx(c,{value:String(s.privacyPolicyUrl??""),onChange:t=>r("privacyPolicyUrl",t.target.value)})}),e.jsx(l,{label:"\u5BA1\u8BA1\u65E5\u5FD7\u4FDD\u7559\u5929\u6570\uFF0830\u2013180\uFF0C\u9ED8\u8BA4 30\uFF09",hint:"\u6700\u77ED 30 \u5929\uFF0C\u6700\u957F 180 \u5929",children:e.jsx(c,{type:"number",min:30,max:180,step:1,value:String(s.auditLogRetentionDays??30),onChange:t=>r("auditLogRetentionDays",+t.target.value),onBlur:t=>r("auditLogRetentionDays",Math.min(180,Math.max(30,Math.round(+t.target.value)||30)))})})]})]}),["billing","moderation","compliance"].includes(p)&&e.jsx("div",{className:"flex justify-end",children:e.jsx(g,{onClick:R,children:"\u4FDD\u5B58\u5408\u89C4\u4E0E\u9650\u6D41\u8BBE\u7F6E"})}),p==="webhook"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"Webhook \u4E0E\u5B89\u5168"}),e.jsx(l,{label:"\u4E0A\u6E38\u4E8B\u4EF6 Webhook \u5730\u5740",children:e.jsx(c,{value:n,onChange:t=>I(t.target.value),placeholder:"https://api.obitw.cn/api/webhooks/upstream\uFF08X-Webhook-Secret \u6821\u9A8C\uFF09"})}),e.jsxs("div",{className:"mt-4 flex flex-col gap-3 border-t border-line pt-4",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u5173\u95ED\u4E8C\u6B21\u9A8C\u8BC1\uFF08\u7BA1\u7406\u64CD\u4F5C\u4EC5\u9700\u7BA1\u7406\u5458\u89D2\u8272\uFF0C\u4E0D\u518D\u8981\u6C42\u91CD\u65B0\u8F93\u5165\u5BC6\u7801\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.stepUpDisabled,onChange:t=>r("stepUpDisabled",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u4FDD\u6301\u767B\u5F55\u72B6\u6001\uFF08\u4F1A\u8BDD 10 \u5E74\u6709\u6548\uFF0C\u4E0D\u518D 7 \u5929\u8FC7\u671F\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.persistentSession,onChange:t=>r("persistentSession",t.target.checked)})]}),e.jsx("p",{className:"text-xs text-muted",children:"\u26A0\uFE0F \u5173\u95ED\u4E8C\u6B21\u9A8C\u8BC1\u4F1A\u964D\u4F4E\u7BA1\u7406\u63A5\u53E3\u5B89\u5168\u6027\uFF0C\u5EFA\u8BAE\u4EC5\u5728\u4E2A\u4EBA/\u5185\u7F51\u73AF\u5883\u4F7F\u7528\u3002\u300C\u4FDD\u6301\u767B\u5F55\u72B6\u6001\u300D\u5BF9\u4E4B\u540E\u7684\u65B0\u767B\u5F55\u751F\u6548\uFF0C\u5DF2\u6709\u4F1A\u8BDD\u9700\u91CD\u65B0\u767B\u5F55\u4E00\u6B21\u3002"}),e.jsx("div",{children:e.jsx(g,{onClick:async()=>{try{await u("set_settings",{stepUpDisabled:!!s.stepUpDisabled,persistentSession:!!s.persistentSession}),m("\u5B89\u5168\u9009\u9879\u5DF2\u4FDD\u5B58")}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58\u5B89\u5168\u8BBE\u7F6E"})})]}),e.jsxs("ul",{className:"mt-3 list-disc space-y-1 pl-4 text-xs text-muted",children:[e.jsx("li",{children:"API Key \u652F\u6301\u5F3A\u5236\u7B7E\u540D\uFF1AX-Timestamp + X-Signature\uFF08HMAC-SHA256\uFF09\uFF0C\xB1300s \u9632\u91CD\u653E\u7A97\u53E3"}),e.jsx("li",{children:"\u5BA1\u8BA1\u65E5\u5FD7\u54C8\u5E0C\u94FE\u9632\u7BE1\u6539\uFF0C\u5EFA\u8BAE\u6BCF\u65E5\u8FD0\u884C\u300C\u6821\u9A8C\u94FE\u5B8C\u6574\u6027\u300D"})]})]}),p==="site"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u7AD9\u70B9\u4FE1\u606F"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u7528\u4E8E\u5404\u9875\u9762 SEO \u4E0E\u63A7\u5236\u53F0\u54C1\u724C\uFF1B\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\u3002"}),e.jsxs("div",{className:"grid gap-3 md:grid-cols-2",children:[e.jsx(l,{label:"\u7AD9\u70B9\u540D\u79F0",children:e.jsx(c,{value:String(s.siteName??""),onChange:t=>r("siteName",t.target.value)})}),e.jsx(l,{label:"\u7AD9\u70B9\u4E3B\u9875\uFF08\u53EF\u9009\uFF0C\u7528\u4E8E Logo \u8DF3\u8F6C\uFF09",children:e.jsx(c,{value:String(s.siteHomepage??""),onChange:t=>r("siteHomepage",t.target.value),placeholder:"https://..."})}),e.jsx(l,{label:"\u9996\u9875\u5FBD\u7AE0\u6807\u7B7E\uFF08Hero Badge\uFF09",children:e.jsx(c,{value:String(s.heroBadge??"\u8DD1\u5728 EdgeOne \u5168\u7403\u8FB9\u7F18\u8282\u70B9"),onChange:t=>r("heroBadge",t.target.value)})}),e.jsx(l,{label:"\u5E95\u90E8\u6280\u672F\u652F\u6301\u90AE\u7BB1",children:e.jsx(c,{value:String(s.supportEmail??"hackerxiaow@gmail.com"),onChange:t=>r("supportEmail",t.target.value)})}),e.jsx(l,{label:"\u5907\u6848\u53F7\uFF08ICP\uFF09",children:e.jsx(c,{value:String(s.icpNumber??""),onChange:t=>r("icpNumber",t.target.value),placeholder:"\u5982\uFF1A\u4EACICP\u59072024000000\u53F7-1\uFF1B\u7559\u7A7A\u5219\u4E0D\u663E\u793A"})}),e.jsx(l,{label:"\u7248\u6743\u6587\u6848",children:e.jsx(c,{value:String(s.copyrightText??""),onChange:t=>r("copyrightText",t.target.value),placeholder:"\u7559\u7A7A\u81EA\u52A8\u4F7F\u7528 \xA9 \u5E74\u4EFD \u7AD9\u70B9\u540D"})}),e.jsx(l,{label:"GitHub \u94FE\u63A5",children:e.jsx(c,{value:String(s.githubUrl??""),onChange:t=>r("githubUrl",t.target.value),placeholder:"https://github.com/...\uFF1B\u7559\u7A7A\u5219\u9690\u85CF\u56FE\u6807"})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(l,{label:"\u9996\u9875\u4E3B\u6807\u8BED\uFF08Hero \u6807\u9898\uFF09",children:e.jsx(c,{value:String(s.heroTitle??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"),onChange:t=>r("heroTitle",t.target.value)})})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(l,{label:"\u9996\u9875\u526F\u6807\u8BED\u4ECB\u7ECD",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:2,value:String(s.heroSubtitle??"\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\uFF0C\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6CBB\u7406\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002\u5408\u6CD5\u6388\u6743\u4E0A\u6E38\u3001\u900F\u660E\u8BA1\u8D39\u3001\u54C8\u5E0C\u94FE\u5BA1\u8BA1\u2014\u2014\u9762\u5411\u5F00\u53D1\u8005\u4E0E\u4F01\u4E1A\u7684\u6B63\u89C4\u805A\u5408\u5206\u53D1\u5E73\u53F0\u3002"),onChange:t=>r("heroSubtitle",t.target.value)})})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(l,{label:"\u7AD9\u70B9\u63CF\u8FF0\uFF08meta description / og:description\uFF09",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:2,value:String(s.siteDescription??""),onChange:t=>r("siteDescription",t.target.value)})})}),e.jsxs("div",{className:"flex items-center gap-4",children:[(k==null?void 0:k.siteLogoUrl)&&e.jsx("img",{src:k.siteLogoUrl,alt:"\u5F53\u524D Logo",className:"h-12 w-12 rounded-lg border border-line object-contain"}),e.jsxs("label",{className:"cursor-pointer rounded-lg border border-line bg-surface px-3 py-2 text-[13px] hover:bg-surface2",children:["\u4E0A\u4F20\u65B0 Logo\uFF08\u81EA\u52A8\u538B\u7F29\uFF09",e.jsx("input",{type:"file",accept:"image/png,image/jpeg,image/webp,image/svg+xml",className:"hidden",onChange:async t=>{var E;const d=(E=t.target.files)==null?void 0:E[0];if(d)try{const P=URL.createObjectURL(d),y=new Image;await new Promise((D,F)=>{y.onload=D,y.onerror=()=>F(new Error("\u65E0\u6CD5\u8BFB\u53D6\u8BE5\u56FE\u7247")),y.src=P}),URL.revokeObjectURL(P);const L=Math.min(1,256/Math.max(y.width,y.height)),w=document.createElement("canvas");w.width=Math.round(y.width*L),w.height=Math.round(y.height*L),w.getContext("2d").drawImage(y,0,0,w.width,w.height),await u("upsert_site_logo",{dataBase64:w.toDataURL("image/png")}),m("Logo \u5DF2\u66F4\u65B0\uFF08R2 \u5B58\u50A8\uFF09"),location.reload()}catch(P){m(P.message,"err")}}})]}),e.jsxs("span",{className:"text-xs text-muted",children:["\u5F53\u524D\uFF1A",String(s.siteLogoUrl??"/logo.png")]})]})]}),e.jsx("div",{className:"mt-4",children:e.jsx(g,{onClick:R,children:"\u4FDD\u5B58\u7AD9\u70B9\u4FE1\u606F"})})]}),p==="smtp"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"SMTP \u90AE\u4EF6\uFF08\u5BC6\u7801\u91CD\u7F6E\u9A8C\u8BC1\u7801\uFF09"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\uFF0C\u4E0E\u300C\u5408\u89C4\u4E0E\u9650\u6D41\u300D\u4E92\u4E0D\u5F71\u54CD\u3002"}),a===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u542F\u7528 SMTP",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:a.enabled,onChange:t=>x({...a,enabled:t.target.checked})})]}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(l,{label:"SMTP \u4E3B\u673A",children:e.jsx(c,{value:a.host,onChange:t=>x({...a,host:t.target.value}),placeholder:"smtp.example.com"})}),e.jsx(l,{label:"\u7AEF\u53E3\uFF08465=TLS / 587=STARTTLS\uFF09",children:e.jsx(c,{type:"number",value:String(a.port),onChange:t=>x({...a,port:+t.target.value||465}),placeholder:"\u63A8\u8350 587"})}),e.jsx(l,{label:"\u7528\u6237\u540D\uFF08\u5B8C\u6574\u90AE\u7BB1\u5730\u5740\uFF09",children:e.jsx(c,{value:a.username,onChange:t=>x({...a,username:t.target.value}),placeholder:"mail@collegehub.cn"})}),e.jsx(l,{label:`\u5BC6\u7801${a.passwordSet?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,children:e.jsx(c,{type:"password",value:C,onChange:t=>A(t.target.value)})})]}),e.jsx(l,{label:"\u53D1\u4EF6\u4EBA\u5730\u5740\uFF08From\uFF09",children:e.jsx(c,{value:a.from,onChange:t=>x({...a,from:t.target.value}),placeholder:"noreply@example.com"})}),e.jsx("div",{children:e.jsx(g,{onClick:async()=>{try{await u("set_smtp",{enabled:a.enabled,host:a.host,port:a.port,username:a.username,from:a.from,...C?{password:C}:{}}),m("SMTP \u914D\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5BC6\u7801\u52A0\u5BC6\u5B58\u50A8\uFF09"),A("")}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58 SMTP \u914D\u7F6E"})})]})]}),p==="oauth"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"OAuth \u767B\u5F55\uFF08GitHub / Google\uFF09"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\uFF1B\u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\u3002\u4FDD\u5B58\u540E\u4E0D\u4F1A\u88AB\u5176\u4ED6\u5361\u7247\u7684\u4FDD\u5B58\u64CD\u4F5C\u8986\u76D6\u3002"}),o===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-4",children:[["github","google"].map(t=>e.jsxs("div",{className:"rounded-lg border border-line p-3",children:[e.jsxs("label",{className:"mb-2 flex items-center justify-between text-[13px] font-medium",children:["\u542F\u7528 ",t==="github"?"GitHub":"Google"," \u767B\u5F55",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:o[t].enabled,onChange:d=>v({...o,[t]:{...o[t],enabled:d.target.checked}})})]}),e.jsxs("div",{className:"grid gap-2.5",children:[e.jsx(l,{label:"Client ID",children:e.jsx(c,{value:o[t].clientId,onChange:d=>v({...o,[t]:{...o[t],clientId:d.target.value}})})}),e.jsx(l,{label:`Client Secret${o[t].secretSet?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,children:e.jsx(c,{type:"password",value:t==="github"?j.gh:j.gg,onChange:d=>T({...j,[t==="github"?"gh":"gg"]:d.target.value})})})]})]},t)),e.jsxs("p",{className:"text-xs text-muted",children:["\u56DE\u8C03\u5730\u5740\uFF08\u5728 GitHub/Google OAuth \u5E94\u7528\u4E2D\u914D\u7F6E\uFF09\uFF1A",e.jsxs("code",{children:[location.origin,"/api/auth/oauth?provider=github|google&callback=1"]})," \xB7 \u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\uFF0C\u4EC5\u767B\u5F55\u6D41\u7A0B\u5185\u5B58\u89E3\u5BC6\u3002"]}),e.jsx("div",{children:e.jsx(g,{onClick:async()=>{try{await u("set_oauth",{githubEnabled:o.github.enabled,googleEnabled:o.google.enabled,githubClientId:o.github.clientId,googleClientId:o.google.clientId,...j.gh?{githubClientSecret:j.gh}:{},...j.gg?{googleClientSecret:j.gg}:{}}),m("OAuth \u914D\u7F6E\u5DF2\u4FDD\u5B58"),T({gh:"",gg:""})}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58 OAuth \u914D\u7F6E"})})]})]}),p==="epay"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u5728\u7EBF\u652F\u4ED8\uFF08\u6613\u652F\u4ED8\u534F\u8BAE\uFF09"}),e.jsxs("p",{className:"mb-4 text-xs text-muted",children:["\u517C\u5BB9\u5F69\u8679\u6613\u652F\u4ED8 ",e.jsx("code",{children:"mapi.php"})," / ",e.jsx("code",{children:"submit.php"})," \u534F\u8BAE\uFF0C\u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\u3002\u542F\u7528\u540E\u7528\u6237\u53EF\u5728\u4F59\u989D\u9875\u81EA\u52A9\u5145\u503C\uFF0C\u5230\u8D26\u7531\u5E73\u53F0\u5F02\u6B65\u56DE\u8C03\u9A71\u52A8\u3002"]}),i===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs("label",{className:"flex items-center justify-between rounded-lg border border-line px-3 py-2 text-[13px] font-medium",children:["\u542F\u7528\u5728\u7EBF\u652F\u4ED8",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:i.enabled,onChange:t=>b({...i,enabled:t.target.checked})})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-3 sm:grid-cols-2",children:[e.jsx(l,{label:"\u7F51\u5173\u5730\u5740",hint:"\u6613\u652F\u4ED8\u7AD9\u70B9\u6839\u5730\u5740\uFF0C\u4E0D\u8981\u5E26 /submit.php",children:e.jsx(c,{value:i.gateway,onChange:t=>b({...i,gateway:t.target.value}),placeholder:"https://epay-pages.pages.dev"})}),e.jsx(l,{label:"\u5546\u6237 PID",hint:"\u5546\u6237\u4E2D\u5FC3\u663E\u793A\u7684\u5546\u6237\u7F16\u53F7",children:e.jsx(c,{value:i.pid,onChange:t=>b({...i,pid:t.target.value}),placeholder:"\u5982 1001"})}),e.jsx(l,{label:`\u5546\u6237\u5BC6\u94A5 KEY${i.hasKey?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,hint:"32 \u4F4D\u901A\u4FE1\u79C1\u94A5\uFF0C\u4EC5\u52A0\u5BC6\u5B58\u50A8\u3001\u4E0D\u56DE\u663E",children:e.jsx(c,{type:"password",value:U,onChange:t=>_(t.target.value),placeholder:i.hasKey?"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022":"\u7C98\u8D34\u5546\u6237\u5BC6\u94A5"})}),e.jsx(l,{label:"\u5546\u54C1\u540D\u79F0",hint:"\u4E0B\u5355\u65F6\u5C55\u793A\u7ED9\u4ED8\u6B3E\u4EBA",children:e.jsx(c,{value:i.productName,onChange:t=>b({...i,productName:t.target.value}),placeholder:"API \u989D\u5EA6\u5145\u503C"})}),e.jsx(l,{label:"\u5355\u7B14\u6700\u4F4E\u91D1\u989D\uFF08\u5143\uFF09",children:e.jsx(c,{type:"number",value:String(i.minAmount),onChange:t=>b({...i,minAmount:+t.target.value||0})})}),e.jsx(l,{label:"\u5355\u7B14\u6700\u9AD8\u91D1\u989D\uFF08\u5143\uFF09",children:e.jsx(c,{type:"number",value:String(i.maxAmount),onChange:t=>b({...i,maxAmount:+t.target.value||0})})})]}),e.jsx(l,{label:"\u542F\u7528\u7684\u652F\u4ED8\u65B9\u5F0F",hint:"\u7528\u6237\u5145\u503C\u65F6\u53EF\u9009\u7684\u6E20\u9053",children:e.jsx("div",{className:"flex flex-wrap gap-2 pt-1",children:z.map(t=>{const d=i.channels.includes(t.key);return e.jsx("button",{type:"button",onClick:()=>b({...i,channels:d?i.channels.filter(E=>E!==t.key):[...i.channels,t.key]}),className:`cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${d?"border-brand/40 bg-brand/10 text-brand":"border-line text-muted hover:text-ink"}`,children:t.label},t.key)})})}),e.jsxs("p",{className:"text-xs text-muted",children:["\u5F02\u6B65\u56DE\u8C03\u5730\u5740\uFF08\u5728\u6613\u652F\u4ED8\u5546\u6237\u540E\u53F0\u786E\u8BA4\u8BE5\u5730\u5740\u53EF\u516C\u7F51\u8BBF\u95EE\uFF09\uFF1A",e.jsxs("code",{className:"ml-1",children:[location.origin,"/api/pay/epay/notify"]})]}),e.jsx("div",{children:e.jsx(g,{onClick:async()=>{try{await q("set_epay",{enabled:i.enabled,gateway:i.gateway,pid:i.pid,channels:i.channels,minAmount:i.minAmount,maxAmount:i.maxAmount,productName:i.productName,...U?{key:U}:{}}),m("\u652F\u4ED8\u914D\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5BC6\u94A5\u5DF2\u52A0\u5BC6\u5B58\u50A8\uFF09"),_(""),u("get_epay").then(t=>b(t.epay)).catch(()=>{})}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58\u652F\u4ED8\u914D\u7F6E"})})]})]}),p==="announcements"&&e.jsx(X,{})]}):e.jsx("div",{className:"grid gap-4 md:grid-cols-2",children:[...Array(4)].map((t,d)=>e.jsx("div",{className:"skeleton h-44"},d))})}\n',
+            "/assets/Settings-CYX-p-Xb.js": {
+              content: 'import{i as H,u as M,j as e,B as g,d as f,h as K,g as B,e as G,F as l,I as c,n as u,t as q}from"./index-OWhocmiM.js";import{r as h}from"./vendor-BbQ_LiY-.js";import{P as $}from"./plus-DjGDWRHo.js";import{T as W}from"./trash-2-BAKVuXGI.js";function X(){const[s,S]=h.useState(null),[k,N]=h.useState(!1),[a,x]=h.useState({id:"",title:"",content:"",popup:!1,enabled:!0}),{confirm:C,confirmEl:A}=H(),o=M(),v=()=>u("list_announcements").then(n=>S(n.announcements)).catch(n=>o(n.message,"err"));h.useEffect(()=>{v()},[]);const j=async()=>{if(!a.title.trim()||!a.content.trim())return o("\u6807\u9898\u4E0E\u5185\u5BB9\u4E0D\u80FD\u4E3A\u7A7A","err");try{await u(a.id?"update_announcement":"create_announcement",a),o(a.id?"\u516C\u544A\u5DF2\u66F4\u65B0":"\u516C\u544A\u5DF2\u53D1\u5E03"),N(!1),v()}catch(n){o(n.message,"err")}},T=async n=>{await C(`\u5220\u9664\u516C\u544A\u300C${n.title}\u300D\uFF1F`)&&(await u("delete_announcement",{id:n.id}),o("\u5DF2\u5220\u9664"),v())};return e.jsxs("div",{className:"flex max-w-3xl flex-col gap-4",children:[e.jsx("div",{className:"flex justify-end",children:e.jsxs(g,{onClick:()=>{x({id:"",title:"",content:"",popup:!1,enabled:!0}),N(!0)},children:[e.jsx($,{size:14}),"\u53D1\u5E03\u516C\u544A"]})}),e.jsx(f,{className:"p-4",children:s===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(3)].map((n,I)=>e.jsx("div",{className:"skeleton h-12"},I))}):s.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u8FD8\u6CA1\u6709\u516C\u544A"}):s.map(n=>e.jsxs("div",{className:"border-b border-line/60 py-3 last:border-0",children:[e.jsxs("div",{className:"flex items-center justify-between gap-3",children:[e.jsxs("div",{className:"flex min-w-0 items-center gap-2",children:[e.jsx("span",{className:"truncate text-sm font-medium",children:n.title}),n.popup?e.jsx("span",{className:"shrink-0 whitespace-nowrap rounded-full bg-brand/10 px-2 py-0.5 text-[11px] text-brand",children:"\u5F39\u7A97"}):null,e.jsx(K,{value:n.enabled?"active":"pending"})]}),e.jsxs("div",{className:"flex shrink-0 items-center gap-1.5",children:[e.jsx(g,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:()=>{x({id:n.id,title:n.title,content:n.content,popup:!!n.popup,enabled:!!n.enabled}),N(!0)},children:"\u7F16\u8F91"}),e.jsx(g,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:()=>T(n),children:e.jsx(W,{size:12})})]})]}),e.jsx("p",{className:"mt-1 line-clamp-2 pl-6 text-xs text-muted",children:n.content}),e.jsx("div",{className:"mt-1.5 pr-1 text-right text-[11px] text-muted",children:B(n.created_at)})]},n.id))}),e.jsxs(G,{open:k,onClose:()=>N(!1),title:a.id?"\u7F16\u8F91\u516C\u544A":"\u53D1\u5E03\u516C\u544A",width:560,children:[e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx(l,{label:"\u6807\u9898",children:e.jsx(c,{value:a.title,onChange:n=>x({...a,title:n.target.value})})}),e.jsx(l,{label:"\u5185\u5BB9",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:5,value:a.content,onChange:n=>x({...a,content:n.target.value})})}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u8FDB\u5165\u7F51\u7AD9\u65F6\u5F39\u7A97\u5C55\u793A",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:a.popup,onChange:n=>x({...a,popup:n.target.checked})})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u542F\u7528\uFF08\u5173\u95ED\u540E\u4EC5\u4FDD\u7559\u8BB0\u5F55\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:a.enabled,onChange:n=>x({...a,enabled:n.target.checked})})]})]}),e.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[e.jsx(g,{variant:"ghost",onClick:()=>N(!1),children:"\u53D6\u6D88"}),e.jsx(g,{onClick:j,children:a.id?"\u4FDD\u5B58\u4FEE\u6539":"\u53D1\u5E03"})]})]}),A]})}const z=[{key:"alipay",label:"\u652F\u4ED8\u5B9D"},{key:"wxpay",label:"\u5FAE\u4FE1\u652F\u4ED8"},{key:"qqpay",label:"QQ \u94B1\u5305"},{key:"usdt",label:"USDT"}];function Z(){const[s,S]=h.useState(null),[k,N]=h.useState(null),[a,x]=h.useState(null),[C,A]=h.useState(""),[o,v]=h.useState(null),[j,T]=h.useState({gh:"",gg:""}),[n,I]=h.useState(""),[i,b]=h.useState(null),[U,_]=h.useState(""),[p,O]=h.useState("billing"),m=M();h.useEffect(()=>{u("get_settings").then(t=>S(t.settings)).catch(t=>m(t.message,"err")),u("get_smtp").then(t=>x(t.smtp)).catch(()=>x(null)),u("get_oauth").then(t=>v(t.oauth)).catch(()=>v(null)),u("get_epay").then(t=>b(t.epay)).catch(()=>b(null)),fetch("/api/site").then(t=>t.json()).then(N).catch(()=>{})},[]);const R=async()=>{if(s)try{await u("set_settings",s),m("\u8BBE\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5DF2\u5199\u5165\u5BA1\u8BA1\u65E5\u5FD7\uFF09")}catch(t){m(t.message,"err")}},r=(t,d)=>S({...s,[t]:d});return s?e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:[["billing","\u8BA1\u8D39\u4E0E\u9650\u6D41"],["moderation","\u5185\u5BB9\u5B89\u5168"],["compliance","\u6CE8\u518C\u4E0E\u5408\u89C4"],["webhook","Webhook \u4E0E\u5B89\u5168"],["site","\u7AD9\u70B9\u4FE1\u606F"],["smtp","\u53D1\u4EF6\u914D\u7F6E"],["oauth","\u7B2C\u4E09\u65B9\u767B\u5F55"],["epay","\u652F\u4ED8\u914D\u7F6E"],["announcements","\u516C\u544A"]].map(([t,d])=>e.jsx("button",{role:"tab","aria-selected":p===t,onClick:()=>O(t),className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${p===t?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:d},t))}),p==="billing"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u8BA1\u8D39\u4E0E\u9650\u6D41"}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(l,{label:"\u9ED8\u8BA4 RPM\uFF08\u6BCF Key\uFF09",hint:"\u586B 0 \u4E3A\u5B8C\u5168\u4E0D\u9650",children:e.jsx(c,{type:"number",value:String(s.defaultRpm??60),onChange:t=>r("defaultRpm",+t.target.value),placeholder:"0 \u4E3A\u4E0D\u9650"})}),e.jsx(l,{label:"\u9ED8\u8BA4 TPM\uFF08\u6BCF Key\uFF09",hint:"\u586B 0 \u4E3A\u5B8C\u5168\u4E0D\u9650",children:e.jsx(c,{type:"number",value:String(s.defaultTpm??1e5),onChange:t=>r("defaultTpm",+t.target.value),placeholder:"0 \u4E3A\u4E0D\u9650"})})]}),e.jsx("p",{className:"mt-3 text-xs text-muted",children:"\u8D85\u51FA\u9650\u5236\u8FD4\u56DE HTTP 429 \u4E0E Retry-After\u3002\u586B 0 \u4EE3\u8868\u5B8C\u5168\u4E0D\u9650\u6D41\uFF1B\u53EF\u5728\u300C\u5B9A\u4EF7\u300D\u9875\u9762\u4E3A\u6BCF\u4E2A\u5927\u6A21\u578B\u5355\u72EC\u8BBE\u7F6E\u72EC\u7ACB RPM \u9650\u6D41\u3002"})]}),p==="moderation"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u5185\u5BB9\u5B89\u5168"}),e.jsxs("label",{className:"mb-3 flex items-center justify-between text-[13px]",children:["\u542F\u7528\u5185\u5BB9\u5B89\u5168\u5BA1\u6838",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.contentModerationEnabled,onChange:t=>r("contentModerationEnabled",t.target.checked)})]}),e.jsxs("label",{className:"mb-3 flex items-center justify-between text-[13px]",children:["\u8BB0\u5F55\u8131\u654F\u5185\u5BB9\u7247\u6BB5\uFF08\u9ED8\u8BA4\u5173\u95ED\uFF0C\u4EC5\u5B58\u6458\u8981\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.logContentEnabled,onChange:t=>r("logContentEnabled",t.target.checked)})]}),e.jsx(l,{label:"\u5916\u90E8\u5BA1\u6838 API\uFF08\u53EF\u9009\uFF0CPOST {input} \u2192 {flagged}\uFF09",children:e.jsx(c,{value:String(s.MODERATION_API_URL??""),onChange:t=>r("MODERATION_API_URL",t.target.value),placeholder:"https://..."})})]}),p==="compliance"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"\u6CE8\u518C\u4E0E\u5408\u89C4\u6587\u672C"}),e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u5F00\u653E\u6CE8\u518C",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.signupsEnabled,onChange:t=>r("signupsEnabled",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u6CE8\u518C\u5F3A\u5236\u90AE\u7BB1\u9A8C\u8BC1\u7801",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:s.requireEmailVerification!==!1,onChange:t=>r("requireEmailVerification",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u6CE8\u518C\u5F3A\u5236\u786E\u8BA4\u6761\u6B3E/\u9690\u79C1",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.requireTosAcceptance,onChange:t=>r("requireTosAcceptance",t.target.checked)})]}),e.jsx(l,{label:"\u670D\u52A1\u6761\u6B3E URL",children:e.jsx(c,{value:String(s.termsOfServiceUrl??""),onChange:t=>r("termsOfServiceUrl",t.target.value)})}),e.jsx(l,{label:"\u9690\u79C1\u653F\u7B56 URL",children:e.jsx(c,{value:String(s.privacyPolicyUrl??""),onChange:t=>r("privacyPolicyUrl",t.target.value)})}),e.jsx(l,{label:"\u5BA1\u8BA1\u65E5\u5FD7\u4FDD\u7559\u5929\u6570\uFF0830\u2013180\uFF0C\u9ED8\u8BA4 30\uFF09",hint:"\u6700\u77ED 30 \u5929\uFF0C\u6700\u957F 180 \u5929",children:e.jsx(c,{type:"number",min:30,max:180,step:1,value:String(s.auditLogRetentionDays??30),onChange:t=>r("auditLogRetentionDays",+t.target.value),onBlur:t=>r("auditLogRetentionDays",Math.min(180,Math.max(30,Math.round(+t.target.value)||30)))})})]})]}),["billing","moderation","compliance"].includes(p)&&e.jsx("div",{className:"flex justify-end",children:e.jsx(g,{onClick:R,children:"\u4FDD\u5B58\u5408\u89C4\u4E0E\u9650\u6D41\u8BBE\u7F6E"})}),p==="webhook"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-4 text-sm font-semibold",children:"Webhook \u4E0E\u5B89\u5168"}),e.jsx(l,{label:"\u4E0A\u6E38\u4E8B\u4EF6 Webhook \u5730\u5740",children:e.jsx(c,{value:n,onChange:t=>I(t.target.value),placeholder:"https://api.obitw.cn/api/webhooks/upstream\uFF08X-Webhook-Secret \u6821\u9A8C\uFF09"})}),e.jsxs("div",{className:"mt-4 flex flex-col gap-3 border-t border-line pt-4",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u5173\u95ED\u4E8C\u6B21\u9A8C\u8BC1\uFF08\u7BA1\u7406\u64CD\u4F5C\u4EC5\u9700\u7BA1\u7406\u5458\u89D2\u8272\uFF0C\u4E0D\u518D\u8981\u6C42\u91CD\u65B0\u8F93\u5165\u5BC6\u7801\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.stepUpDisabled,onChange:t=>r("stepUpDisabled",t.target.checked)})]}),e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u4FDD\u6301\u767B\u5F55\u72B6\u6001\uFF08\u4F1A\u8BDD 10 \u5E74\u6709\u6548\uFF0C\u4E0D\u518D 7 \u5929\u8FC7\u671F\uFF09",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:!!s.persistentSession,onChange:t=>r("persistentSession",t.target.checked)})]}),e.jsx("p",{className:"text-xs text-muted",children:"\u26A0\uFE0F \u5173\u95ED\u4E8C\u6B21\u9A8C\u8BC1\u4F1A\u964D\u4F4E\u7BA1\u7406\u63A5\u53E3\u5B89\u5168\u6027\uFF0C\u5EFA\u8BAE\u4EC5\u5728\u4E2A\u4EBA/\u5185\u7F51\u73AF\u5883\u4F7F\u7528\u3002\u300C\u4FDD\u6301\u767B\u5F55\u72B6\u6001\u300D\u5BF9\u4E4B\u540E\u7684\u65B0\u767B\u5F55\u751F\u6548\uFF0C\u5DF2\u6709\u4F1A\u8BDD\u9700\u91CD\u65B0\u767B\u5F55\u4E00\u6B21\u3002"}),e.jsx("div",{children:e.jsx(g,{onClick:async()=>{try{await u("set_settings",{stepUpDisabled:!!s.stepUpDisabled,persistentSession:!!s.persistentSession}),m("\u5B89\u5168\u9009\u9879\u5DF2\u4FDD\u5B58")}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58\u5B89\u5168\u8BBE\u7F6E"})})]}),e.jsxs("ul",{className:"mt-3 list-disc space-y-1 pl-4 text-xs text-muted",children:[e.jsx("li",{children:"API Key \u652F\u6301\u5F3A\u5236\u7B7E\u540D\uFF1AX-Timestamp + X-Signature\uFF08HMAC-SHA256\uFF09\uFF0C\xB1300s \u9632\u91CD\u653E\u7A97\u53E3"}),e.jsx("li",{children:"\u5BA1\u8BA1\u65E5\u5FD7\u54C8\u5E0C\u94FE\u9632\u7BE1\u6539\uFF0C\u5EFA\u8BAE\u6BCF\u65E5\u8FD0\u884C\u300C\u6821\u9A8C\u94FE\u5B8C\u6574\u6027\u300D"})]})]}),p==="site"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u7AD9\u70B9\u4FE1\u606F"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u7528\u4E8E\u5404\u9875\u9762 SEO \u4E0E\u63A7\u5236\u53F0\u54C1\u724C\uFF1B\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\u3002"}),e.jsxs("div",{className:"grid gap-3 md:grid-cols-2",children:[e.jsx(l,{label:"\u7AD9\u70B9\u540D\u79F0",children:e.jsx(c,{value:String(s.siteName??""),onChange:t=>r("siteName",t.target.value)})}),e.jsx(l,{label:"\u7AD9\u70B9\u4E3B\u9875\uFF08\u53EF\u9009\uFF0C\u7528\u4E8E Logo \u8DF3\u8F6C\uFF09",children:e.jsx(c,{value:String(s.siteHomepage??""),onChange:t=>r("siteHomepage",t.target.value),placeholder:"https://..."})}),e.jsx(l,{label:"\u9996\u9875\u5FBD\u7AE0\u6807\u7B7E\uFF08Hero Badge\uFF09",children:e.jsx(c,{value:String(s.heroBadge??"\u8DD1\u5728 EdgeOne \u5168\u7403\u8FB9\u7F18\u8282\u70B9"),onChange:t=>r("heroBadge",t.target.value)})}),e.jsx(l,{label:"\u5E95\u90E8\u6280\u672F\u652F\u6301\u90AE\u7BB1",children:e.jsx(c,{value:String(s.supportEmail??"hackerxiaow@gmail.com"),onChange:t=>r("supportEmail",t.target.value)})}),e.jsx(l,{label:"\u5907\u6848\u53F7\uFF08ICP\uFF09",children:e.jsx(c,{value:String(s.icpNumber??""),onChange:t=>r("icpNumber",t.target.value),placeholder:"\u5982\uFF1A\u4EACICP\u59072024000000\u53F7-1\uFF1B\u7559\u7A7A\u5219\u4E0D\u663E\u793A"})}),e.jsx(l,{label:"\u7248\u6743\u6587\u6848",children:e.jsx(c,{value:String(s.copyrightText??""),onChange:t=>r("copyrightText",t.target.value),placeholder:"\u7559\u7A7A\u81EA\u52A8\u4F7F\u7528 \xA9 \u5E74\u4EFD \u7AD9\u70B9\u540D"})}),e.jsx(l,{label:"GitHub \u94FE\u63A5",children:e.jsx(c,{value:String(s.githubUrl??""),onChange:t=>r("githubUrl",t.target.value),placeholder:"https://github.com/...\uFF1B\u7559\u7A7A\u5219\u9690\u85CF\u56FE\u6807"})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(l,{label:"\u9996\u9875\u4E3B\u6807\u8BED\uFF08Hero \u6807\u9898\uFF09",children:e.jsx(c,{value:String(s.heroTitle??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"),onChange:t=>r("heroTitle",t.target.value)})})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(l,{label:"\u9996\u9875\u526F\u6807\u8BED\u4ECB\u7ECD",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:2,value:String(s.heroSubtitle??"\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\uFF0C\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6CBB\u7406\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002\u5408\u6CD5\u6388\u6743\u4E0A\u6E38\u3001\u900F\u660E\u8BA1\u8D39\u3001\u54C8\u5E0C\u94FE\u5BA1\u8BA1\u2014\u2014\u9762\u5411\u5F00\u53D1\u8005\u4E0E\u4F01\u4E1A\u7684\u6B63\u89C4\u805A\u5408\u5206\u53D1\u5E73\u53F0\u3002"),onChange:t=>r("heroSubtitle",t.target.value)})})}),e.jsx("div",{className:"md:col-span-2",children:e.jsx(l,{label:"\u7AD9\u70B9\u63CF\u8FF0\uFF08meta description / og:description\uFF09",children:e.jsx("textarea",{className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-ink focus:border-brand focus:outline-none",rows:2,value:String(s.siteDescription??""),onChange:t=>r("siteDescription",t.target.value)})})}),e.jsxs("div",{className:"flex items-center gap-4",children:[(k==null?void 0:k.siteLogoUrl)&&e.jsx("img",{src:k.siteLogoUrl,alt:"\u5F53\u524D Logo",className:"h-12 w-12 rounded-lg border border-line object-contain"}),e.jsxs("label",{className:"cursor-pointer rounded-lg border border-line bg-surface px-3 py-2 text-[13px] hover:bg-surface2",children:["\u4E0A\u4F20\u65B0 Logo\uFF08\u81EA\u52A8\u538B\u7F29\uFF09",e.jsx("input",{type:"file",accept:"image/png,image/jpeg,image/webp,image/svg+xml",className:"hidden",onChange:async t=>{var E;const d=(E=t.target.files)==null?void 0:E[0];if(d)try{const P=URL.createObjectURL(d),y=new Image;await new Promise((D,F)=>{y.onload=D,y.onerror=()=>F(new Error("\u65E0\u6CD5\u8BFB\u53D6\u8BE5\u56FE\u7247")),y.src=P}),URL.revokeObjectURL(P);const L=Math.min(1,256/Math.max(y.width,y.height)),w=document.createElement("canvas");w.width=Math.round(y.width*L),w.height=Math.round(y.height*L),w.getContext("2d").drawImage(y,0,0,w.width,w.height),await u("upsert_site_logo",{dataBase64:w.toDataURL("image/png")}),m("Logo \u5DF2\u66F4\u65B0\uFF08R2 \u5B58\u50A8\uFF09"),location.reload()}catch(P){m(P.message,"err")}}})]}),e.jsxs("span",{className:"text-xs text-muted",children:["\u5F53\u524D\uFF1A",String(s.siteLogoUrl??"/logo.png")]})]})]}),e.jsx("div",{className:"mt-4",children:e.jsx(g,{onClick:R,children:"\u4FDD\u5B58\u7AD9\u70B9\u4FE1\u606F"})})]}),p==="smtp"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"SMTP \u90AE\u4EF6\uFF08\u5BC6\u7801\u91CD\u7F6E\u9A8C\u8BC1\u7801\uFF09"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\uFF0C\u4E0E\u300C\u5408\u89C4\u4E0E\u9650\u6D41\u300D\u4E92\u4E0D\u5F71\u54CD\u3002"}),a===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsxs("label",{className:"flex items-center justify-between text-[13px]",children:["\u542F\u7528 SMTP",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:a.enabled,onChange:t=>x({...a,enabled:t.target.checked})})]}),e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(l,{label:"SMTP \u4E3B\u673A",children:e.jsx(c,{value:a.host,onChange:t=>x({...a,host:t.target.value}),placeholder:"smtp.example.com"})}),e.jsx(l,{label:"\u7AEF\u53E3\uFF08465=TLS / 587=STARTTLS\uFF09",children:e.jsx(c,{type:"number",value:String(a.port),onChange:t=>x({...a,port:+t.target.value||465}),placeholder:"\u63A8\u8350 587"})}),e.jsx(l,{label:"\u7528\u6237\u540D\uFF08\u5B8C\u6574\u90AE\u7BB1\u5730\u5740\uFF09",children:e.jsx(c,{value:a.username,onChange:t=>x({...a,username:t.target.value}),placeholder:"mail@collegehub.cn"})}),e.jsx(l,{label:`\u5BC6\u7801${a.passwordSet?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,children:e.jsx(c,{type:"password",value:C,onChange:t=>A(t.target.value)})})]}),e.jsx(l,{label:"\u53D1\u4EF6\u4EBA\u5730\u5740\uFF08From\uFF09",children:e.jsx(c,{value:a.from,onChange:t=>x({...a,from:t.target.value}),placeholder:"noreply@example.com"})}),e.jsx("div",{children:e.jsx(g,{onClick:async()=>{try{await u("set_smtp",{enabled:a.enabled,host:a.host,port:a.port,username:a.username,from:a.from,...C?{password:C}:{}}),m("SMTP \u914D\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5BC6\u7801\u52A0\u5BC6\u5B58\u50A8\uFF09"),A("")}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58 SMTP \u914D\u7F6E"})})]})]}),p==="oauth"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"OAuth \u767B\u5F55\uFF08GitHub / Google\uFF09"}),e.jsx("p",{className:"mb-4 text-xs text-muted",children:"\u6B64\u5361\u7247\u72EC\u7ACB\u4FDD\u5B58\uFF1B\u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\u3002\u4FDD\u5B58\u540E\u4E0D\u4F1A\u88AB\u5176\u4ED6\u5361\u7247\u7684\u4FDD\u5B58\u64CD\u4F5C\u8986\u76D6\u3002"}),o===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-4",children:[["github","google"].map(t=>e.jsxs("div",{className:"rounded-lg border border-line p-3",children:[e.jsxs("label",{className:"mb-2 flex items-center justify-between text-[13px] font-medium",children:["\u542F\u7528 ",t==="github"?"GitHub":"Google"," \u767B\u5F55",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:o[t].enabled,onChange:d=>v({...o,[t]:{...o[t],enabled:d.target.checked}})})]}),e.jsxs("div",{className:"grid gap-2.5",children:[e.jsx(l,{label:"Client ID",children:e.jsx(c,{value:o[t].clientId,onChange:d=>v({...o,[t]:{...o[t],clientId:d.target.value}})})}),e.jsx(l,{label:`Client Secret${o[t].secretSet?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,children:e.jsx(c,{type:"password",value:t==="github"?j.gh:j.gg,onChange:d=>T({...j,[t==="github"?"gh":"gg"]:d.target.value})})})]})]},t)),e.jsxs("p",{className:"text-xs text-muted",children:["\u56DE\u8C03\u5730\u5740\uFF08\u5728 GitHub/Google OAuth \u5E94\u7528\u4E2D\u914D\u7F6E\uFF09\uFF1A",e.jsxs("code",{children:[location.origin,"/api/auth/oauth?provider=github|google&callback=1"]})," \xB7 \u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\uFF0C\u4EC5\u767B\u5F55\u6D41\u7A0B\u5185\u5B58\u89E3\u5BC6\u3002"]}),e.jsx("div",{children:e.jsx(g,{onClick:async()=>{try{await u("set_oauth",{githubEnabled:o.github.enabled,googleEnabled:o.google.enabled,githubClientId:o.github.clientId,googleClientId:o.google.clientId,...j.gh?{githubClientSecret:j.gh}:{},...j.gg?{googleClientSecret:j.gg}:{}}),m("OAuth \u914D\u7F6E\u5DF2\u4FDD\u5B58"),T({gh:"",gg:""})}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58 OAuth \u914D\u7F6E"})})]})]}),p==="epay"&&e.jsxs(f,{className:"p-4 sm:p-5",children:[e.jsx("h2",{className:"mb-1 text-sm font-semibold",children:"\u5728\u7EBF\u652F\u4ED8\uFF08\u6613\u652F\u4ED8\u534F\u8BAE\uFF09"}),e.jsxs("p",{className:"mb-4 text-xs text-muted",children:["\u517C\u5BB9\u5F69\u8679\u6613\u652F\u4ED8 ",e.jsx("code",{children:"mapi.php"})," / ",e.jsx("code",{children:"submit.php"})," \u534F\u8BAE\uFF0C\u5BC6\u94A5\u52A0\u5BC6\u5B58\u50A8\u3002\u542F\u7528\u540E\u7528\u6237\u53EF\u5728\u4F59\u989D\u9875\u81EA\u52A9\u5145\u503C\uFF0C\u5230\u8D26\u7531\u5E73\u53F0\u5F02\u6B65\u56DE\u8C03\u9A71\u52A8\u3002"]}),i===null?e.jsx("div",{className:"skeleton h-32"}):e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs("label",{className:"flex items-center justify-between rounded-lg border border-line px-3 py-2 text-[13px] font-medium",children:["\u542F\u7528\u5728\u7EBF\u652F\u4ED8",e.jsx("input",{type:"checkbox",className:"h-4 w-4 accent-[#F38020]",checked:i.enabled,onChange:t=>b({...i,enabled:t.target.checked})})]}),e.jsxs("div",{className:"grid grid-cols-1 gap-3 sm:grid-cols-2",children:[e.jsx(l,{label:"\u7F51\u5173\u5730\u5740",hint:"\u6613\u652F\u4ED8\u7AD9\u70B9\u6839\u5730\u5740\uFF0C\u4E0D\u8981\u5E26 /submit.php",children:e.jsx(c,{value:i.gateway,onChange:t=>b({...i,gateway:t.target.value}),placeholder:"https://epay-pages.pages.dev"})}),e.jsx(l,{label:"\u5546\u6237 PID",hint:"\u5546\u6237\u4E2D\u5FC3\u663E\u793A\u7684\u5546\u6237\u7F16\u53F7",children:e.jsx(c,{value:i.pid,onChange:t=>b({...i,pid:t.target.value}),placeholder:"\u5982 1001"})}),e.jsx(l,{label:`\u5546\u6237\u5BC6\u94A5 KEY${i.hasKey?"\uFF08\u5DF2\u8BBE\u7F6E\uFF0C\u7559\u7A7A\u4FDD\u6301\u4E0D\u53D8\uFF09":""}`,hint:"32 \u4F4D\u901A\u4FE1\u79C1\u94A5\uFF0C\u4EC5\u52A0\u5BC6\u5B58\u50A8\u3001\u4E0D\u56DE\u663E",children:e.jsx(c,{type:"password",value:U,onChange:t=>_(t.target.value),placeholder:i.hasKey?"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022":"\u7C98\u8D34\u5546\u6237\u5BC6\u94A5"})}),e.jsx(l,{label:"\u5546\u54C1\u540D\u79F0",hint:"\u4E0B\u5355\u65F6\u5C55\u793A\u7ED9\u4ED8\u6B3E\u4EBA",children:e.jsx(c,{value:i.productName,onChange:t=>b({...i,productName:t.target.value}),placeholder:"API \u989D\u5EA6\u5145\u503C"})}),e.jsx(l,{label:"\u5355\u7B14\u6700\u4F4E\u91D1\u989D\uFF08\u5143\uFF09",children:e.jsx(c,{type:"number",value:String(i.minAmount),onChange:t=>b({...i,minAmount:+t.target.value||0})})}),e.jsx(l,{label:"\u5355\u7B14\u6700\u9AD8\u91D1\u989D\uFF08\u5143\uFF09",children:e.jsx(c,{type:"number",value:String(i.maxAmount),onChange:t=>b({...i,maxAmount:+t.target.value||0})})})]}),e.jsx(l,{label:"\u542F\u7528\u7684\u652F\u4ED8\u65B9\u5F0F",hint:"\u7528\u6237\u5145\u503C\u65F6\u53EF\u9009\u7684\u6E20\u9053",children:e.jsx("div",{className:"flex flex-wrap gap-2 pt-1",children:z.map(t=>{const d=i.channels.includes(t.key);return e.jsx("button",{type:"button",onClick:()=>b({...i,channels:d?i.channels.filter(E=>E!==t.key):[...i.channels,t.key]}),className:`cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${d?"border-brand/40 bg-brand/10 text-brand":"border-line text-muted hover:text-ink"}`,children:t.label},t.key)})})}),e.jsxs("p",{className:"text-xs text-muted",children:["\u5F02\u6B65\u56DE\u8C03\u5730\u5740\uFF08\u5728\u6613\u652F\u4ED8\u5546\u6237\u540E\u53F0\u786E\u8BA4\u8BE5\u5730\u5740\u53EF\u516C\u7F51\u8BBF\u95EE\uFF09\uFF1A",e.jsxs("code",{className:"ml-1",children:[location.origin,"/api/pay/epay/notify"]})]}),e.jsx("div",{children:e.jsx(g,{onClick:async()=>{try{await q("set_epay",{enabled:i.enabled,gateway:i.gateway,pid:i.pid,channels:i.channels,minAmount:i.minAmount,maxAmount:i.maxAmount,productName:i.productName,...U?{key:U}:{}}),m("\u652F\u4ED8\u914D\u7F6E\u5DF2\u4FDD\u5B58\uFF08\u5BC6\u94A5\u5DF2\u52A0\u5BC6\u5B58\u50A8\uFF09"),_(""),u("get_epay").then(t=>b(t.epay)).catch(()=>{})}catch(t){m(t.message,"err")}},children:"\u4FDD\u5B58\u652F\u4ED8\u914D\u7F6E"})})]})]}),p==="announcements"&&e.jsx(X,{})]}):e.jsx("div",{className:"grid gap-4 md:grid-cols-2",children:[...Array(4)].map((t,d)=>e.jsx("div",{className:"skeleton h-44"},d))})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/Users-uCYfXv9U.js": {
-              content: 'import{i as be,u as ge,j as e,d as j,b as ve,B as n,D as T,h as q,n as d,g as z,e as S,F as p,I as g,k as Ne,C as ye,q as ke,o as we}from"./index-JGTLcmXV.js";import{h as Ce,r as c}from"./vendor-BbQ_LiY-.js";import Ie from"./Invite-ieRMYJHX.js";import{P as le}from"./plus-v0UXhlLi.js";import{T as ae}from"./trash-2-DuK1uChF.js";import"./download-D7etkHHV.js";const h={superadmin:{label:"\u8D85\u7EA7\u7BA1\u7406\u5458",color:"bg-red-500/10 text-red-500 font-bold border border-red-500/30",desc:"\u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u5168\u7AD9\u7BA1\u7406\uFF0C\u989D\u5EA6\u65E0\u9650\u771F\u5B9E\u6263\u8D39",lvl:100},admin:{label:"\u7BA1\u7406\u5458",color:"bg-brand/10 text-brand font-semibold border border-brand/20",desc:"\u53EF\u8C03\u7528\u5168\u91CF\u6A21\u578B\uFF0C\u53EF\u7BA1\u7406\u4E0B\u7EA7\u7528\u6237\u5E76\u8F6C\u8D26\u5145\u503C",lvl:50},finance:{label:"\u8D22\u52A1\u4EBA\u5458",color:"bg-purple-500/10 text-purple-400 border border-purple-500/20",desc:"\u8D22\u52A1\u4E0E\u8D26\u5355\u6838\u5BF9\u6743\u9650",lvl:30},auditor:{label:"\u5BA1\u8BA1\u5458",color:"bg-blue-500/10 text-blue-400 border border-blue-500/20",desc:"\u5BA1\u8BA1\u65E5\u5FD7\u53EA\u8BFB\u6743\u9650",lvl:20},vip:{label:"VIP \u8D26\u53F7",color:"bg-amber-500/10 text-amber-500 font-semibold border border-amber-500/20",desc:"\u4F59\u989D\u5927\u4E8E 0 \u81EA\u52A8\u83B7\u5F97\uFF0C\u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u6A21\u578B\u5E76\u6309\u91CF\u6263\u8D39",lvl:10},user:{label:"\u666E\u901A\u7528\u6237",color:"bg-zinc-500/10 text-zinc-400 border border-zinc-500/20",desc:"\u4F59\u989D\u5F52\u96F6\u72B6\u6001\uFF0C\u4EC5\u9650\u514D\u8D39\u6A21\u578B\u6C60\uFF0C\u514D\u5145\u503C\u4E0D\u6263\u8D39",lvl:1}};function ze(){var J,Q,W,X,Z,ee,se,te;const{me:t}=Ce(),x=(t==null?void 0:t.user.role)==="superadmin",F=x||(t==null?void 0:t.user.role)==="admin",[f,ne]=c.useState(F?"users":"mygroup"),[C,re]=c.useState(null),[o,K]=c.useState(null),[A,G]=c.useState(null),[D,Y]=c.useState(null),[y,I]=c.useState({open:!1,email:"",role:"member"}),[m,k]=c.useState({open:!1,user:null,role:"user"}),[r,v]=c.useState({open:!1,user:null,amount:"50",memo:"\u7BA1\u7406\u5458\u8F6C\u8D26\u5145\u503C",password:""}),[i,b]=c.useState({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),[w,E]=c.useState(null),[oe,H]=c.useState(null),{confirm:B,confirmEl:ie}=be(),a=ge(),N=()=>d("list_users").then(s=>re(s.users)).catch(s=>a(s.message,"err")),M=()=>d("list_redeem_codes").then(s=>K(s.codes)).catch(()=>K([])),L=()=>d("flags_queue").then(s=>G(s.flags)).catch(()=>G([])),R=()=>d("appeals_list").then(s=>Y(s.appeals)).catch(()=>Y([]));c.useEffect(()=>{F&&N()},[]);const de=async()=>{var s;if(m.user)try{await d("set_role",{userId:m.user.id,role:m.role}),a(`\u5DF2\u5C06\u300C${m.user.email}\u300D\u89D2\u8272\u66F4\u65B0\u4E3A ${((s=h[m.role])==null?void 0:s.label)||m.role}`),k({open:!1,user:null,role:"user"}),N()}catch(l){a(l.message,"err")}},ce=s=>{v({open:!0,user:s,amount:"50",memo:"\u7BA1\u7406\u5458\u8F6C\u8D26\u5145\u503C",password:""})},xe=async()=>{if(!r.user)return;const s=parseFloat(r.amount);if(isNaN(s)||s<=0)return a("\u8BF7\u8F93\u5165\u5927\u4E8E 0 \u7684\u5145\u503C\u91D1\u989D","err");if(!r.password.trim())return a("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u5145\u503C\u64CD\u4F5C","err");try{await d("topup",{scope:`user:${r.user.id}`,amount:s,memo:r.memo.trim()||void 0,password:r.password.trim()}),a(`\u8F6C\u8D26\u5145\u503C\u6210\u529F\uFF01\u5DF2\u4E3A\u300C${r.user.email}\u300D\u5145\u503C \xA5${s.toFixed(2)}${x?"":"\uFF08\u5DF2\u6263\u9664\u60A8\u7B49\u989D\u4F59\u989D\uFF09"}`),v({open:!1,user:null,amount:"50",memo:"",password:""}),N()}catch(l){a(l.message,"err")}},me=async s=>{if(await B(`\u5371\u9669\u64CD\u4F5C\uFF1A\u786E\u8BA4\u6C38\u4E45\u5220\u9664\u7528\u6237\u300C${s.email}\u300D\uFF1F\u8BE5\u7528\u6237\u7684\u4E2A\u4EBA\u8D26\u6237\u3001\u6570\u636E\u4E0E\u5168\u90E8 API Key \u5C06\u88AB\u7269\u7406\u9500\u6BC1\u4E14\u65E0\u6CD5\u6062\u590D\uFF01`))try{await d("delete_user",{userId:s.id}),a(`\u5DF2\u5F7B\u5E95\u5220\u9664\u7528\u6237\u300C${s.email}\u300D`),N()}catch(l){a(l.message,"err")}},O=async(s,l)=>{try{await navigator.clipboard.writeText(s),H(s),a(`\u5DF2\u590D\u5236 ${l}`),setTimeout(()=>H(null),1800)}catch{a("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u590D\u5236","err")}},ue=async()=>{const s=parseFloat(i.amount),l=parseInt(i.count,10);if(isNaN(s)||s<=0)return a("\u5361\u5BC6\u9762\u989D\u5FC5\u987B\u5927\u4E8E 0","err");if(isNaN(l)||l<=0||l>100)return a("\u6BCF\u6B21\u751F\u6210\u6570\u91CF\u9700\u5728 1 \u5230 100 \u5F20\u4E4B\u95F4","err");if(!i.password.trim())return a("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u64CD\u4F5C","err");try{const u=await d("generate_redeem_codes",{amount:s,count:l,autoVip:i.autoVip,note:i.note.trim()||void 0,password:i.password.trim()});a(`\u5DF2\u6210\u529F\u751F\u6210 ${u.count||l} \u5F20\u5361\u5BC6\uFF01`),E((u.codes||[]).map(V=>V.code)),b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),M()}catch(u){a(u.message,"err")}},pe=async s=>{if(await B(`\u786E\u8BA4\u5220\u9664/\u4F5C\u5E9F\u5361\u5BC6\u300C${s.code}\u300D\uFF1F`))try{await d("delete_redeem_code",{codeId:s.id}),a("\u5361\u5BC6\u5DF2\u5220\u9664"),M()}catch(l){a(l.message,"err")}},he=[{key:"email",label:"\u90AE\u7BB1",sortVal:s=>s.email,render:s=>e.jsx("span",{className:"font-medium text-ink",children:s.email})},{key:"id",label:"\u7528\u6237 ID",render:s=>e.jsxs("code",{className:"text-xs text-muted font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"role",label:"\u8D26\u53F7\u7B49\u7EA7",render:s=>{var P,$;const l=h[s.role]||{label:s.role,color:"bg-surface2 text-muted"},u=((P=h[(t==null?void 0:t.user.role)??"user"])==null?void 0:P.lvl)??1,V=(($=h[s.role])==null?void 0:$.lvl)??1,_=x||u>V&&s.id!==(t==null?void 0:t.user.id);return e.jsx("button",{type:"button",disabled:!_,onClick:()=>_&&k({open:!0,user:s,role:s.role}),className:`rounded-full px-2.5 py-0.5 text-[11px] transition-all ${_?"hover:scale-105 cursor-pointer":"cursor-default opacity-85"} ${l.color}`,title:_?"\u70B9\u51FB\u4FEE\u6539\u7528\u6237\u89D2\u8272\u7B49\u7EA7\u4E0E\u6743\u9650":"\u540C\u7EA7\u6216\u9AD8\u6743\u9650\u8D26\u53F7\u4E0D\u53EF\u76F4\u63A5\u4FEE\u6539\u89D2\u8272",children:l.label})}},{key:"balance",label:"\u53EF\u7528\u4F59\u989D",sortVal:s=>s.unlimited?Number.POSITIVE_INFINITY:s.balance??0,render:s=>s.unlimited?e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 font-mono text-xs font-semibold text-brand whitespace-nowrap",title:"\u8D85\u7EA7\u7BA1\u7406\u5458\u4E3A\u94F8\u5E01\u65B9\uFF0C\u989D\u5EA6\u65E0\u4E0A\u9650",children:"\u221E \u65E0\u9650"}):e.jsxs("span",{className:"font-mono text-xs font-semibold text-emerald-500",children:["\xA5",(s.balance??0).toFixed(2)]})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"created",label:"\u6CE8\u518C\u65F6\u95F4",sortVal:s=>s.created_at,render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.created_at)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>{var P,$;const l=((P=h[(t==null?void 0:t.user.role)??"user"])==null?void 0:P.lvl)??1,u=(($=h[s.role])==null?void 0:$.lvl)??1,V=s.id===(t==null?void 0:t.user.id);return x||l>u&&!V?e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsxs(n,{variant:"soft",className:"!h-7 !px-2 text-xs !text-emerald-500 font-medium",onClick:()=>ce(s),children:[e.jsx(ye,{size:12,className:"mr-0.5"}),"\u5145\u503C"]}),e.jsx(n,{variant:"soft",className:"!h-7 !px-2 text-xs",onClick:()=>k({open:!0,user:s,role:s.role}),children:"\u8C03\u6574\u89D2\u8272"}),s.status==="active"?e.jsx(n,{variant:"ghost",className:"!h-7 !px-2 text-xs !text-err",onClick:async U=>{U.stopPropagation(),await B(`\u5C01\u7981 ${s.email}\uFF1F\u5C06\u540C\u65F6\u64A4\u9500\u5176\u5168\u90E8 Key \u5E76\u5F3A\u5236\u4E0B\u7EBF\u3002`)&&(await d("ban_user",{userId:s.id}),a("\u5DF2\u5C01\u7981"),N())},children:"\u5C01\u7981"}):e.jsx(n,{variant:"ghost",className:"!h-7 !px-2 text-xs",onClick:async U=>{U.stopPropagation(),await d("unban_user",{userId:s.id}),a("\u5DF2\u89E3\u5C01"),N()},children:"\u89E3\u5C01"}),e.jsx(n,{variant:"ghost",className:"!h-7 !px-1.5 text-xs !text-err",onClick:()=>me(s),title:"\u7269\u7406\u5220\u9664\u8BE5\u7528\u6237",children:e.jsx(ae,{size:12})})]}):e.jsx("span",{className:"text-xs text-muted/60",children:"\u2014"})}}],je=[{key:"code",label:"\u5361\u5BC6\u4EE3\u7801",render:s=>e.jsxs("button",{type:"button",onClick:()=>O(s.code,"\u5361\u5BC6\u4EE3\u7801"),className:"flex items-center gap-1.5 font-mono text-xs font-bold text-ink hover:text-brand transition-colors",title:"\u70B9\u51FB\u4E00\u952E\u590D\u5236\u5361\u5BC6",children:[e.jsx("span",{children:s.code}),oe===s.code?e.jsx(ke,{size:12,className:"text-emerald-500"}):e.jsx(we,{size:12,className:"text-muted/60"})]})},{key:"amount",label:"\u5145\u503C\u9762\u989D",sortVal:s=>s.amount,render:s=>e.jsxs("span",{className:"font-mono text-xs font-bold text-emerald-500",children:["\xA5",s.amount.toFixed(2)]})},{key:"autoVip",label:"\u6743\u76CA\u5C5E\u6027",render:s=>e.jsx("span",{className:"rounded bg-amber-500/10 text-amber-500 text-[10px] font-semibold px-2 py-0.5",children:"\u4F59\u989D\u5927\u4E8E0\u81EA\u52A8VIP"})},{key:"status",label:"\u72B6\u6001",render:s=>s.status==="unused"?e.jsx("span",{className:"rounded bg-emerald-500/10 text-emerald-500 text-[11px] font-semibold px-2 py-0.5",children:"\u672A\u5151\u6362"}):s.status==="used"?e.jsx("span",{className:"rounded bg-zinc-500/10 text-zinc-400 text-[11px] px-2 py-0.5",children:"\u5DF2\u4F7F\u7528"}):e.jsx("span",{className:"rounded bg-red-500/10 text-red-500 text-[11px] px-2 py-0.5",children:"\u5DF2\u4F5C\u5E9F"})},{key:"usedBy",label:"\u5151\u6362\u8BB0\u5F55",render:s=>s.usedByEmail?e.jsxs("div",{className:"flex flex-col text-[11px]",children:[e.jsx("span",{className:"text-ink font-medium",children:s.usedByEmail}),e.jsx("span",{className:"text-muted",children:s.usedAt?z(s.usedAt):""})]}):e.jsx("span",{className:"text-xs text-muted",children:"\u2014"})},{key:"note",label:"\u751F\u6210\u5907\u6CE8",render:s=>e.jsx("span",{className:"text-xs text-muted truncate max-w-[140px]",children:s.note||"\u2014"})},{key:"created",label:"\u751F\u6210\u65F6\u95F4",sortVal:s=>s.createdAt,render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.createdAt)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsx(n,{variant:"soft",className:"!h-7 !px-2 text-xs",onClick:()=>O(s.code,"\u5361\u5BC6\u4EE3\u7801"),children:"\u590D\u5236"}),e.jsx(n,{variant:"ghost",className:"!h-7 !px-1.5 text-xs !text-err",onClick:()=>pe(s),title:"\u5220\u9664/\u4F5C\u5E9F\u5361\u5BC6",children:e.jsx(ae,{size:12})})]})}],fe=x?[["users","\u7528\u6237\u4E0E\u6743\u9650"],["invite","\u9080\u8BF7"],["codes","\u5361\u5BC6\u7BA1\u7406"],["flags","\u5185\u5BB9\u590D\u6838\u961F\u5217"],["appeals","\u7533\u8BC9"]]:F?[["users","\u7528\u6237\u4E0E\u6743\u9650"],["invite","\u9080\u8BF7"]]:[["mygroup","\u6211\u7684\u7528\u6237\u7EC4"],["invite","\u9080\u8BF7"]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:fe.map(([s,l])=>e.jsx("button",{role:"tab","aria-selected":f===s,onClick:()=>{var u;ne(s),(u=s==="invite"||s==="mygroup"?void 0:s==="flags"?L:s==="appeals"?R:s==="codes"?M:N)==null||u()},className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${f===s?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:l},s))}),f==="mygroup"&&e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{children:[e.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u6211\u7684\u7528\u6237\u7EC4"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u5F53\u524D\u8D26\u53F7\u6240\u5C5E\u7684\u7528\u6237\u7EC4\u4E0E\u6743\u9650\u7EA7\u522B\uFF1B\u5982\u9700\u8C03\u6574\u7528\u6237\u7EC4\u6216\u989D\u5EA6\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458\u3002"})]}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-4",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2",children:[e.jsx("span",{className:`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${((J=h[t.user.role])==null?void 0:J.color)??""}`,children:((Q=h[t.user.role])==null?void 0:Q.label)??t.user.role}),e.jsxs("span",{className:"text-xs text-muted",children:["\u6743\u9650\u7B49\u7EA7 ",((W=h[t.user.role])==null?void 0:W.lvl)??0]})]}),e.jsx("p",{className:"mt-2 text-xs leading-relaxed text-muted",children:((X=h[t.user.role])==null?void 0:X.desc)??"\u2014"}),e.jsxs("div",{className:"mt-4 grid grid-cols-1 gap-3 text-xs sm:grid-cols-3",children:[e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u8D26\u53F7\u90AE\u7BB1"}),e.jsx("div",{className:"mt-0.5 font-medium text-ink break-all",children:t.user.email})]}),e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u7528\u6237\u7EC4\u6807\u8BC6"}),e.jsx("div",{className:"mt-0.5 font-mono font-medium text-ink",children:t.user.role})]}),e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u53EF\u7528\u4F59\u989D"}),e.jsx("div",{className:"mt-0.5 font-medium text-ink",children:t.unlimited?"\u221E \u65E0\u9650\u989D\u5EA6":ve(t.balance.available,t.balance.currency)})]})]})]})]}),f==="users"&&e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted space-y-1.5",children:[e.jsx("div",{className:"font-semibold text-ink text-[13px] mb-1",children:"\u{1F451} \u6743\u9650\u7EE7\u627F\u4E0E\u52A8\u6001\u4F1A\u5458\u7B49\u7EA7\u89C4\u5219\uFF08superadmin > admin > vip > user\uFF09\uFF1A"}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-red-500/10 text-red-500 px-1.5 py-0.5 text-[10px] font-bold",children:"\u8D85\u7EA7\u7BA1\u7406\u5458 (superadmin)"}),e.jsxs("span",{children:["\u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u72EC\u5360\u5168\u7AD9\u8BBE\u7F6E\u4E0E\u6E20\u9053\u6CBB\u7406\uFF1B",e.jsx("b",{children:"\u4F59\u989D\u989D\u5EA6\u65E0\u9650\uFF08\u7167\u5E38\u6309\u91CF\u6263\u8D39\u8BB0\u8D26\uFF09"}),"\uFF1B\u53EF\u7BA1\u7406/\u5145\u503C/\u5C01\u7981/\u5220\u9664\u6240\u6709\u4E0B\u7EA7\u8D26\u53F7\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-brand/10 text-brand px-1.5 py-0.5 text-[10px] font-bold",children:"\u7BA1\u7406\u5458 (admin)"}),e.jsxs("span",{children:["\u62E5\u6709\u5168\u6A21\u578B\u8C03\u7528\u6743\u9650\uFF1B\u53EF\u5728\u6743\u9650\u8303\u56F4\u5185\u7BA1\u7406\u4E0B\u7EA7\u5E76",e.jsx("b",{children:"\u5B9E\u6253\u5B9E\u6263\u9664\u81EA\u8EAB\u4F59\u989D\u4E3A\u4E0B\u7EA7\u8F6C\u8D26\u5145\u503C"}),"\uFF1B\u4EC5\u9650\u8D85\u7EA7\u7BA1\u7406\u5458\u540E\u53F0\u4EFB\u547D\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-amber-500/10 text-amber-500 px-1.5 py-0.5 text-[10px] font-bold",children:"VIP \u8D26\u53F7 (vip)"}),e.jsxs("span",{children:[e.jsx("b",{children:"\u53EA\u8981\u53EF\u7528\u4F59\u989D > 0 \u81EA\u52A8\u664B\u5347\u4E3A VIP"}),"\uFF1B\u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u5927\u6A21\u578B\u5E76\u6309\u771F\u5B9E Token \u6263\u9664\u8D26\u6237\u4F59\u989D\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-zinc-500/10 text-zinc-400 px-1.5 py-0.5 text-[10px] font-bold",children:"\u666E\u901A\u7528\u6237 (user)"}),e.jsxs("span",{children:[e.jsx("b",{children:"\u53EA\u8981\u53EF\u7528\u4F59\u989D\u7B49\u4E8E 0 \u81EA\u52A8\u964D\u7EA7\u4E3A\u666E\u901A\u7528\u6237"}),"\uFF1B\u4EC5\u53EF\u514D\u8D39\u4F7F\u7528 0 \u5143\u6A21\u578B\u6C60\uFF08\u514D\u5145\u503C\u514D\u6263\u8D39\uFF09\uFF0C\u4ED8\u8D39\u6A21\u578B\u62E6\u622A\u5F15\u5BFC\u5145\u503C\u3002"]})]})]}),e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsxs("span",{className:"text-xs text-muted",children:["\u5171\u8BA1 ",(C==null?void 0:C.length)??0," \u4F4D\u6CE8\u518C\u7528\u6237"]}),e.jsxs(n,{onClick:()=>I({open:!0,email:"",role:"member"}),children:[e.jsx(le,{size:14}),"\u9080\u8BF7\u6210\u5458"]})]}),C===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,l)=>e.jsx("div",{className:"skeleton h-9"},l))}):e.jsx(T,{cols:he,rows:C})]}),f==="invite"&&e.jsx(Ie,{me:t}),f==="codes"&&x&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs("div",{className:"grid grid-cols-2 sm:grid-cols-4 gap-3",children:[e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u751F\u6210\u5361\u5BC6\u603B\u8BA1"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-ink mt-1",children:[(o==null?void 0:o.length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u672A\u5151\u6362\u6709\u6548\u5361\u5BC6"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-emerald-500 mt-1",children:[(o==null?void 0:o.filter(s=>s.status==="unused").length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u5DF2\u6838\u9500\u5151\u6362"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-muted mt-1",children:[(o==null?void 0:o.filter(s=>s.status==="used").length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u603B\u5361\u5BC6\u52A0\u6B3E\u9762\u989D"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-amber-500 mt-1",children:["\xA5",((o==null?void 0:o.reduce((s,l)=>s+l.amount,0))??0).toFixed(2)]})]})]}),e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsxs("div",{children:[e.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u5361\u5BC6\u5217\u8868"}),e.jsx("p",{className:"text-xs text-muted mt-0.5",children:"\u652F\u6301\u6279\u91CF\u751F\u6210\u5151\u6362\u5361\u5BC6\uFF0C\u7528\u6237\u53EF\u5728\u524D\u53F0\u81EA\u52A9\u624B\u586B\u5361\u5BC6\u52A0\u6B3E\u5E76\u81EA\u52A8\u5347\u7EA7 VIP\u3002"})]}),e.jsxs(n,{onClick:()=>b({open:!0,amount:"50",count:"10",autoVip:!0,note:"",password:""}),children:[e.jsx(le,{size:14}),"\u6279\u91CF\u751F\u6210\u5361\u5BC6"]})]}),o===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,l)=>e.jsx("div",{className:"skeleton h-9"},l))}):o.length===0?e.jsx("div",{className:"py-12 text-center text-xs text-muted",children:"\u6682\u65E0\u5361\u5BC6\uFF0C\u8BF7\u70B9\u51FB\u53F3\u4E0A\u89D2\u300C\u6279\u91CF\u751F\u6210\u5361\u5BC6\u300D\u5F00\u59CB\u521B\u5EFA\u3002"}):e.jsx(T,{cols:je,rows:o})]})]}),f==="flags"&&e.jsx(j,{className:"p-4",children:A===null?e.jsx("div",{className:"skeleton h-40"}):A.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u2713 \u590D\u6838\u961F\u5217\u4E3A\u7A7A\u3002\u5F00\u542F\u5185\u5BB9\u5BA1\u6838\u540E\uFF0C\u547D\u4E2D\u89C4\u5219\u7684\u8BF7\u6C42\u4F1A\u8FDB\u5165\u8FD9\u91CC\u3002"}):e.jsx(T,{cols:[{key:"id",label:"ID",render:s=>e.jsxs("code",{className:"text-xs font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"model",label:"\u6A21\u578B",render:s=>s.public_model??"\u2014"},{key:"rule",label:"\u547D\u4E2D\u89C4\u5219",render:s=>e.jsx("code",{className:"text-xs",children:s.rule})},{key:"hash",label:"\u5185\u5BB9\u6458\u8981",render:s=>e.jsxs("code",{className:"text-xs text-muted font-mono",children:[(s.excerpt_hash??"").slice(0,16),"\u2026"]})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex gap-1.5",children:[e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:async()=>{await d("resolve_flag",{flagId:s.id,decision:"cleared",note:""}),a("\u5DF2\u653E\u884C"),L()},children:"\u653E\u884C"}),e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async()=>{await d("resolve_flag",{flagId:s.id,decision:"confirmed",note:""}),a("\u5DF2\u786E\u8BA4\u8FDD\u89C4"),L()},children:"\u786E\u8BA4\u8FDD\u89C4"})]})}],rows:A})}),f==="appeals"&&e.jsx(j,{className:"p-4",children:D===null?e.jsx("div",{className:"skeleton h-40"}):D.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u6682\u65E0\u5F85\u5904\u7406\u7533\u8BC9"}):e.jsx(T,{cols:[{key:"id",label:"ID",render:s=>e.jsxs("code",{className:"text-xs font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"type",label:"\u7C7B\u578B",render:s=>s.target_type},{key:"reason",label:"\u7533\u8BC9\u7406\u7531",render:s=>e.jsx("span",{className:"line-clamp-1 max-w-md",children:s.reason})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"time",label:"\u65F6\u95F4",render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.created_at)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex gap-1.5",children:[e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:async()=>{await d("resolve_appeal",{appealId:s.id,decision:"accepted",note:""}),a("\u5DF2\u53D7\u7406"),R()},children:"\u53D7\u7406"}),e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async()=>{await d("resolve_appeal",{appealId:s.id,decision:"rejected",note:""}),a("\u5DF2\u9A73\u56DE"),R()},children:"\u9A73\u56DE"})]})}],rows:D})}),e.jsx(S,{open:r.open,onClose:()=>v({open:!1,user:null,amount:"50",memo:"",password:""}),title:`\u4E3A\u7528\u6237\u5145\u503C\u52A0\u6B3E \u2014 ${((Z=r.user)==null?void 0:Z.email)??""}`,width:460,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u76EE\u6807\u7528\u6237\u5F53\u524D\u4F59\u989D"}),e.jsxs("span",{className:"font-mono text-sm font-bold text-emerald-500",children:["\xA5",(((ee=r.user)==null?void 0:ee.balance)??0).toFixed(2)]})]}),e.jsx(p,{label:"\u5145\u503C\u52A0\u6B3E\u91D1\u989D (\u5143)",children:e.jsx(g,{type:"number",min:"0.01",step:"0.01",value:r.amount,onChange:s=>v({...r,amount:s.target.value}),placeholder:"50"})}),e.jsxs("div",{className:"rounded-lg border border-amber-500/20 bg-amber-500/10 p-2.5 text-xs text-amber-600 dark:text-amber-400 space-y-1",children:[e.jsx("div",{className:"font-semibold",children:"\u{1F4A1} \u8F6C\u8D26\u6263\u6B3E\u4E0E\u81EA\u52A8 VIP \u664B\u5347\u673A\u5236\uFF1A"}),e.jsx("div",{children:x?"\u8D85\u7EA7\u7BA1\u7406\u5458\u62E5\u6709\u65E0\u9650\u8C03\u7528\u989D\u5EA6\uFF0C\u4E3A\u4E0B\u7EA7\u5145\u503C\u5C06\u7167\u5E38\u8BB0\u5165\u7CFB\u7EDF\u8F6C\u8D26\u6263\u51CF\u6D41\u6C34\u3002":`\u672C\u6B21\u5145\u503C\u5C06\u4ECE\u60A8\u7684\u8D26\u6237\u4F59\u989D\u4E2D\u5B9E\u6253\u5B9E\u6263\u9664 \xA5${r.amount||"0"}\uFF08\u60A8\u5F53\u524D\u53EF\u7528\u4F59\u989D\u4E3A \xA5${((t==null?void 0:t.balance.available)??0).toFixed(2)}\uFF09\u3002`}),e.jsx("div",{children:"\u7528\u6237\u5145\u503C\u540E\u53EA\u8981\u53EF\u7528\u4F59\u989D\u5927\u4E8E 0\uFF0C\u7CFB\u7EDF\u5C06\u81EA\u52A8\u664B\u5347\u5176\u4E3A VIP \u8D26\u53F7\uFF01"})]}),e.jsx(p,{label:"\u5145\u503C\u5907\u6CE8 (\u53EF\u9009)",children:e.jsx(g,{value:r.memo,onChange:s=>v({...r,memo:s.target.value}),placeholder:"\u7BA1\u7406\u5458\u624B\u52A8\u8F6C\u8D26\u5145\u503C"})}),e.jsx(p,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u8D26\u6237\u52A0\u6B3E\u5C5E\u4E8E\u9AD8\u5371\u8D22\u52A1\u64CD\u4F5C\uFF0C\u9700\u6838\u9A8C\u5BC6\u7801",children:e.jsx(g,{type:"password",value:r.password,onChange:s=>v({...r,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u64CD\u4F5C\u8005\u7684\u5BC6\u7801",autoComplete:"current-password"})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>v({open:!1,user:null,amount:"50",memo:"",password:""}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:xe,children:"\u786E\u8BA4\u8F6C\u8D26\u5145\u503C"})]})]})}),e.jsx(S,{open:i.open,onClose:()=>b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),title:"\u6279\u91CF\u751F\u6210\u5145\u503C\u5361\u5BC6",width:480,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(p,{label:"\u5361\u5BC6\u9762\u503C (\u5143)",children:e.jsx(g,{type:"number",step:"0.01",value:i.amount,onChange:s=>b({...i,amount:s.target.value}),placeholder:"50"})}),e.jsx(p,{label:"\u751F\u6210\u6570\u91CF (\u5F20)",hint:"\u5355\u6B21\u6700\u591A 100 \u5F20",children:e.jsx(g,{type:"number",min:"1",max:"100",value:i.count,onChange:s=>b({...i,count:s.target.value}),placeholder:"10"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(p,{label:"\u5361\u5BC6\u6279\u6B21\u5907\u6CE8 (\u53EF\u9009)",children:e.jsx(g,{value:i.note,onChange:s=>b({...i,note:s.target.value}),placeholder:"\u4F8B\u5982: \u5BA2\u6237\u6279\u91CF\u91C7\u8D2D\u3001\u65B0\u7528\u6237\u798F\u5229\u5361"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx("p",{className:"text-xs text-muted",children:"\u{1F4A1} \u7528\u6237\u5151\u6362\u540E\u8D26\u6237\u4F59\u989D > 0 \u5C06\u81EA\u52A8\u83B7\u5F97 VIP \u8EAB\u4EFD\uFF1B\u8D85\u7EA7\u7BA1\u7406\u5458\u751F\u6210\u7684\u5361\u5BC6\u4E3A\u7CFB\u7EDF\u94F8\u5E01\u52A0\u6B3E\u3002"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(p,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u751F\u6210\u6709\u6548\u8D27\u5E01\u5361\u5BC6\u5C5E\u4E8E\u8D22\u52A1\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u6838\u9A8C\u7BA1\u7406\u5458\u5BC6\u7801",children:e.jsx(g,{type:"password",value:i.password,onChange:s=>b({...i,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:ue,children:"\u786E\u8BA4\u6279\u91CF\u751F\u6210"})]})]})}),e.jsx(S,{open:!!w,onClose:()=>E(null),title:"\u5361\u5BC6\u751F\u6210\u6210\u529F",width:480,children:e.jsxs("div",{className:"space-y-3",children:[e.jsxs("p",{className:"text-xs text-muted",children:["\u5DF2\u6210\u529F\u751F\u6210 ",(w==null?void 0:w.length)??0," \u5F20\u5361\u5BC6\u3002\u60A8\u53EF\u4EE5\u4E00\u952E\u590D\u5236\u5E76\u76F4\u63A5\u53D1\u7ED9\u5BA2\u6237\u6216\u5BFC\u5165\u53D1\u5361\u7CFB\u7EDF\uFF1A"]}),e.jsx("textarea",{readOnly:!0,value:(w||[]).join(`\n`),rows:6,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink focus:outline-none"}),e.jsxs("div",{className:"flex justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",onClick:()=>E(null),children:"\u5173\u95ED"}),e.jsx(n,{onClick:()=>O((w||[]).join(`\n`),"\u5168\u90E8\u5361\u5BC6"),children:"\u4E00\u952E\u590D\u5236\u5168\u90E8\u5361\u5BC6"})]})]})}),e.jsx(S,{open:m.open,onClose:()=>k({open:!1,user:null,role:"user"}),title:`\u8C03\u6574\u8D26\u53F7\u7B49\u7EA7 \u2014 ${((se=m.user)==null?void 0:se.email)??""}`,width:500,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u76EE\u6807\u7528\u6237\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsxs("span",{className:"font-mono text-sm font-bold text-emerald-500",children:["\xA5",(((te=m.user)==null?void 0:te.balance)??0).toFixed(2)]})]}),e.jsx(p,{label:"\u8D26\u53F7\u89D2\u8272\u7B49\u7EA7",children:e.jsxs(Ne,{value:m.role,onChange:s=>k({...m,role:s.target.value}),children:[x&&e.jsx("option",{value:"superadmin",children:"\u8D85\u7EA7\u7BA1\u7406\u5458 (superadmin) \u2014 \u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u5168\u7AD9\u7BA1\u7406"}),x&&e.jsx("option",{value:"admin",children:"\u7BA1\u7406\u5458 (admin) \u2014 \u62E5\u6709\u4E0B\u7EA7\u7528\u6237\u7BA1\u7406\u4E0E\u8F6C\u8D26\u5145\u503C\u6743\u9650\uFF08\u4F59\u989D\u4E3A0\u4E0D\u5F71\u54CD\u4EFB\u547D\uFF09"}),e.jsx("option",{value:"vip",children:"VIP \u8D26\u53F7 (vip) \u2014 \u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u5927\u6A21\u578B\uFF0C\u6309\u91CF\u6263\u8D39"}),e.jsx("option",{value:"user",children:"\u666E\u901A\u7528\u6237 (user) \u2014 \u4EC5\u9650\u514D\u8D39\u6A21\u578B\u6C60\uFF0C\u514D\u5145\u503C\u4E0D\u6263\u8D39"}),x&&e.jsx("option",{value:"finance",children:"\u8D22\u52A1\u4EBA\u5458 (finance)"}),x&&e.jsx("option",{value:"auditor",children:"\u5BA1\u8BA1\u5458 (auditor)"})]})}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/60 p-3 text-xs text-muted space-y-1.5",children:[e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u7BA1\u7406\u5458 (admin)"}),"\uFF1A\u7531\u8D85\u7EA7\u7BA1\u7406\u5458\u5728\u540E\u53F0\u4EFB\u547D\u3002\u7BA1\u7406\u5458\u4F59\u989D\u53EF\u4EE5\u4E3A 0\uFF0C\u4F46\u4F59\u989D\u4E3A 0 \u65F6\u65E0\u6CD5\u5411\u4E0B\u7EA7\u8F6C\u8D26\u52A0\u6B3E\u3002"]}),e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u81EA\u52A8 VIP \u673A\u5236"}),"\uFF1A\u666E\u901A\u7528\u6237\u53EA\u8981\u4F59\u989D > 0 \u81EA\u52A8\u664B\u5347\u4E3A VIP\uFF1B\u4F59\u989D\u7B49\u4E8E 0 \u81EA\u52A8\u964D\u4E3A\u666E\u901A\u7528\u6237\u3002\u82E5\u9700\u5F00\u901A VIP\uFF0C\u76F4\u63A5\u4F7F\u7528\u300C\u5145\u503C\u300D\u52A0\u6B3E\u5373\u53EF\u3002"]}),e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u6743\u9650\u5C42\u7EA7\u7EE7\u627F"}),"\uFF1A\u53EA\u5141\u8BB8\u7BA1\u7406\u4E0E\u5145\u503C\u6743\u9650\u4E25\u683C\u4F4E\u4E8E\u81EA\u8EAB\u7684\u4E0B\u7EA7\u7528\u6237\u3002"]})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>k({open:!1,user:null,role:"user"}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:de,children:"\u786E\u8BA4\u4FEE\u6539\u89D2\u8272"})]})]})}),e.jsxs(S,{open:y.open,onClose:()=>I({...y,open:!1}),title:"\u9080\u8BF7\u7EC4\u7EC7\u6210\u5458",width:440,children:[e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx(p,{label:"\u6210\u5458\u90AE\u7BB1",children:e.jsx(g,{type:"email",value:y.email,onChange:s=>I({...y,email:s.target.value})})}),e.jsx(p,{label:"\u5907\u6CE8",children:"\u7EC4\u7EC7\u6210\u5458\u9700\u5148\u81EA\u884C\u6CE8\u518C\u8D26\u53F7\uFF0C\u7BA1\u7406\u5458\u5728\u6B64\u767B\u8BB0\u540E\u5206\u914D\u7EC4\u7EC7\u4E0E\u89D2\u8272\uFF08MVP \u9636\u6BB5\u4EE5\u7528\u6237\u89D2\u8272\u4E3A\u51C6\uFF09\u3002"})]}),e.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[e.jsx(n,{variant:"ghost",onClick:()=>I({...y,open:!1}),children:"\u53D6\u6D88"}),e.jsx(n,{onClick:()=>{a("\u5DF2\u8BB0\u5F55\u9080\u8BF7\uFF08MVP \u5360\u4F4D\uFF09"),I({...y,open:!1})},children:"\u53D1\u9001\u9080\u8BF7"})]})]}),ie]})}\n',
+            "/assets/Users-CsKHEnB4.js": {
+              content: 'import{i as be,u as ge,j as e,d as j,b as ve,B as n,D as T,h as q,n as d,g as z,e as S,F as p,I as g,k as Ne,C as ye,q as ke,o as we}from"./index-OWhocmiM.js";import{h as Ce,r as c}from"./vendor-BbQ_LiY-.js";import Ie from"./Invite-CbRAI9tf.js";import{P as le}from"./plus-DjGDWRHo.js";import{T as ae}from"./trash-2-BAKVuXGI.js";import"./download-BtYvvPCG.js";const h={superadmin:{label:"\u8D85\u7EA7\u7BA1\u7406\u5458",color:"bg-red-500/10 text-red-500 font-bold border border-red-500/30",desc:"\u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u5168\u7AD9\u7BA1\u7406\uFF0C\u989D\u5EA6\u65E0\u9650\u771F\u5B9E\u6263\u8D39",lvl:100},admin:{label:"\u7BA1\u7406\u5458",color:"bg-brand/10 text-brand font-semibold border border-brand/20",desc:"\u53EF\u8C03\u7528\u5168\u91CF\u6A21\u578B\uFF0C\u53EF\u7BA1\u7406\u4E0B\u7EA7\u7528\u6237\u5E76\u8F6C\u8D26\u5145\u503C",lvl:50},finance:{label:"\u8D22\u52A1\u4EBA\u5458",color:"bg-purple-500/10 text-purple-400 border border-purple-500/20",desc:"\u8D22\u52A1\u4E0E\u8D26\u5355\u6838\u5BF9\u6743\u9650",lvl:30},auditor:{label:"\u5BA1\u8BA1\u5458",color:"bg-blue-500/10 text-blue-400 border border-blue-500/20",desc:"\u5BA1\u8BA1\u65E5\u5FD7\u53EA\u8BFB\u6743\u9650",lvl:20},vip:{label:"VIP \u8D26\u53F7",color:"bg-amber-500/10 text-amber-500 font-semibold border border-amber-500/20",desc:"\u4F59\u989D\u5927\u4E8E 0 \u81EA\u52A8\u83B7\u5F97\uFF0C\u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u6A21\u578B\u5E76\u6309\u91CF\u6263\u8D39",lvl:10},user:{label:"\u666E\u901A\u7528\u6237",color:"bg-zinc-500/10 text-zinc-400 border border-zinc-500/20",desc:"\u4F59\u989D\u5F52\u96F6\u72B6\u6001\uFF0C\u4EC5\u9650\u514D\u8D39\u6A21\u578B\u6C60\uFF0C\u514D\u5145\u503C\u4E0D\u6263\u8D39",lvl:1}};function ze(){var J,Q,W,X,Z,ee,se,te;const{me:t}=Ce(),x=(t==null?void 0:t.user.role)==="superadmin",F=x||(t==null?void 0:t.user.role)==="admin",[f,ne]=c.useState(F?"users":"mygroup"),[C,re]=c.useState(null),[o,K]=c.useState(null),[A,G]=c.useState(null),[D,Y]=c.useState(null),[y,I]=c.useState({open:!1,email:"",role:"member"}),[m,k]=c.useState({open:!1,user:null,role:"user"}),[r,v]=c.useState({open:!1,user:null,amount:"50",memo:"\u7BA1\u7406\u5458\u8F6C\u8D26\u5145\u503C",password:""}),[i,b]=c.useState({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),[w,E]=c.useState(null),[oe,H]=c.useState(null),{confirm:B,confirmEl:ie}=be(),a=ge(),N=()=>d("list_users").then(s=>re(s.users)).catch(s=>a(s.message,"err")),M=()=>d("list_redeem_codes").then(s=>K(s.codes)).catch(()=>K([])),L=()=>d("flags_queue").then(s=>G(s.flags)).catch(()=>G([])),R=()=>d("appeals_list").then(s=>Y(s.appeals)).catch(()=>Y([]));c.useEffect(()=>{F&&N()},[]);const de=async()=>{var s;if(m.user)try{await d("set_role",{userId:m.user.id,role:m.role}),a(`\u5DF2\u5C06\u300C${m.user.email}\u300D\u89D2\u8272\u66F4\u65B0\u4E3A ${((s=h[m.role])==null?void 0:s.label)||m.role}`),k({open:!1,user:null,role:"user"}),N()}catch(l){a(l.message,"err")}},ce=s=>{v({open:!0,user:s,amount:"50",memo:"\u7BA1\u7406\u5458\u8F6C\u8D26\u5145\u503C",password:""})},xe=async()=>{if(!r.user)return;const s=parseFloat(r.amount);if(isNaN(s)||s<=0)return a("\u8BF7\u8F93\u5165\u5927\u4E8E 0 \u7684\u5145\u503C\u91D1\u989D","err");if(!r.password.trim())return a("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u5145\u503C\u64CD\u4F5C","err");try{await d("topup",{scope:`user:${r.user.id}`,amount:s,memo:r.memo.trim()||void 0,password:r.password.trim()}),a(`\u8F6C\u8D26\u5145\u503C\u6210\u529F\uFF01\u5DF2\u4E3A\u300C${r.user.email}\u300D\u5145\u503C \xA5${s.toFixed(2)}${x?"":"\uFF08\u5DF2\u6263\u9664\u60A8\u7B49\u989D\u4F59\u989D\uFF09"}`),v({open:!1,user:null,amount:"50",memo:"",password:""}),N()}catch(l){a(l.message,"err")}},me=async s=>{if(await B(`\u5371\u9669\u64CD\u4F5C\uFF1A\u786E\u8BA4\u6C38\u4E45\u5220\u9664\u7528\u6237\u300C${s.email}\u300D\uFF1F\u8BE5\u7528\u6237\u7684\u4E2A\u4EBA\u8D26\u6237\u3001\u6570\u636E\u4E0E\u5168\u90E8 API Key \u5C06\u88AB\u7269\u7406\u9500\u6BC1\u4E14\u65E0\u6CD5\u6062\u590D\uFF01`))try{await d("delete_user",{userId:s.id}),a(`\u5DF2\u5F7B\u5E95\u5220\u9664\u7528\u6237\u300C${s.email}\u300D`),N()}catch(l){a(l.message,"err")}},O=async(s,l)=>{try{await navigator.clipboard.writeText(s),H(s),a(`\u5DF2\u590D\u5236 ${l}`),setTimeout(()=>H(null),1800)}catch{a("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u590D\u5236","err")}},ue=async()=>{const s=parseFloat(i.amount),l=parseInt(i.count,10);if(isNaN(s)||s<=0)return a("\u5361\u5BC6\u9762\u989D\u5FC5\u987B\u5927\u4E8E 0","err");if(isNaN(l)||l<=0||l>100)return a("\u6BCF\u6B21\u751F\u6210\u6570\u91CF\u9700\u5728 1 \u5230 100 \u5F20\u4E4B\u95F4","err");if(!i.password.trim())return a("\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4\u64CD\u4F5C","err");try{const u=await d("generate_redeem_codes",{amount:s,count:l,autoVip:i.autoVip,note:i.note.trim()||void 0,password:i.password.trim()});a(`\u5DF2\u6210\u529F\u751F\u6210 ${u.count||l} \u5F20\u5361\u5BC6\uFF01`),E((u.codes||[]).map(V=>V.code)),b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),M()}catch(u){a(u.message,"err")}},pe=async s=>{if(await B(`\u786E\u8BA4\u5220\u9664/\u4F5C\u5E9F\u5361\u5BC6\u300C${s.code}\u300D\uFF1F`))try{await d("delete_redeem_code",{codeId:s.id}),a("\u5361\u5BC6\u5DF2\u5220\u9664"),M()}catch(l){a(l.message,"err")}},he=[{key:"email",label:"\u90AE\u7BB1",sortVal:s=>s.email,render:s=>e.jsx("span",{className:"font-medium text-ink",children:s.email})},{key:"id",label:"\u7528\u6237 ID",render:s=>e.jsxs("code",{className:"text-xs text-muted font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"role",label:"\u8D26\u53F7\u7B49\u7EA7",render:s=>{var P,$;const l=h[s.role]||{label:s.role,color:"bg-surface2 text-muted"},u=((P=h[(t==null?void 0:t.user.role)??"user"])==null?void 0:P.lvl)??1,V=(($=h[s.role])==null?void 0:$.lvl)??1,_=x||u>V&&s.id!==(t==null?void 0:t.user.id);return e.jsx("button",{type:"button",disabled:!_,onClick:()=>_&&k({open:!0,user:s,role:s.role}),className:`rounded-full px-2.5 py-0.5 text-[11px] transition-all ${_?"hover:scale-105 cursor-pointer":"cursor-default opacity-85"} ${l.color}`,title:_?"\u70B9\u51FB\u4FEE\u6539\u7528\u6237\u89D2\u8272\u7B49\u7EA7\u4E0E\u6743\u9650":"\u540C\u7EA7\u6216\u9AD8\u6743\u9650\u8D26\u53F7\u4E0D\u53EF\u76F4\u63A5\u4FEE\u6539\u89D2\u8272",children:l.label})}},{key:"balance",label:"\u53EF\u7528\u4F59\u989D",sortVal:s=>s.unlimited?Number.POSITIVE_INFINITY:s.balance??0,render:s=>s.unlimited?e.jsx("span",{className:"rounded bg-brand/10 px-1.5 py-0.5 font-mono text-xs font-semibold text-brand whitespace-nowrap",title:"\u8D85\u7EA7\u7BA1\u7406\u5458\u4E3A\u94F8\u5E01\u65B9\uFF0C\u989D\u5EA6\u65E0\u4E0A\u9650",children:"\u221E \u65E0\u9650"}):e.jsxs("span",{className:"font-mono text-xs font-semibold text-emerald-500",children:["\xA5",(s.balance??0).toFixed(2)]})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"created",label:"\u6CE8\u518C\u65F6\u95F4",sortVal:s=>s.created_at,render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.created_at)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>{var P,$;const l=((P=h[(t==null?void 0:t.user.role)??"user"])==null?void 0:P.lvl)??1,u=(($=h[s.role])==null?void 0:$.lvl)??1,V=s.id===(t==null?void 0:t.user.id);return x||l>u&&!V?e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsxs(n,{variant:"soft",className:"!h-7 !px-2 text-xs !text-emerald-500 font-medium",onClick:()=>ce(s),children:[e.jsx(ye,{size:12,className:"mr-0.5"}),"\u5145\u503C"]}),e.jsx(n,{variant:"soft",className:"!h-7 !px-2 text-xs",onClick:()=>k({open:!0,user:s,role:s.role}),children:"\u8C03\u6574\u89D2\u8272"}),s.status==="active"?e.jsx(n,{variant:"ghost",className:"!h-7 !px-2 text-xs !text-err",onClick:async U=>{U.stopPropagation(),await B(`\u5C01\u7981 ${s.email}\uFF1F\u5C06\u540C\u65F6\u64A4\u9500\u5176\u5168\u90E8 Key \u5E76\u5F3A\u5236\u4E0B\u7EBF\u3002`)&&(await d("ban_user",{userId:s.id}),a("\u5DF2\u5C01\u7981"),N())},children:"\u5C01\u7981"}):e.jsx(n,{variant:"ghost",className:"!h-7 !px-2 text-xs",onClick:async U=>{U.stopPropagation(),await d("unban_user",{userId:s.id}),a("\u5DF2\u89E3\u5C01"),N()},children:"\u89E3\u5C01"}),e.jsx(n,{variant:"ghost",className:"!h-7 !px-1.5 text-xs !text-err",onClick:()=>me(s),title:"\u7269\u7406\u5220\u9664\u8BE5\u7528\u6237",children:e.jsx(ae,{size:12})})]}):e.jsx("span",{className:"text-xs text-muted/60",children:"\u2014"})}}],je=[{key:"code",label:"\u5361\u5BC6\u4EE3\u7801",render:s=>e.jsxs("button",{type:"button",onClick:()=>O(s.code,"\u5361\u5BC6\u4EE3\u7801"),className:"flex items-center gap-1.5 font-mono text-xs font-bold text-ink hover:text-brand transition-colors",title:"\u70B9\u51FB\u4E00\u952E\u590D\u5236\u5361\u5BC6",children:[e.jsx("span",{children:s.code}),oe===s.code?e.jsx(ke,{size:12,className:"text-emerald-500"}):e.jsx(we,{size:12,className:"text-muted/60"})]})},{key:"amount",label:"\u5145\u503C\u9762\u989D",sortVal:s=>s.amount,render:s=>e.jsxs("span",{className:"font-mono text-xs font-bold text-emerald-500",children:["\xA5",s.amount.toFixed(2)]})},{key:"autoVip",label:"\u6743\u76CA\u5C5E\u6027",render:s=>e.jsx("span",{className:"rounded bg-amber-500/10 text-amber-500 text-[10px] font-semibold px-2 py-0.5",children:"\u4F59\u989D\u5927\u4E8E0\u81EA\u52A8VIP"})},{key:"status",label:"\u72B6\u6001",render:s=>s.status==="unused"?e.jsx("span",{className:"rounded bg-emerald-500/10 text-emerald-500 text-[11px] font-semibold px-2 py-0.5",children:"\u672A\u5151\u6362"}):s.status==="used"?e.jsx("span",{className:"rounded bg-zinc-500/10 text-zinc-400 text-[11px] px-2 py-0.5",children:"\u5DF2\u4F7F\u7528"}):e.jsx("span",{className:"rounded bg-red-500/10 text-red-500 text-[11px] px-2 py-0.5",children:"\u5DF2\u4F5C\u5E9F"})},{key:"usedBy",label:"\u5151\u6362\u8BB0\u5F55",render:s=>s.usedByEmail?e.jsxs("div",{className:"flex flex-col text-[11px]",children:[e.jsx("span",{className:"text-ink font-medium",children:s.usedByEmail}),e.jsx("span",{className:"text-muted",children:s.usedAt?z(s.usedAt):""})]}):e.jsx("span",{className:"text-xs text-muted",children:"\u2014"})},{key:"note",label:"\u751F\u6210\u5907\u6CE8",render:s=>e.jsx("span",{className:"text-xs text-muted truncate max-w-[140px]",children:s.note||"\u2014"})},{key:"created",label:"\u751F\u6210\u65F6\u95F4",sortVal:s=>s.createdAt,render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.createdAt)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex items-center gap-1.5 shrink-0",children:[e.jsx(n,{variant:"soft",className:"!h-7 !px-2 text-xs",onClick:()=>O(s.code,"\u5361\u5BC6\u4EE3\u7801"),children:"\u590D\u5236"}),e.jsx(n,{variant:"ghost",className:"!h-7 !px-1.5 text-xs !text-err",onClick:()=>pe(s),title:"\u5220\u9664/\u4F5C\u5E9F\u5361\u5BC6",children:e.jsx(ae,{size:12})})]})}],fe=x?[["users","\u7528\u6237\u4E0E\u6743\u9650"],["invite","\u9080\u8BF7"],["codes","\u5361\u5BC6\u7BA1\u7406"],["flags","\u5185\u5BB9\u590D\u6838\u961F\u5217"],["appeals","\u7533\u8BC9"]]:F?[["users","\u7528\u6237\u4E0E\u6743\u9650"],["invite","\u9080\u8BF7"]]:[["mygroup","\u6211\u7684\u7528\u6237\u7EC4"],["invite","\u9080\u8BF7"]];return e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsx("div",{className:"flex w-full gap-1 overflow-x-auto rounded-lg bg-surface2 p-0.5 sm:w-fit",role:"tablist",children:fe.map(([s,l])=>e.jsx("button",{role:"tab","aria-selected":f===s,onClick:()=>{var u;ne(s),(u=s==="invite"||s==="mygroup"?void 0:s==="flags"?L:s==="appeals"?R:s==="codes"?M:N)==null||u()},className:`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${f===s?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"}`,children:l},s))}),f==="mygroup"&&e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{children:[e.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u6211\u7684\u7528\u6237\u7EC4"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:"\u5F53\u524D\u8D26\u53F7\u6240\u5C5E\u7684\u7528\u6237\u7EC4\u4E0E\u6743\u9650\u7EA7\u522B\uFF1B\u5982\u9700\u8C03\u6574\u7528\u6237\u7EC4\u6216\u989D\u5EA6\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458\u3002"})]}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-4",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2",children:[e.jsx("span",{className:`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${((J=h[t.user.role])==null?void 0:J.color)??""}`,children:((Q=h[t.user.role])==null?void 0:Q.label)??t.user.role}),e.jsxs("span",{className:"text-xs text-muted",children:["\u6743\u9650\u7B49\u7EA7 ",((W=h[t.user.role])==null?void 0:W.lvl)??0]})]}),e.jsx("p",{className:"mt-2 text-xs leading-relaxed text-muted",children:((X=h[t.user.role])==null?void 0:X.desc)??"\u2014"}),e.jsxs("div",{className:"mt-4 grid grid-cols-1 gap-3 text-xs sm:grid-cols-3",children:[e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u8D26\u53F7\u90AE\u7BB1"}),e.jsx("div",{className:"mt-0.5 font-medium text-ink break-all",children:t.user.email})]}),e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u7528\u6237\u7EC4\u6807\u8BC6"}),e.jsx("div",{className:"mt-0.5 font-mono font-medium text-ink",children:t.user.role})]}),e.jsxs("div",{children:[e.jsx("div",{className:"text-muted",children:"\u53EF\u7528\u4F59\u989D"}),e.jsx("div",{className:"mt-0.5 font-medium text-ink",children:t.unlimited?"\u221E \u65E0\u9650\u989D\u5EA6":ve(t.balance.available,t.balance.currency)})]})]})]})]}),f==="users"&&e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/50 p-3 text-xs text-muted space-y-1.5",children:[e.jsx("div",{className:"font-semibold text-ink text-[13px] mb-1",children:"\u{1F451} \u6743\u9650\u7EE7\u627F\u4E0E\u52A8\u6001\u4F1A\u5458\u7B49\u7EA7\u89C4\u5219\uFF08superadmin > admin > vip > user\uFF09\uFF1A"}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-red-500/10 text-red-500 px-1.5 py-0.5 text-[10px] font-bold",children:"\u8D85\u7EA7\u7BA1\u7406\u5458 (superadmin)"}),e.jsxs("span",{children:["\u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u72EC\u5360\u5168\u7AD9\u8BBE\u7F6E\u4E0E\u6E20\u9053\u6CBB\u7406\uFF1B",e.jsx("b",{children:"\u4F59\u989D\u989D\u5EA6\u65E0\u9650\uFF08\u7167\u5E38\u6309\u91CF\u6263\u8D39\u8BB0\u8D26\uFF09"}),"\uFF1B\u53EF\u7BA1\u7406/\u5145\u503C/\u5C01\u7981/\u5220\u9664\u6240\u6709\u4E0B\u7EA7\u8D26\u53F7\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-brand/10 text-brand px-1.5 py-0.5 text-[10px] font-bold",children:"\u7BA1\u7406\u5458 (admin)"}),e.jsxs("span",{children:["\u62E5\u6709\u5168\u6A21\u578B\u8C03\u7528\u6743\u9650\uFF1B\u53EF\u5728\u6743\u9650\u8303\u56F4\u5185\u7BA1\u7406\u4E0B\u7EA7\u5E76",e.jsx("b",{children:"\u5B9E\u6253\u5B9E\u6263\u9664\u81EA\u8EAB\u4F59\u989D\u4E3A\u4E0B\u7EA7\u8F6C\u8D26\u5145\u503C"}),"\uFF1B\u4EC5\u9650\u8D85\u7EA7\u7BA1\u7406\u5458\u540E\u53F0\u4EFB\u547D\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-amber-500/10 text-amber-500 px-1.5 py-0.5 text-[10px] font-bold",children:"VIP \u8D26\u53F7 (vip)"}),e.jsxs("span",{children:[e.jsx("b",{children:"\u53EA\u8981\u53EF\u7528\u4F59\u989D > 0 \u81EA\u52A8\u664B\u5347\u4E3A VIP"}),"\uFF1B\u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u5927\u6A21\u578B\u5E76\u6309\u771F\u5B9E Token \u6263\u9664\u8D26\u6237\u4F59\u989D\u3002"]})]}),e.jsxs("div",{className:"flex items-start gap-2",children:[e.jsx("span",{className:"shrink-0 rounded bg-zinc-500/10 text-zinc-400 px-1.5 py-0.5 text-[10px] font-bold",children:"\u666E\u901A\u7528\u6237 (user)"}),e.jsxs("span",{children:[e.jsx("b",{children:"\u53EA\u8981\u53EF\u7528\u4F59\u989D\u7B49\u4E8E 0 \u81EA\u52A8\u964D\u7EA7\u4E3A\u666E\u901A\u7528\u6237"}),"\uFF1B\u4EC5\u53EF\u514D\u8D39\u4F7F\u7528 0 \u5143\u6A21\u578B\u6C60\uFF08\u514D\u5145\u503C\u514D\u6263\u8D39\uFF09\uFF0C\u4ED8\u8D39\u6A21\u578B\u62E6\u622A\u5F15\u5BFC\u5145\u503C\u3002"]})]})]}),e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsxs("span",{className:"text-xs text-muted",children:["\u5171\u8BA1 ",(C==null?void 0:C.length)??0," \u4F4D\u6CE8\u518C\u7528\u6237"]}),e.jsxs(n,{onClick:()=>I({open:!0,email:"",role:"member"}),children:[e.jsx(le,{size:14}),"\u9080\u8BF7\u6210\u5458"]})]}),C===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,l)=>e.jsx("div",{className:"skeleton h-9"},l))}):e.jsx(T,{cols:he,rows:C})]}),f==="invite"&&e.jsx(Ie,{me:t}),f==="codes"&&x&&e.jsxs("div",{className:"flex flex-col gap-4",children:[e.jsxs("div",{className:"grid grid-cols-2 sm:grid-cols-4 gap-3",children:[e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u751F\u6210\u5361\u5BC6\u603B\u8BA1"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-ink mt-1",children:[(o==null?void 0:o.length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u672A\u5151\u6362\u6709\u6548\u5361\u5BC6"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-emerald-500 mt-1",children:[(o==null?void 0:o.filter(s=>s.status==="unused").length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u5DF2\u6838\u9500\u5151\u6362"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-muted mt-1",children:[(o==null?void 0:o.filter(s=>s.status==="used").length)??0," \u5F20"]})]}),e.jsxs(j,{className:"p-3.5 flex flex-col justify-between",children:[e.jsx("span",{className:"text-xs text-muted",children:"\u603B\u5361\u5BC6\u52A0\u6B3E\u9762\u989D"}),e.jsxs("span",{className:"text-xl font-bold font-mono text-amber-500 mt-1",children:["\xA5",((o==null?void 0:o.reduce((s,l)=>s+l.amount,0))??0).toFixed(2)]})]})]}),e.jsxs(j,{className:"p-4 sm:p-5 flex flex-col gap-3.5",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsxs("div",{children:[e.jsx("h3",{className:"text-sm font-semibold text-ink",children:"\u5361\u5BC6\u5217\u8868"}),e.jsx("p",{className:"text-xs text-muted mt-0.5",children:"\u652F\u6301\u6279\u91CF\u751F\u6210\u5151\u6362\u5361\u5BC6\uFF0C\u7528\u6237\u53EF\u5728\u524D\u53F0\u81EA\u52A9\u624B\u586B\u5361\u5BC6\u52A0\u6B3E\u5E76\u81EA\u52A8\u5347\u7EA7 VIP\u3002"})]}),e.jsxs(n,{onClick:()=>b({open:!0,amount:"50",count:"10",autoVip:!0,note:"",password:""}),children:[e.jsx(le,{size:14}),"\u6279\u91CF\u751F\u6210\u5361\u5BC6"]})]}),o===null?e.jsx("div",{className:"flex flex-col gap-2",children:[...Array(5)].map((s,l)=>e.jsx("div",{className:"skeleton h-9"},l))}):o.length===0?e.jsx("div",{className:"py-12 text-center text-xs text-muted",children:"\u6682\u65E0\u5361\u5BC6\uFF0C\u8BF7\u70B9\u51FB\u53F3\u4E0A\u89D2\u300C\u6279\u91CF\u751F\u6210\u5361\u5BC6\u300D\u5F00\u59CB\u521B\u5EFA\u3002"}):e.jsx(T,{cols:je,rows:o})]})]}),f==="flags"&&e.jsx(j,{className:"p-4",children:A===null?e.jsx("div",{className:"skeleton h-40"}):A.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u2713 \u590D\u6838\u961F\u5217\u4E3A\u7A7A\u3002\u5F00\u542F\u5185\u5BB9\u5BA1\u6838\u540E\uFF0C\u547D\u4E2D\u89C4\u5219\u7684\u8BF7\u6C42\u4F1A\u8FDB\u5165\u8FD9\u91CC\u3002"}):e.jsx(T,{cols:[{key:"id",label:"ID",render:s=>e.jsxs("code",{className:"text-xs font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"model",label:"\u6A21\u578B",render:s=>s.public_model??"\u2014"},{key:"rule",label:"\u547D\u4E2D\u89C4\u5219",render:s=>e.jsx("code",{className:"text-xs",children:s.rule})},{key:"hash",label:"\u5185\u5BB9\u6458\u8981",render:s=>e.jsxs("code",{className:"text-xs text-muted font-mono",children:[(s.excerpt_hash??"").slice(0,16),"\u2026"]})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex gap-1.5",children:[e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:async()=>{await d("resolve_flag",{flagId:s.id,decision:"cleared",note:""}),a("\u5DF2\u653E\u884C"),L()},children:"\u653E\u884C"}),e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async()=>{await d("resolve_flag",{flagId:s.id,decision:"confirmed",note:""}),a("\u5DF2\u786E\u8BA4\u8FDD\u89C4"),L()},children:"\u786E\u8BA4\u8FDD\u89C4"})]})}],rows:A})}),f==="appeals"&&e.jsx(j,{className:"p-4",children:D===null?e.jsx("div",{className:"skeleton h-40"}):D.length===0?e.jsx("p",{className:"py-8 text-center text-xs text-muted",children:"\u6682\u65E0\u5F85\u5904\u7406\u7533\u8BC9"}):e.jsx(T,{cols:[{key:"id",label:"ID",render:s=>e.jsxs("code",{className:"text-xs font-mono",children:[s.id.slice(0,8),"\u2026"]})},{key:"type",label:"\u7C7B\u578B",render:s=>s.target_type},{key:"reason",label:"\u7533\u8BC9\u7406\u7531",render:s=>e.jsx("span",{className:"line-clamp-1 max-w-md",children:s.reason})},{key:"status",label:"\u72B6\u6001",render:s=>e.jsx(q,{value:s.status})},{key:"time",label:"\u65F6\u95F4",render:s=>e.jsx("span",{className:"text-xs text-muted",children:z(s.created_at)})},{key:"ops",label:"\u64CD\u4F5C",render:s=>e.jsxs("span",{className:"flex gap-1.5",children:[e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs",onClick:async()=>{await d("resolve_appeal",{appealId:s.id,decision:"accepted",note:""}),a("\u5DF2\u53D7\u7406"),R()},children:"\u53D7\u7406"}),e.jsx(n,{variant:"ghost",className:"!px-2 !py-1 text-xs !text-err",onClick:async()=>{await d("resolve_appeal",{appealId:s.id,decision:"rejected",note:""}),a("\u5DF2\u9A73\u56DE"),R()},children:"\u9A73\u56DE"})]})}],rows:D})}),e.jsx(S,{open:r.open,onClose:()=>v({open:!1,user:null,amount:"50",memo:"",password:""}),title:`\u4E3A\u7528\u6237\u5145\u503C\u52A0\u6B3E \u2014 ${((Z=r.user)==null?void 0:Z.email)??""}`,width:460,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u76EE\u6807\u7528\u6237\u5F53\u524D\u4F59\u989D"}),e.jsxs("span",{className:"font-mono text-sm font-bold text-emerald-500",children:["\xA5",(((ee=r.user)==null?void 0:ee.balance)??0).toFixed(2)]})]}),e.jsx(p,{label:"\u5145\u503C\u52A0\u6B3E\u91D1\u989D (\u5143)",children:e.jsx(g,{type:"number",min:"0.01",step:"0.01",value:r.amount,onChange:s=>v({...r,amount:s.target.value}),placeholder:"50"})}),e.jsxs("div",{className:"rounded-lg border border-amber-500/20 bg-amber-500/10 p-2.5 text-xs text-amber-600 dark:text-amber-400 space-y-1",children:[e.jsx("div",{className:"font-semibold",children:"\u{1F4A1} \u8F6C\u8D26\u6263\u6B3E\u4E0E\u81EA\u52A8 VIP \u664B\u5347\u673A\u5236\uFF1A"}),e.jsx("div",{children:x?"\u8D85\u7EA7\u7BA1\u7406\u5458\u62E5\u6709\u65E0\u9650\u8C03\u7528\u989D\u5EA6\uFF0C\u4E3A\u4E0B\u7EA7\u5145\u503C\u5C06\u7167\u5E38\u8BB0\u5165\u7CFB\u7EDF\u8F6C\u8D26\u6263\u51CF\u6D41\u6C34\u3002":`\u672C\u6B21\u5145\u503C\u5C06\u4ECE\u60A8\u7684\u8D26\u6237\u4F59\u989D\u4E2D\u5B9E\u6253\u5B9E\u6263\u9664 \xA5${r.amount||"0"}\uFF08\u60A8\u5F53\u524D\u53EF\u7528\u4F59\u989D\u4E3A \xA5${((t==null?void 0:t.balance.available)??0).toFixed(2)}\uFF09\u3002`}),e.jsx("div",{children:"\u7528\u6237\u5145\u503C\u540E\u53EA\u8981\u53EF\u7528\u4F59\u989D\u5927\u4E8E 0\uFF0C\u7CFB\u7EDF\u5C06\u81EA\u52A8\u664B\u5347\u5176\u4E3A VIP \u8D26\u53F7\uFF01"})]}),e.jsx(p,{label:"\u5145\u503C\u5907\u6CE8 (\u53EF\u9009)",children:e.jsx(g,{value:r.memo,onChange:s=>v({...r,memo:s.target.value}),placeholder:"\u7BA1\u7406\u5458\u624B\u52A8\u8F6C\u8D26\u5145\u503C"})}),e.jsx(p,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u8D26\u6237\u52A0\u6B3E\u5C5E\u4E8E\u9AD8\u5371\u8D22\u52A1\u64CD\u4F5C\uFF0C\u9700\u6838\u9A8C\u5BC6\u7801",children:e.jsx(g,{type:"password",value:r.password,onChange:s=>v({...r,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u64CD\u4F5C\u8005\u7684\u5BC6\u7801",autoComplete:"current-password"})}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>v({open:!1,user:null,amount:"50",memo:"",password:""}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:xe,children:"\u786E\u8BA4\u8F6C\u8D26\u5145\u503C"})]})]})}),e.jsx(S,{open:i.open,onClose:()=>b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),title:"\u6279\u91CF\u751F\u6210\u5145\u503C\u5361\u5BC6",width:480,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"grid grid-cols-1 sm:grid-cols-2 gap-3",children:[e.jsx(p,{label:"\u5361\u5BC6\u9762\u503C (\u5143)",children:e.jsx(g,{type:"number",step:"0.01",value:i.amount,onChange:s=>b({...i,amount:s.target.value}),placeholder:"50"})}),e.jsx(p,{label:"\u751F\u6210\u6570\u91CF (\u5F20)",hint:"\u5355\u6B21\u6700\u591A 100 \u5F20",children:e.jsx(g,{type:"number",min:"1",max:"100",value:i.count,onChange:s=>b({...i,count:s.target.value}),placeholder:"10"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(p,{label:"\u5361\u5BC6\u6279\u6B21\u5907\u6CE8 (\u53EF\u9009)",children:e.jsx(g,{value:i.note,onChange:s=>b({...i,note:s.target.value}),placeholder:"\u4F8B\u5982: \u5BA2\u6237\u6279\u91CF\u91C7\u8D2D\u3001\u65B0\u7528\u6237\u798F\u5229\u5361"})})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx("p",{className:"text-xs text-muted",children:"\u{1F4A1} \u7528\u6237\u5151\u6362\u540E\u8D26\u6237\u4F59\u989D > 0 \u5C06\u81EA\u52A8\u83B7\u5F97 VIP \u8EAB\u4EFD\uFF1B\u8D85\u7EA7\u7BA1\u7406\u5458\u751F\u6210\u7684\u5361\u5BC6\u4E3A\u7CFB\u7EDF\u94F8\u5E01\u52A0\u6B3E\u3002"})}),e.jsx("div",{className:"col-span-1 sm:col-span-2",children:e.jsx(p,{label:"\u7BA1\u7406\u5458\u5BC6\u7801\u786E\u8BA4",hint:"\u751F\u6210\u6709\u6548\u8D27\u5E01\u5361\u5BC6\u5C5E\u4E8E\u8D22\u52A1\u654F\u611F\u64CD\u4F5C\uFF0C\u9700\u6838\u9A8C\u7BA1\u7406\u5458\u5BC6\u7801",children:e.jsx(g,{type:"password",value:i.password,onChange:s=>b({...i,password:s.target.value}),placeholder:"\u8BF7\u8F93\u5165\u5F53\u524D\u7BA1\u7406\u5458\u5BC6\u7801",autoComplete:"current-password"})})})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>b({open:!1,amount:"50",count:"10",autoVip:!0,note:"",password:""}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:ue,children:"\u786E\u8BA4\u6279\u91CF\u751F\u6210"})]})]})}),e.jsx(S,{open:!!w,onClose:()=>E(null),title:"\u5361\u5BC6\u751F\u6210\u6210\u529F",width:480,children:e.jsxs("div",{className:"space-y-3",children:[e.jsxs("p",{className:"text-xs text-muted",children:["\u5DF2\u6210\u529F\u751F\u6210 ",(w==null?void 0:w.length)??0," \u5F20\u5361\u5BC6\u3002\u60A8\u53EF\u4EE5\u4E00\u952E\u590D\u5236\u5E76\u76F4\u63A5\u53D1\u7ED9\u5BA2\u6237\u6216\u5BFC\u5165\u53D1\u5361\u7CFB\u7EDF\uFF1A"]}),e.jsx("textarea",{readOnly:!0,value:(w||[]).join(`\n`),rows:6,className:"w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink focus:outline-none"}),e.jsxs("div",{className:"flex justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",onClick:()=>E(null),children:"\u5173\u95ED"}),e.jsx(n,{onClick:()=>O((w||[]).join(`\n`),"\u5168\u90E8\u5361\u5BC6"),children:"\u4E00\u952E\u590D\u5236\u5168\u90E8\u5361\u5BC6"})]})]})}),e.jsx(S,{open:m.open,onClose:()=>k({open:!1,user:null,role:"user"}),title:`\u8C03\u6574\u8D26\u53F7\u7B49\u7EA7 \u2014 ${((se=m.user)==null?void 0:se.email)??""}`,width:500,children:e.jsxs("div",{className:"space-y-4",children:[e.jsxs("div",{className:"flex items-center justify-between rounded-lg bg-surface2/60 p-3 text-xs",children:[e.jsx("span",{className:"text-muted",children:"\u76EE\u6807\u7528\u6237\u5F53\u524D\u53EF\u7528\u4F59\u989D"}),e.jsxs("span",{className:"font-mono text-sm font-bold text-emerald-500",children:["\xA5",(((te=m.user)==null?void 0:te.balance)??0).toFixed(2)]})]}),e.jsx(p,{label:"\u8D26\u53F7\u89D2\u8272\u7B49\u7EA7",children:e.jsxs(Ne,{value:m.role,onChange:s=>k({...m,role:s.target.value}),children:[x&&e.jsx("option",{value:"superadmin",children:"\u8D85\u7EA7\u7BA1\u7406\u5458 (superadmin) \u2014 \u6700\u9AD8\u7AD9\u957F\u6743\u9650\uFF0C\u5168\u7AD9\u7BA1\u7406"}),x&&e.jsx("option",{value:"admin",children:"\u7BA1\u7406\u5458 (admin) \u2014 \u62E5\u6709\u4E0B\u7EA7\u7528\u6237\u7BA1\u7406\u4E0E\u8F6C\u8D26\u5145\u503C\u6743\u9650\uFF08\u4F59\u989D\u4E3A0\u4E0D\u5F71\u54CD\u4EFB\u547D\uFF09"}),e.jsx("option",{value:"vip",children:"VIP \u8D26\u53F7 (vip) \u2014 \u89E3\u9501\u5168\u91CF\u4ED8\u8D39\u5927\u6A21\u578B\uFF0C\u6309\u91CF\u6263\u8D39"}),e.jsx("option",{value:"user",children:"\u666E\u901A\u7528\u6237 (user) \u2014 \u4EC5\u9650\u514D\u8D39\u6A21\u578B\u6C60\uFF0C\u514D\u5145\u503C\u4E0D\u6263\u8D39"}),x&&e.jsx("option",{value:"finance",children:"\u8D22\u52A1\u4EBA\u5458 (finance)"}),x&&e.jsx("option",{value:"auditor",children:"\u5BA1\u8BA1\u5458 (auditor)"})]})}),e.jsxs("div",{className:"rounded-xl border border-line bg-surface2/60 p-3 text-xs text-muted space-y-1.5",children:[e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u7BA1\u7406\u5458 (admin)"}),"\uFF1A\u7531\u8D85\u7EA7\u7BA1\u7406\u5458\u5728\u540E\u53F0\u4EFB\u547D\u3002\u7BA1\u7406\u5458\u4F59\u989D\u53EF\u4EE5\u4E3A 0\uFF0C\u4F46\u4F59\u989D\u4E3A 0 \u65F6\u65E0\u6CD5\u5411\u4E0B\u7EA7\u8F6C\u8D26\u52A0\u6B3E\u3002"]}),e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u81EA\u52A8 VIP \u673A\u5236"}),"\uFF1A\u666E\u901A\u7528\u6237\u53EA\u8981\u4F59\u989D > 0 \u81EA\u52A8\u664B\u5347\u4E3A VIP\uFF1B\u4F59\u989D\u7B49\u4E8E 0 \u81EA\u52A8\u964D\u4E3A\u666E\u901A\u7528\u6237\u3002\u82E5\u9700\u5F00\u901A VIP\uFF0C\u76F4\u63A5\u4F7F\u7528\u300C\u5145\u503C\u300D\u52A0\u6B3E\u5373\u53EF\u3002"]}),e.jsxs("div",{children:["\u2022 ",e.jsx("b",{children:"\u6743\u9650\u5C42\u7EA7\u7EE7\u627F"}),"\uFF1A\u53EA\u5141\u8BB8\u7BA1\u7406\u4E0E\u5145\u503C\u6743\u9650\u4E25\u683C\u4F4E\u4E8E\u81EA\u8EAB\u7684\u4E0B\u7EA7\u7528\u6237\u3002"]})]}),e.jsxs("div",{className:"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-line",children:[e.jsx(n,{variant:"ghost",className:"flex-1 sm:flex-initial",onClick:()=>k({open:!1,user:null,role:"user"}),children:"\u53D6\u6D88"}),e.jsx(n,{className:"flex-1 sm:flex-initial",onClick:de,children:"\u786E\u8BA4\u4FEE\u6539\u89D2\u8272"})]})]})}),e.jsxs(S,{open:y.open,onClose:()=>I({...y,open:!1}),title:"\u9080\u8BF7\u7EC4\u7EC7\u6210\u5458",width:440,children:[e.jsxs("div",{className:"flex flex-col gap-3",children:[e.jsx(p,{label:"\u6210\u5458\u90AE\u7BB1",children:e.jsx(g,{type:"email",value:y.email,onChange:s=>I({...y,email:s.target.value})})}),e.jsx(p,{label:"\u5907\u6CE8",children:"\u7EC4\u7EC7\u6210\u5458\u9700\u5148\u81EA\u884C\u6CE8\u518C\u8D26\u53F7\uFF0C\u7BA1\u7406\u5458\u5728\u6B64\u767B\u8BB0\u540E\u5206\u914D\u7EC4\u7EC7\u4E0E\u89D2\u8272\uFF08MVP \u9636\u6BB5\u4EE5\u7528\u6237\u89D2\u8272\u4E3A\u51C6\uFF09\u3002"})]}),e.jsxs("div",{className:"mt-5 flex justify-end gap-2",children:[e.jsx(n,{variant:"ghost",onClick:()=>I({...y,open:!1}),children:"\u53D6\u6D88"}),e.jsx(n,{onClick:()=>{a("\u5DF2\u8BB0\u5F55\u9080\u8BF7\uFF08MVP \u5360\u4F4D\uFF09"),I({...y,open:!1})},children:"\u53D1\u9001\u9080\u8BF7"})]})]}),ie]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/VideoTasks-BDX3xrTh.js": {
-              content: 'import{c as I,u as G,i as H,j as e,m as i,B as h,d as g,g as b,E as J,o as K,a as M}from"./index-JGTLcmXV.js";import{r as o}from"./vendor-BbQ_LiY-.js";import{R as q}from"./refresh-cw-BY9R0tIW.js";import{E as Q}from"./external-link-CAe9zb1u.js";import{T as W}from"./trash-2-DuK1uChF.js";import{C as $}from"./clock-D3gRE-jV.js";import{C as Y}from"./circle-check-CmF7WJUQ.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Z=I("CircleX",[["circle",{cx:"12",cy:"12",r:"10",key:"1mglay"}],["path",{d:"m15 9-6 6",key:"1uzhvr"}],["path",{d:"m9 9 6 6",key:"z0biqf"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const j=I("Film",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",key:"afitv7"}],["path",{d:"M7 3v18",key:"bbkbws"}],["path",{d:"M3 7.5h4",key:"zfgn84"}],["path",{d:"M3 12h18",key:"1i2n21"}],["path",{d:"M3 16.5h4",key:"1230mu"}],["path",{d:"M17 3v18",key:"in4fa5"}],["path",{d:"M17 7.5h4",key:"myr1c1"}],["path",{d:"M17 16.5h4",key:"go4c1d"}]]),y=6e4,ee=[{key:"all",label:"\u5168\u90E8"},{key:"pending",label:"\u5F85\u63D0\u4EA4",hint:"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF0C\u672C\u5730\u6302\u7740\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295"},{key:"queued",label:"\u6392\u961F\u4E2D",hint:"\u5DF2\u63D0\u4EA4\u4E0A\u6E38\uFF0C\u5728\u4E0A\u6E38\u961F\u5217\u91CC\u7B49\u751F\u6210"},{key:"in_progress",label:"\u751F\u6210\u4E2D"},{key:"completed",label:"\u5DF2\u5B8C\u6210"},{key:"failed",label:"\u5931\u8D25"}];function L(t,a){return a==="all"?!0:a==="pending"?t.waiting_slot===!0:a==="queued"?t.status==="queued"&&!t.waiting_slot:a==="failed"?t.status==="failed"||t.status==="cancelled":t.status===a}const se={queued:"\u961F\u5217\u4E2D",in_progress:"\u751F\u6210\u4E2D",completed:"\u5DF2\u5B8C\u6210",failed:"\u5931\u8D25",cancelled:"\u5DF2\u53D6\u6D88"};function te({status:t}){const a=t==="completed"?"bg-emerald-500/10 text-emerald-500":t==="failed"||t==="cancelled"?"bg-red-500/10 text-red-500":t==="in_progress"?"bg-amber-500/10 text-amber-500":"bg-zinc-500/10 text-zinc-400",r=t==="completed"?Y:t==="failed"||t==="cancelled"?Z:$;return e.jsxs("span",{className:i("inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium",a),children:[e.jsx(r,{size:10}),se[t]??t]})}function ne({value:t}){const a=Math.max(0,Math.min(100,Math.round(t||0)));return e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("div",{className:"h-1.5 w-24 overflow-hidden rounded-full bg-line/70",children:e.jsx("div",{className:i("h-full rounded-full",a>=100?"bg-emerald-500":a>0?"bg-brand":"bg-muted/40"),style:{width:`${a}%`}})}),e.jsxs("span",{className:"w-9 text-right font-mono text-[10px] text-muted",children:[a,"%"]})]})}function xe({me:t,embedded:a=!1}){const[r,A]=o.useState(null),[l,f]=o.useState("own"),[x,D]=o.useState("all"),[m,N]=o.useState(!1),[v,k]=o.useState(y/1e3),p=G(),{confirm:P,confirmEl:R}=H(),w=o.useRef(null),u=async(s=!1,n=l)=>{s||N(!0);try{const c=await M(`/api/video/tasks?limit=100&scope=${n}`);A(c)}catch(c){s||p(c.message,"err")}finally{s||N(!1),k(y/1e3)}};o.useEffect(()=>{u(!1,l);const s=window.setInterval(()=>{document.hidden||k(c=>c<=1?(u(!0,l),y/1e3):c-1)},1e3),n=()=>{document.hidden||u(!0,l)};return document.addEventListener("visibilitychange",n),()=>{window.clearInterval(s),document.removeEventListener("visibilitychange",n),w.current&&window.clearTimeout(w.current)}},[l]);const V=async(s,n)=>{try{await navigator.clipboard.writeText(s),p(`${n}\u5DF2\u590D\u5236`)}catch{p("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9","err")}},B=async s=>{if(await P(`\u5220\u9664\u4EFB\u52A1 ${s.id} \u7684\u8BB0\u5F55\uFF1F\u4EC5\u6E05\u7406\u672C\u5730\u8BB0\u5F55\uFF0C\u4E0D\u4F1A\u53D6\u6D88\u4E0A\u6E38\u4EFB\u52A1\u3002`))try{await M(`/api/video/tasks/${s.id}`,"DELETE"),p("\u5DF2\u5220\u9664"),u(!1,l)}catch(n){p(n.message,"err")}},d=(r==null?void 0:r.tasks)??[],_=(r==null?void 0:r.can_view_all)===!0,C=l==="all",F=d.filter(s=>s.status==="in_progress"||s.status==="queued").length,X=d.filter(s=>s.status==="completed").length,O=d.filter(s=>s.status==="failed"||s.status==="cancelled").length,z=d.filter(s=>s.waiting_slot).length,T=d.filter(s=>L(s,x)),E=s=>e.jsx("div",{className:s,children:ee.map(n=>{const c=d.filter(U=>L(U,n.key)).length,S=x===n.key;return e.jsxs("button",{type:"button",onClick:()=>D(n.key),title:n.hint,className:i("inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors",S?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:[n.label,e.jsx("span",{className:i("rounded px-1 text-[10px] font-mono",S?"bg-brand/15":"bg-surface2"),children:c})]},n.key)})});return e.jsxs("div",{className:"flex flex-col gap-4",children:[R,a?e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-end gap-2",children:[_?e.jsxs("div",{className:"inline-flex overflow-hidden rounded-lg border border-line",children:[e.jsx("button",{type:"button",onClick:()=>f("own"),className:i("inline-flex h-8 items-center justify-center px-3 text-xs font-medium transition-colors",l==="own"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u6211\u7684\u4EFB\u52A1"}),e.jsx("button",{type:"button",onClick:()=>f("all"),className:i("inline-flex h-8 items-center justify-center px-3 text-xs font-medium transition-colors",l==="all"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u5168\u90E8\u4EFB\u52A1"})]}):e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-lg bg-surface2 px-3 py-1.5 text-xs font-medium text-muted",children:[e.jsx(j,{size:12})," \u6211\u7684\u4EFB\u52A1"]}),e.jsxs(h,{variant:"soft",className:"h-8",onClick:()=>u(!1,l),disabled:m,children:[e.jsx(q,{size:13,className:i(m&&"animate-spin")}),m?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex h-8 items-center rounded-lg bg-surface2 px-3 text-xs font-medium text-muted",title:"\u6BCF 60 \u79D2\u81EA\u52A8\u5237\u65B0\u672A\u5B8C\u6210\u4EFB\u52A1",children:[v,"s"]})]}),E("flex flex-wrap gap-1.5")]}):e.jsxs(g,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(j,{size:18})}),e.jsxs("div",{children:[e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u89C6\u9891\u4EFB\u52A1"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:C?"\u5168\u90E8\u4EFB\u52A1\u89C6\u56FE\uFF1A\u53EF\u67E5\u770B\u6240\u6709\u7528\u6237\u53D1\u8D77\u7684\u89C6\u9891\u4EFB\u52A1\uFF0C\u5E76\u6E05\u7406\u4EFB\u610F\u8BB0\u5F55\u3002":"\u9ED8\u8BA4\u4EC5\u663E\u793A\u4F60\u81EA\u5DF1\u53D1\u8D77\u7684\u4EFB\u52A1\uFF1B\u751F\u6210\u5B8C\u6210\u540E\u53EF\u76F4\u63A5\u64AD\u653E\u6216\u4E0B\u8F7D\u3002"})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[_?e.jsxs("div",{className:"inline-flex overflow-hidden rounded-lg border border-line",children:[e.jsx("button",{type:"button",onClick:()=>f("own"),className:i("inline-flex h-9 items-center justify-center px-3.5 text-[13px] font-medium transition-colors",l==="own"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u6211\u7684\u4EFB\u52A1"}),e.jsx("button",{type:"button",onClick:()=>f("all"),className:i("inline-flex h-9 items-center justify-center px-3.5 text-[13px] font-medium transition-colors",l==="all"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u5168\u90E8\u4EFB\u52A1"})]}):e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-lg bg-surface2 px-3.5 py-2 text-[13px] font-medium text-muted",children:[e.jsx(j,{size:12})," \u6211\u7684\u4EFB\u52A1"]}),e.jsxs(h,{variant:"soft",className:"h-9",onClick:()=>u(!1,l),disabled:m,children:[e.jsx(q,{size:14,className:i(m&&"animate-spin")}),m?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex h-9 items-center rounded-lg bg-surface2 px-3 text-[13px] font-medium text-muted",title:"\u6BCF 60 \u79D2\u81EA\u52A8\u5237\u65B0\u672A\u5B8C\u6210\u4EFB\u52A1\uFF08\u4E0E\u72B6\u6001\u7AD9\u76D1\u63A7\u540C\u9891\uFF09",children:[v,"s"]})]})]}),e.jsxs("div",{className:"mt-3 flex flex-wrap items-center gap-3 text-[11px] text-muted",children:[e.jsxs("span",{children:["\u5171 ",e.jsx("b",{className:"font-mono text-ink",children:d.length})," \u4E2A"]}),e.jsxs("span",{children:["\u8FDB\u884C\u4E2D ",e.jsx("b",{className:"font-mono text-ink",children:F})]}),z>0&&e.jsxs("span",{children:["\u5F85\u63D0\u4EA4 ",e.jsx("b",{className:"font-mono text-amber-500",children:z})]}),e.jsxs("span",{children:["\u5DF2\u5B8C\u6210 ",e.jsx("b",{className:"font-mono text-emerald-500",children:X})]}),e.jsxs("span",{children:["\u5931\u8D25 ",e.jsx("b",{className:"font-mono text-red-500",children:O})]}),r&&e.jsxs("span",{className:"ml-auto",children:["\u4E0A\u6B21\u5237\u65B0 ",b(r.refreshed_at)]})]}),E("mt-3 flex flex-wrap gap-1.5 border-t border-line/70 pt-3")]}),r===null?e.jsx(g,{className:"p-6",children:e.jsx("div",{className:"skeleton h-24 rounded-xl2"})}):T.length===0?e.jsx(g,{children:e.jsx(J,{icon:e.jsx(j,{size:32}),title:x==="pending"?"\u6CA1\u6709\u5F85\u63D0\u4EA4\u7684\u4EFB\u52A1":x==="queued"?"\u6CA1\u6709\u6392\u961F\u4E2D\u7684\u4EFB\u52A1":"\u6682\u65E0\u89C6\u9891\u4EFB\u52A1",hint:x==="pending"?"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF08503 video_queue_full\uFF09\u65F6\uFF0C\u63D0\u4EA4\u7684\u8BF7\u6C42\u4F1A\u6302\u5728\u8FD9\u91CC\uFF0C\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295\u4E00\u6B21\uFF0C\u6324\u5230\u7A7A\u4F4D\u5C31\u81EA\u52A8\u63D0\u4EA4\u3002":x==="queued"?"\u5DF2\u7ECF\u63D0\u4EA4\u5230\u4E0A\u6E38\u3001\u6B63\u5728\u4E0A\u6E38\u961F\u5217\u91CC\u6392\u961F\u7684\u4EFB\u52A1\u4F1A\u663E\u793A\u5728\u8FD9\u91CC\u3002":"\u8C03\u7528 POST /v1/videos \u521B\u5EFA\u4EFB\u52A1\u540E\uFF0C\u8FD9\u91CC\u4F1A\u81EA\u52A8\u51FA\u73B0\uFF0C\u5E76\u6309 60 \u79D2\u95F4\u9694\u8F6E\u8BE2\u8FDB\u5EA6\u3002"})}):e.jsx("div",{className:"flex flex-col gap-3",children:T.map(s=>e.jsxs(g,{className:"p-3.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2",children:[e.jsx(te,{status:s.status}),e.jsx("span",{className:"text-sm font-semibold text-ink",children:s.model}),C&&e.jsx("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px] text-muted",children:s.user_email??s.user_id.slice(0,8)}),s.seconds?e.jsxs("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px] text-muted",children:[s.seconds,"s"]}):null,s.size?e.jsx("span",{className:"rounded bg-line/70 px-1.5 py-0.5 text-[10px] text-muted",children:s.size}):null,e.jsxs("span",{className:"ml-auto flex items-center gap-1.5",children:[s.url&&e.jsxs("a",{className:"inline-flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-[11px] text-brand hover:bg-brand/10",href:s.url,target:"_blank",rel:"noopener noreferrer",children:[e.jsx(Q,{size:11})," \u64AD\u653E / \u4E0B\u8F7D"]}),e.jsxs(h,{variant:"ghost",className:"!px-2 !py-1 text-[11px]",onClick:()=>V(s.id,"\u4EFB\u52A1 ID"),children:[e.jsx(K,{size:11,className:"mr-1"}),"ID"]}),e.jsxs(h,{variant:"ghost",className:"!px-2 !py-1 text-[11px] !text-err",onClick:()=>B(s),children:[e.jsx(W,{size:11,className:"mr-1"}),"\u5220\u9664"]})]})]}),e.jsxs("div",{className:"mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2",children:[e.jsx(ne,{value:s.progress}),e.jsx("code",{className:"text-[11px] font-mono text-muted",children:s.id}),e.jsxs("span",{className:"text-[10px] text-muted",children:["\u521B\u5EFA ",b(s.created_at)]}),s.updated_at>s.created_at&&e.jsxs("span",{className:"text-[10px] text-muted",children:["\u66F4\u65B0 ",b(s.updated_at)]})]}),s.waiting_slot&&e.jsxs("div",{className:"mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-500",children:[e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx($,{size:11})," \u6392\u961F\u7B49\u7A7A\u4F4D"]}),e.jsxs("span",{children:["\u5DF2\u91CD\u8BD5 ",e.jsx("b",{className:"font-mono",children:s.retry_count??0})," \u6B21"]}),s.next_retry_at?e.jsxs("span",{children:["\u4E0B\u6B21\u91CD\u6295 ",b(s.next_retry_at)]}):null,e.jsx("span",{className:"text-amber-500/70",children:"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF0C\u540E\u53F0\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295\uFF0C\u65E0\u9700\u91CD\u65B0\u63D0\u4EA4"})]}),s.error&&e.jsx("p",{className:"mt-2 break-all text-[11px] text-err",children:s.error})]},s.id))})]})}\n',
+            "/assets/VideoTasks-sX0jnlVr.js": {
+              content: 'import{c as I,u as G,i as H,j as e,m as i,B as h,d as g,g as b,E as J,o as K,a as M}from"./index-OWhocmiM.js";import{r as o}from"./vendor-BbQ_LiY-.js";import{R as q}from"./refresh-cw-CiqXg9A7.js";import{E as Q}from"./external-link-DgYLUCQ-.js";import{T as W}from"./trash-2-BAKVuXGI.js";import{C as $}from"./clock-I44wVmzv.js";import{C as Y}from"./circle-check-CIKjzwLy.js";/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const Z=I("CircleX",[["circle",{cx:"12",cy:"12",r:"10",key:"1mglay"}],["path",{d:"m15 9-6 6",key:"1uzhvr"}],["path",{d:"m9 9 6 6",key:"z0biqf"}]]);/**\n * @license lucide-react v0.469.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */const j=I("Film",[["rect",{width:"18",height:"18",x:"3",y:"3",rx:"2",key:"afitv7"}],["path",{d:"M7 3v18",key:"bbkbws"}],["path",{d:"M3 7.5h4",key:"zfgn84"}],["path",{d:"M3 12h18",key:"1i2n21"}],["path",{d:"M3 16.5h4",key:"1230mu"}],["path",{d:"M17 3v18",key:"in4fa5"}],["path",{d:"M17 7.5h4",key:"myr1c1"}],["path",{d:"M17 16.5h4",key:"go4c1d"}]]),y=6e4,ee=[{key:"all",label:"\u5168\u90E8"},{key:"pending",label:"\u5F85\u63D0\u4EA4",hint:"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF0C\u672C\u5730\u6302\u7740\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295"},{key:"queued",label:"\u6392\u961F\u4E2D",hint:"\u5DF2\u63D0\u4EA4\u4E0A\u6E38\uFF0C\u5728\u4E0A\u6E38\u961F\u5217\u91CC\u7B49\u751F\u6210"},{key:"in_progress",label:"\u751F\u6210\u4E2D"},{key:"completed",label:"\u5DF2\u5B8C\u6210"},{key:"failed",label:"\u5931\u8D25"}];function L(t,a){return a==="all"?!0:a==="pending"?t.waiting_slot===!0:a==="queued"?t.status==="queued"&&!t.waiting_slot:a==="failed"?t.status==="failed"||t.status==="cancelled":t.status===a}const se={queued:"\u961F\u5217\u4E2D",in_progress:"\u751F\u6210\u4E2D",completed:"\u5DF2\u5B8C\u6210",failed:"\u5931\u8D25",cancelled:"\u5DF2\u53D6\u6D88"};function te({status:t}){const a=t==="completed"?"bg-emerald-500/10 text-emerald-500":t==="failed"||t==="cancelled"?"bg-red-500/10 text-red-500":t==="in_progress"?"bg-amber-500/10 text-amber-500":"bg-zinc-500/10 text-zinc-400",r=t==="completed"?Y:t==="failed"||t==="cancelled"?Z:$;return e.jsxs("span",{className:i("inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium",a),children:[e.jsx(r,{size:10}),se[t]??t]})}function ne({value:t}){const a=Math.max(0,Math.min(100,Math.round(t||0)));return e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("div",{className:"h-1.5 w-24 overflow-hidden rounded-full bg-line/70",children:e.jsx("div",{className:i("h-full rounded-full",a>=100?"bg-emerald-500":a>0?"bg-brand":"bg-muted/40"),style:{width:`${a}%`}})}),e.jsxs("span",{className:"w-9 text-right font-mono text-[10px] text-muted",children:[a,"%"]})]})}function xe({me:t,embedded:a=!1}){const[r,A]=o.useState(null),[l,f]=o.useState("own"),[x,D]=o.useState("all"),[m,N]=o.useState(!1),[v,k]=o.useState(y/1e3),p=G(),{confirm:P,confirmEl:R}=H(),w=o.useRef(null),u=async(s=!1,n=l)=>{s||N(!0);try{const c=await M(`/api/video/tasks?limit=100&scope=${n}`);A(c)}catch(c){s||p(c.message,"err")}finally{s||N(!1),k(y/1e3)}};o.useEffect(()=>{u(!1,l);const s=window.setInterval(()=>{document.hidden||k(c=>c<=1?(u(!0,l),y/1e3):c-1)},1e3),n=()=>{document.hidden||u(!0,l)};return document.addEventListener("visibilitychange",n),()=>{window.clearInterval(s),document.removeEventListener("visibilitychange",n),w.current&&window.clearTimeout(w.current)}},[l]);const V=async(s,n)=>{try{await navigator.clipboard.writeText(s),p(`${n}\u5DF2\u590D\u5236`)}catch{p("\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9","err")}},B=async s=>{if(await P(`\u5220\u9664\u4EFB\u52A1 ${s.id} \u7684\u8BB0\u5F55\uFF1F\u4EC5\u6E05\u7406\u672C\u5730\u8BB0\u5F55\uFF0C\u4E0D\u4F1A\u53D6\u6D88\u4E0A\u6E38\u4EFB\u52A1\u3002`))try{await M(`/api/video/tasks/${s.id}`,"DELETE"),p("\u5DF2\u5220\u9664"),u(!1,l)}catch(n){p(n.message,"err")}},d=(r==null?void 0:r.tasks)??[],_=(r==null?void 0:r.can_view_all)===!0,C=l==="all",F=d.filter(s=>s.status==="in_progress"||s.status==="queued").length,X=d.filter(s=>s.status==="completed").length,O=d.filter(s=>s.status==="failed"||s.status==="cancelled").length,z=d.filter(s=>s.waiting_slot).length,T=d.filter(s=>L(s,x)),E=s=>e.jsx("div",{className:s,children:ee.map(n=>{const c=d.filter(U=>L(U,n.key)).length,S=x===n.key;return e.jsxs("button",{type:"button",onClick:()=>D(n.key),title:n.hint,className:i("inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors",S?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:[n.label,e.jsx("span",{className:i("rounded px-1 text-[10px] font-mono",S?"bg-brand/15":"bg-surface2"),children:c})]},n.key)})});return e.jsxs("div",{className:"flex flex-col gap-4",children:[R,a?e.jsxs(e.Fragment,{children:[e.jsxs("div",{className:"flex flex-wrap items-center justify-end gap-2",children:[_?e.jsxs("div",{className:"inline-flex overflow-hidden rounded-lg border border-line",children:[e.jsx("button",{type:"button",onClick:()=>f("own"),className:i("inline-flex h-8 items-center justify-center px-3 text-xs font-medium transition-colors",l==="own"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u6211\u7684\u4EFB\u52A1"}),e.jsx("button",{type:"button",onClick:()=>f("all"),className:i("inline-flex h-8 items-center justify-center px-3 text-xs font-medium transition-colors",l==="all"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u5168\u90E8\u4EFB\u52A1"})]}):e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-lg bg-surface2 px-3 py-1.5 text-xs font-medium text-muted",children:[e.jsx(j,{size:12})," \u6211\u7684\u4EFB\u52A1"]}),e.jsxs(h,{variant:"soft",className:"h-8",onClick:()=>u(!1,l),disabled:m,children:[e.jsx(q,{size:13,className:i(m&&"animate-spin")}),m?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex h-8 items-center rounded-lg bg-surface2 px-3 text-xs font-medium text-muted",title:"\u6BCF 60 \u79D2\u81EA\u52A8\u5237\u65B0\u672A\u5B8C\u6210\u4EFB\u52A1",children:[v,"s"]})]}),E("flex flex-wrap gap-1.5")]}):e.jsxs(g,{className:"p-4 sm:p-5",children:[e.jsxs("div",{className:"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",children:[e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("div",{className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand",children:e.jsx(j,{size:18})}),e.jsxs("div",{children:[e.jsx("h1",{className:"text-base font-bold text-ink",children:"\u89C6\u9891\u4EFB\u52A1"}),e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:C?"\u5168\u90E8\u4EFB\u52A1\u89C6\u56FE\uFF1A\u53EF\u67E5\u770B\u6240\u6709\u7528\u6237\u53D1\u8D77\u7684\u89C6\u9891\u4EFB\u52A1\uFF0C\u5E76\u6E05\u7406\u4EFB\u610F\u8BB0\u5F55\u3002":"\u9ED8\u8BA4\u4EC5\u663E\u793A\u4F60\u81EA\u5DF1\u53D1\u8D77\u7684\u4EFB\u52A1\uFF1B\u751F\u6210\u5B8C\u6210\u540E\u53EF\u76F4\u63A5\u64AD\u653E\u6216\u4E0B\u8F7D\u3002"})]})]}),e.jsxs("div",{className:"flex items-center gap-2",children:[_?e.jsxs("div",{className:"inline-flex overflow-hidden rounded-lg border border-line",children:[e.jsx("button",{type:"button",onClick:()=>f("own"),className:i("inline-flex h-9 items-center justify-center px-3.5 text-[13px] font-medium transition-colors",l==="own"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u6211\u7684\u4EFB\u52A1"}),e.jsx("button",{type:"button",onClick:()=>f("all"),className:i("inline-flex h-9 items-center justify-center px-3.5 text-[13px] font-medium transition-colors",l==="all"?"bg-brand/15 text-brand":"text-muted hover:bg-surface2"),children:"\u5168\u90E8\u4EFB\u52A1"})]}):e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-lg bg-surface2 px-3.5 py-2 text-[13px] font-medium text-muted",children:[e.jsx(j,{size:12})," \u6211\u7684\u4EFB\u52A1"]}),e.jsxs(h,{variant:"soft",className:"h-9",onClick:()=>u(!1,l),disabled:m,children:[e.jsx(q,{size:14,className:i(m&&"animate-spin")}),m?"\u5237\u65B0\u4E2D\u2026":"\u5237\u65B0"]}),e.jsxs("span",{className:"inline-flex h-9 items-center rounded-lg bg-surface2 px-3 text-[13px] font-medium text-muted",title:"\u6BCF 60 \u79D2\u81EA\u52A8\u5237\u65B0\u672A\u5B8C\u6210\u4EFB\u52A1\uFF08\u4E0E\u72B6\u6001\u7AD9\u76D1\u63A7\u540C\u9891\uFF09",children:[v,"s"]})]})]}),e.jsxs("div",{className:"mt-3 flex flex-wrap items-center gap-3 text-[11px] text-muted",children:[e.jsxs("span",{children:["\u5171 ",e.jsx("b",{className:"font-mono text-ink",children:d.length})," \u4E2A"]}),e.jsxs("span",{children:["\u8FDB\u884C\u4E2D ",e.jsx("b",{className:"font-mono text-ink",children:F})]}),z>0&&e.jsxs("span",{children:["\u5F85\u63D0\u4EA4 ",e.jsx("b",{className:"font-mono text-amber-500",children:z})]}),e.jsxs("span",{children:["\u5DF2\u5B8C\u6210 ",e.jsx("b",{className:"font-mono text-emerald-500",children:X})]}),e.jsxs("span",{children:["\u5931\u8D25 ",e.jsx("b",{className:"font-mono text-red-500",children:O})]}),r&&e.jsxs("span",{className:"ml-auto",children:["\u4E0A\u6B21\u5237\u65B0 ",b(r.refreshed_at)]})]}),E("mt-3 flex flex-wrap gap-1.5 border-t border-line/70 pt-3")]}),r===null?e.jsx(g,{className:"p-6",children:e.jsx("div",{className:"skeleton h-24 rounded-xl2"})}):T.length===0?e.jsx(g,{children:e.jsx(J,{icon:e.jsx(j,{size:32}),title:x==="pending"?"\u6CA1\u6709\u5F85\u63D0\u4EA4\u7684\u4EFB\u52A1":x==="queued"?"\u6CA1\u6709\u6392\u961F\u4E2D\u7684\u4EFB\u52A1":"\u6682\u65E0\u89C6\u9891\u4EFB\u52A1",hint:x==="pending"?"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF08503 video_queue_full\uFF09\u65F6\uFF0C\u63D0\u4EA4\u7684\u8BF7\u6C42\u4F1A\u6302\u5728\u8FD9\u91CC\uFF0C\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295\u4E00\u6B21\uFF0C\u6324\u5230\u7A7A\u4F4D\u5C31\u81EA\u52A8\u63D0\u4EA4\u3002":x==="queued"?"\u5DF2\u7ECF\u63D0\u4EA4\u5230\u4E0A\u6E38\u3001\u6B63\u5728\u4E0A\u6E38\u961F\u5217\u91CC\u6392\u961F\u7684\u4EFB\u52A1\u4F1A\u663E\u793A\u5728\u8FD9\u91CC\u3002":"\u8C03\u7528 POST /v1/videos \u521B\u5EFA\u4EFB\u52A1\u540E\uFF0C\u8FD9\u91CC\u4F1A\u81EA\u52A8\u51FA\u73B0\uFF0C\u5E76\u6309 60 \u79D2\u95F4\u9694\u8F6E\u8BE2\u8FDB\u5EA6\u3002"})}):e.jsx("div",{className:"flex flex-col gap-3",children:T.map(s=>e.jsxs(g,{className:"p-3.5",children:[e.jsxs("div",{className:"flex flex-wrap items-center gap-2",children:[e.jsx(te,{status:s.status}),e.jsx("span",{className:"text-sm font-semibold text-ink",children:s.model}),C&&e.jsx("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px] text-muted",children:s.user_email??s.user_id.slice(0,8)}),s.seconds?e.jsxs("span",{className:"rounded bg-surface2 px-1.5 py-0.5 text-[10px] text-muted",children:[s.seconds,"s"]}):null,s.size?e.jsx("span",{className:"rounded bg-line/70 px-1.5 py-0.5 text-[10px] text-muted",children:s.size}):null,e.jsxs("span",{className:"ml-auto flex items-center gap-1.5",children:[s.url&&e.jsxs("a",{className:"inline-flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-[11px] text-brand hover:bg-brand/10",href:s.url,target:"_blank",rel:"noopener noreferrer",children:[e.jsx(Q,{size:11})," \u64AD\u653E / \u4E0B\u8F7D"]}),e.jsxs(h,{variant:"ghost",className:"!px-2 !py-1 text-[11px]",onClick:()=>V(s.id,"\u4EFB\u52A1 ID"),children:[e.jsx(K,{size:11,className:"mr-1"}),"ID"]}),e.jsxs(h,{variant:"ghost",className:"!px-2 !py-1 text-[11px] !text-err",onClick:()=>B(s),children:[e.jsx(W,{size:11,className:"mr-1"}),"\u5220\u9664"]})]})]}),e.jsxs("div",{className:"mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2",children:[e.jsx(ne,{value:s.progress}),e.jsx("code",{className:"text-[11px] font-mono text-muted",children:s.id}),e.jsxs("span",{className:"text-[10px] text-muted",children:["\u521B\u5EFA ",b(s.created_at)]}),s.updated_at>s.created_at&&e.jsxs("span",{className:"text-[10px] text-muted",children:["\u66F4\u65B0 ",b(s.updated_at)]})]}),s.waiting_slot&&e.jsxs("div",{className:"mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-500",children:[e.jsxs("span",{className:"inline-flex items-center gap-1",children:[e.jsx($,{size:11})," \u6392\u961F\u7B49\u7A7A\u4F4D"]}),e.jsxs("span",{children:["\u5DF2\u91CD\u8BD5 ",e.jsx("b",{className:"font-mono",children:s.retry_count??0})," \u6B21"]}),s.next_retry_at?e.jsxs("span",{children:["\u4E0B\u6B21\u91CD\u6295 ",b(s.next_retry_at)]}):null,e.jsx("span",{className:"text-amber-500/70",children:"\u4E0A\u6E38\u961F\u5217\u6EE1\uFF0C\u540E\u53F0\u6BCF\u5206\u949F\u81EA\u52A8\u91CD\u6295\uFF0C\u65E0\u9700\u91CD\u65B0\u63D0\u4EA4"})]}),s.error&&e.jsx("p",{className:"mt-2 break-all text-[11px] text-err",children:s.error})]},s.id))})]})}\n',
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
@@ -41554,8 +41554,8 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/circle-check-CmF7WJUQ.js": {
-              content: `import{c}from"./index-JGTLcmXV.js";/**
+            "/assets/circle-check-CIKjzwLy.js": {
+              content: `import{c}from"./index-OWhocmiM.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41565,8 +41565,8 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/clock-D3gRE-jV.js": {
-              content: `import{c}from"./index-JGTLcmXV.js";/**
+            "/assets/clock-I44wVmzv.js": {
+              content: `import{c}from"./index-OWhocmiM.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41576,8 +41576,8 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/download-D7etkHHV.js": {
-              content: `import{c as o}from"./index-JGTLcmXV.js";/**
+            "/assets/download-BtYvvPCG.js": {
+              content: `import{c as o}from"./index-OWhocmiM.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41587,8 +41587,8 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/external-link-CAe9zb1u.js": {
-              content: `import{c as a}from"./index-JGTLcmXV.js";/**
+            "/assets/external-link-DgYLUCQ-.js": {
+              content: `import{c as a}from"./index-OWhocmiM.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41604,8 +41604,8 @@ Minimum version required to store current data is: \`+o+\`.
               isBase64: false,
               type: "text/css; charset=utf-8"
             },
-            "/assets/index-JGTLcmXV.js": {
-              content: `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/Dashboard-FzUkn96H.js","assets/vendor-BbQ_LiY-.js","assets/charts-mu_46IqZ.js","assets/Keys-hYc0wvAM.js","assets/plus-v0UXhlLi.js","assets/VideoTasks-BDX3xrTh.js","assets/refresh-cw-BY9R0tIW.js","assets/external-link-CAe9zb1u.js","assets/trash-2-DuK1uChF.js","assets/clock-D3gRE-jV.js","assets/circle-check-CmF7WJUQ.js","assets/ScheduledTasks-D8yy-VHd.js","assets/Playground-BFItBA0T.js","assets/send-itasS0aM.js","assets/Providers-DlvpArmL.js","assets/message-square-CYBPWetn.js","assets/triangle-alert-V4ji6s4N.js","assets/AccountPool-nRKJqe5N.js","assets/ModelsPricing-CjxHlu3Y.js","assets/Logs-DM6UBkca.js","assets/download-D7etkHHV.js","assets/Users-uCYfXv9U.js","assets/Invite-ieRMYJHX.js","assets/Profile-40VAHmIU.js","assets/Backup-CYl2Spyg.js","assets/Settings-4ntRTP5e.js"])))=>i.map(i=>d[i]);
+            "/assets/index-OWhocmiM.js": {
+              content: `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/Dashboard-CLfQzMok.js","assets/vendor-BbQ_LiY-.js","assets/charts-mu_46IqZ.js","assets/Keys-DU1VqEBm.js","assets/plus-DjGDWRHo.js","assets/VideoTasks-sX0jnlVr.js","assets/refresh-cw-CiqXg9A7.js","assets/external-link-DgYLUCQ-.js","assets/trash-2-BAKVuXGI.js","assets/clock-I44wVmzv.js","assets/circle-check-CIKjzwLy.js","assets/ScheduledTasks-_PMtXiY3.js","assets/Playground-CFl2kj_K.js","assets/send-Ck83dgZo.js","assets/Providers-BiTzce6H.js","assets/message-square-nskUin8a.js","assets/triangle-alert-DwdzAbbD.js","assets/AccountPool-H4ndr5z3.js","assets/ModelsPricing-D3r_Eoea.js","assets/Logs-DC-adhq4.js","assets/download-BtYvvPCG.js","assets/Users-CsKHEnB4.js","assets/Invite-CbRAI9tf.js","assets/Profile-8VMY8-5m.js","assets/Backup-c98MuXhX.js","assets/Settings-CYX-p-Xb.js"])))=>i.map(i=>d[i]);
 import{r as l,a as De,R as pe,u as $e,b as te,L as T,O as qe,N as Ve,B as Ue,d as Be,e as w,f as k}from"./vendor-BbQ_LiY-.js";(function(){const s=document.createElement("link").relList;if(s&&s.supports&&s.supports("modulepreload"))return;for(const r of document.querySelectorAll('link[rel="modulepreload"]'))i(r);new MutationObserver(r=>{for(const n of r)if(n.type==="childList")for(const o of n.addedNodes)o.tagName==="LINK"&&o.rel==="modulepreload"&&i(o)}).observe(document,{childList:!0,subtree:!0});function a(r){const n={};return r.integrity&&(n.integrity=r.integrity),r.referrerPolicy&&(n.referrerPolicy=r.referrerPolicy),r.crossOrigin==="use-credentials"?n.credentials="include":r.crossOrigin==="anonymous"?n.credentials="omit":n.credentials="same-origin",n}function i(r){if(r.ep)return;r.ep=!0;const n=a(r);fetch(r.href,n)}})();var ue={exports:{}},Y={};/**
  * @license React
  * react-jsx-runtime.production.min.js
@@ -41836,13 +41836,13 @@ client = OpenAI(
 res = client.chat.completions.create(
     model="deepseek-chat",
     messages=[{"role": "user", "content": "\u4F60\u597D"}],
-)\`};return e.jsxs("div",{className:"min-h-screen bg-bg text-ink",children:[e.jsxs("header",{className:N("fixed inset-x-0 top-0 z-40 border-b transition-all",p?"border-line bg-bg/80 shadow-card backdrop-blur-md":"border-transparent bg-transparent"),children:[e.jsxs("div",{className:"mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6",children:[e.jsxs(T,{to:"/",className:"flex items-center gap-2.5",children:[e.jsx("img",{src:v,alt:b,className:"h-8 w-8 rounded-lg object-contain"}),e.jsx("span",{className:"text-[15px] font-bold",children:b})]}),e.jsx("nav",{className:"hidden flex-1 items-center gap-1 md:flex",children:$.map(([c,m])=>e.jsx("a",{href:m,onClick:j=>h(j,m),className:"rounded-lg px-3 py-2 text-[13px] text-muted transition-colors hover:bg-surface2 hover:text-ink",children:c},c))}),e.jsxs("div",{className:"ml-auto hidden items-center gap-2 md:flex",children:[e.jsx(me,{}),s?e.jsx(T,{to:"/dashboard",children:e.jsx("button",{className:"rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover",children:"\u8FDB\u5165\u63A7\u5236\u53F0"})}):e.jsxs(e.Fragment,{children:[e.jsx(T,{to:"/login",children:e.jsx("button",{className:"rounded-lg px-4 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-surface2",children:"\u767B\u5F55"})}),e.jsx(T,{to:"/login",children:e.jsx("button",{className:"rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover",children:"\u514D\u8D39\u6CE8\u518C"})})]})]}),e.jsx("button",{className:"ml-auto rounded-lg p-2 text-muted hover:bg-surface2 md:hidden",onClick:()=>i(!a),"aria-label":"\u83DC\u5355",children:a?e.jsx(ae,{size:20}):e.jsx(Ce,{size:20})})]}),a&&e.jsxs("div",{className:"border-t border-line bg-surface px-4 py-3 md:hidden",children:[$.map(([c,m])=>e.jsx("a",{href:m,onClick:j=>{i(!1),h(j,m)},className:"block rounded-lg px-3 py-2.5 text-sm text-ink hover:bg-surface2",children:c},c)),e.jsxs("div",{className:"mt-2 flex items-center gap-2 border-t border-line pt-3",children:[e.jsx(me,{}),s?e.jsx(T,{to:"/dashboard",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white",children:"\u8FDB\u5165\u63A7\u5236\u53F0"})}):e.jsxs(e.Fragment,{children:[e.jsx(T,{to:"/login",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg border border-line px-4 py-2 text-[13px]",children:"\u767B\u5F55"})}),e.jsx(T,{to:"/login",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white",children:"\u514D\u8D39\u6CE8\u518C"})})]})]})]})]}),e.jsxs("section",{className:"relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28",children:[e.jsx("div",{"aria-hidden":!0,className:"pointer-events-none absolute inset-0",style:{backgroundImage:"radial-gradient(ellipse 60% 50% at 50% -10%, rgba(243,128,32,.14), transparent), linear-gradient(rgb(var(--c-line)) .5px, transparent .5px), linear-gradient(90deg, rgb(var(--c-line)) .5px, transparent .5px)",backgroundSize:"auto, 48px 48px, 48px 48px",maskImage:"linear-gradient(to bottom, black 30%, transparent 90%)"}}),e.jsxs("div",{className:"relative mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2",children:[e.jsxs("div",{children:[e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-medium text-brand",children:[e.jsx(ze,{size:12}),(t==null?void 0:t.heroBadge)??"\u8DD1\u5728 EdgeOne \u5168\u7403\u8FB9\u7F18\u8282\u70B9"]}),e.jsx("h1",{className:"mt-5 text-4xl font-bold leading-[1.15] tracking-tight sm:text-5xl",children:e.jsx("span",{className:"text-balance",children:(t==null?void 0:t.heroTitle)??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"})}),e.jsx("p",{className:"mt-5 max-w-lg text-[15px] leading-relaxed text-muted",children:(t==null?void 0:t.heroSubtitle)??"\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\uFF0C\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6CBB\u7406\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002\u5408\u6CD5\u6388\u6743\u4E0A\u6E38\u3001\u900F\u660E\u8BA1\u8D39\u3001\u54C8\u5E0C\u94FE\u5BA1\u8BA1\u2014\u2014\u9762\u5411\u5F00\u53D1\u8005\u4E0E\u4F01\u4E1A\u7684\u6B63\u89C4\u805A\u5408\u5206\u53D1\u5E73\u53F0\u3002"}),e.jsxs("div",{className:"mt-8 flex flex-wrap gap-3",children:[e.jsx(T,{to:s?"/dashboard":"/login",children:e.jsxs("button",{className:"inline-flex items-center gap-1.5 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-brand-hover hover:shadow-pop",children:["\u5F00\u59CB\u4F7F\u7528",e.jsx(ve,{size:15})]})}),e.jsx("a",{href:"#dev",onClick:c=>h(c,"#dev"),children:e.jsxs("button",{className:"inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-6 py-3 text-sm font-medium transition-colors hover:bg-surface2",children:["\u67E5\u770B\u6587\u6863",e.jsx(rt,{size:15})]})})]})]}),e.jsx("div",{className:"min-w-0",children:e.jsx(he,{title:"\u5FEB\u901F\u5F00\u59CB \u2014 curl",code:E.curl})})]})]}),e.jsx("section",{className:"border-y border-line bg-surface py-8",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("p",{className:"text-center text-xs uppercase tracking-widest text-muted",children:"\u5DF2\u652F\u6301\u4E3B\u6D41\u6A21\u578B\u4F9B\u5E94\u5546 \xB7 \u5747\u9700\u5408\u6CD5\u6388\u6743\u63A5\u5165"}),e.jsx("div",{className:"mt-5 flex flex-wrap items-center justify-center gap-x-10 gap-y-4",children:At.map(c=>e.jsx("span",{className:"text-lg font-semibold text-muted opacity-60 grayscale transition-all hover:text-ink hover:opacity-100 hover:grayscale-0",children:c},c))})]})}),e.jsxs("section",{id:"features",className:"mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6",children:[e.jsxs("h2",{className:"text-center text-3xl font-bold tracking-tight",children:["\u4E3A\u4EC0\u4E48\u9009\u62E9 ",b]}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u4ECE\u63A5\u53E3\u3001\u8DEF\u7531\u3001\u8BA1\u8D39\u5230\u5BA1\u8BA1\uFF0C\u4E00\u4E2A\u5E73\u53F0\u8986\u76D6 AI API \u5206\u53D1\u7684\u5168\u90E8\u5173\u952E\u73AF\u8282\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3",children:Ot.map(({icon:c,title:m,desc:j})=>e.jsxs("div",{className:"group rounded-xl2 border border-line bg-surface p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-pop",children:[e.jsx("span",{className:"flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10 text-brand",children:e.jsx(c,{size:19})}),e.jsx("h3",{className:"mt-4 text-[15px] font-semibold",children:m}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:j})]},m))})]}),e.jsx("section",{id:"models",className:"border-t border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u4E00\u4E2A\u63A5\u53E3\uFF0C\u63A5\u5165\u4E3B\u6D41\u6A21\u578B"}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u6A21\u578B\u6E05\u5355\u7531\u7BA1\u7406\u5458\u5728\u63A7\u5236\u53F0\u7EDF\u4E00\u914D\u7F6E\uFF0C\u4E3B\u5907\u8DEF\u7531\u4E0E\u4EF7\u683C\u900F\u660E\u53EF\u67E5\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3",children:zt.map(c=>e.jsxs("div",{className:"rounded-xl2 border border-line bg-bg p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-pop",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsx("span",{className:"text-[15px] font-semibold",children:c.provider}),e.jsx(se,{size:17,className:"text-brand"})]}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:c.desc}),e.jsx("div",{className:"mt-4 flex flex-wrap gap-1.5",children:c.models.map(m=>e.jsx("span",{className:"rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] text-muted",children:m},m))})]},c.provider))}),e.jsx("p",{className:"mt-6 text-center text-xs text-muted",children:"\u5177\u4F53\u53EF\u7528\u6A21\u578B\u4E0E\u4EF7\u683C\uFF0C\u4EE5\u63A7\u5236\u53F0\u300C\u6A21\u578B\u300D\u9875\u548C\u5B9E\u9645\u914D\u7F6E\u4E3A\u51C6\u3002"})]})}),e.jsx("section",{id:"pricing",className:"scroll-mt-20 border-y border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u7075\u6D3B\u7684\u6A21\u578B\u4E0E\u5B9A\u4EF7"}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u4ECE\u4E2A\u4EBA\u4F53\u9A8C\u5230\u4F01\u4E1A\u7EA7\u90E8\u7F72\uFF0C\u6309\u9700\u9009\u62E9\uFF0C\u968F\u65F6\u5347\u7EA7\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4",children:It.map(c=>e.jsxs("div",{className:N("relative flex flex-col rounded-xl2 border bg-bg p-6 transition-all hover:-translate-y-1",c.hot?"border-brand shadow-pop ring-1 ring-brand":"border-line shadow-card"),children:[c.hot&&e.jsx("span",{className:"absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3 py-0.5 text-[11px] font-medium text-white",children:"\u6700\u53D7\u6B22\u8FCE"}),e.jsx("div",{className:"text-sm font-medium",children:c.name}),e.jsxs("div",{className:"mt-3",children:[e.jsx("span",{className:"text-3xl font-bold tracking-tight",children:c.price}),e.jsx("span",{className:"text-sm text-muted",children:c.unit})]}),e.jsx("div",{className:"mt-1 text-xs text-muted",children:c.desc}),e.jsx("ul",{className:"mt-5 flex-1 space-y-2.5",children:c.items.map(m=>e.jsxs("li",{className:"flex items-start gap-2 text-[13px]",children:[e.jsx(Z,{size:15,className:"mt-0.5 shrink-0 text-ok"}),m]},m))}),e.jsx(T,{to:s?"/dashboard":"/login",className:"mt-6",children:e.jsx("button",{className:N("w-full rounded-lg px-4 py-2.5 text-[13px] font-medium transition-colors",c.hot?"bg-brand text-white hover:bg-brand-hover":"border border-line bg-surface hover:bg-surface2"),children:c.cta})})]},c.name))}),e.jsx("p",{className:"mt-6 text-center text-xs text-muted",children:"\u6240\u6709\u4EF7\u683C\u4EC5\u4E3A\u793A\u4F8B\uFF0C\u5B9E\u9645\u4EE5\u4E0A\u6E38\u4F9B\u5E94\u5546\u6388\u6743\u4E0E\u5E73\u53F0\u516C\u793A\u4E3A\u51C6\u3002"})]})}),e.jsx("section",{id:"dev",className:"mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6",children:e.jsxs("div",{className:"grid items-center gap-10 lg:grid-cols-2",children:[e.jsxs("div",{children:[e.jsx("h2",{className:"text-3xl font-bold tracking-tight",children:"\u4E3A\u5F00\u53D1\u8005\u800C\u751F"}),e.jsx("p",{className:"mt-4 text-sm leading-relaxed text-muted",children:"\u4EFB\u4F55\u652F\u6301 OpenAI SDK \u7684\u8BED\u8A00\u4E0E\u6846\u67B6\uFF0C\u6539\u4E00\u884C Base URL \u5373\u53EF\u63A5\u5165\u3002\u7EDF\u4E00\u7684\u9519\u8BEF\u683C\u5F0F\u3001\u900F\u660E\u7684\u9650\u6D41\u54CD\u5E94\u3001\u539F\u751F SSE \u6D41\u5F0F\u8F6C\u53D1\u2014\u2014\u4E0D\u9700\u8981\u5B66\u4E60\u65B0\u7684\u79C1\u6709\u534F\u8BAE\u3002"}),e.jsx("ul",{className:"mt-6 space-y-3",children:[["OpenAI \u517C\u5BB9","/v1/chat/completions\u3001/v1/models\uFF0C\u517C\u5BB9\u5B98\u65B9 SDK \u4E0E\u751F\u6001\u5DE5\u5177"],["\u7ED3\u6784\u5316\u9519\u8BEF","\u6BCF\u4E2A\u9519\u8BEF\u90FD\u5E26\u5E73\u53F0\u9519\u8BEF\u7801\u4E0E request_id\uFF0C\u65B9\u4FBF\u5B9A\u4F4D\u4E0E\u5DE5\u5355\u6392\u67E5"],["\u6D41\u5F0F\u54CD\u5E94","SSE \u900F\u4F20 + \u5B9E\u9645 Token \u7528\u91CF\u6355\u83B7\uFF0C\u8BA1\u8D39\u7CBE\u786E\u5230\u6B21"],["\u591A\u8BED\u8A00\u793A\u4F8B","curl / Node.js / Python \u5F00\u7BB1\u5373\u7528"]].map(([c,m])=>e.jsxs("li",{className:"flex gap-3",children:[e.jsx(Z,{size:16,className:"mt-0.5 shrink-0 text-brand"}),e.jsxs("span",{className:"text-[13px]",children:[e.jsx("strong",{className:"font-semibold",children:c})," \u2014 ",e.jsx("span",{className:"text-muted",children:m})]})]},c))}),e.jsxs("a",{href:"https://github.com/wimdaw/EdgeRelay",target:"_blank",rel:"noreferrer",className:"mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-brand hover:underline",children:["\u67E5\u770B\u9879\u76EE\u6587\u6863",e.jsx(dt,{size:14})]})]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"mb-3 flex gap-1 rounded-lg bg-surface2 p-0.5",style:{width:"fit-content"},children:["curl","node","python"].map(c=>e.jsx("button",{onClick:()=>d(c),className:N("rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors",o===c?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:c==="node"?"Node.js":c},c))}),e.jsx(he,{title:\`\${o} \u2014 \u8C03\u7528\u793A\u4F8B\`,code:E[o]})]})]})}),e.jsx("section",{id:"compliance",className:"scroll-mt-20 border-y border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u5408\u89C4\u4E0E\u5B89\u5168\uFF0C\u4ECE\u7B2C\u4E00\u5929\u5F00\u59CB"}),e.jsxs("p",{className:"mx-auto mt-3 max-w-2xl text-center text-sm text-muted",children:[b," \u662F\u6B63\u89C4\u7684 API \u805A\u5408\u4E0E\u5206\u53D1\u5E73\u53F0\u2014\u2014\u4E0D\u6D89\u53CA\u53F7\u6C60\u3001\u8D26\u53F7\u62C6\u5206\u3001\u51ED\u8BC1\u76D7\u7528\u7B49\u4EFB\u4F55\u7070\u4EA7\u884C\u4E3A\u3002"]}),e.jsx("div",{className:"mt-10 grid gap-4 md:grid-cols-3",children:[{icon:Me,title:"\u5408\u6CD5\u6388\u6743\u4E0A\u6E38",desc:"\u4EC5\u63A5\u5165\u6301\u6709\u5408\u6CD5\u4EE3\u7406\u3001\u5206\u9500\u6216\u518D\u8BB8\u53EF\u6388\u6743\u7684\u4F9B\u5E94\u5546\uFF0C\u6388\u6743\u534F\u8BAE\u7F16\u53F7\u767B\u8BB0\u5165\u6863\u5E76\u53EF\u8FFD\u6EAF\u3002"},{icon:gt,title:"\u5185\u5BB9\u5B89\u5168\u5BA1\u6838",desc:"\u53EF\u914D\u7F6E\u7684\u5185\u5BB9\u5BA1\u6838\u94A9\u5B50\u4E0E\u654F\u611F\u8BCD\u89C4\u5219\uFF0C\u547D\u4E2D\u8BF7\u6C42\u81EA\u52A8\u62E6\u622A\u5E76\u8FDB\u5165\u4EBA\u5DE5\u590D\u6838\u961F\u5217\u3002"},{icon:Ee,title:"\u6570\u636E\u9690\u79C1\u4E0E\u5BA1\u8BA1",desc:"\u9ED8\u8BA4\u4E0D\u8BB0\u5F55\u5BF9\u8BDD\u660E\u6587\uFF1B\u5BC6\u94A5\u5168\u94FE\u8DEF\u52A0\u5BC6\uFF1B\u5BA1\u8BA1\u65E5\u5FD7\u54C8\u5E0C\u94FE\u9632\u7BE1\u6539\uFF0C\u4FDD\u7559\u671F\u53EF\u914D 30\u2013180 \u5929\u3002"}].map(({icon:c,title:m,desc:j})=>e.jsxs("div",{className:"rounded-xl2 border border-line bg-bg p-6 shadow-card",children:[e.jsx("span",{className:"flex h-10 w-10 items-center justify-center rounded-lg bg-ok/10 text-ok",children:e.jsx(c,{size:19})}),e.jsx("h3",{className:"mt-4 text-[15px] font-semibold",children:m}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:j})]},m))})]})}),e.jsxs("section",{className:"mx-auto max-w-3xl px-4 py-20 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u5E38\u89C1\u95EE\u9898"}),e.jsx("div",{className:"mt-10 space-y-3",children:Pt.map((c,m)=>e.jsxs("div",{className:"overflow-hidden rounded-xl2 border border-line bg-surface shadow-card",children:[e.jsxs("button",{className:"flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm font-medium",onClick:()=>n(r===m?null:m),"aria-expanded":r===m,children:[c.q.replace(/EdgeRelay/g,b),e.jsx(we,{size:16,className:N("shrink-0 text-muted transition-transform",r===m&&"rotate-180")})]}),r===m&&e.jsx("p",{className:"border-t border-line px-5 py-4 text-[13px] leading-relaxed text-muted",children:c.a.replace(/EdgeRelay/g,b)})]},m))})]}),e.jsx("section",{className:"border-t border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 text-center sm:px-6",children:[e.jsx(nt,{"aria-hidden":!0,className:"mx-auto text-brand",size:36}),e.jsx("h2",{className:"mt-4 text-3xl font-bold tracking-tight",children:"\u51C6\u5907\u597D\u63A5\u5165\u8FB9\u7F18 AI \u7F51\u5173\u4E86\uFF1F"}),e.jsx("p",{className:"mx-auto mt-3 max-w-md text-sm text-muted",children:"\u6CE8\u518C\u5373\u9001\u4F53\u9A8C\u989D\u5EA6\uFF0C5 \u5206\u949F\u5B8C\u6210\u7B2C\u4E00\u6B21\u8C03\u7528\u3002"}),e.jsxs("div",{className:"mt-8 flex flex-wrap justify-center gap-3",children:[e.jsx(T,{to:s?"/dashboard":"/login",children:e.jsx("button",{className:"rounded-lg bg-brand px-7 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-hover",children:"\u514D\u8D39\u5F00\u59CB"})}),e.jsx("a",{href:t!=null&&t.supportEmail?\`mailto:\${t.supportEmail}\`:"mailto:hackerxiaow@gmail.com",children:e.jsx("button",{className:"rounded-lg border border-line bg-surface px-7 py-3 text-sm font-medium transition-colors hover:bg-surface2",children:"\u8054\u7CFB\u9500\u552E"})})]})]})}),e.jsxs("footer",{className:"bg-[#0F1219] text-zinc-400",children:[e.jsxs("div",{className:"mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-4",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2.5",children:[e.jsx("img",{src:v,alt:b,className:"h-7 w-7 rounded-lg object-contain"}),e.jsx("span",{className:"text-[15px] font-bold text-white",children:b})]}),e.jsx("p",{className:"mt-3 max-w-xs text-xs leading-relaxed",children:(t==null?void 0:t.siteDescription)??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173\uFF0C\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6D3E\u53D1\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002"})]}),[{t:"\u4EA7\u54C1",links:[["\u529F\u80FD\u7279\u6027","#features"],["\u6A21\u578B\u4E0E\u5B9A\u4EF7","#pricing"],["\u8FDB\u5165\u63A7\u5236\u53F0","/dashboard"],["\u6CE8\u518C\u8D26\u53F7","/login"]]},{t:"\u5F00\u53D1\u8005",links:[["\u5FEB\u901F\u5F00\u59CB","#dev"],["\u8C03\u7528\u793A\u4F8B","#dev"],["OpenAI \u517C\u5BB9\u63A5\u53E3","https://platform.openai.com/docs/api-reference"]]},{t:"\u5408\u89C4",links:[["\u670D\u52A1\u6761\u6B3E","/terms.html"],["\u9690\u79C1\u653F\u7B56","/privacy.html"],["\u5185\u5BB9\u5B89\u5168","#compliance"]]}].map(c=>e.jsxs("div",{children:[e.jsx("h4",{className:"text-[13px] font-semibold text-white",children:c.t}),e.jsx("ul",{className:"mt-3 space-y-2.5 text-xs",children:c.links.map(([m,j])=>e.jsx("li",{children:j.startsWith("/")&&!j.endsWith(".html")?e.jsx(T,{to:j,className:"transition-colors hover:text-white",children:m}):j.startsWith("#")?e.jsx("a",{href:j,onClick:B=>h(B,j),className:"transition-colors hover:text-white",children:m}):e.jsx("a",{href:j,target:(j.endsWith(".html"),"_blank"),rel:"noreferrer",className:"transition-colors hover:text-white",children:m})},m))})]},c.t))]}),e.jsx("div",{className:"border-t border-white/10",children:e.jsxs("div",{className:"mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-5 text-[11px] sm:flex-row sm:px-6",children:[e.jsx("span",{children:D}),e.jsxs("span",{className:"flex items-center gap-4",children:[e.jsx("a",{href:"/terms.html",className:"hover:text-white",children:"\u670D\u52A1\u6761\u6B3E"}),e.jsx("a",{href:"/privacy.html",className:"hover:text-white",children:"\u9690\u79C1\u653F\u7B56"}),M?e.jsxs("span",{className:"text-zinc-600",children:["\u5907\u6848\u53F7\uFF1A",M]}):null,L?e.jsx("a",{href:L,target:"_blank",rel:"noreferrer","aria-label":"GitHub",children:e.jsx(Se,{size:15,className:"hover:text-white"})}):null]})]})})]})]})}const Dt=l.lazy(()=>O(()=>import("./Dashboard-FzUkn96H.js"),__vite__mapDeps([0,1,2]))),$t=l.lazy(()=>O(()=>import("./Keys-hYc0wvAM.js"),__vite__mapDeps([3,1,4])));l.lazy(()=>O(()=>import("./VideoTasks-BDX3xrTh.js"),__vite__mapDeps([5,1,6,7,8,9,10])));const qt=l.lazy(()=>O(()=>import("./ScheduledTasks-D8yy-VHd.js"),__vite__mapDeps([11,1,5,6,7,8,9,10]))),Vt=l.lazy(()=>O(()=>import("./Playground-BFItBA0T.js"),__vite__mapDeps([12,1,13]))),Ut=l.lazy(()=>O(()=>import("./Providers-DlvpArmL.js"),__vite__mapDeps([14,1,15,6,4,8,16,10,7]))),Bt=l.lazy(()=>O(()=>import("./AccountPool-nRKJqe5N.js"),__vite__mapDeps([17,1,6,10,16,9]))),Ft=l.lazy(()=>O(()=>import("./ModelsPricing-CjxHlu3Y.js"),__vite__mapDeps([18,1,4]))),Gt=l.lazy(()=>O(()=>import("./Logs-DM6UBkca.js"),__vite__mapDeps([19,1,20,6,8]))),Ht=l.lazy(()=>O(()=>import("./Users-uCYfXv9U.js"),__vite__mapDeps([21,1,22,20,4,8]))),Wt=l.lazy(()=>O(()=>import("./Profile-40VAHmIU.js"),__vite__mapDeps([23,1,6,4,15]))),Kt=l.lazy(()=>O(()=>import("./Invite-ieRMYJHX.js"),__vite__mapDeps([22,1,20]))),Zt=l.lazy(()=>O(()=>import("./Backup-CYl2Spyg.js"),__vite__mapDeps([24,1,20,6,8,13]))),Yt=l.lazy(()=>O(()=>import("./Settings-4ntRTP5e.js"),__vite__mapDeps([25,1,4,8])));function Jt(){const[t,s]=l.useState(()=>typeof window<"u"?window.__EDGERELAY_SITE__??null:null);return l.useEffect(()=>{P("/api/site").then(a=>{s(a),document.title=\`\${a.siteName} \u2014 \${a.heroTitle??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"}\`;const i=(n,o,d)=>{let p=document.head.querySelector(\`meta[\${n}="\${o}"]\`);p||(p=document.createElement("meta"),p.setAttribute(n,o),document.head.appendChild(p)),p.setAttribute("content",d)};i("name","description",a.siteDescription),i("property","og:title",a.siteName),i("property","og:description",a.siteDescription),i("property","og:image",a.siteLogoUrl);const r=document.head.querySelector("link[rel=icon]");r&&(r.href=a.siteLogoUrl)}).catch(()=>{})},[]),t}function Xt({meKey:t}){const[s,a]=l.useState(null);if(l.useEffect(()=>{P("/api/announcements").then(r=>{const n=r.announcements.filter(o=>o.popup===1).sort((o,d)=>d.id.localeCompare(o.id))[0];n&&(localStorage.getItem(\`ann-never-\${n.id}-\${t}\`)||sessionStorage.getItem(\`ann-later-\${n.id}-\${t}\`)||(a(n),ee(t,[n.id]),window.dispatchEvent(new CustomEvent("gw:ann-changed"))))}).catch(()=>{})},[t]),!s)return null;const i=r=>{(r?localStorage:sessionStorage).setItem(\`\${r?"ann-never":"ann-later"}-\${s.id}-\${t}\`,"1"),ee(t,[s.id]),a(null),window.dispatchEvent(new CustomEvent("gw:ann-changed"))};return e.jsxs(J,{open:!0,onClose:()=>i(!1),title:"\u5E73\u53F0\u516C\u544A",width:480,children:[e.jsx("h3",{className:"text-base font-semibold",children:s.title}),e.jsx("p",{className:"mt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-muted",children:s.content}),e.jsxs("div",{className:"mt-6 flex justify-end gap-2",children:[e.jsx(_,{variant:"ghost",onClick:()=>i(!1),children:"\u4E0B\u6B21\u518D\u8BF4"}),e.jsx(_,{onClick:()=>i(!0),children:"\u4E0D\u518D\u63D0\u793A"})]})]})}function Qt(){const[t,s]=l.useState(null),[a,i]=l.useState(!1),r=Jt(),n=te(),{stepUpEl:o}=Et(),d=()=>P("/api/auth/me").then(L=>{s(L)}).finally(()=>i(!0));if(l.useEffect(()=>{d()},[]),!a)return null;const p=()=>P("/api/auth/logout","POST",{}).catch(()=>{}).finally(()=>{s(null),n("/")}),b=t==null?void 0:t.user.role,v=b==="superadmin",u=b==="superadmin"||b==="admin",S=b==="superadmin"||b==="admin"||b==="auditor";return e.jsxs(e.Fragment,{children:[o,t&&e.jsx(Xt,{meKey:t.user.id}),e.jsx(l.Suspense,{fallback:e.jsx("div",{className:"flex min-h-[40vh] items-center justify-center text-[13px] text-muted",children:"\u52A0\u8F7D\u4E2D\u2026"}),children:e.jsxs(Be,{children:[e.jsx(w,{path:"/",element:e.jsx(Tt,{site:r,me:t})}),e.jsx(w,{path:"/login",element:e.jsx(Mt,{site:r,onLogin:d})}),e.jsxs(w,{element:t?e.jsx(_t,{me:t,site:r,onLogout:p}):e.jsx(k,{to:"/login",replace:!0}),children:[e.jsx(w,{path:"/dashboard",element:t?e.jsx(Dt,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/keys",element:t?e.jsx($t,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/playground",element:t?e.jsx(Vt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/tasks",element:t?e.jsx(qt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/videos",element:e.jsx(k,{to:"/dashboard/tasks",replace:!0})}),e.jsx(w,{path:"/dashboard/models",element:t?e.jsx(Ft,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/pricing",element:e.jsx(k,{to:"/dashboard/models",replace:!0})}),e.jsx(w,{path:"/dashboard/logs",element:t&&S?e.jsx(Gt,{me:t}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(w,{path:"/dashboard/usage",element:e.jsx(k,{to:"/dashboard/logs",replace:!0})}),e.jsx(w,{path:"/dashboard/audit",element:e.jsx(k,{to:"/dashboard/logs",replace:!0})}),e.jsx(w,{path:"/dashboard/profile",element:t?e.jsx(Wt,{me:t,onRefresh:d}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/backup",element:v?e.jsx(Zt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(w,{path:"/dashboard/invite",element:t?u?e.jsx(k,{to:"/dashboard/users",replace:!0}):e.jsx(Kt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/providers",element:v?e.jsx(Ut,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(w,{path:"/dashboard/accounts",element:v?e.jsx(Bt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(w,{path:"/dashboard/users",element:t?e.jsx(Ht,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/settings",element:v?e.jsx(Yt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(w,{path:"/dashboard/announcements",element:e.jsx(k,{to:"/dashboard/settings",replace:!0})})]}),e.jsx(w,{path:"*",element:e.jsx(k,{to:"/",replace:!0})})]})})]})}function es(){return e.jsx(kt,{children:e.jsx(Ue,{children:e.jsx(Qt,{})})})}X.createRoot(document.getElementById("root")).render(e.jsx(pe.StrictMode,{children:e.jsx(es,{})}));
+)\`};return e.jsxs("div",{className:"min-h-screen bg-bg text-ink",children:[e.jsxs("header",{className:N("fixed inset-x-0 top-0 z-40 border-b transition-all",p?"border-line bg-bg/80 shadow-card backdrop-blur-md":"border-transparent bg-transparent"),children:[e.jsxs("div",{className:"mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6",children:[e.jsxs(T,{to:"/",className:"flex items-center gap-2.5",children:[e.jsx("img",{src:v,alt:b,className:"h-8 w-8 rounded-lg object-contain"}),e.jsx("span",{className:"text-[15px] font-bold",children:b})]}),e.jsx("nav",{className:"hidden flex-1 items-center gap-1 md:flex",children:$.map(([c,m])=>e.jsx("a",{href:m,onClick:j=>h(j,m),className:"rounded-lg px-3 py-2 text-[13px] text-muted transition-colors hover:bg-surface2 hover:text-ink",children:c},c))}),e.jsxs("div",{className:"ml-auto hidden items-center gap-2 md:flex",children:[e.jsx(me,{}),s?e.jsx(T,{to:"/dashboard",children:e.jsx("button",{className:"rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover",children:"\u8FDB\u5165\u63A7\u5236\u53F0"})}):e.jsxs(e.Fragment,{children:[e.jsx(T,{to:"/login",children:e.jsx("button",{className:"rounded-lg px-4 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-surface2",children:"\u767B\u5F55"})}),e.jsx(T,{to:"/login",children:e.jsx("button",{className:"rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover",children:"\u514D\u8D39\u6CE8\u518C"})})]})]}),e.jsx("button",{className:"ml-auto rounded-lg p-2 text-muted hover:bg-surface2 md:hidden",onClick:()=>i(!a),"aria-label":"\u83DC\u5355",children:a?e.jsx(ae,{size:20}):e.jsx(Ce,{size:20})})]}),a&&e.jsxs("div",{className:"border-t border-line bg-surface px-4 py-3 md:hidden",children:[$.map(([c,m])=>e.jsx("a",{href:m,onClick:j=>{i(!1),h(j,m)},className:"block rounded-lg px-3 py-2.5 text-sm text-ink hover:bg-surface2",children:c},c)),e.jsxs("div",{className:"mt-2 flex items-center gap-2 border-t border-line pt-3",children:[e.jsx(me,{}),s?e.jsx(T,{to:"/dashboard",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white",children:"\u8FDB\u5165\u63A7\u5236\u53F0"})}):e.jsxs(e.Fragment,{children:[e.jsx(T,{to:"/login",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg border border-line px-4 py-2 text-[13px]",children:"\u767B\u5F55"})}),e.jsx(T,{to:"/login",className:"flex-1",children:e.jsx("button",{className:"w-full rounded-lg bg-brand px-4 py-2 text-[13px] font-medium text-white",children:"\u514D\u8D39\u6CE8\u518C"})})]})]})]})]}),e.jsxs("section",{className:"relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28",children:[e.jsx("div",{"aria-hidden":!0,className:"pointer-events-none absolute inset-0",style:{backgroundImage:"radial-gradient(ellipse 60% 50% at 50% -10%, rgba(243,128,32,.14), transparent), linear-gradient(rgb(var(--c-line)) .5px, transparent .5px), linear-gradient(90deg, rgb(var(--c-line)) .5px, transparent .5px)",backgroundSize:"auto, 48px 48px, 48px 48px",maskImage:"linear-gradient(to bottom, black 30%, transparent 90%)"}}),e.jsxs("div",{className:"relative mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2",children:[e.jsxs("div",{children:[e.jsxs("span",{className:"inline-flex items-center gap-1.5 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-medium text-brand",children:[e.jsx(ze,{size:12}),(t==null?void 0:t.heroBadge)??"\u8DD1\u5728 EdgeOne \u5168\u7403\u8FB9\u7F18\u8282\u70B9"]}),e.jsx("h1",{className:"mt-5 text-4xl font-bold leading-[1.15] tracking-tight sm:text-5xl",children:e.jsx("span",{className:"text-balance",children:(t==null?void 0:t.heroTitle)??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"})}),e.jsx("p",{className:"mt-5 max-w-lg text-[15px] leading-relaxed text-muted",children:(t==null?void 0:t.heroSubtitle)??"\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\uFF0C\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6CBB\u7406\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002\u5408\u6CD5\u6388\u6743\u4E0A\u6E38\u3001\u900F\u660E\u8BA1\u8D39\u3001\u54C8\u5E0C\u94FE\u5BA1\u8BA1\u2014\u2014\u9762\u5411\u5F00\u53D1\u8005\u4E0E\u4F01\u4E1A\u7684\u6B63\u89C4\u805A\u5408\u5206\u53D1\u5E73\u53F0\u3002"}),e.jsxs("div",{className:"mt-8 flex flex-wrap gap-3",children:[e.jsx(T,{to:s?"/dashboard":"/login",children:e.jsxs("button",{className:"inline-flex items-center gap-1.5 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-brand-hover hover:shadow-pop",children:["\u5F00\u59CB\u4F7F\u7528",e.jsx(ve,{size:15})]})}),e.jsx("a",{href:"#dev",onClick:c=>h(c,"#dev"),children:e.jsxs("button",{className:"inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-6 py-3 text-sm font-medium transition-colors hover:bg-surface2",children:["\u67E5\u770B\u6587\u6863",e.jsx(rt,{size:15})]})})]})]}),e.jsx("div",{className:"min-w-0",children:e.jsx(he,{title:"\u5FEB\u901F\u5F00\u59CB \u2014 curl",code:E.curl})})]})]}),e.jsx("section",{className:"border-y border-line bg-surface py-8",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("p",{className:"text-center text-xs uppercase tracking-widest text-muted",children:"\u5DF2\u652F\u6301\u4E3B\u6D41\u6A21\u578B\u4F9B\u5E94\u5546 \xB7 \u5747\u9700\u5408\u6CD5\u6388\u6743\u63A5\u5165"}),e.jsx("div",{className:"mt-5 flex flex-wrap items-center justify-center gap-x-10 gap-y-4",children:At.map(c=>e.jsx("span",{className:"text-lg font-semibold text-muted opacity-60 grayscale transition-all hover:text-ink hover:opacity-100 hover:grayscale-0",children:c},c))})]})}),e.jsxs("section",{id:"features",className:"mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6",children:[e.jsxs("h2",{className:"text-center text-3xl font-bold tracking-tight",children:["\u4E3A\u4EC0\u4E48\u9009\u62E9 ",b]}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u4ECE\u63A5\u53E3\u3001\u8DEF\u7531\u3001\u8BA1\u8D39\u5230\u5BA1\u8BA1\uFF0C\u4E00\u4E2A\u5E73\u53F0\u8986\u76D6 AI API \u5206\u53D1\u7684\u5168\u90E8\u5173\u952E\u73AF\u8282\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3",children:Ot.map(({icon:c,title:m,desc:j})=>e.jsxs("div",{className:"group rounded-xl2 border border-line bg-surface p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-pop",children:[e.jsx("span",{className:"flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10 text-brand",children:e.jsx(c,{size:19})}),e.jsx("h3",{className:"mt-4 text-[15px] font-semibold",children:m}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:j})]},m))})]}),e.jsx("section",{id:"models",className:"border-t border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u4E00\u4E2A\u63A5\u53E3\uFF0C\u63A5\u5165\u4E3B\u6D41\u6A21\u578B"}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u6A21\u578B\u6E05\u5355\u7531\u7BA1\u7406\u5458\u5728\u63A7\u5236\u53F0\u7EDF\u4E00\u914D\u7F6E\uFF0C\u4E3B\u5907\u8DEF\u7531\u4E0E\u4EF7\u683C\u900F\u660E\u53EF\u67E5\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3",children:zt.map(c=>e.jsxs("div",{className:"rounded-xl2 border border-line bg-bg p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-pop",children:[e.jsxs("div",{className:"flex items-center justify-between",children:[e.jsx("span",{className:"text-[15px] font-semibold",children:c.provider}),e.jsx(se,{size:17,className:"text-brand"})]}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:c.desc}),e.jsx("div",{className:"mt-4 flex flex-wrap gap-1.5",children:c.models.map(m=>e.jsx("span",{className:"rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] text-muted",children:m},m))})]},c.provider))}),e.jsx("p",{className:"mt-6 text-center text-xs text-muted",children:"\u5177\u4F53\u53EF\u7528\u6A21\u578B\u4E0E\u4EF7\u683C\uFF0C\u4EE5\u63A7\u5236\u53F0\u300C\u6A21\u578B\u300D\u9875\u548C\u5B9E\u9645\u914D\u7F6E\u4E3A\u51C6\u3002"})]})}),e.jsx("section",{id:"pricing",className:"scroll-mt-20 border-y border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u7075\u6D3B\u7684\u6A21\u578B\u4E0E\u5B9A\u4EF7"}),e.jsx("p",{className:"mx-auto mt-3 max-w-xl text-center text-sm text-muted",children:"\u4ECE\u4E2A\u4EBA\u4F53\u9A8C\u5230\u4F01\u4E1A\u7EA7\u90E8\u7F72\uFF0C\u6309\u9700\u9009\u62E9\uFF0C\u968F\u65F6\u5347\u7EA7\u3002"}),e.jsx("div",{className:"mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4",children:It.map(c=>e.jsxs("div",{className:N("relative flex flex-col rounded-xl2 border bg-bg p-6 transition-all hover:-translate-y-1",c.hot?"border-brand shadow-pop ring-1 ring-brand":"border-line shadow-card"),children:[c.hot&&e.jsx("span",{className:"absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3 py-0.5 text-[11px] font-medium text-white",children:"\u6700\u53D7\u6B22\u8FCE"}),e.jsx("div",{className:"text-sm font-medium",children:c.name}),e.jsxs("div",{className:"mt-3",children:[e.jsx("span",{className:"text-3xl font-bold tracking-tight",children:c.price}),e.jsx("span",{className:"text-sm text-muted",children:c.unit})]}),e.jsx("div",{className:"mt-1 text-xs text-muted",children:c.desc}),e.jsx("ul",{className:"mt-5 flex-1 space-y-2.5",children:c.items.map(m=>e.jsxs("li",{className:"flex items-start gap-2 text-[13px]",children:[e.jsx(Z,{size:15,className:"mt-0.5 shrink-0 text-ok"}),m]},m))}),e.jsx(T,{to:s?"/dashboard":"/login",className:"mt-6",children:e.jsx("button",{className:N("w-full rounded-lg px-4 py-2.5 text-[13px] font-medium transition-colors",c.hot?"bg-brand text-white hover:bg-brand-hover":"border border-line bg-surface hover:bg-surface2"),children:c.cta})})]},c.name))}),e.jsx("p",{className:"mt-6 text-center text-xs text-muted",children:"\u6240\u6709\u4EF7\u683C\u4EC5\u4E3A\u793A\u4F8B\uFF0C\u5B9E\u9645\u4EE5\u4E0A\u6E38\u4F9B\u5E94\u5546\u6388\u6743\u4E0E\u5E73\u53F0\u516C\u793A\u4E3A\u51C6\u3002"})]})}),e.jsx("section",{id:"dev",className:"mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6",children:e.jsxs("div",{className:"grid items-center gap-10 lg:grid-cols-2",children:[e.jsxs("div",{children:[e.jsx("h2",{className:"text-3xl font-bold tracking-tight",children:"\u4E3A\u5F00\u53D1\u8005\u800C\u751F"}),e.jsx("p",{className:"mt-4 text-sm leading-relaxed text-muted",children:"\u4EFB\u4F55\u652F\u6301 OpenAI SDK \u7684\u8BED\u8A00\u4E0E\u6846\u67B6\uFF0C\u6539\u4E00\u884C Base URL \u5373\u53EF\u63A5\u5165\u3002\u7EDF\u4E00\u7684\u9519\u8BEF\u683C\u5F0F\u3001\u900F\u660E\u7684\u9650\u6D41\u54CD\u5E94\u3001\u539F\u751F SSE \u6D41\u5F0F\u8F6C\u53D1\u2014\u2014\u4E0D\u9700\u8981\u5B66\u4E60\u65B0\u7684\u79C1\u6709\u534F\u8BAE\u3002"}),e.jsx("ul",{className:"mt-6 space-y-3",children:[["OpenAI \u517C\u5BB9","/v1/chat/completions\u3001/v1/models\uFF0C\u517C\u5BB9\u5B98\u65B9 SDK \u4E0E\u751F\u6001\u5DE5\u5177"],["\u7ED3\u6784\u5316\u9519\u8BEF","\u6BCF\u4E2A\u9519\u8BEF\u90FD\u5E26\u5E73\u53F0\u9519\u8BEF\u7801\u4E0E request_id\uFF0C\u65B9\u4FBF\u5B9A\u4F4D\u4E0E\u5DE5\u5355\u6392\u67E5"],["\u6D41\u5F0F\u54CD\u5E94","SSE \u900F\u4F20 + \u5B9E\u9645 Token \u7528\u91CF\u6355\u83B7\uFF0C\u8BA1\u8D39\u7CBE\u786E\u5230\u6B21"],["\u591A\u8BED\u8A00\u793A\u4F8B","curl / Node.js / Python \u5F00\u7BB1\u5373\u7528"]].map(([c,m])=>e.jsxs("li",{className:"flex gap-3",children:[e.jsx(Z,{size:16,className:"mt-0.5 shrink-0 text-brand"}),e.jsxs("span",{className:"text-[13px]",children:[e.jsx("strong",{className:"font-semibold",children:c})," \u2014 ",e.jsx("span",{className:"text-muted",children:m})]})]},c))}),e.jsxs("a",{href:"https://github.com/wimdaw/EdgeRelay",target:"_blank",rel:"noreferrer",className:"mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-brand hover:underline",children:["\u67E5\u770B\u9879\u76EE\u6587\u6863",e.jsx(dt,{size:14})]})]}),e.jsxs("div",{className:"min-w-0",children:[e.jsx("div",{className:"mb-3 flex gap-1 rounded-lg bg-surface2 p-0.5",style:{width:"fit-content"},children:["curl","node","python"].map(c=>e.jsx("button",{onClick:()=>d(c),className:N("rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors",o===c?"bg-surface text-brand shadow-sm":"text-muted hover:text-ink"),children:c==="node"?"Node.js":c},c))}),e.jsx(he,{title:\`\${o} \u2014 \u8C03\u7528\u793A\u4F8B\`,code:E[o]})]})]})}),e.jsx("section",{id:"compliance",className:"scroll-mt-20 border-y border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u5408\u89C4\u4E0E\u5B89\u5168\uFF0C\u4ECE\u7B2C\u4E00\u5929\u5F00\u59CB"}),e.jsxs("p",{className:"mx-auto mt-3 max-w-2xl text-center text-sm text-muted",children:[b," \u662F\u6B63\u89C4\u7684 API \u805A\u5408\u4E0E\u5206\u53D1\u5E73\u53F0\u2014\u2014\u4E0D\u6D89\u53CA\u53F7\u6C60\u3001\u8D26\u53F7\u62C6\u5206\u3001\u51ED\u8BC1\u76D7\u7528\u7B49\u4EFB\u4F55\u7070\u4EA7\u884C\u4E3A\u3002"]}),e.jsx("div",{className:"mt-10 grid gap-4 md:grid-cols-3",children:[{icon:Me,title:"\u5408\u6CD5\u6388\u6743\u4E0A\u6E38",desc:"\u4EC5\u63A5\u5165\u6301\u6709\u5408\u6CD5\u4EE3\u7406\u3001\u5206\u9500\u6216\u518D\u8BB8\u53EF\u6388\u6743\u7684\u4F9B\u5E94\u5546\uFF0C\u6388\u6743\u534F\u8BAE\u7F16\u53F7\u767B\u8BB0\u5165\u6863\u5E76\u53EF\u8FFD\u6EAF\u3002"},{icon:gt,title:"\u5185\u5BB9\u5B89\u5168\u5BA1\u6838",desc:"\u53EF\u914D\u7F6E\u7684\u5185\u5BB9\u5BA1\u6838\u94A9\u5B50\u4E0E\u654F\u611F\u8BCD\u89C4\u5219\uFF0C\u547D\u4E2D\u8BF7\u6C42\u81EA\u52A8\u62E6\u622A\u5E76\u8FDB\u5165\u4EBA\u5DE5\u590D\u6838\u961F\u5217\u3002"},{icon:Ee,title:"\u6570\u636E\u9690\u79C1\u4E0E\u5BA1\u8BA1",desc:"\u9ED8\u8BA4\u4E0D\u8BB0\u5F55\u5BF9\u8BDD\u660E\u6587\uFF1B\u5BC6\u94A5\u5168\u94FE\u8DEF\u52A0\u5BC6\uFF1B\u5BA1\u8BA1\u65E5\u5FD7\u54C8\u5E0C\u94FE\u9632\u7BE1\u6539\uFF0C\u4FDD\u7559\u671F\u53EF\u914D 30\u2013180 \u5929\u3002"}].map(({icon:c,title:m,desc:j})=>e.jsxs("div",{className:"rounded-xl2 border border-line bg-bg p-6 shadow-card",children:[e.jsx("span",{className:"flex h-10 w-10 items-center justify-center rounded-lg bg-ok/10 text-ok",children:e.jsx(c,{size:19})}),e.jsx("h3",{className:"mt-4 text-[15px] font-semibold",children:m}),e.jsx("p",{className:"mt-2 text-[13px] leading-relaxed text-muted",children:j})]},m))})]})}),e.jsxs("section",{className:"mx-auto max-w-3xl px-4 py-20 sm:px-6",children:[e.jsx("h2",{className:"text-center text-3xl font-bold tracking-tight",children:"\u5E38\u89C1\u95EE\u9898"}),e.jsx("div",{className:"mt-10 space-y-3",children:Pt.map((c,m)=>e.jsxs("div",{className:"overflow-hidden rounded-xl2 border border-line bg-surface shadow-card",children:[e.jsxs("button",{className:"flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm font-medium",onClick:()=>n(r===m?null:m),"aria-expanded":r===m,children:[c.q.replace(/EdgeRelay/g,b),e.jsx(we,{size:16,className:N("shrink-0 text-muted transition-transform",r===m&&"rotate-180")})]}),r===m&&e.jsx("p",{className:"border-t border-line px-5 py-4 text-[13px] leading-relaxed text-muted",children:c.a.replace(/EdgeRelay/g,b)})]},m))})]}),e.jsx("section",{className:"border-t border-line bg-surface py-20",children:e.jsxs("div",{className:"mx-auto max-w-6xl px-4 text-center sm:px-6",children:[e.jsx(nt,{"aria-hidden":!0,className:"mx-auto text-brand",size:36}),e.jsx("h2",{className:"mt-4 text-3xl font-bold tracking-tight",children:"\u51C6\u5907\u597D\u63A5\u5165\u8FB9\u7F18 AI \u7F51\u5173\u4E86\uFF1F"}),e.jsx("p",{className:"mx-auto mt-3 max-w-md text-sm text-muted",children:"\u6CE8\u518C\u5373\u9001\u4F53\u9A8C\u989D\u5EA6\uFF0C5 \u5206\u949F\u5B8C\u6210\u7B2C\u4E00\u6B21\u8C03\u7528\u3002"}),e.jsxs("div",{className:"mt-8 flex flex-wrap justify-center gap-3",children:[e.jsx(T,{to:s?"/dashboard":"/login",children:e.jsx("button",{className:"rounded-lg bg-brand px-7 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-hover",children:"\u514D\u8D39\u5F00\u59CB"})}),e.jsx("a",{href:t!=null&&t.supportEmail?\`mailto:\${t.supportEmail}\`:"mailto:hackerxiaow@gmail.com",children:e.jsx("button",{className:"rounded-lg border border-line bg-surface px-7 py-3 text-sm font-medium transition-colors hover:bg-surface2",children:"\u8054\u7CFB\u9500\u552E"})})]})]})}),e.jsxs("footer",{className:"bg-[#0F1219] text-zinc-400",children:[e.jsxs("div",{className:"mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-4",children:[e.jsxs("div",{children:[e.jsxs("div",{className:"flex items-center gap-2.5",children:[e.jsx("img",{src:v,alt:b,className:"h-7 w-7 rounded-lg object-contain"}),e.jsx("span",{className:"text-[15px] font-bold text-white",children:b})]}),e.jsx("p",{className:"mt-3 max-w-xs text-xs leading-relaxed",children:(t==null?void 0:t.siteDescription)??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173\uFF0C\u7528\u7EDF\u4E00 OpenAI \u517C\u5BB9\u63A5\u53E3\u63A5\u5165\u3001\u8DEF\u7531\u548C\u6D3E\u53D1\u591A\u5BB6\u5927\u6A21\u578B\u670D\u52A1\u3002"})]}),[{t:"\u4EA7\u54C1",links:[["\u529F\u80FD\u7279\u6027","#features"],["\u6A21\u578B\u4E0E\u5B9A\u4EF7","#pricing"],["\u8FDB\u5165\u63A7\u5236\u53F0","/dashboard"],["\u6CE8\u518C\u8D26\u53F7","/login"]]},{t:"\u5F00\u53D1\u8005",links:[["\u5FEB\u901F\u5F00\u59CB","#dev"],["\u8C03\u7528\u793A\u4F8B","#dev"],["OpenAI \u517C\u5BB9\u63A5\u53E3","https://platform.openai.com/docs/api-reference"]]},{t:"\u5408\u89C4",links:[["\u670D\u52A1\u6761\u6B3E","/terms.html"],["\u9690\u79C1\u653F\u7B56","/privacy.html"],["\u5185\u5BB9\u5B89\u5168","#compliance"]]}].map(c=>e.jsxs("div",{children:[e.jsx("h4",{className:"text-[13px] font-semibold text-white",children:c.t}),e.jsx("ul",{className:"mt-3 space-y-2.5 text-xs",children:c.links.map(([m,j])=>e.jsx("li",{children:j.startsWith("/")&&!j.endsWith(".html")?e.jsx(T,{to:j,className:"transition-colors hover:text-white",children:m}):j.startsWith("#")?e.jsx("a",{href:j,onClick:B=>h(B,j),className:"transition-colors hover:text-white",children:m}):e.jsx("a",{href:j,target:(j.endsWith(".html"),"_blank"),rel:"noreferrer",className:"transition-colors hover:text-white",children:m})},m))})]},c.t))]}),e.jsx("div",{className:"border-t border-white/10",children:e.jsxs("div",{className:"mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-5 text-[11px] sm:flex-row sm:px-6",children:[e.jsx("span",{children:D}),e.jsxs("span",{className:"flex items-center gap-4",children:[e.jsx("a",{href:"/terms.html",className:"hover:text-white",children:"\u670D\u52A1\u6761\u6B3E"}),e.jsx("a",{href:"/privacy.html",className:"hover:text-white",children:"\u9690\u79C1\u653F\u7B56"}),M?e.jsxs("span",{className:"text-zinc-600",children:["\u5907\u6848\u53F7\uFF1A",M]}):null,L?e.jsx("a",{href:L,target:"_blank",rel:"noreferrer","aria-label":"GitHub",children:e.jsx(Se,{size:15,className:"hover:text-white"})}):null]})]})})]})]})}const Dt=l.lazy(()=>O(()=>import("./Dashboard-CLfQzMok.js"),__vite__mapDeps([0,1,2]))),$t=l.lazy(()=>O(()=>import("./Keys-DU1VqEBm.js"),__vite__mapDeps([3,1,4])));l.lazy(()=>O(()=>import("./VideoTasks-sX0jnlVr.js"),__vite__mapDeps([5,1,6,7,8,9,10])));const qt=l.lazy(()=>O(()=>import("./ScheduledTasks-_PMtXiY3.js"),__vite__mapDeps([11,1,5,6,7,8,9,10]))),Vt=l.lazy(()=>O(()=>import("./Playground-CFl2kj_K.js"),__vite__mapDeps([12,1,13]))),Ut=l.lazy(()=>O(()=>import("./Providers-BiTzce6H.js"),__vite__mapDeps([14,1,15,6,4,8,16,10,7]))),Bt=l.lazy(()=>O(()=>import("./AccountPool-H4ndr5z3.js"),__vite__mapDeps([17,1,6,10,16,9]))),Ft=l.lazy(()=>O(()=>import("./ModelsPricing-D3r_Eoea.js"),__vite__mapDeps([18,1,4]))),Gt=l.lazy(()=>O(()=>import("./Logs-DC-adhq4.js"),__vite__mapDeps([19,1,20,6,8]))),Ht=l.lazy(()=>O(()=>import("./Users-CsKHEnB4.js"),__vite__mapDeps([21,1,22,20,4,8]))),Wt=l.lazy(()=>O(()=>import("./Profile-8VMY8-5m.js"),__vite__mapDeps([23,1,6,4,15]))),Kt=l.lazy(()=>O(()=>import("./Invite-CbRAI9tf.js"),__vite__mapDeps([22,1,20]))),Zt=l.lazy(()=>O(()=>import("./Backup-c98MuXhX.js"),__vite__mapDeps([24,1,20,6,8,13]))),Yt=l.lazy(()=>O(()=>import("./Settings-CYX-p-Xb.js"),__vite__mapDeps([25,1,4,8])));function Jt(){const[t,s]=l.useState(()=>typeof window<"u"?window.__EDGERELAY_SITE__??null:null);return l.useEffect(()=>{P("/api/site").then(a=>{s(a),document.title=\`\${a.siteName} \u2014 \${a.heroTitle??"\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173"}\`;const i=(n,o,d)=>{let p=document.head.querySelector(\`meta[\${n}="\${o}"]\`);p||(p=document.createElement("meta"),p.setAttribute(n,o),document.head.appendChild(p)),p.setAttribute("content",d)};i("name","description",a.siteDescription),i("property","og:title",a.siteName),i("property","og:description",a.siteDescription),i("property","og:image",a.siteLogoUrl);const r=document.head.querySelector("link[rel=icon]");r&&(r.href=a.siteLogoUrl)}).catch(()=>{})},[]),t}function Xt({meKey:t}){const[s,a]=l.useState(null);if(l.useEffect(()=>{P("/api/announcements").then(r=>{const n=r.announcements.filter(o=>o.popup===1).sort((o,d)=>d.id.localeCompare(o.id))[0];n&&(localStorage.getItem(\`ann-never-\${n.id}-\${t}\`)||sessionStorage.getItem(\`ann-later-\${n.id}-\${t}\`)||(a(n),ee(t,[n.id]),window.dispatchEvent(new CustomEvent("gw:ann-changed"))))}).catch(()=>{})},[t]),!s)return null;const i=r=>{(r?localStorage:sessionStorage).setItem(\`\${r?"ann-never":"ann-later"}-\${s.id}-\${t}\`,"1"),ee(t,[s.id]),a(null),window.dispatchEvent(new CustomEvent("gw:ann-changed"))};return e.jsxs(J,{open:!0,onClose:()=>i(!1),title:"\u5E73\u53F0\u516C\u544A",width:480,children:[e.jsx("h3",{className:"text-base font-semibold",children:s.title}),e.jsx("p",{className:"mt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-muted",children:s.content}),e.jsxs("div",{className:"mt-6 flex justify-end gap-2",children:[e.jsx(_,{variant:"ghost",onClick:()=>i(!1),children:"\u4E0B\u6B21\u518D\u8BF4"}),e.jsx(_,{onClick:()=>i(!0),children:"\u4E0D\u518D\u63D0\u793A"})]})]})}function Qt(){const[t,s]=l.useState(null),[a,i]=l.useState(!1),r=Jt(),n=te(),{stepUpEl:o}=Et(),d=()=>P("/api/auth/me").then(L=>{s(L)}).finally(()=>i(!0));if(l.useEffect(()=>{d()},[]),!a)return null;const p=()=>P("/api/auth/logout","POST",{}).catch(()=>{}).finally(()=>{s(null),n("/")}),b=t==null?void 0:t.user.role,v=b==="superadmin",u=b==="superadmin"||b==="admin",S=b==="superadmin"||b==="admin"||b==="auditor";return e.jsxs(e.Fragment,{children:[o,t&&e.jsx(Xt,{meKey:t.user.id}),e.jsx(l.Suspense,{fallback:e.jsx("div",{className:"flex min-h-[40vh] items-center justify-center text-[13px] text-muted",children:"\u52A0\u8F7D\u4E2D\u2026"}),children:e.jsxs(Be,{children:[e.jsx(w,{path:"/",element:e.jsx(Tt,{site:r,me:t})}),e.jsx(w,{path:"/login",element:e.jsx(Mt,{site:r,onLogin:d})}),e.jsxs(w,{element:t?e.jsx(_t,{me:t,site:r,onLogout:p}):e.jsx(k,{to:"/login",replace:!0}),children:[e.jsx(w,{path:"/dashboard",element:t?e.jsx(Dt,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/keys",element:t?e.jsx($t,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/playground",element:t?e.jsx(Vt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/tasks",element:t?e.jsx(qt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/videos",element:e.jsx(k,{to:"/dashboard/tasks",replace:!0})}),e.jsx(w,{path:"/dashboard/models",element:t?e.jsx(Ft,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/pricing",element:e.jsx(k,{to:"/dashboard/models",replace:!0})}),e.jsx(w,{path:"/dashboard/logs",element:t&&S?e.jsx(Gt,{me:t}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(w,{path:"/dashboard/usage",element:e.jsx(k,{to:"/dashboard/logs",replace:!0})}),e.jsx(w,{path:"/dashboard/audit",element:e.jsx(k,{to:"/dashboard/logs",replace:!0})}),e.jsx(w,{path:"/dashboard/profile",element:t?e.jsx(Wt,{me:t,onRefresh:d}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/backup",element:v?e.jsx(Zt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(w,{path:"/dashboard/invite",element:t?u?e.jsx(k,{to:"/dashboard/users",replace:!0}):e.jsx(Kt,{me:t}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/providers",element:v?e.jsx(Ut,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(w,{path:"/dashboard/accounts",element:v?e.jsx(Bt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(w,{path:"/dashboard/users",element:t?e.jsx(Ht,{}):e.jsx(k,{to:"/login",replace:!0})}),e.jsx(w,{path:"/dashboard/settings",element:v?e.jsx(Yt,{}):e.jsx(k,{to:"/dashboard",replace:!0})}),e.jsx(w,{path:"/dashboard/announcements",element:e.jsx(k,{to:"/dashboard/settings",replace:!0})})]}),e.jsx(w,{path:"*",element:e.jsx(k,{to:"/",replace:!0})})]})})]})}function es(){return e.jsx(kt,{children:e.jsx(Ue,{children:e.jsx(Qt,{})})})}X.createRoot(document.getElementById("root")).render(e.jsx(pe.StrictMode,{children:e.jsx(es,{})}));
 `,
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/message-square-CYBPWetn.js": {
-              content: `import{c as e}from"./index-JGTLcmXV.js";/**
+            "/assets/message-square-nskUin8a.js": {
+              content: `import{c as e}from"./index-OWhocmiM.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41852,8 +41852,8 @@ res = client.chat.completions.create(
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/plus-v0UXhlLi.js": {
-              content: `import{c as e}from"./index-JGTLcmXV.js";/**
+            "/assets/plus-DjGDWRHo.js": {
+              content: `import{c as e}from"./index-OWhocmiM.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41863,8 +41863,8 @@ res = client.chat.completions.create(
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/refresh-cw-BY9R0tIW.js": {
-              content: `import{c as e}from"./index-JGTLcmXV.js";/**
+            "/assets/refresh-cw-CiqXg9A7.js": {
+              content: `import{c as e}from"./index-OWhocmiM.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41874,8 +41874,8 @@ res = client.chat.completions.create(
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/send-itasS0aM.js": {
-              content: `import{c as e}from"./index-JGTLcmXV.js";/**
+            "/assets/send-Ck83dgZo.js": {
+              content: `import{c as e}from"./index-OWhocmiM.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41890,8 +41890,8 @@ res = client.chat.completions.create(
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/trash-2-DuK1uChF.js": {
-              content: `import{c as e}from"./index-JGTLcmXV.js";/**
+            "/assets/trash-2-BAKVuXGI.js": {
+              content: `import{c as e}from"./index-OWhocmiM.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -41901,8 +41901,8 @@ res = client.chat.completions.create(
               isBase64: false,
               type: "application/javascript; charset=utf-8"
             },
-            "/assets/triangle-alert-V4ji6s4N.js": {
-              content: `import{c as e}from"./index-JGTLcmXV.js";/**
+            "/assets/triangle-alert-DwdzAbbD.js": {
+              content: `import{c as e}from"./index-OWhocmiM.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -42011,7 +42011,7 @@ Error generating stack: \`+i.message+\`
         window.location.replace(window.location.hash.slice(1));
       }
     </script>
-    <script type="module" crossorigin src="/assets/index-JGTLcmXV.js"></script>
+    <script type="module" crossorigin src="/assets/index-OWhocmiM.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/vendor-BbQ_LiY-.js">
     <link rel="stylesheet" crossorigin href="/assets/index-AEYJrU2r.css">
   </head>
@@ -42226,7 +42226,7 @@ Error generating stack: \`+i.message+\`
             expires: "0",
             "cdn-cache-control": "no-store"
           };
-          function Vn(e) {
+          function Gn(e) {
             return e.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
           }
           async function bw(e) {
@@ -42249,7 +42249,7 @@ Error generating stack: \`+i.message+\`
               },
               smtpEnabled: !!t.smtpEnabled
             }, c = JSON.stringify(o).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029"), u = t.heroTitle ?? "\u90E8\u7F72\u5728 EdgeOne \u8FB9\u7F18\u7684\u5408\u89C4 AI API \u7F51\u5173";
-            return i = i.replace(/<title>[\s\S]*?<\/title>/i, `<title>${Vn(n)} \u2014 ${Vn(u)}</title>`), i = i.replace(/<meta\s+name="description"[^>]*>/gi, ""), i = i.replace(/<meta\s+property="og:[^"]*"[^>]*>/gi, ""), i = i.replace(/<\/head>/i, [`<meta name="description" content="${Vn(r)}">`, `<meta property="og:title" content="${Vn(n)}">`, `<meta property="og:description" content="${Vn(r)}">`, `<meta property="og:image" content="${Vn(a)}">`, '<meta property="og:type" content="website">', `<link rel="icon" href="${Vn(a)}">`, `<link rel="apple-touch-icon" href="${Vn(a)}">`].join(`
+            return i = i.replace(/<title>[\s\S]*?<\/title>/i, `<title>${Gn(n)} \u2014 ${Gn(u)}</title>`), i = i.replace(/<meta\s+name="description"[^>]*>/gi, ""), i = i.replace(/<meta\s+property="og:[^"]*"[^>]*>/gi, ""), i = i.replace(/<\/head>/i, [`<meta name="description" content="${Gn(r)}">`, `<meta property="og:title" content="${Gn(n)}">`, `<meta property="og:description" content="${Gn(r)}">`, `<meta property="og:image" content="${Gn(a)}">`, '<meta property="og:type" content="website">', `<link rel="icon" href="${Gn(a)}">`, `<link rel="apple-touch-icon" href="${Gn(a)}">`].join(`
 `) + `
 </head>`), i = i.replace(/<script>window\.__EDGERELAY_SITE__=[\s\S]*?<\/script>\n?/g, ""), i = i.replace(/<\/head>/i, `<script>window.__EDGERELAY_SITE__=${c};</script>
 </head>`), i;
@@ -42370,22 +42370,22 @@ Error generating stack: \`+i.message+\`
         try {
           const handler = (() => {
             const method = req.method;
-            if (method === "GET" && mod_6.onRequestGet) {
-              return mod_6.onRequestGet;
-            } else if (method === "POST" && mod_6.onRequestPost) {
-              return mod_6.onRequestPost;
-            } else if (method === "PUT" && mod_6.onRequestPut) {
-              return mod_6.onRequestPut;
-            } else if (method === "DELETE" && mod_6.onRequestDelete) {
-              return mod_6.onRequestDelete;
-            } else if (method === "PATCH" && mod_6.onRequestPatch) {
-              return mod_6.onRequestPatch;
-            } else if (method === "HEAD" && mod_6.onRequestHead) {
-              return mod_6.onRequestHead;
-            } else if (method === "OPTIONS" && mod_6.onRequestOptions) {
-              return mod_6.onRequestOptions;
+            if (method === "GET" && mod_7.onRequestGet) {
+              return mod_7.onRequestGet;
+            } else if (method === "POST" && mod_7.onRequestPost) {
+              return mod_7.onRequestPost;
+            } else if (method === "PUT" && mod_7.onRequestPut) {
+              return mod_7.onRequestPut;
+            } else if (method === "DELETE" && mod_7.onRequestDelete) {
+              return mod_7.onRequestDelete;
+            } else if (method === "PATCH" && mod_7.onRequestPatch) {
+              return mod_7.onRequestPatch;
+            } else if (method === "HEAD" && mod_7.onRequestHead) {
+              return mod_7.onRequestHead;
+            } else if (method === "OPTIONS" && mod_7.onRequestOptions) {
+              return mod_7.onRequestOptions;
             } else {
-              return mod_6.onRequest;
+              return mod_7.onRequest;
             }
           })();
           if (handler) {

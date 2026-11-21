@@ -219,6 +219,13 @@ export async function appendProviderSubmissionMessage(env: any, msg: ProviderSub
   await store.setJSON(PROVIDER_SUB_MSG_KEY(msg.submissionId), list);
 }
 
+export async function deleteProviderSubmission(env: any, submissionId: string): Promise<void> {
+  const list = await getProviderSubmissions(env);
+  await saveProviderSubmissions(env, list.filter((x) => x.id !== submissionId));
+  const store = getBlobStore(env);
+  await store.delete(PROVIDER_SUB_MSG_KEY(submissionId)).catch(() => {});
+}
+
 export async function getModels(env: any): Promise<ModelRouteRecord[]> {
   return (await loadConfigSnapshot(env)).models;
 }

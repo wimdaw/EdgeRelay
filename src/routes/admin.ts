@@ -230,6 +230,7 @@ adminRouter.post("/actions", async (c) => {
       action === "provider_submission_thread" ||
       action === "provider_submission_review" ||
       action === "provider_submission_reply" ||
+      action === "provider_submission_delete" ||
       action === "codebuddy_checkin" ||
       action === "codebuddy_checkin_link" ||
       action === "checkin_config" ||
@@ -869,6 +870,17 @@ adminRouter.post("/actions", async (c) => {
           createdAt: Math.floor(Date.now() / 1000),
         };
         await appendProviderSubmissionMessage(env, msg);
+        return done({ ok: true }, "provider_submission", id);
+      }
+
+      case "provider_submission_delete": {
+        // 清理提交记录（测试残留 / 用户请求撤回且已处理完毕时使用）
+        const id = String(p.id || "");
+        const subs = await getProviderSubmissions(env);
+        const sub = subs.find((x) => x.id === id);
+        if (!sub) throw new ApiError(404, ErrorCode.NOT_FOUND, "提交记录不存在");
+        const { deleteProviderSubmission } = await import("../storage/db");
+        await deleteProviderSubmission(env, id);
         return done({ ok: true }, "provider_submission", id);
       }
 
