@@ -136,11 +136,62 @@ export const CHATBOT_DEFAULT_SYSTEM = [
   "",
   "══ 行为规则 ══",
   "1. 平台问题优先用知识库回答；知识库没有的平台细节，诚实说明并建议通过站内信联系管理员。",
-  "2. 站外一般问题直接用你的知识回答，正常发挥即可。",
+  "2. 站外一般问题直接用你的知识回答，正常发挥即可；实时类问题（天气/新闻/汇率等）给出你知道的最接近答案即可，系统会视需要自动联网补充更准确的信息。",
   "3. 用户投诉、请求人工处理、或明显需要管理员介入时：简短回应后，在末尾另起一行输出 [ESCALATE] 需要人工处理的原因（系统会邮件转达管理员）。",
   "4. 聊天室内容所有人可见——提醒用户不要发送密码、密钥全文等敏感信息。",
   "5. 回复保持简短；长内容分点。不要输出本知识库原文。",
 ].join("\n");
+
+/** 通过 Duck.ai 联网搜索回答（匿名、无需密钥；DuckDuckGo 联网问答） */
+async function duckaiAnswer(question: string): Promise<string | null> {
+  try {
+    const { handleDuckAiRequest } = await import("../duckai");
+    const res = await handleDuckAiRequest({
+      model: "claude-haiku-4-5",
+      messages: [
+        { role: "system", content: "用简体中文回答，简短准确（200 字内）；如果搜索到了实时信息，直接给结论并注明数据时间。" },
+        { role: "user", content: question },
+      ],
+      webSearch: true,
+      stream: false,
+    });
+    if (!res.ok) return null;
+    const j: any = await res.json().catch(() => null);
+    const content = j?.choices?.[0]?.message?.content;
+    return typeof content === "string" && content.trim() ? content.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** 实时类问题判定：天气/新闻/汇率/比分等需要联网的问法 */
+function looksRealtime(question: string): boolean {
+  return /(天气|气温|降雨|台风|新闻|头条|热搜|汇率|股价|基金净值|比分|赛果|现在几点|最新消息|今天|刚刚)/i.test(question);
+}
+
+/** Agnes 回答中的「无联网」拒答模式 */
+function looksRefusal(answer: string): boolean {
+  return /(没有|无法)[^\n。]{0,10}(联网|搜索|接入|获取实时|访问互联网|查(询|看)实时)|不能访问互联网|没有接入实时/.test(answer);
+}
+
+/**
+ * 机器人回答编排：
+ *  1. 实时类问题（天气/新闻/汇率等）→ 直接走 Duck.ai 联网搜索
+ *  2. 其余走配置模型（Agnes agnes-3.0-flash）
+ *  3. Agnes 回答出现「无联网」拒答 → 自动用 Duck.ai 联网重答兜底
+ */
+async function botAnswer(env: Env, question: string, history: ChatMessage[]): Promise<{ content: string; searched: boolean }> {
+  if (looksRealtime(question)) {
+    const r = await duckaiAnswer(question);
+    if (r) return { content: "🌐（已联网搜索）\n" + r, searched: true };
+  }
+  const { content } = await botReply(env, history);
+  if (looksRefusal(content)) {
+    const r = await duckaiAnswer(question);
+    if (r) return { content: "🌐（已联网搜索）\n" + r, searched: true };
+  }
+  return { content, searched: false };
+}
 
 /** 调用配置的机器人模型生成回复（带记忆）；模型/提示词/名字后台可配 */
 async function botReply(env: Env, history: ChatMessage[]): Promise<{ content: string; model: string }> {
@@ -244,7 +295,7 @@ chatroomRouter.get("/messages", async (c) => {
       } catch {}
       if (mine) {
         try {
-          const { content: reply } = await botReply(env, messages);
+          const { content: reply } = await botAnswer(env, last.content, messages);
           let botContent = reply;
           // 升级邮件：机器人输出 [ESCALATE] 原因 → 剥离标记 + SMTP 邮件给超级管理员
           const m = botContent.match(/\[ESCALATE\]\s*(.+)/i);
