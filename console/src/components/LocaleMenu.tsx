@@ -10,8 +10,22 @@ import { cn } from "../lib/utils";
  */
 export default function LocaleMenu({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
+  // 下拉对齐方向：打开时按按钮位置测量。桌面顶栏（按钮靠右）→ 右对齐向下展开；
+  // 移动端展开菜单里按钮在行首，右对齐会让 144px 宽的下拉溢出视口左缘（错位）→ 左对齐。
+  const [align, setAlign] = useState<"left" | "right">("right");
   const locale = useLocaleSync();
   const box = useRef<HTMLDivElement>(null);
+  const MENU_WIDTH = 144; // 与下方 w-36 一致
+
+  const toggle = () => {
+    setOpen((v) => {
+      if (!v) {
+        const rect = box.current?.getBoundingClientRect();
+        setAlign(rect && rect.left + MENU_WIDTH <= window.innerWidth - 8 ? "left" : "right");
+      }
+      return !v;
+    });
+  };
 
   // 点击面板/按钮以外区域或按 Esc 关闭
   useEffect(() => {
@@ -40,7 +54,7 @@ export default function LocaleMenu({ compact = false }: { compact?: boolean }) {
     <div ref={box} className="relative">
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggle}
         aria-label="切换语言"
         aria-haspopup="menu"
         aria-expanded={open}
@@ -60,7 +74,10 @@ export default function LocaleMenu({ compact = false }: { compact?: boolean }) {
           /* 语言名永远显示原生写法（简体中文/繁體中文/English），打上免疫标记避免 zh-TW/en-US DOM 转换层改写 */
           data-s2t-done="1"
           data-i18n-done="1"
-          className="absolute right-0 top-full z-50 mt-1.5 w-36 overflow-hidden rounded-xl2 border border-line bg-surface py-1 shadow-pop"
+          className={cn(
+            "absolute top-full z-50 mt-1.5 w-36 overflow-hidden rounded-xl2 border border-line bg-surface py-1 shadow-pop",
+            align === "left" ? "left-0" : "right-0"
+          )}
         >
           {LOCALE_OPTIONS.map((o) => (
             <button
