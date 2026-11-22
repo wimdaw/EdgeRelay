@@ -108,8 +108,15 @@ export function parseDoubaoCookie(raw: string): string | null {
   return cookie.replace(/^cookie\s*:\s*/i, "").trim();
 }
 
-/** 由 Cookie 稳定派生 device_id（同一账号每次请求一致，降低风控扰动） */
+/**
+ * device_id：优先用登录会话自带的 passport_web_did（服务端已注册的设备号）。
+ * 用 cookie 哈希派生的"未注册设备号"上游会静默拒绝生成——对话能建、SSE 正常走完，
+ * 但模型只回一句「出了点问题，请稍后重试。」。Cookie 里没有该字段时才回退哈希派生。
+ */
 async function deriveDeviceId(cookie: string): Promise<string> {
+  const m = cookie.match(/(?:^|;\s*)passport_web_did=([^;]+)/i);
+  const did = m?.[1]?.trim();
+  if (did) return did;
   const hex = await sha256Hex(cookie);
   return hex.slice(0, 16);
 }
