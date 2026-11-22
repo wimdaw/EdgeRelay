@@ -20,8 +20,14 @@ export default function LocaleMenu({ compact = false }: { compact?: boolean }) {
   const toggle = () => {
     setOpen((v) => {
       if (!v) {
+        // 优先保持右对齐（桌面顶栏原行为）；右对齐会让菜单左缘溢出视口时才改左对齐
         const rect = box.current?.getBoundingClientRect();
-        setAlign(rect && rect.left + MENU_WIDTH <= window.innerWidth - 8 ? "left" : "right");
+        if (rect) {
+          const PAD = 8;
+          const rightFits = rect.right - MENU_WIDTH >= PAD;
+          const leftFits = rect.left + MENU_WIDTH <= window.innerWidth - PAD;
+          setAlign(rightFits || !leftFits ? "right" : "left");
+        }
       }
       return !v;
     });
