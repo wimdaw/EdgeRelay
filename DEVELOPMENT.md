@@ -610,3 +610,52 @@ curl -s http://127.0.0.1:8787/v1/chat/completions \
 - [ ] **模型目录精度**：国内实时目录可用；国际版内置 10 个快照模型，官方新增模型需手动补。
 - [ ] **工具调用未验证**：`output.tool_calls` 的字段形态按 OpenAI 风格防御式解析，未用真实工具调用回归。
 - [ ] **签到 / 额度查询未接入**：Trae 有 `checkin_credits`（国内）与 `user_current_entitlement_list`（国际），本轮未纳入每日心跳。
+
+---
+
+## 十三、 2026-11-24 AWS Quick guardrail 自动重试
+
+### 1. 问题
+
+ZCode 客户端（provider `new-provider-2`）调用 `awsquick-oauth/amazon-smart` 时偶发：
+
+```text
+providerCode=guardrail_blocked
+reason=unknown retryable=false
+```
+
+上游 HTTP 200，但 SSE 里返回 `guardrail_blocked` 错误事件，客户端把它当成不可重试的业务错误，整个回合直接失败。
+失败请求里真正的用户输入只有「你好」，7K prompt tokens 绝大部分来自 ZCode 注入的 system、skills 列表和全局 `AGENTS.md`。
+
+复现结果：同一份完整 messages 重放 12 次，1 次触发；脱敏版本 4 次 0 触发。说明不是稳定的内容拒答，而是上游对长上下文/凭据类内容的偶发或边缘命中。
+
+### 2. 改动
+
+- `src/oauth/awsquick-wire.ts`：新增 `redactQuickSecrets()`，覆盖常见 token、JWT、`Authorization`、password 以及带凭据的连接串。
+- `src/oauth/awsquick.ts`：
+  - `runQuickTurn` 拆成外层重试 + `runQuickTurnOnce`；
+  - 仅在 `guardrail_blocked` 且**尚未向客户端输出任何增量**时重试，最多 2 次；
+  - 第 1 次保持原文，排除上游偶发；第 2 次对 prompt/system 脱敏；
+  - 已经输出增量后不重试，避免重复内容；非 guardrail 错误行为不变。
+- 非流式、流式与 `oauth_test` 共用同一重试逻辑。
+
+### 3. 边界
+
+- 如果护栏在已经输出部分文本后才触发，仍按原错误返回，不能安全重试。
+- 脱敏只发生在最后一次重试，正常请求内容不变；响应与日志不会回写脱敏后的 prompt。
+- 根因仍是客户端把带凭据的全局记忆原样发给上游；建议客户端侧不要把密钥类内容注入每次请求。
+
+### 4. 验证
+
+```bash
+npm run build:typecheck
+npm run build:check
+node tests/test-awsquick-wire.mjs   # 66 项
+npm test                            # 303 项
+npm run build:bundle                # 2211.5 KiB
+```
+
+发布链：推 `wimdaw/EdgeRelay` 的 `edgeone` 分支后，由 EdgeOne 项目 `relay`（`makers-fdbswhfbvvwm`）自动部署；生产域 `relay.own.cloudns.nz`。
+
+> `.edgeone/project.json` 原先指向空的 `edgerelay` 项目（`makers-wxydbphzqeku`，无自定义域、无环境变量），已改绑到真实生产项目 `relay`，避免本地 `makers deploy` 再次发错项目。
+

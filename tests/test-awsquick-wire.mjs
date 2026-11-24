@@ -206,6 +206,30 @@ const streamCalls3 = stream3.finish();
 eq("流式裸 JSON 工具调用", streamCalls3[0]?.name, "read_file");
 eq("流式裸 JSON 不泄漏正文", emitted3.join(""), "");
 
+// ---------- 护栏重试脱敏 ----------
+const dirty = [
+  "Authorization: Bearer abcdefghijklmnop",
+  "API Key: sk-1234567890abcdef",
+  "github: ghp_1234567890abcdefghij",
+  "password=hunter2hunter2",
+  "postgresql://user:secretpass@db.example.com:5432/postgres",
+  "JWT eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature123456",
+].join("\n");
+const clean = mod.redactQuickSecrets(dirty);
+eq("脱敏 Bearer", clean.includes("abcdefghijklmnop"), false);
+eq("脱敏 sk", clean.includes("sk-1234567890abcdef"), false);
+eq("脱敏 ghp", clean.includes("ghp_1234567890abcdefghij"), false);
+eq("脱敏 password", clean.includes("hunter2hunter2"), false);
+eq("脱敏 URL 密码", clean.includes("secretpass"), false);
+eq("脱敏 JWT", clean.includes("eyJhbGciOiJIUzI1NiJ9"), false);
+eq("普通文本不变", mod.redactQuickSecrets("你好，帮我读文件。"), "你好，帮我读文件。");
+
+// ---------- 护栏伪正文识别 ----------
+eq("护栏文本尚未完整", mod.couldBeQuickGuardrailText("That content did"), true);
+eq("护栏文本完整", mod.isQuickGuardrailText("That content did not pass our automated check. Try asking again."), true);
+eq("普通文本不是护栏", mod.couldBeQuickGuardrailText("你好"), false);
+eq("护栏前缀不误伤普通英文", mod.isQuickGuardrailText("That sounds good"), false);
+
 console.log(`\n=== awsquick-wire 单元测试：通过 ${pass} 项，失败 ${fail} 项 ===`);
 if (fail) process.exit(1);
 console.log("🎉 全部通过");

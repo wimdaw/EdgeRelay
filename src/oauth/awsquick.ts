@@ -24,9 +24,11 @@ import {
   QuickWireDecoder,
   buildQuickToolBridgePrompt,
   buildQuickUserMessageFrame,
+  couldBeQuickGuardrailText,
   encodeAidp,
   extractQuickToolDefs,
   flattenQuickPrompt,
+  isQuickGuardrailText,
   middleCutUtf8,
   normalizeQuickEffort,
   parseAwsquickCredential,
@@ -34,6 +36,7 @@ import {
   parseQuickToolChoice,
   quickSlotLabel,
   randomUuid,
+  redactQuickSecrets,
   resolveAwsquickModel,
   type AwsquickCredential,
   type AwsquickProvider,
@@ -632,8 +635,61 @@ async function resolveQuickAuth(env: Env, raw: string): Promise<{
 type QuickUsage = { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 type TurnResult = { text: string; reasoning: string; usage: QuickUsage };
 
-/** 执行一次 AIDP WebSocket 对话 */
-function runQuickTurn(
+const QUICK_GUARDRAIL_RETRIES = 2;
+
+/**
+ * 执行一次 AIDP 对话，并在 guardrail_blocked 时自动重试。
+ * - 只在还没有向客户端输出任何增量时重试，避免重复内容；
+ * - 第一次重试保持原文，排除上游偶发误判；
+ * - 最后一次重试对 prompt/system 里的凭据做脱敏，降低内容检查命中率。
+ */
+async function runQuickTurn(
+  cred: AwsquickCredential,
+  bearer: string,
+  opts: {
+    prompt: string;
+    system: string;
+    slot: QuickSlot;
+    effort: QuickEffort;
+    timeoutMs?: number;
+    idleMs?: number;
+    onText?: (delta: string) => void;
+    onReasoning?: (delta: string) => void;
+  }
+): Promise<TurnResult> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= QUICK_GUARDRAIL_RETRIES; attempt++) {
+    let emitted = false;
+    const redact = attempt === QUICK_GUARDRAIL_RETRIES && attempt > 0;
+    const attemptOpts = {
+      ...opts,
+      prompt: redact ? redactQuickSecrets(opts.prompt) : opts.prompt,
+      system: redact ? redactQuickSecrets(opts.system) : opts.system,
+      onText: opts.onText
+        ? (delta: string) => {
+            emitted = true;
+            opts.onText?.(delta);
+          }
+        : undefined,
+      onReasoning: opts.onReasoning
+        ? (delta: string) => {
+            emitted = true;
+            opts.onReasoning?.(delta);
+          }
+        : undefined,
+    };
+    try {
+      return await runQuickTurnOnce(cred, bearer, attemptOpts);
+    } catch (err: any) {
+      lastErr = err;
+      if (err?.code !== "guardrail_blocked" || emitted || attempt === QUICK_GUARDRAIL_RETRIES) throw err;
+    }
+  }
+  throw lastErr;
+}
+
+/** 执行一次 AIDP WebSocket 对话（不含护栏重试） */
+function runQuickTurnOnce(
   cred: AwsquickCredential,
   bearer: string,
   opts: {
@@ -666,6 +722,9 @@ function runQuickTurn(
     let settled = false;
     let text = "";
     let reasoning = "";
+    let pendingText = "";
+    let textStarted = false;
+    let droppedGuardrailText = false;
     let usage: QuickUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
     let turnTimer: ReturnType<typeof setTimeout> | null = null;
@@ -737,7 +796,25 @@ function runQuickTurn(
     const emitText = (delta: string) => {
       if (!delta) return;
       text += delta;
-      opts.onText?.(delta);
+      if (droppedGuardrailText) return;
+      if (textStarted) {
+        opts.onText?.(delta);
+        return;
+      }
+      // 首次输出先缓冲：Quick 的护栏提示会伪装成普通 text_delta 先到，
+      // 识别出来后直接丢弃，让上层按“未输出”处理并重试。
+      pendingText += delta;
+      if (!pendingText.trim()) return;
+      if (couldBeQuickGuardrailText(pendingText)) return;
+      if (isQuickGuardrailText(pendingText)) {
+        droppedGuardrailText = true;
+        pendingText = "";
+        return;
+      }
+      textStarted = true;
+      const flush = pendingText;
+      pendingText = "";
+      opts.onText?.(flush);
     };
     const emitReasoning = (delta: string) => {
       if (!delta) return;

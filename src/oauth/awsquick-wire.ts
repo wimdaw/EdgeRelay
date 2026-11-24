@@ -271,6 +271,43 @@ export function middleCutUtf8(text: string, maxBytes: number, note = "\n…[shor
   return headText + note + tailText;
 }
 
+/**
+ * Quick 护栏拦截时，会先把固定提示文本当作普通 text_delta 下发，
+ * 再发 guardrail_blocked 事件。这里用来识别并丢弃这段伪正文，
+ * 避免它被当成真实回答发给客户端，也避免重试逻辑误判“已经输出过内容”。
+ */
+const QUICK_GUARDRAIL_PREFIX = "that content did not pass our automated check";
+
+export function couldBeQuickGuardrailText(text: string): boolean {
+  const t = text.trimStart().toLowerCase();
+  return !!t && QUICK_GUARDRAIL_PREFIX.startsWith(t);
+}
+
+export function isQuickGuardrailText(text: string): boolean {
+  return text.trimStart().toLowerCase().startsWith(QUICK_GUARDRAIL_PREFIX);
+}
+
+/**
+ * 护栏重试前的凭据脱敏。
+ * 客户端常把全局记忆 / 环境变量原样塞进 prompt，Quick 的内容检查会把
+ * 其中的 token、密码、带凭据的 URL 判成敏感信息。只在 guardrail 重试时使用，
+ * 正常请求不改变原文。
+ */
+export function redactQuickSecrets(text: string): string {
+  let out = String(text ?? "");
+  const rules: Array<[RegExp, string]> = [
+    [/\b(?:sk|rk|pk|cfut|gh[pousr]|xox[baprs])[-_][A-Za-z0-9_-]{12,}\b/g, "<redacted-credential>"],
+    [/\bAKIA[0-9A-Z]{16}\b/g, "<redacted-access-key>"],
+    [/\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/g, "<redacted-jwt>"],
+    [/(\bAuthorization\s*:\s*(?:Bearer|Basic)\s+)[A-Za-z0-9._~+/=-]{8,}/gi, "$1<redacted>"],
+    [/(\b(?:api[ _-]?key|access[ _-]?token|refresh[ _-]?token|token|secret|password|passwd|pwd)\b\s*[:=]\s*)[^\s,;"'`]{8,}/gi, "$1<redacted>"],
+    [/(\b(?:https?|postgres(?:ql)?|mysql|redis|mongodb(?:\+srv)?):\/\/[^\s/:@]+:)[^\s/@]+@/g, "$1<redacted>@"],
+    [/\b[A-Za-z0-9_+/=-]{48,}\b/g, "<redacted-token>"],
+  ];
+  for (const [re, replacement] of rules) out = out.replace(re, replacement);
+  return out;
+}
+
 /** 解析凭据 JSON；非 JSON 或缺少关键字段返回 null */
 export function parseAwsquickCredential(raw: string): AwsquickCredential | null {
   const text = String(raw ?? "").trim();
