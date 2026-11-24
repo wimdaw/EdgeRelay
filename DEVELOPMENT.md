@@ -651,7 +651,8 @@ reason=unknown retryable=false
 npm run build:typecheck
 npm run build:check
 node tests/test-awsquick-wire.mjs   # 66 项
-npm test                            # 303 项
+node tests/test-awsquick-retry.mjs  # 11 项（本地 WS 假上游，验证伪正文丢弃 + 重试）
+npm test                            # 303 项 + 11 项
 npm run build:bundle                # 2211.5 KiB
 ```
 

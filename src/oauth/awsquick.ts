@@ -643,7 +643,7 @@ const QUICK_GUARDRAIL_RETRIES = 2;
  * - 第一次重试保持原文，排除上游偶发误判；
  * - 最后一次重试对 prompt/system 里的凭据做脱敏，降低内容检查命中率。
  */
-async function runQuickTurn(
+export async function runQuickTurn(
   cred: AwsquickCredential,
   bearer: string,
   opts: {
