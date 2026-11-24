@@ -20,6 +20,7 @@ import { handleGeminiWebRequest, listGeminiWebModels, GEMINI_WEB_MODELS } from "
 import { handleMiniMaxWebRequest, listMiniMaxWebModels, MINIMAX_WEB_MODELS } from "./minimaxweb";
 import { handleLingxiRequest, listLingxiModels, LINGXI_MODELS } from "./lingxiweb";
 import { handleChatgptWebRequest, listChatgptWebModels } from "./chatgptweb";
+import { prepareWebToolBody, wrapWebToolResponse } from "./tool-bridge";
 
 export type WebProviderType = "deepseek" | "kimiweb" | "geminiweb" | "minimaxweb" | "lingxi" | "chatgptweb";
 
@@ -119,36 +120,47 @@ export type WebChatArgs = {
 
 /** 对话入口：返回 OpenAI 兼容 JSON 或 SSE（用量由 chat.ts 统一结算） */
 export async function handleWebChat(args: WebChatArgs): Promise<Response> {
+  // 不支持原生 function calling 的网页渠道：请求侧注入工具协议，响应侧翻译回 tool_calls。
+  const prepared = prepareWebToolBody(args.type, args.body);
+  const body = prepared.enabled ? prepared.body : args.body;
   const p: OAuthCallParams = {
     env: args.env,
     providerId: args.providerId,
     modelId: args.upstreamModel,
     requestedModel: args.requestedModel,
-    body: { ...args.body, model: args.upstreamModel },
+    body: { ...body, model: args.upstreamModel },
     refreshTokens: [args.credential],
     maskedToken: "",
     startedAt: Date.now(),
   };
 
+  let resp: Response;
   switch (args.type) {
     case "deepseek":
-      return handleDeepSeekRequest(p, "");
+      resp = await handleDeepSeekRequest(p, "");
+      break;
     case "kimiweb":
-      return handleKimiWebRequest(p, args.baseUrl);
+      resp = await handleKimiWebRequest(p, args.baseUrl);
+      break;
     case "geminiweb":
-      return handleGeminiWebRequest(p);
+      resp = await handleGeminiWebRequest(p);
+      break;
     case "minimaxweb":
-      return handleMiniMaxWebRequest(p);
+      resp = await handleMiniMaxWebRequest(p);
+      break;
     case "lingxi":
-      return handleLingxiRequest(p);
+      resp = await handleLingxiRequest(p);
+      break;
     case "chatgptweb":
-      return handleChatgptWebRequest(p);
+      resp = await handleChatgptWebRequest(p);
+      break;
     default:
       return new Response(JSON.stringify({ error: { message: `未知 Web 反代渠道: ${args.type}` } }), {
         status: 400,
         headers: { "content-type": "application/json" },
       });
   }
+  return prepared.enabled ? wrapWebToolResponse(resp, prepared.allowed) : resp;
 }
 
 /** 拉取可用模型（失败时回退内置清单） */
