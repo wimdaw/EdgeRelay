@@ -143,6 +143,69 @@ const cut = mod.middleCutUtf8("汉".repeat(1000), 300);
 eq("中段截断后不超限", Buffer.byteLength(cut, "utf8") <= 300, true);
 eq("截断标记存在", cut.includes("shortened"), true);
 
+// ---------- 工具桥接 ----------
+const toolDefs = mod.extractQuickToolDefs([
+  {
+    type: "function",
+    function: {
+      name: "read_file",
+      description: "读取本地文件",
+      parameters: { type: "object", properties: { path: { type: "string" } }, required: ["path"] },
+    },
+  },
+  { name: "write_file", description: "写入本地文件", parameters: { type: "object", properties: { path: { type: "string" }, content: { type: "string" } } } },
+]);
+eq("工具定义数量", toolDefs.length, 2);
+eq("工具定义名称", toolDefs.map((d) => d.name).join(","), "read_file,write_file");
+const choiceFn = mod.parseQuickToolChoice({ type: "function", function: { name: "read_file" } });
+eq("tool_choice function", choiceFn.mode + ":" + choiceFn.name, "function:read_file");
+eq("tool_choice none", mod.parseQuickToolChoice("none").mode, "none");
+const bridgePrompt = mod.buildQuickToolBridgePrompt(toolDefs, mod.parseQuickToolChoice("auto"), true);
+eq("桥接提示含协议标签", bridgePrompt.includes("<client_tool_protocol>") && bridgePrompt.includes("</client_tool_protocol>"), true);
+eq("桥接提示含工具名", bridgePrompt.includes("read_file"), true);
+eq("桥接提示含标签格式", bridgePrompt.includes("<client_tool_call>"), true);
+const requiredPrompt = mod.buildQuickToolBridgePrompt(toolDefs, mod.parseQuickToolChoice("required"), false);
+eq("required 声明", requiredPrompt.includes("At least one tool call is required"), true);
+eq("单工具限制", requiredPrompt.includes("Emit at most one tool call"), true);
+eq("tool_choice=none 不注入", mod.buildQuickToolBridgePrompt(toolDefs, mod.parseQuickToolChoice("none"), true), "");
+
+const allowed = new Set(["read_file", "write_file"]);
+const marked = mod.parseQuickClientToolCalls(
+  '好的，我来读取文件。<client_tool_call>{"name":"read_file","arguments":{"path":"/tmp/a.txt"}}</client_tool_call>',
+  allowed
+);
+eq("标签解析文本清理", marked.text, "好的，我来读取文件。");
+eq("标签解析工具名", marked.calls[0]?.name, "read_file");
+eq("标签解析参数", JSON.parse(marked.calls[0]?.arguments || "{}").path, "/tmp/a.txt");
+eq("未知工具不解析", mod.parseQuickClientToolCalls('<client_tool_call>{"name":"rm_rf","arguments":{}}</client_tool_call>', allowed).calls.length, 0);
+const bare = mod.parseQuickClientToolCalls('```json\n{"name":"write_file","arguments":{"path":"/tmp/b.txt","content":"hi"}}\n```', allowed);
+eq("裸 JSON 兜底工具名", bare.calls[0]?.name, "write_file");
+eq("裸 JSON 兜底清除正文", bare.text, "");
+
+const emitted = [];
+const stream = new mod.QuickBridgeStream(allowed, (t) => emitted.push(t));
+stream.push("我来帮你");
+stream.push("读取。<client_tool");
+stream.push('_call>{"name":"read_file","arguments":{"path":"/tmp/c.txt"}}</client_tool_');
+stream.push("call>");
+const streamCalls = stream.finish();
+eq("流式文本不含标签", emitted.join(""), "我来帮你读取。");
+eq("流式解析工具调用", streamCalls[0]?.name, "read_file");
+eq("流式工具参数", JSON.parse(streamCalls[0]?.arguments || "{}").path, "/tmp/c.txt");
+
+const emitted2 = [];
+const stream2 = new mod.QuickBridgeStream(allowed, (t) => emitted2.push(t));
+for (const ch of "普通回答，没有工具调用。") stream2.push(ch);
+eq("普通流式无工具调用", stream2.finish().length, 0);
+eq("普通流式文本完整", emitted2.join(""), "普通回答，没有工具调用。");
+
+const emitted3 = [];
+const stream3 = new mod.QuickBridgeStream(allowed, (t) => emitted3.push(t));
+for (const ch of '{"name":"read_file","arguments":{"path":"/tmp/d.txt"}}') stream3.push(ch);
+const streamCalls3 = stream3.finish();
+eq("流式裸 JSON 工具调用", streamCalls3[0]?.name, "read_file");
+eq("流式裸 JSON 不泄漏正文", emitted3.join(""), "");
+
 console.log(`\n=== awsquick-wire 单元测试：通过 ${pass} 项，失败 ${fail} 项 ===`);
 if (fail) process.exit(1);
 console.log("🎉 全部通过");

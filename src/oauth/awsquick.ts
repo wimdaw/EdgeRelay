@@ -20,13 +20,18 @@ import {
   AWSQUICK_DEFAULT_MODELS,
   AWSQUICK_DEFAULT_WSPATH,
   AWSQUICK_MODELS,
+  QuickBridgeStream,
   QuickWireDecoder,
+  buildQuickToolBridgePrompt,
   buildQuickUserMessageFrame,
   encodeAidp,
+  extractQuickToolDefs,
   flattenQuickPrompt,
   middleCutUtf8,
   normalizeQuickEffort,
   parseAwsquickCredential,
+  parseQuickClientToolCalls,
+  parseQuickToolChoice,
   quickSlotLabel,
   randomUuid,
   resolveAwsquickModel,
@@ -34,6 +39,7 @@ import {
   type AwsquickProvider,
   type QuickEffort,
   type QuickSlot,
+  type QuickToolCall,
 } from "./awsquick-wire";
 
 export { AWSQUICK_MODELS, parseAwsquickCredential };
@@ -966,8 +972,17 @@ export async function handleAwsquickRequest(p: AwsquickChatParams): Promise<Resp
   if (!flat.prompt.trim()) return errorResponse("messages 不能为空", 400, "invalid_request");
   const resolved = resolveAwsquickModel(p.upstreamModel || p.requestedModel);
   const effort = normalizeQuickEffort(p.body?.reasoning_effort ?? p.body?.reasoning?.effort ?? resolved.effort);
-  const prompt = middleCutUtf8(flat.prompt, 60_000);
-  const system = middleCutUtf8(flat.system, 8_000);
+  const toolDefs = extractQuickToolDefs(p.body?.tools, p.body?.functions);
+  const toolChoice = parseQuickToolChoice(p.body?.tool_choice ?? p.body?.function_call);
+  const parallelToolCalls = p.body?.parallel_tool_calls !== false;
+  const allowedTools = new Set(toolDefs.map((d) => d.name));
+  if (toolChoice.mode === "function" && toolChoice.name) allowedTools.add(toolChoice.name);
+  const bridgeEnabled = toolChoice.mode !== "none" && toolDefs.length > 0;
+  const bridgePrompt = bridgeEnabled ? buildQuickToolBridgePrompt(toolDefs, toolChoice, parallelToolCalls) : "";
+  const systemBase = middleCutUtf8(flat.system, 8_000);
+  const system = middleCutUtf8([systemBase, bridgePrompt].filter(Boolean).join("\n\n"), 30_000);
+  const promptBudget = Math.max(4_000, 58_000 - Buffer.byteLength(system, "utf8"));
+  const prompt = middleCutUtf8(flat.prompt, promptBudget);
   const wantStream = p.body?.stream === true;
   const id = `chatcmpl-${randomUuid().replace(/-/g, "").slice(0, 24)}`;
   const created = Math.floor(Date.now() / 1000);
@@ -980,7 +995,17 @@ export async function handleAwsquickRequest(p: AwsquickChatParams): Promise<Resp
         slot: resolved.slot,
         effort,
       });
-      if (!result.text && !result.reasoning) throw new QuickError("Amazon Quick 未返回文本", 502, "empty_response");
+      let finalText = result.text;
+      let calls: QuickToolCall[] = [];
+      if (bridgeEnabled) {
+        const parsed = parseQuickClientToolCalls(result.text, allowedTools);
+        finalText = parsed.text;
+        calls = parsed.calls;
+        if (!parallelToolCalls && calls.length > 1) calls = calls.slice(0, 1);
+      }
+      if (!finalText && !result.reasoning && !calls.length) {
+        throw new QuickError("Amazon Quick 未返回文本", 502, "empty_response");
+      }
       return jsonResponse({
         id,
         object: "chat.completion",
@@ -991,10 +1016,19 @@ export async function handleAwsquickRequest(p: AwsquickChatParams): Promise<Resp
             index: 0,
             message: {
               role: "assistant",
-              content: result.text,
+              content: calls.length ? finalText || null : finalText,
               ...(result.reasoning ? { reasoning_content: result.reasoning } : {}),
+              ...(calls.length
+                ? {
+                    tool_calls: calls.map((c) => ({
+                      id: c.id,
+                      type: "function",
+                      function: { name: c.name, arguments: c.arguments },
+                    })),
+                  }
+                : {}),
             },
-            finish_reason: "stop",
+            finish_reason: calls.length ? "tool_calls" : "stop",
           },
         ],
         usage: result.usage,
@@ -1024,17 +1058,47 @@ export async function handleAwsquickRequest(p: AwsquickChatParams): Promise<Resp
             })}\n\n`
           );
         };
+        const bridge = bridgeEnabled
+          ? new QuickBridgeStream(allowedTools, (text) => chunk({ content: text }))
+          : null;
         chunk({ role: "assistant" });
         runQuickTurn(auth.cred, auth.bearer, {
           prompt,
           system,
           slot: resolved.slot,
           effort,
-          onText: (delta) => chunk({ content: delta }),
+          onText: (delta) => (bridge ? bridge.push(delta) : chunk({ content: delta })),
           onReasoning: (delta) => chunk({ reasoning_content: delta }),
         })
           .then((result) => {
-            if (!result.text && !result.reasoning) {
+            let calls = bridge ? bridge.finish() : [];
+            if (!parallelToolCalls && calls.length > 1) calls = calls.slice(0, 1);
+            if (calls.length) {
+              for (let i = 0; i < calls.length; i++) {
+                const call = calls[i]!;
+                chunk({
+                  tool_calls: [
+                    {
+                      index: i,
+                      id: call.id,
+                      type: "function",
+                      function: { name: call.name, arguments: call.arguments },
+                    },
+                  ],
+                });
+              }
+              chunk({}, "tool_calls");
+              push(
+                `data: ${JSON.stringify({
+                  id,
+                  object: "chat.completion.chunk",
+                  created,
+                  model: p.requestedModel,
+                  choices: [],
+                  usage: result.usage,
+                })}\n\n`
+              );
+            } else if (!result.text && !result.reasoning) {
               push(`data: ${JSON.stringify({ error: { message: "Amazon Quick 未返回文本", type: "upstream_error", code: "empty_response" } })}\n\n`);
             } else {
               chunk({}, "stop");

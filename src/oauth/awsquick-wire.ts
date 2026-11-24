@@ -582,3 +582,276 @@ export function randomUuid(): string {
 export function quickSlotLabel(slot: QuickSlot): string {
   return SLOT_IDS[slot];
 }
+
+// =====================================================================
+// 客户端工具桥接（prompt-based）
+//
+// Quick 原生只认自己的 Agent 工具；要让 Cline / Roo / OpenCode 等客户端
+// 在本地执行 read_file / write_file 等工具，需要把客户端 tools 定义注入
+// custom_prompt，并解析模型输出的 <client_tool_call> 标签，翻译成
+// OpenAI 的 tool_calls。
+// =====================================================================
+
+export const QUICK_TOOL_OPEN = "<client_tool_call>";
+export const QUICK_TOOL_CLOSE = "</client_tool_call>";
+
+export type QuickToolDef = { name: string; description?: string; parameters?: any };
+export type QuickToolChoice = { mode: "auto" | "none" | "required" | "function"; name?: string };
+export type QuickToolCall = { id: string; name: string; arguments: string };
+
+export function newQuickCallId(): string {
+  return "call_" + randomUuid().replace(/-/g, "");
+}
+
+/** 从 OpenAI tools / functions 提取函数定义 */
+export function extractQuickToolDefs(toolsRaw: any, funcsRaw?: any): QuickToolDef[] {
+  const defs: QuickToolDef[] = [];
+  const add = (fn: any) => {
+    if (!fn || typeof fn !== "object") return;
+    const name = String(fn.name ?? "").trim();
+    if (!name) return;
+    defs.push({
+      name,
+      ...(typeof fn.description === "string" && fn.description.trim() ? { description: fn.description.trim() } : {}),
+      ...(fn.parameters != null ? { parameters: fn.parameters } : {}),
+    });
+  };
+  if (Array.isArray(toolsRaw)) {
+    for (const item of toolsRaw) {
+      if (!item || typeof item !== "object") continue;
+      if (item.function && typeof item.function === "object") add(item.function);
+      else if (item.name != null) add(item);
+    }
+  }
+  if (Array.isArray(funcsRaw)) {
+    for (const item of funcsRaw) add(item);
+  }
+  return defs;
+}
+
+/** 归一化 tool_choice / function_call */
+export function parseQuickToolChoice(raw: any): QuickToolChoice {
+  if (typeof raw === "string") {
+    const mode = raw.trim().toLowerCase();
+    if (mode) return { mode: mode as QuickToolChoice["mode"] };
+  } else if (raw && typeof raw === "object") {
+    const fn = raw.function && typeof raw.function === "object" ? raw.function : null;
+    const name = String(fn?.name ?? raw.name ?? "").trim();
+    if (name) return { mode: "function", name };
+    const typ = String(raw.type ?? "").trim().toLowerCase();
+    if (typ) return { mode: typ as QuickToolChoice["mode"] };
+  }
+  return { mode: "auto" };
+}
+
+function compactQuickSchema(schema: any, depth = 0): string {
+  if (!schema || typeof schema !== "object") return "any";
+  if (Array.isArray(schema.enum) && schema.enum.length && schema.enum.length <= 8) {
+    return schema.enum.map((v: any) => JSON.stringify(v)).join("|");
+  }
+  let type = "";
+  if (typeof schema.type === "string") type = schema.type;
+  else if (Array.isArray(schema.type)) {
+    const found = schema.type.find((t: any) => typeof t === "string" && t !== "null");
+    if (found) type = found;
+  }
+  if (type === "array") return compactQuickSchema(schema.items, depth + 1) + "[]";
+  if (type === "object" || schema.properties) {
+    const props = schema.properties;
+    if (!props || typeof props !== "object" || depth >= 2) return "object";
+    const keys = Object.keys(props).sort();
+    if (!keys.length) return "object";
+    const required = new Set(Array.isArray(schema.required) ? schema.required : []);
+    return "{" + keys.map((k) => `${k}${required.has(k) ? "*" : ""}: ${compactQuickSchema(props[k], depth + 1)}`).join(", ") + "}";
+  }
+  return type || "any";
+}
+
+function formatQuickToolListing(defs: QuickToolDef[]): string {
+  const full = JSON.stringify(defs, null, 2);
+  if (full.length <= 20_000) return full;
+  const lines = defs.map((d) => {
+    const params = d.parameters && typeof d.parameters === "object" ? d.parameters : null;
+    const props = params?.properties && typeof params.properties === "object" ? params.properties : null;
+    const required = new Set(Array.isArray(params?.required) ? params.required : []);
+    const args = props
+      ? Object.keys(props)
+          .sort()
+          .map((k) => `${k}${required.has(k) ? "*" : ""}: ${compactQuickSchema(props[k], 1)}`)
+          .join(", ")
+      : "";
+    const desc = String(d.description || "").replace(/\s+/g, " ").slice(0, 160);
+    return `- ${d.name}(${args})${desc ? ": " + desc : ""}`;
+  });
+  return "(name(arguments): description; * marks a required argument)\n" + lines.join("\n");
+}
+
+/** 构造工具调用协议提示词 */
+export function buildQuickToolBridgePrompt(defs: QuickToolDef[], choice: QuickToolChoice, parallel = true): string {
+  if (!defs.length || choice.mode === "none") return "";
+  const lines = [
+    "<client_tool_protocol>",
+    "Available client-side tools:",
+    formatQuickToolListing(defs),
+    "",
+    "Invoke a client tool by emitting a raw tag containing JSON (no Markdown fences):",
+    `<client_tool_call>{"name":"TOOL_NAME","arguments":{...}}</client_tool_call>`,
+    "Wait for the caller to return each tool result before continuing.",
+  ];
+  if (choice.mode === "function" && choice.name) lines.push(`Required tool: ${JSON.stringify(choice.name)}.`);
+  if (choice.mode === "required") lines.push("At least one tool call is required in this response.");
+  if (!parallel) lines.push("Emit at most one tool call in this turn.");
+  lines.push("</client_tool_protocol>");
+  return lines.join("\n");
+}
+
+function parseQuickToolEnvelopes(payload: string): Record<string, any>[] {
+  const text = payload.trim();
+  if (!text) return [];
+  let value: any;
+  try {
+    value = JSON.parse(text);
+  } catch {
+    return [];
+  }
+  if (Array.isArray(value)) return value.filter((x) => x && typeof x === "object");
+  if (!value || typeof value !== "object") return [];
+  if (Array.isArray(value.tool_calls) && value.tool_calls.length) {
+    return value.tool_calls.filter((x: any) => x && typeof x === "object");
+  }
+  return [value];
+}
+
+function quickToolCallsFromEnvelopes(envs: Record<string, any>[], allowed: Set<string>): QuickToolCall[] {
+  const out: QuickToolCall[] = [];
+  for (const env of envs) {
+    const name = String(env.name ?? "").trim();
+    if (!name || !allowed.has(name)) continue;
+    out.push({ id: newQuickCallId(), name, arguments: quickArgumentString(env.arguments) });
+  }
+  return out;
+}
+
+/** 解析 <client_tool_call>...</client_tool_call>，保留无法识别的原始文本 */
+export function extractQuickMarkedToolCalls(text: string, allowed: Set<string>): { text: string; calls: QuickToolCall[] } {
+  if (!allowed.size) return { text, calls: [] };
+  let clean = "";
+  const calls: QuickToolCall[] = [];
+  let rest = text;
+  for (;;) {
+    const start = rest.indexOf(QUICK_TOOL_OPEN);
+    if (start < 0) break;
+    const closeRel = rest.indexOf(QUICK_TOOL_CLOSE, start + QUICK_TOOL_OPEN.length);
+    if (closeRel < 0) break;
+    const end = closeRel;
+    clean += rest.slice(0, start);
+    const inner = rest.slice(start + QUICK_TOOL_OPEN.length, end);
+    const parsed = quickToolCallsFromEnvelopes(parseQuickToolEnvelopes(inner), allowed);
+    if (parsed.length) calls.push(...parsed);
+    else clean += rest.slice(start, end + QUICK_TOOL_CLOSE.length);
+    rest = rest.slice(end + QUICK_TOOL_CLOSE.length);
+  }
+  if (!calls.length) return { text, calls: [] };
+  clean += rest;
+  return { text: clean.trim(), calls };
+}
+
+/** 兜底：模型直接输出裸 JSON（可带 Markdown 围栏）而不是标签 */
+export function extractQuickBareToolCalls(text: string, allowed: Set<string>): { text: string; calls: QuickToolCall[] } {
+  if (!allowed.size) return { text, calls: [] };
+  let trimmed = text.trim();
+  if (trimmed.startsWith("```")) {
+    const nl = trimmed.indexOf("\n");
+    if (nl >= 0) {
+      trimmed = trimmed.slice(nl + 1).trim();
+      if (trimmed.endsWith("```")) trimmed = trimmed.slice(0, -3).trim();
+    }
+  }
+  if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return { text, calls: [] };
+  const calls = quickToolCallsFromEnvelopes(parseQuickToolEnvelopes(trimmed), allowed);
+  return calls.length ? { text: "", calls } : { text, calls: [] };
+}
+
+export function parseQuickClientToolCalls(text: string, allowed: Set<string>): { text: string; calls: QuickToolCall[] } {
+  const marked = extractQuickMarkedToolCalls(text, allowed);
+  if (marked.calls.length) return marked;
+  return extractQuickBareToolCalls(text, allowed);
+}
+
+/**
+ * 流式工具桥：实时放行普通文本，但扣住可能的工具标签 / 裸 JSON，
+ * 结束时统一解析为 tool_calls，避免把标签泄漏给客户端。
+ */
+export class QuickBridgeStream {
+  private pending = "";
+  private mode: "start" | "text" | "held" = "start";
+  private emitted = false;
+
+  constructor(
+    private readonly allowed: Set<string>,
+    private readonly onText?: (text: string) => void
+  ) {}
+
+  private emit(text: string): void {
+    if (!text) return;
+    if (!this.emitted && !text.trim()) {
+      this.pending = text + this.pending;
+      return;
+    }
+    this.emitted = true;
+    this.onText?.(text);
+  }
+
+  push(delta: string): void {
+    if (!delta) return;
+    this.pending += delta;
+    if (this.mode === "held") return;
+    if (this.mode === "start") {
+      const lead = this.pending.replace(/^[\s]+/, "");
+      if (!lead) return;
+      const first = lead[0]!;
+      if (first === "{" || first === "[" || first === "`") {
+        this.mode = "held";
+        return;
+      }
+      this.mode = "text";
+    }
+    const idx = this.pending.indexOf(QUICK_TOOL_OPEN);
+    if (idx >= 0) {
+      const before = this.pending.slice(0, idx);
+      this.pending = this.pending.slice(idx);
+      this.mode = "held";
+      this.emit(before);
+      return;
+    }
+    let keep = 0;
+    const maxPrefix = Math.min(QUICK_TOOL_OPEN.length - 1, this.pending.length);
+    for (let n = maxPrefix; n > 0; n--) {
+      if (QUICK_TOOL_OPEN.startsWith(this.pending.slice(this.pending.length - n))) {
+        keep = n;
+        break;
+      }
+    }
+    const ready = this.pending.slice(0, this.pending.length - keep);
+    this.pending = this.pending.slice(this.pending.length - keep);
+    this.emit(ready);
+  }
+
+  finish(): QuickToolCall[] {
+    const rest = this.pending;
+    this.pending = "";
+    const parsed = this.emitted
+      ? extractQuickMarkedToolCalls(rest, this.allowed)
+      : parseQuickClientToolCalls(rest, this.allowed);
+    if (parsed.calls.length) {
+      if (parsed.text.trim()) {
+        this.emitted = true;
+        this.onText?.(parsed.text);
+      }
+      return parsed.calls;
+    }
+    if (rest.trim() || this.emitted) this.emit(rest);
+    return [];
+  }
+}
+
