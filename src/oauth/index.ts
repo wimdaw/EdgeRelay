@@ -10,6 +10,7 @@
  * access_token 由 common.resolveAccessToken 缓存并自动续期。
  */
 import type { Env } from "../types";
+import { ApiError, ErrorCode } from "../errors";
 import type { OAuthCallParams } from "./common";
 import { buildClaudeAuthUrl, exchangeClaudeCode, testClaude, fetchClaudeModels, handleClaudeRequest } from "./claude";
 import { buildCodexAuthUrl, exchangeCodexCode, testCodex, fetchCodexModels, handleCodexRequest } from "./codex";
@@ -329,7 +330,25 @@ export async function completeOAuth(
   state?: string;
 }> {
   if (type === "awsquick") {
-    return completeAwsquickOAuth(env, code, state);
+    try {
+      return await completeAwsquickOAuth(env, code, state);
+    } catch (err: any) {
+      if (err instanceof ApiError) throw err;
+      const status = Number(err?.status) || 400;
+      const errCode =
+        status === 401
+          ? ErrorCode.AUTH_INVALID
+          : status === 404
+          ? ErrorCode.NOT_FOUND
+          : status === 429
+          ? ErrorCode.RATE_LIMITED
+          : status === 504
+          ? ErrorCode.UPSTREAM_TIMEOUT
+          : status >= 500
+          ? ErrorCode.UPSTREAM_ERROR
+          : ErrorCode.BAD_REQUEST;
+      throw new ApiError(status, errCode, String(err?.message || err), err?.code ? { reason: String(err.code) } : undefined);
+    }
   }
   if (type === "trae") {
     return completeTraeOAuth(env, code, state, baseUrl, deviceId);

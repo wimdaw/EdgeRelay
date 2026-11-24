@@ -1072,7 +1072,17 @@ adminRouter.post("/actions", async (c) => {
           p.baseUrl ? String(p.baseUrl) : undefined,
           p.deviceId ? String(p.deviceId) : undefined
         );
-        return done({ refreshToken: result.refreshToken, email: result.email, account: result.account }, "oauth", type);
+        return done(
+          {
+            refreshToken: result.refreshToken,
+            email: result.email,
+            account: result.account,
+            // Amazon Quick 两步授权：第一步回调只返回第二步 authorize URL
+            ...(result.needAuthorizeUrl ? { needAuthorizeUrl: true, authorizeUrl: result.authorizeUrl, state: result.state } : {}),
+          },
+          "oauth",
+          type
+        );
       }
       case "oauth_poll": {
         const type = String(p.provider || "");
