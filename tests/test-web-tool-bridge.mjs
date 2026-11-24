@@ -78,6 +78,7 @@ eq("助手 tool_calls 折成文本", String(prepared.body.messages.find((m) => m
 const toolMsg = prepared.body.messages.find((m) => String(m.content || "").includes("[Tool result"));
 eq("工具结果改 user 角色", toolMsg?.role, "user");
 eq("工具结果保留内容", String(toolMsg?.content).includes("hello"), true);
+eq("最近 user 消息也注入协议", String(toolMsg?.content).includes("<client_tool_protocol>"), true);
 
 // ---------- 响应侧：非流式 ----------
 const jsonResp = new Response(

@@ -93,6 +93,22 @@ export function prepareWebToolBody(type: string, body: Record<string, any>): Pre
     messages.unshift({ role: "system", content: prompt });
   }
 
+  // 部分网页上游会弱化/丢弃 system 消息（例如 ChatGPT 网页端），
+  // 因此把同一份协议再附到最近一条 user 消息末尾，确保模型一定能看到工具定义。
+  let lastUser = -1;
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (String((messages[i] as any)?.role ?? "").toLowerCase() === "user") {
+      lastUser = i;
+      break;
+    }
+  }
+  if (lastUser >= 0) {
+    const current = messages[lastUser] as Record<string, any>;
+    messages[lastUser] = { ...current, content: appendSystemContent(current?.content, prompt) };
+  } else {
+    messages.push({ role: "user", content: prompt });
+  }
+
   return { body: { ...body, messages }, allowed, enabled: true };
 }
 

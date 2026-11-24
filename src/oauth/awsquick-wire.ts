@@ -697,6 +697,7 @@ export function buildQuickToolBridgePrompt(defs: QuickToolDef[], choice: QuickTo
     "Invoke a client tool by emitting a raw tag containing JSON (no Markdown fences):",
     `<client_tool_call>{"name":"TOOL_NAME","arguments":{...}}</client_tool_call>`,
     "Wait for the caller to return each tool result before continuing.",
+    "IMPORTANT: If the user's request can be fulfilled by one of these tools, you MUST emit a tool call instead of answering from memory or using built-in web search. Do not fabricate tool results.",
   ];
   if (choice.mode === "function" && choice.name) lines.push(`Required tool: ${JSON.stringify(choice.name)}.`);
   if (choice.mode === "required") lines.push("At least one tool call is required in this response.");
