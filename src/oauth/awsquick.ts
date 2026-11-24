@@ -964,7 +964,7 @@ export async function handleAwsquickRequest(p: AwsquickChatParams): Promise<Resp
   const messages = Array.isArray(p.body?.messages) ? p.body.messages : [];
   const flat = flattenQuickPrompt(messages);
   if (!flat.prompt.trim()) return errorResponse("messages 不能为空", 400, "invalid_request");
-  const resolved = resolveAwsquickModel(p.requestedModel || p.upstreamModel);
+  const resolved = resolveAwsquickModel(p.upstreamModel || p.requestedModel);
   const effort = normalizeQuickEffort(p.body?.reasoning_effort ?? p.body?.reasoning?.effort ?? resolved.effort);
   const prompt = middleCutUtf8(flat.prompt, 60_000);
   const system = middleCutUtf8(flat.system, 8_000);
