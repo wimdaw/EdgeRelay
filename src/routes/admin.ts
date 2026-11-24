@@ -127,6 +127,12 @@ async function addProviderKeys(
       } else if (prov?.kind === "oauth:trae") {
         const { parseTraeCredential } = await import("../oauth/trae");
         extractUid = (raw) => parseTraeCredential(raw, prov?.baseUrl)?.uid || "";
+      } else if (prov?.kind === "oauth:awsquick") {
+        const { parseAwsquickCredential } = await import("../oauth/awsquick-wire");
+        extractUid = (raw) => {
+          const cred = parseAwsquickCredential(raw);
+          return cred?.uid || cred?.email || cred?.actorArn || "";
+        };
       }
       if (extractUid) {
         for (const k of existing) {

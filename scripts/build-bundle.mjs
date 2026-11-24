@@ -27,6 +27,12 @@ await esbuild.build({
   platform: "node",
   target: "node20",
   external: ["@edgeone/pages-blob", "wreq-js", "@wreq-js/binding-linux-x64-gnu"],
+  // ws 是 CommonJS 包，打包进 ESM 后其内部 require("stream"/"http"/...) 会变成
+  // esbuild 的动态 require 桩并在纯 ESM 环境抛错。注入 createRequire 让这些
+  // Node 内置模块在 EdgeOne Node 运行时正常解析。
+  banner: {
+    js: "import { createRequire as __edgeRelayCreateRequire } from 'node:module'; const require = __edgeRelayCreateRequire(import.meta.url);",
+  },
   outfile: join(outDir, "[[default]].js"),
   logLevel: "warning",
   sourcemap: false,

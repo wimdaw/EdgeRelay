@@ -177,6 +177,15 @@ const OAUTH_CATALOG: OAuthMeta[] = [
     models: ["auto", "doubao-2.1-lite", "doubao-2.1-pro", "deepseek-v4-flash", "deepseek-v4-pro", "kimi-k3", "kimi-k3.1-pro", "kimi-k3.1-pro-fast", "glm-5.3", "glm-5.3-flash"],
   },
   {
+    type: "awsquick",
+    name: "Amazon Quick (AWS)",
+    slug: "awsquick-oauth",
+    baseUrl: "https://quick.aws.com",
+    mode: "redirect" as const,
+    desc: "Amazon Quick 个人/企业账号 PKCE 授权（协议移植自开源 awsquick2api），AIDP WebSocket 反代，OpenAI 兼容输出；支持 smart / balanced / fast / auto 档位与 -low/-medium/-high 思考强度后缀。",
+    models: ["amazon-smart", "amazon-balanced", "amazon-fast", "amazon-auto", "amazon-advanced"],
+  },
+  {
     type: "cline",
     name: "Cline",
     slug: "cline-oauth",
@@ -201,6 +210,8 @@ type OAuthDialogState = {
   step: "region" | "loading" | "ready" | "polling" | "error";
   message?: string;
   codeInput: string;
+  /** Amazon Quick 两步授权：1 = 已拿到第二步 authorize URL，等待第二次回调 */
+  phase?: number;
   /** Trae 专用：客户端真实设备号（选填，签到域 UG 接口只认它） */
   deviceIdInput?: string;
   busy?: boolean;
@@ -743,6 +754,24 @@ export default function Providers() {
         baseUrl: oauthDlg.baseUrl,
         deviceId: oauthDlg.deviceIdInput?.trim() || undefined,
       });
+      // Amazon Quick 两步授权：第一次粘贴的是「授权发现」回调，后端返回第二步 authorize URL
+      if (r.result?.needAuthorizeUrl && r.result?.authorizeUrl) {
+        setOauthDlg((d) =>
+          d
+            ? {
+                ...d,
+                url: r.result.authorizeUrl,
+                state: r.result.state || d.state,
+                step: "ready",
+                phase: 1,
+                codeInput: "",
+                busy: false,
+                message: "第一步已完成：请打开第二步授权页登录，再把跳转后的回调地址粘贴回来。",
+              }
+            : d
+        );
+        return;
+      }
       const token = r.result?.refreshToken;
       if (!token) throw new Error("上游未返回 refresh_token");
       await finishOAuth(oauthDlg.meta, oauthDlg.baseUrl, token, r.result?.email, r.result?.account?.uid);
@@ -1602,6 +1631,14 @@ export default function Providers() {
                 2. 浏览器按 <code className="rounded bg-line px-1">F12</code> 打开开发者工具 → Network（网络）面板 → 刷新页面 → 点击任一 doubao.com 请求；<br />
                 3. 复制请求头（Request Headers）里整段 <code className="rounded bg-line px-1">Cookie</code> 粘贴到下方（必须含 <code className="rounded bg-line px-1">sessionid=</code>）。
               </p>
+            ) : oauthDlg?.meta.type === "awsquick" ? (
+              <p className="text-xs leading-relaxed text-muted">
+                1. 点击下方按钮打开 Amazon Quick 授权页并登录；浏览器会跳转到 <code className="rounded bg-line px-1">127.0.0.1:18080</code> 回调地址（页面打不开属正常现象）；<br />
+                2. 复制地址栏整段 URL 粘贴到下方并提交，系统会解析授权发现信息并生成第二步授权链接；<br />
+                3. {oauthDlg?.phase === 1
+                  ? "打开第二步授权链接完成登录，再次复制跳转后的回调 URL 粘贴提交，即可完成授权。"
+                  : "打开第二步授权链接完成登录后，再次复制回调 URL 粘贴提交。"}
+              </p>
             ) : (
               <p className="text-xs leading-relaxed text-muted">
                 1. 点击下方按钮打开 {oauthDlg?.meta.name} 授权页并登录；<br />
@@ -1618,12 +1655,12 @@ export default function Providers() {
                 <ExternalLink size={12} />{oauthDlg?.meta.type === "doubao" ? "打开豆包" : "打开"}
               </Button>
             </div>
-            <Field label={oauthDlg?.meta.type === "doubao" ? "豆包 Cookie（整段）" : "授权 code 或整段回调地址"}>
+            <Field label={oauthDlg?.meta.type === "doubao" ? "豆包 Cookie（整段）" : oauthDlg?.meta.type === "awsquick" ? (oauthDlg?.phase === 1 ? "第二步回调地址（含 code/state）" : "第一步回调地址（含 nonce）") : "授权 code 或整段回调地址"}>
               <textarea
                 value={oauthDlg?.codeInput ?? ""}
                 onChange={(e) => oauthDlg && setOauthDlg({ ...oauthDlg, codeInput: e.target.value })}
                 rows={3}
-                placeholder={oauthDlg?.meta.type === "doubao" ? "sessionid=...; sid_tt=...; ttwid=...; ..." : "粘贴 code 或 http://localhost:xxxxx/callback?code=..."}
+                placeholder={oauthDlg?.meta.type === "doubao" ? "sessionid=...; sid_tt=...; ttwid=...; ..." : oauthDlg?.meta.type === "awsquick" ? "粘贴浏览器地址栏整段回调 URL（http://127.0.0.1:18080/?nonce=... 或 ?code=...）" : "粘贴 code 或 http://localhost:xxxxx/callback?code=..."}
                 className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs font-mono text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none"
               />
             </Field>

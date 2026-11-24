@@ -69,8 +69,16 @@ import {
   checkinDoubao,
   DOUBAO_MODEL_NAMES,
 } from "./doubao";
+import {
+  startAwsquickFlow,
+  completeAwsquickOAuth,
+  testAwsquick,
+  fetchAwsquickModels,
+  handleAwsquickRequest,
+  AWSQUICK_MODELS,
+} from "./awsquick";
 
-export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok" | "codebuddy" | "cline" | "zcode" | "qoder" | "trae" | "doubao";
+export type OAuthProviderType = "claude" | "codex" | "antigravity" | "kimi" | "qwen" | "grok" | "codebuddy" | "cline" | "zcode" | "qoder" | "trae" | "doubao" | "awsquick";
 
 export type OAuthProviderMeta = {
   type: OAuthProviderType;
@@ -205,6 +213,15 @@ export const OAUTH_PROVIDERS: Record<OAuthProviderType, OAuthProviderMeta> = {
     desc: "豆包客户端「工作模式」Cookie 反代（协议移植自开源 doubao2api），OpenAI 兼容输出；授权方式为粘贴整段豆包 Cookie（需含 sessionid），支持每日签到领积分。",
     defaultModels: DOUBAO_MODEL_NAMES,
   },
+  awsquick: {
+    type: "awsquick",
+    name: "Amazon Quick (AWS)",
+    slug: "awsquick-oauth",
+    baseUrl: "https://quick.aws.com",
+    mode: "redirect",
+    desc: "Amazon Quick 个人/企业账号 PKCE 授权（协议移植自开源 awsquick2api），AIDP WebSocket 反代，OpenAI 兼容输出；支持 amazon-smart / balanced / fast / auto 档位与思考强度后缀。",
+    defaultModels: AWSQUICK_MODELS.slice(0, 4),
+  },
 };
 
 export const OAUTH_KIND_PREFIX = "oauth:";
@@ -269,6 +286,12 @@ export async function startOAuth(
     // url 仅作为引导入口（打开豆包网页取 Cookie），state 透传给 complete 校验用。
     return { mode: "redirect", url: "https://www.doubao.com", state: `doubao-${Date.now()}` };
   }
+  if (type === "awsquick") {
+    // Quick 授权发现落在本机 127.0.0.1 回调，云端收不到：
+    // 前端展示发现链接，用户把地址栏第一段回调 URL 粘回来，再进入第二步 authorize。
+    const flow = await startAwsquickFlow(env, baseUrl);
+    return { mode: "redirect", url: flow.url, state: flow.state };
+  }
   const flow =
     type === "kimi"
       ? await startKimiDeviceFlow(env, baseUrl)
@@ -296,7 +319,18 @@ export async function completeOAuth(
   state: string,
   baseUrl?: string,
   deviceId?: string
-): Promise<{ refreshToken: string; email?: string; account?: { uid?: string } }> {
+): Promise<{
+  refreshToken?: string;
+  email?: string;
+  account?: { uid?: string; enterpriseId?: string };
+  /** Amazon Quick 两步授权：第一步回调返回第二步授权链接 */
+  needAuthorizeUrl?: boolean;
+  authorizeUrl?: string;
+  state?: string;
+}> {
+  if (type === "awsquick") {
+    return completeAwsquickOAuth(env, code, state);
+  }
   if (type === "trae") {
     return completeTraeOAuth(env, code, state, baseUrl, deviceId);
   }
@@ -398,6 +432,10 @@ export async function fetchOAuthModels(
       // 工作模式无模型目录接口，内置清单即权威
       return { models: DOUBAO_MODEL_NAMES };
     }
+    if (type === "awsquick") {
+      const r = await fetchAwsquickModels(env, refreshToken);
+      return { models: r.models.length ? r.models : fallback, message: r.message };
+    }
     if (type === "cline") {
       const r = await fetchClineModels(env, refreshToken);
       return r.success && r.models.length ? { models: r.models } : { models: fallback, message: r.message };
@@ -426,6 +464,7 @@ export async function testOAuth(
   if (type === "qoder") return testQoder(env, refreshToken, modelId, baseUrl);
   if (type === "trae") return testTrae(env, refreshToken, modelId, baseUrl);
   if (type === "doubao") return testDoubao(env, refreshToken, modelId);
+  if (type === "awsquick") return testAwsquick(env, refreshToken, modelId, baseUrl);
   if (type === "cline") return testCline(env, refreshToken, modelId);
   return testGrok(env, refreshToken, modelId);
 }
@@ -487,6 +526,16 @@ export async function handleOAuthChat(args: OAuthChatArgs): Promise<Response> {
       return handleTraeRequest(p, args.baseUrl);
     case "doubao":
       return handleDoubaoRequest(p);
+    case "awsquick":
+      return handleAwsquickRequest({
+        env: args.env,
+        providerId: args.providerId,
+        baseUrl: args.baseUrl,
+        upstreamModel: args.upstreamModel,
+        requestedModel: args.requestedModel,
+        body: args.body,
+        refreshToken: args.refreshToken,
+      });
     case "qoder":
       return handleQoderRequest({
         env: args.env,
