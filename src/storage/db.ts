@@ -273,6 +273,11 @@ export async function setPricing(env: any, pricing: ModelPricingRecord): Promise
   await saveConfigSnapshot(env, { pricing: { ...map, [pricing.publicName]: pricing } });
 }
 
+/** 整表覆盖定价（模型批量同步时一次性落库，避免逐条写快照） */
+export async function setPricingMap(env: any, pricing: Record<string, ModelPricingRecord>): Promise<void> {
+  await saveConfigSnapshot(env, { pricing });
+}
+
 /** 删除某对外名的定价；返回是否确实存在并已删除 */
 export async function deletePricing(env: any, publicName: string): Promise<boolean> {
   const map = await getAllPricing(env);

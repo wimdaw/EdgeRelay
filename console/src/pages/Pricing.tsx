@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { adminAction, api, type Me, type ModelRow, type Provider } from "../lib/api";
 import { Button, Card, Dialog, DataTable, Field, Input, Select, StatusTag, useConfirm, useToast, type Col } from "../components/ui";
 
@@ -9,10 +9,9 @@ export default function Pricing({ me }: { me: Me }) {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [dlg, setDlg] = useState(false);
   const [form, setForm] = useState({
-    publicName: "",
     providerId: "",
     upstream: "",
-    priority: "10",
+    publicName: "",
     cost: "1",
     inputPerMillion: "0",
     outputPerMillion: "0",
@@ -23,17 +22,17 @@ export default function Pricing({ me }: { me: Me }) {
   const [editPassword, setEditPassword] = useState("");
   const [editForm, setEditForm] = useState({
     id: "",
-    publicName: "",
     oldPublicName: "",
+    publicName: "",
     providerId: "",
     upstreamModel: "",
-    priority: "10",
     costWeight: "1",
     inputPerMillion: "0",
     outputPerMillion: "0",
     rpmLimit: "",
     enabled: true,
   });
+  const [normalizing, setNormalizing] = useState(false);
   const { confirm, confirmEl } = useConfirm();
   const toast = useToast();
 
@@ -44,7 +43,6 @@ export default function Pricing({ me }: { me: Me }) {
   }, [isAdmin]);
 
   const save = async () => {
-    if (!form.publicName.trim()) return toast("请填写对外统一模型名", "err");
     if (!form.providerId) return toast("请选择所属供应商渠道", "err");
     if (!form.upstream.trim()) return toast("请填写上游真实模型名", "err");
     if (!form.password.trim()) return toast("请输入管理员密码确认操作", "err");
@@ -62,16 +60,16 @@ export default function Pricing({ me }: { me: Me }) {
         publicName: form.publicName.trim(),
         providerId: form.providerId,
         upstreamModel: form.upstream.trim(),
-        priority: +form.priority || 10,
+        priority: 10,
         costWeight: +form.cost || 1,
         inputPerMillion: inPrice,
         outputPerMillion: outPrice,
         rpmLimit: rpmVal,
         password: form.password.trim(),
       });
-      toast("模型映射已保存并上架");
+      toast("模型已保存上架（对外名默认取上游真实名）");
       setDlg(false);
-      setForm({ publicName: "", providerId: "", upstream: "", priority: "10", cost: "1", inputPerMillion: "0", outputPerMillion: "0", rpmLimit: "", password: "" });
+      setForm({ providerId: "", upstream: "", publicName: "", cost: "1", inputPerMillion: "0", outputPerMillion: "0", rpmLimit: "", password: "" });
       load();
     } catch (e) { toast((e as Error).message, "err"); }
   };
@@ -81,11 +79,10 @@ export default function Pricing({ me }: { me: Me }) {
     setEditPassword("");
     setEditForm({
       id: m.id,
-      publicName: m.public_name,
       oldPublicName: m.public_name,
+      publicName: m.public_name.toLowerCase() === m.upstream_model.toLowerCase() ? "" : m.public_name,
       providerId: m.provider_id || "",
       upstreamModel: m.upstream_model,
-      priority: String(m.priority ?? 10),
       costWeight: String(m.cost_weight ?? 1),
       inputPerMillion: String(m.input_per_million ?? 0),
       outputPerMillion: String(m.output_per_million ?? 0),
@@ -95,7 +92,6 @@ export default function Pricing({ me }: { me: Me }) {
   };
 
   const saveEdit = async () => {
-    if (!editForm.publicName.trim()) return toast("请填写对外统一模型名", "err");
     if (!editForm.providerId) return toast("请选择所属供应商渠道", "err");
     if (!editForm.upstreamModel.trim()) return toast("请填写上游真实模型名", "err");
     if (!editPassword.trim()) return toast("请输入管理员密码确认修改", "err");
@@ -115,7 +111,7 @@ export default function Pricing({ me }: { me: Me }) {
         oldPublicName: editForm.oldPublicName,
         providerId: editForm.providerId,
         upstreamModel: editForm.upstreamModel.trim(),
-        priority: +editForm.priority || 10,
+        priority: 10,
         costWeight: +editForm.costWeight || 1,
         inputPerMillion: inPrice,
         outputPerMillion: outPrice,
@@ -123,7 +119,7 @@ export default function Pricing({ me }: { me: Me }) {
         enabled: editForm.enabled,
         password: editPassword.trim(),
       });
-      toast(`「${editForm.publicName}」模型映射与定价已更新`);
+      toast(`「${editForm.upstreamModel}」已更新`);
       setEditDlg(null);
       setEditPassword("");
       load();
@@ -135,6 +131,19 @@ export default function Pricing({ me }: { me: Me }) {
   const remove = async (m: ModelRow) => {
     if (!(await confirm(`删除模型映射「${m.public_name} → ${m.upstream_model}」？`))) return;
     try { await adminAction("delete_model", { id: m.id }); toast("已删除"); load(); } catch (e) { toast((e as Error).message, "err"); }
+  };
+
+  /** 存量配置一次性拉回基线：未自定义的对外名对齐上游、优先级统一 10、同渠道重复合并 */
+  const normalizeAll = async () => {
+    if (normalizing) return;
+    if (!(await confirm("将把所有模型优先级统一为 10，并把未自定义的对外名对齐上游真实名（定价里显式改过的名称与定价保留）。继续？"))) return;
+    setNormalizing(true);
+    try {
+      const r = await adminAction<{ result?: { renamed?: number; customKept?: number; priorityFixed?: number; deduped?: number; total?: number } }>("normalize_models", {});
+      const s = r.result ?? {};
+      toast(`已规范化：名称对齐 ${s.renamed ?? 0}、保留自定义名 ${s.customKept ?? 0}、优先级修正 ${s.priorityFixed ?? 0}、去重 ${s.deduped ?? 0}，共 ${s.total ?? 0} 个模型`);
+      load();
+    } catch (e) { toast((e as Error).message, "err"); } finally { setNormalizing(false); }
   };
 
   const cols: Col<ModelRow>[] = [
@@ -226,7 +235,11 @@ export default function Pricing({ me }: { me: Me }) {
   return (
     <div className="flex flex-col gap-4">
       {isAdmin && (
-        <div className="flex justify-end">
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button variant="soft" onClick={normalizeAll} disabled={normalizing}>
+            <RefreshCw size={14} className={normalizing ? "animate-spin" : undefined} />
+            {normalizing ? "规范化中…" : "规范化全部模型"}
+          </Button>
           <Button onClick={() => setDlg(true)}><Plus size={14} />新增映射与定价</Button>
         </div>
       )}
@@ -238,7 +251,7 @@ export default function Pricing({ me }: { me: Me }) {
       <Dialog open={dlg} onClose={() => setDlg(false)} title="新增模型映射与定价" width={540}>
         <div className="space-y-4">
           <p className="text-xs text-muted">
-            为上游供应商关联对外模型名并设定调用单价与限流。多个供应商可配置相同的对外模型名，网关将按优先级自动故障转移与容灾。
+            登记上游模型并设定调用单价与限流。对外模型名默认取上游真实名，只有需要改名时才填写；所有模型优先级统一为 10。
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="所属供应商">
@@ -247,28 +260,18 @@ export default function Pricing({ me }: { me: Me }) {
                 {providers.map((p) => <option key={p.id} value={p.id}>{p.name}（{p.slug}）</option>)}
               </Select>
             </Field>
-            <Field label="优先级（数字越小越优先）">
-              <Input type="number" value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} placeholder="10" />
-            </Field>
             <Field label="上游真实模型名">
               <Input
                 value={form.upstream}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setForm({
-                    ...form,
-                    upstream: val,
-                    publicName: form.publicName ? form.publicName : val,
-                  });
-                }}
+                onChange={(e) => setForm({ ...form, upstream: e.target.value })}
                 placeholder="例如: deepseek-chat 或 gpt-4o"
               />
             </Field>
-            <Field label="对外统一模型名">
+            <Field label="对外模型名" hint="留空 = 上游真实名">
               <Input
                 value={form.publicName}
                 onChange={(e) => setForm({ ...form, publicName: e.target.value })}
-                placeholder="例如: deepseek-chat"
+                placeholder={form.upstream.trim() || "留空则直接使用上游真实名"}
               />
             </Field>
             <Field label="输入价格 (元 / 1M Tokens)">
@@ -323,7 +326,7 @@ export default function Pricing({ me }: { me: Me }) {
       <Dialog open={!!editDlg} onClose={() => setEditDlg(null)} title={`编辑模型与定价 — ${editDlg?.public_name ?? ""}`} width={540}>
         <div className="space-y-4">
           <p className="text-xs text-muted">
-            修改模型映射与调用定价。修改对外统一模型名后，系统会自动同步更新对应定价配置并热重载路由。
+            修改上游模型与调用定价。对外模型名默认取上游真实名，只有显式填写才作为自定义名保留；改名后原定价会自动跟随迁移。
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="所属供应商渠道">
@@ -335,14 +338,6 @@ export default function Pricing({ me }: { me: Me }) {
                 {providers.map((p) => <option key={p.id} value={p.id}>{p.name}（{p.slug}）</option>)}
               </Select>
             </Field>
-            <Field label="优先级（数字越小越优先）">
-              <Input
-                type="number"
-                value={editForm.priority}
-                onChange={(e) => setEditForm({ ...editForm, priority: e.target.value })}
-                placeholder="10"
-              />
-            </Field>
             <Field label="上游真实模型名">
               <Input
                 value={editForm.upstreamModel}
@@ -350,11 +345,11 @@ export default function Pricing({ me }: { me: Me }) {
                 placeholder="例如: deepseek-chat"
               />
             </Field>
-            <Field label="对外统一模型名">
+            <Field label="对外模型名" hint="留空 = 上游真实名">
               <Input
                 value={editForm.publicName}
                 onChange={(e) => setEditForm({ ...editForm, publicName: e.target.value })}
-                placeholder="例如: deepseek-chat"
+                placeholder={editForm.upstreamModel.trim() || "留空则直接使用上游真实名"}
               />
             </Field>
             <Field label="输入价格 (元 / 1M Tokens)">

@@ -319,6 +319,8 @@ export default function Providers() {
   // 模型导入流程
   const [importStep, setImportStep] = useState<{ providerId: string; providerName: string; models: string[]; picked: Set<string>; loading: boolean; error?: string; note?: string } | null>(null);
   const [customModelInput, setCustomModelInput] = useState("");
+  // 按上游同步（以上游列表为准：新增/移除 + 名称与优先级规范化）
+  const [syncing, setSyncing] = useState(false);
   // OAuth 授权流程
   const [oauthDlg, setOauthDlg] = useState<OAuthDialogState | null>(null);
   const oauthTimer = useRef<number | null>(null);
@@ -452,6 +454,29 @@ export default function Providers() {
       toast(`已导入 ${r.result?.imported ?? picked.length} 个模型，可在「模型与定价」调整定价`);
       setImportStep(null); load();
     } catch (e) { toast((e as Error).message, "err"); }
+  };
+
+  /** 以上游当前模型列表为准同步：上游没有的移除、新增的补齐，名称与优先级一并对齐 */
+  const syncUpstream = async () => {
+    if (!importStep || syncing) return;
+    setSyncing(true);
+    try {
+      const r = await adminAction<{
+        result?: { added?: string[]; removed?: string[]; renamed?: number; customKept?: number; priorityFixed?: number; deduped?: number; total?: number };
+      }>("sync_provider_models", { providerId: importStep.providerId });
+      const s = r.result ?? {};
+      const parts = [
+        `新增 ${s.added?.length ?? 0}`,
+        `移除 ${s.removed?.length ?? 0}`,
+        `名称对齐 ${s.renamed ?? 0}`,
+        `保留自定义名 ${s.customKept ?? 0}`,
+        `优先级修正 ${s.priorityFixed ?? 0}`,
+        `去重 ${s.deduped ?? 0}`,
+      ];
+      toast(`已按上游同步：${parts.join("、")}，当前共 ${s.total ?? 0} 个模型`);
+      setImportStep(null); load();
+    } catch (e) { toast((e as Error).message, "err"); }
+    finally { setSyncing(false); }
   };
 
   const saveKey = async () => {
@@ -954,7 +979,7 @@ export default function Providers() {
                   </div>
 
                   <div className="mt-3.5 flex items-center gap-1.5 border-t border-line pt-2.5">
-                    <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => fetchModels(p.id, p.name)} title="从上游导入或手动添加模型" aria-label="导入模型">
+                    <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => fetchModels(p.id, p.name)} title="模型管理：按上游同步 / 导入模型" aria-label="模型管理">
                       <RefreshCw size={13} />
                     </Button>
                     <Button variant="soft" className="!h-7 !w-7 !px-0" onClick={() => openManualAdd(p.id, p.name)} title="手动添加模型" aria-label="手动添加模型">
@@ -1358,10 +1383,18 @@ export default function Providers() {
               </div>
             </div>
 
-            <p className="mt-2.5 text-[11px] text-muted">导入后模型即刻上架；对外模型名默认与上游一致，可在「模型与定价」修改或配置自定义别名。</p>
-            <div className="mt-3.5 flex justify-end gap-2">
+            <p className="mt-2.5 text-[11px] text-muted">
+              「按上游同步」以上游当前列表为准：上游已不存在的模型会被移除，新增模型自动补齐；
+              新增模型默认显示上游真实名，定价里改过对外名的保留自定义名，优先级统一为 10，自定义定价不受影响。
+              只想追加个别模型时用「仅导入所选」。
+            </p>
+            <div className="mt-3.5 flex flex-wrap justify-end gap-2">
               <Button variant="ghost" onClick={() => setImportStep(null)}>取消</Button>
-              <Button onClick={importPicked} disabled={!importStep?.picked.size}>导入所选模型 ({importStep?.picked.size ?? 0})</Button>
+              <Button variant="soft" onClick={importPicked} disabled={!importStep?.picked.size}>仅导入所选 ({importStep?.picked.size ?? 0})</Button>
+              <Button onClick={syncUpstream} disabled={syncing}>
+                <RefreshCw size={14} className={syncing ? "animate-spin" : undefined} />
+                {syncing ? "同步中…" : "按上游同步"}
+              </Button>
             </div>
           </>
         )}

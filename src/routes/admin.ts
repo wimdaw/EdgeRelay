@@ -2,7 +2,7 @@
  * 管理后台统一路由 /api/admin/*
  */
 import { Hono } from "hono";
-import type { Env, HandlerCtx, PlatformSettings, ProviderRecord, UserRole } from "../types";
+import type { Env, HandlerCtx, PlatformSettings, ProviderRecord, ModelRouteRecord, UserRole } from "../types";
 import { ROLE_HIERARCHY } from "../types";
 import { requireAdminStepUp, requireUser, requireRole, clientIp } from "../auth";
 import { ApiError, ErrorCode, errorResponse } from "../errors";
@@ -10,7 +10,6 @@ import { uuid, encryptSecret, decryptSecret, sha256Hex } from "../crypto";
 import { getSettings, updateSettings, json } from "../settings";
 import { audit, verifyAuditChain } from "../audit";
 import { topup } from "../billing";
-import { joinApiPath, normalizeUpstreamModel } from "../providers";
 import {
   listAllUsers,
   getUserById,
@@ -27,11 +26,12 @@ import {
   deleteProviderKey,
   updateProviderKeyStatus,
   getModels,
-  upsertModel,
+  setModels,
   deleteModel,
   deletePricing,
   getAllPricing,
   setPricing,
+  setPricingMap,
   getAuditLogs,
   deleteAuditLog,
   clearAuditLogs,
@@ -49,6 +49,8 @@ import {
 } from "../storage/db";
 import { readKeyHealth } from "../key-health";
 import { mapLimit } from "../storage/cache";
+import { UNIFIED_MODEL_PRIORITY, normalizeModels, planProviderSync } from "../model-config";
+import { fetchProviderUpstreamModels } from "../upstream-models";
 
 export const adminRouter = new Hono<{ Bindings: Env }>();
 
@@ -263,6 +265,8 @@ adminRouter.post("/actions", async (c) => {
         "upsert_model",
         "delete_model",
         "import_models",
+        "sync_provider_models",
+        "normalize_models",
         "set_pricing",
         "delete_pricing",
         "set_settings",
@@ -1113,168 +1117,47 @@ adminRouter.post("/actions", async (c) => {
       /* ---- 模型管理 ---- */
       case "list_upstream_models": {
         const providerId = String(p.providerId || "");
-        const providers = await getProviders(env);
-        const prov = providers.find((x) => x.id === providerId || x.slug === providerId);
-        const provKind = prov?.kind || "";
-        if (provKind.startsWith("web:")) {
-          const type = provKind.slice("web:".length);
-          const { fetchWebModels, WEB_PROVIDERS } = await import("../web");
-          const keys = prov ? await getProviderKeysAll(env, prov.id) : [];
-          const activeKey = keys.find((k) => k.status === "active") || keys[0];
-          if (activeKey && type !== "geminiweb") {
-            try {
-              const credential = await decryptSecret(env, activeKey.encryptedKey);
-              const r = await fetchWebModels(env, type as any, credential, prov?.baseUrl);
-              return json({ ok: true, models: r.models, note: r.message });
-            } catch {}
-          }
-          const meta = WEB_PROVIDERS[type as keyof typeof WEB_PROVIDERS];
-          return json({ ok: true, models: meta?.defaultModels ?? [] });
+        const { list } = await fetchProviderUpstreamModels(env, providerId);
+        return json({ ok: true, models: list.models, note: list.note, degraded: list.degraded === true });
+      }
+
+      case "sync_provider_models": {
+        const providerId = String(p.providerId || "");
+        const { provider, list } = await fetchProviderUpstreamModels(env, providerId);
+        if (!provider) throw new ApiError(404, ErrorCode.NOT_FOUND, "供应商不存在");
+        // 上游一个模型都没返回时宁可不动：空列表多半是鉴权或网络失败，
+        // 直接按空列表同步会把整条渠道的模型配置误删。
+        if (!list.models.length) {
+          throw new ApiError(400, ErrorCode.BAD_REQUEST, "上游未返回任何模型，已跳过同步以避免误删现有配置");
         }
-        if (provKind.startsWith("oauth:")) {
-          const type = provKind.slice("oauth:".length);
-          const { fetchOAuthModels, OAUTH_PROVIDERS } = await import("../oauth");
-          const keys = prov ? await getProviderKeysAll(env, prov.id) : [];
-          const activeKey = keys.find((k) => k.status === "active") || keys[0];
-          if (activeKey) {
-            try {
-              const token = await decryptSecret(env, activeKey.encryptedKey);
-              const r = await fetchOAuthModels(env, type as any, token, prov?.baseUrl);
-              return json({ ok: true, models: r.models, note: r.message, degraded: r.degraded === true });
-            } catch {}
-          }
-          const meta = OAUTH_PROVIDERS[type as keyof typeof OAUTH_PROVIDERS];
-          return json({ ok: true, models: meta?.defaultModels ?? [] });
+        // 只能拿到内置兜底清单时同样不同步：兜底清单不等于上游真实目录
+        if (list.degraded) {
+          throw new ApiError(400, ErrorCode.BAD_REQUEST, "上游模型目录当前不可用（已回退内置清单），已跳过同步以避免误删");
         }
-        const slug = prov?.slug || prov?.kind || providerId;
-        if (slug === "opencode") {
-          // 对齐 ai-gateway-edgeone 原理：请求 OpenCode /models 端点并通过 filterOpenCodeModels 严格筛选免费层模型
-          // 免费模型特征：以 -free 结尾，或特定白名单（如 big-pickle）
-          try {
-            const { fetchOpenCodeModels, resolveOpenCodeUrls, resolveOpenCodeRelay } = await import("../opencode");
-            const mirrors = resolveOpenCodeUrls(env);
-            const relay = resolveOpenCodeRelay(env);
-            const res = await fetchOpenCodeModels(prov?.baseUrl || "https://opencode.ai/zen/v1", [], mirrors, undefined, relay);
-            if (res.success && res.data?.data && Array.isArray(res.data.data)) {
-              const freeList = res.data.data
-                .map((m: any) => m.id)
-                .filter((id: string) => typeof id === "string" && (id === "big-pickle" || id.endsWith("-free")));
-              if (freeList.length) return json({ ok: true, models: freeList });
-            }
-          } catch {}
-          return json({
-            ok: true,
-            models: [
-              "deepseek-v4.1-flash-free",
-              "big-pickle",
-              "beam-free",
-              "flint-40b-free",
-              "mimo-v2.6-flash-free",
-              "nemotron-3.5-super-vl-free",
-              "nemotron-3.5-lightning-free",
-              "jev-1.13-free",
-              "glm-5.3-flash-free",
-            ],
-          });
-        }
-        if (slug === "duckai") {
-          return json({
-            ok: true,
-            models: [
-              "gpt-6-luna",
-              "gpt-5.4-mini",
-              "claude-haiku-4-5",
-              "mistral-small-2603",
-              "tinfoil/gpt-oss-120b",
-              "tinfoil/gemma4-31b",
-            ],
-          });
-        }
-        if (slug === "kilo") {
-          try {
-            const res = await fetch("https://api.kilo.ai/api/gateway/models", {
-              headers: { "user-agent": "Relay/1.0" },
-              signal: AbortSignal.timeout(10000),
-            });
-            if (res.ok) {
-              const d = (await res.json()) as { data?: { id?: string }[] };
-              const freeList = (d.data ?? [])
-                .map((m) => m.id)
-                .filter((id): id is string => typeof id === "string" && (id.includes(":free") || id === "kilo-auto/free" || id === "openrouter/free"));
-              if (freeList.length) return json({ ok: true, models: freeList });
-            }
-          } catch {}
-          return json({
-            ok: true,
-            models: [
-              "kilo-auto/free",
-              "openrouter/free",
-              "nvidia/nemotron-3.5-super-vl:free",
-              "nvidia/nemotron-3.5-lightning:free",
-              "reflection/beam-free",
-              "xingchen-agi/xing4.0-29b-a4b:free",
-              "dots-studio/dots-3-note-preview:free",
-              "liquid/lfm-2.5-2.6b:free",
-              "cohere/north-mini-code:free",
-              "nvidia/nemotron-3-ultra-550b-a55b:free",
-              "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-            ],
-          });
-        }
-        if (slug === "anthropic") {
-          try {
-            const keys = await getProviderKeysAll(env, prov?.id || "anthropic");
-            const activeKey = keys.find((k) => k.status === "active");
-            if (activeKey) {
-              const plainKey = await decryptSecret(env, activeKey.encryptedKey);
-              const res = await fetch("https://api.anthropic.com/v1/models", {
-                headers: {
-                  "x-api-key": plainKey,
-                  "anthropic-version": "2023-06-01",
-                },
-                signal: AbortSignal.timeout(10000),
-              });
-              if (res.ok) {
-                const d = (await res.json()) as { data?: { id?: string }[] };
-                const mList = (d.data ?? []).map((m) => m.id).filter((x): x is string => !!x);
-                if (mList.length) return json({ ok: true, models: mList });
-              }
-            }
-          } catch {}
-          return json({
-            ok: true,
-            models: [
-              "claude-3-5-sonnet-20241022",
-              "claude-3-5-haiku-20241022",
-              "claude-3-opus-20240229",
-              "claude-3-sonnet-20240229",
-              "claude-3-haiku-20240307",
-            ],
-          });
-        }
-        if (prov?.baseUrl) {
-          const keys = await getProviderKeysAll(env, prov.id);
-          const activeKey = keys.find((k) => k.status === "active");
-          if (activeKey) {
-            try {
-              const plainKey = await decryptSecret(env, activeKey.encryptedKey);
-              const mRes = await fetch(joinApiPath(prov.baseUrl, "/v1/models"), {
-                headers: { authorization: `Bearer ${plainKey}` },
-                signal: AbortSignal.timeout(15000),
-              });
-              if (mRes.ok) {
-                const data = (await mRes.json()) as { data?: { id?: string }[] };
-                // Google 兼容列表返回 models/xxx，对话接口只认裸名，导入时统一剥前缀
-                const mList = (data.data ?? [])
-                  .map((m) => m.id)
-                  .filter((x): x is string => !!x)
-                  .map((id) => normalizeUpstreamModel(prov.slug, prov.baseUrl, id));
-                if (mList.length) return json({ ok: true, models: mList });
-              }
-            } catch {}
-          }
-        }
-        return json({ ok: true, models: [] });
+        const [models, pricing] = await Promise.all([getModels(env), getAllPricing(env)]);
+        const plan = planProviderSync({
+          models,
+          pricing,
+          providerId: provider.id,
+          upstreamModels: list.models,
+          now,
+          newModelId: () => `m_${uuid().slice(0, 8)}`,
+          newPricingId: () => `pr_${uuid().slice(0, 8)}`,
+        });
+        // 模型表与定价表一次性落库，避免逐条写快照产生中间态
+        await setModels(env, plan.models);
+        await setPricingMap(env, plan.pricing);
+        return done(plan.summary, "provider", provider.id);
+      }
+
+      case "normalize_models": {
+        // 存量配置一次性拉回基线：对外名 = 上游真实名、优先级统一 10、同渠道重复合并。
+        // 刷新单个渠道时也会隐式执行同一套规范化，这里给管理员一个显式入口。
+        const [models, pricing] = await Promise.all([getModels(env), getAllPricing(env)]);
+        const result = normalizeModels({ models, pricing });
+        await setModels(env, result.models);
+        await setPricingMap(env, result.pricing);
+        return done({ ...result.summary, total: result.models.length }, "models", "all");
       }
 
       case "list_models": {
@@ -1305,39 +1188,61 @@ adminRouter.post("/actions", async (c) => {
         return json({ ok: true, models: rows });
       }
       case "upsert_model": {
-        const id = (p.id as string) || uuid();
-        const publicName = String(p.publicName);
-        await upsertModel(env, {
+        // 对外名默认为上游真实名；定价里显式填了不同的名字才作为自定义对外名保留
+        const upstreamModel = String(p.upstreamModel || "").trim();
+        if (!upstreamModel) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少上游真实模型名");
+        const providerId = String(p.providerId || "");
+        const requestedPublicName = String(p.publicName || "").trim();
+        const publicName = requestedPublicName || upstreamModel;
+        const oldPublicName = String(p.oldPublicName || "").trim();
+
+        const [models, pricingMap] = await Promise.all([getModels(env), getAllPricing(env)]);
+        // 同一渠道同一上游只保留一条路由：命中既有记录时原地更新
+        const sameRoute = models.find((m) => m.providerId === providerId && m.upstreamModel === upstreamModel);
+        const id = (p.id as string) || sameRoute?.id || uuid();
+        const prev = models.find((m) => m.id === id);
+
+        const record: ModelRouteRecord = {
           id,
           publicName,
-          providerId: String(p.providerId),
-          upstreamModel: String(p.upstreamModel),
-          priority: Number(p.priority ?? 10),
-          costWeight: Number(p.costWeight ?? 1),
-          maxContext: (p.maxContext as number) ?? null,
+          providerId,
+          upstreamModel,
+          priority: UNIFIED_MODEL_PRIORITY,
+          costWeight: Number(p.costWeight ?? prev?.costWeight ?? 1),
+          maxContext: (p.maxContext as number) ?? prev?.maxContext ?? null,
           enabled: p.enabled === false ? 0 : 1,
-          createdAt: now,
-        });
+          createdAt: prev?.createdAt ?? now,
+        };
+        // 剔除被编辑记录本身，以及与它构成重复的旧条目
+        const next = models.filter(
+          (m) => m.id !== id && !(m.providerId === providerId && m.upstreamModel === upstreamModel)
+        );
+        next.push(record);
 
-        // 若携带定价或限流数据，或该模型尚未配置定价，自动维护定价表
-        const pricing = await getAllPricing(env);
-        const existingPricing = pricing[publicName] || (p.oldPublicName ? pricing[String(p.oldPublicName)] : undefined);
-        const inputPerMillion = p.inputPerMillion !== undefined ? Number(p.inputPerMillion) : (existingPricing?.inputPerMillion ?? 0);
-        const outputPerMillion = p.outputPerMillion !== undefined ? Number(p.outputPerMillion) : (existingPricing?.outputPerMillion ?? 0);
-        const rpmLimit = p.rpmLimit !== undefined
-          ? (p.rpmLimit === null || p.rpmLimit === "" ? null : Number(p.rpmLimit))
-          : (existingPricing?.rpmLimit ?? null);
-        const prId = existingPricing?.id || `pr_${uuid().slice(0, 8)}`;
-        await setPricing(env, {
-          id: prId,
+        // 定价：显式传了就用传的，否则沿用新名/旧名上已有的配置
+        const existingPricing = pricingMap[publicName] || (oldPublicName ? pricingMap[oldPublicName] : undefined);
+        const pricingNext = { ...pricingMap };
+        pricingNext[publicName] = {
+          id: existingPricing?.id || `pr_${uuid().slice(0, 8)}`,
           publicName,
-          inputPerMillion,
-          outputPerMillion,
+          inputPerMillion: p.inputPerMillion !== undefined ? Number(p.inputPerMillion) : (existingPricing?.inputPerMillion ?? 0),
+          outputPerMillion: p.outputPerMillion !== undefined ? Number(p.outputPerMillion) : (existingPricing?.outputPerMillion ?? 0),
           currency: String(p.currency ?? existingPricing?.currency ?? "CNY"),
-          rpmLimit,
+          rpmLimit: p.rpmLimit !== undefined
+            ? (p.rpmLimit === null || p.rpmLimit === "" ? null : Number(p.rpmLimit))
+            : (existingPricing?.rpmLimit ?? null),
           createdAt: existingPricing?.createdAt ?? now,
-        });
-        return done({ id }, "model", id);
+        };
+        // 旧名改名后没有模型再用即清理
+        if (oldPublicName && oldPublicName !== publicName && !next.some((m) => m.publicName === oldPublicName)) {
+          delete pricingNext[oldPublicName];
+        }
+
+        // 保存时顺带做一次全量规范化，保证对外名与优先级始终处于基线
+        const normalized = normalizeModels({ models: next, pricing: pricingNext });
+        await setModels(env, normalized.models);
+        await setPricingMap(env, normalized.pricing);
+        return done({ id, publicName, priority: UNIFIED_MODEL_PRIORITY }, "model", id);
       }
       case "import_models": {
         const providerId = String(p.providerId || "");
@@ -1347,41 +1252,46 @@ adminRouter.post("/actions", async (c) => {
           ? p.models.split(/[\r\n,]+/).map((s) => s.trim()).filter(Boolean)
           : [];
         if (!providerId || !rawModels.length) throw new ApiError(400, ErrorCode.BAD_REQUEST, "缺少 providerId 或 models 列表");
-        const priority = Number(p.priority ?? 10);
         const costWeight = Number(p.costWeight ?? 1);
-        const existingModels = await getModels(env);
+
+        // 一次性读改写：旧实现每导入一条就写一次快照，模型多时会产生大量中间态写入
+        const [models, pricingMap] = await Promise.all([getModels(env), getAllPricing(env)]);
+        const next = models.slice();
+        const pricing = { ...pricingMap };
         let imported = 0;
         for (const mName of rawModels) {
-          const trimmed = mName.trim();
-          if (!trimmed) continue;
-          const existing = existingModels.find((em) => em.providerId === providerId && em.upstreamModel === trimmed);
-          if (!existing) {
-            const id = `m_${uuid().slice(0, 8)}`;
-            await upsertModel(env, {
-              id,
-              publicName: trimmed,
-              providerId,
-              upstreamModel: trimmed,
-              priority,
-              costWeight,
-              maxContext: null,
-              enabled: 1,
+          const name = mName.trim();
+          if (!name) continue;
+          if (next.some((m) => m.providerId === providerId && m.upstreamModel === name)) continue;
+          next.push({
+            id: `m_${uuid().slice(0, 8)}`,
+            publicName: name,
+            providerId,
+            upstreamModel: name,
+            priority: UNIFIED_MODEL_PRIORITY,
+            costWeight,
+            maxContext: null,
+            enabled: 1,
+            createdAt: now,
+          });
+          // 已有同名定价（人工配置过）则保留，不覆盖
+          if (!pricing[name]) {
+            pricing[name] = {
+              id: `pr_${uuid().slice(0, 8)}`,
+              publicName: name,
+              inputPerMillion: 0,
+              outputPerMillion: 0,
+              currency: "CNY",
+              rpmLimit: null,
               createdAt: now,
-            });
-            const pricing = await getAllPricing(env);
-            if (!pricing[trimmed]) {
-              await setPricing(env, {
-                id: `pr_${uuid().slice(0, 8)}`,
-                publicName: trimmed,
-                inputPerMillion: 0,
-                outputPerMillion: 0,
-                currency: "CNY",
-                createdAt: now,
-              });
-            }
-            imported++;
+            };
           }
+          imported++;
         }
+        // 顺带把存量条目的名称与优先级拉回基线
+        const normalized = normalizeModels({ models: next, pricing });
+        await setModels(env, normalized.models);
+        await setPricingMap(env, normalized.pricing);
         return done({ imported, total: rawModels.length }, "models", providerId);
       }
       case "delete_model": {
