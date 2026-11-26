@@ -14,6 +14,26 @@ import type { ModelPricingRecord, ModelRouteRecord } from "./types";
 /** 全站统一的模型路由优先级（数字越小越优先，统一后同层按 costWeight 排序） */
 export const UNIFIED_MODEL_PRIORITY = 10;
 
+/**
+ * 渠道免费模型白名单：这些渠道只上架可免费调用的模型。
+ *  - cline：零扣费模型（`cline-free/` 前缀或 `:free` 后缀）；`~` 前缀是赠金通道，其余为付费
+ *  - bigmodel：免费 Flash 系列（`-flash`），排除付费的 FlashX
+ * 其余渠道原样返回。
+ */
+export function filterProviderModels(slug: string, kind: string, models: string[]): string[] {
+  const key = slug || "";
+  if (key === "cline" || key === "cline-oauth" || kind === "oauth:cline") {
+    return models.filter((m) => m.startsWith("cline-free/") || m.endsWith(":free"));
+  }
+  if (key === "bigmodel") {
+    return models.filter((m) => {
+      const s = m.toLowerCase();
+      return s.includes("flash") && !s.includes("flashx");
+    });
+  }
+  return models;
+}
+
 export type NormalizeSummary = {
   /** 因对外名为空/等于旧上游名而被对齐到最新上游名的条数 */
   renamed: number;

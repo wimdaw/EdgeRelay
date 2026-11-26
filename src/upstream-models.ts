@@ -10,6 +10,7 @@ import type { Env, ProviderRecord } from "./types";
 import { getProviders, getProviderKeysAll } from "./storage/db";
 import { decryptSecret } from "./crypto";
 import { joinApiPath, normalizeUpstreamModel } from "./providers";
+import { filterProviderModels } from "./model-config";
 
 export type UpstreamModelList = {
   models: string[];
@@ -29,7 +30,7 @@ function dedupe(names: string[]): string[] {
   return out;
 }
 
-export async function fetchProviderUpstreamModels(
+async function fetchProviderUpstreamModelsRaw(
   env: Env,
   providerIdOrSlug: string
 ): Promise<{ provider: ProviderRecord | null; list: UpstreamModelList }> {
@@ -226,4 +227,26 @@ export async function fetchProviderUpstreamModels(
   }
 
   return { provider: prov, list: { models: [] } };
+}
+
+/**
+ * 渠道级上架策略：这些渠道只保留可免费调用的模型，付费模型不进配置。
+ *  - cline：零扣费模型（cline-free/ 前缀或 :free 后缀）；~ 前缀是赠金通道、其余为付费，均排除
+ *  - bigmodel：免费 Flash 系列（排除付费的 FlashX）
+ * 其余渠道原样返回。
+ */
+function applyProviderModelPolicy(provider: ProviderRecord | null, models: string[]): string[] {
+  return filterProviderModels(provider?.slug || "", provider?.kind || "", models);
+}
+
+/** 上游模型目录（已按渠道策略过滤，调用方拿到的即为可上架清单） */
+export async function fetchProviderUpstreamModels(
+  env: Env,
+  providerIdOrSlug: string
+): Promise<{ provider: ProviderRecord | null; list: UpstreamModelList }> {
+  const result = await fetchProviderUpstreamModelsRaw(env, providerIdOrSlug);
+  return {
+    provider: result.provider,
+    list: { ...result.list, models: applyProviderModelPolicy(result.provider, result.list.models) },
+  };
 }

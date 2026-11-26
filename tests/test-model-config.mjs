@@ -169,5 +169,20 @@ const idFactory = (prefix) => () => `${prefix}_${++seq}`;
   eq("新增计数", r.summary.added, ["n"]);
 }
 
+/* ---------------- 8. 渠道免费模型白名单 ---------------- */
+{
+  eq(
+    "cline 只保留零扣费模型",
+    mod.filterProviderModels("cline-oauth", "oauth:cline", ["a/b:free", "~c/d", "e/f:batch", "cline-free/x"]),
+    ["a/b:free", "cline-free/x"]
+  );
+  eq(
+    "bigmodel 只保留免费 Flash（排除 FlashX）",
+    mod.filterProviderModels("bigmodel", "openai_compat", ["glm-5.3-flash", "glm-5.3-flashx", "glm-5", "glm-4.5-air"]),
+    ["glm-5.3-flash"]
+  );
+  eq("其他渠道不做过滤", mod.filterProviderModels("google", "openai_compat", ["a", "b"]), ["a", "b"]);
+}
+
 console.log(`\n${fail === 0 ? "🎉 全部通过" : "❌ 存在失败"}：成功 ${pass}，失败 ${fail}`);
 process.exit(fail === 0 ? 0 : 1);
