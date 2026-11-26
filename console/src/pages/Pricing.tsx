@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Plus, RefreshCw } from "lucide-react";
-import { adminAction, api, type Me, type ModelRow, type Provider } from "../lib/api";
+import { adminAction, adminActionStepUp, api, type Me, type ModelRow, type Provider } from "../lib/api";
 import { Button, Card, Dialog, DataTable, Field, Input, Select, StatusTag, useConfirm, useToast, type Col } from "../components/ui";
 
 export default function Pricing({ me }: { me: Me }) {
@@ -139,7 +139,7 @@ export default function Pricing({ me }: { me: Me }) {
     if (!(await confirm("将把所有模型优先级统一为 10，并把未自定义的对外名对齐上游真实名（定价里显式改过的名称与定价保留）。继续？"))) return;
     setNormalizing(true);
     try {
-      const r = await adminAction<{ result?: { renamed?: number; customKept?: number; priorityFixed?: number; deduped?: number; total?: number } }>("normalize_models", {});
+      const r = await adminActionStepUp<{ result?: { renamed?: number; customKept?: number; priorityFixed?: number; deduped?: number; total?: number } }>("normalize_models", {});
       const s = r.result ?? {};
       toast(`已规范化：名称对齐 ${s.renamed ?? 0}、保留自定义名 ${s.customKept ?? 0}、优先级修正 ${s.priorityFixed ?? 0}、去重 ${s.deduped ?? 0}，共 ${s.total ?? 0} 个模型`);
       load();

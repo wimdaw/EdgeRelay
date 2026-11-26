@@ -450,7 +450,7 @@ export default function Providers() {
     const picked = [...importStep.picked];
     if (!picked.length) return toast("请至少选择一个模型", "err");
     try {
-      const r = await adminAction<{ result?: { imported?: number } }>("import_models", { providerId: importStep.providerId, models: picked, priority: 10 });
+      const r = await adminActionStepUp<{ result?: { imported?: number } }>("import_models", { providerId: importStep.providerId, models: picked, priority: 10 });
       toast(`已导入 ${r.result?.imported ?? picked.length} 个模型，可在「模型与定价」调整定价`);
       setImportStep(null); load();
     } catch (e) { toast((e as Error).message, "err"); }
@@ -461,7 +461,7 @@ export default function Providers() {
     if (!importStep || syncing) return;
     setSyncing(true);
     try {
-      const r = await adminAction<{
+      const r = await adminActionStepUp<{
         result?: { added?: string[]; removed?: string[]; renamed?: number; customKept?: number; priorityFixed?: number; deduped?: number; total?: number };
       }>("sync_provider_models", { providerId: importStep.providerId });
       const s = r.result ?? {};
