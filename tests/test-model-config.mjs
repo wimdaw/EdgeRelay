@@ -204,5 +204,14 @@ const idFactory = (prefix) => () => `${prefix}_${++seq}`;
   );
 }
 
+/* ---------------- 9. bigmodel 目录补齐 ---------------- */
+{
+  const a = mod.augmentProviderModels("bigmodel", "openai_compat", ["glm-5.3-flash", "glm-5.4"]);
+  eq("bigmodel 补齐目录遗漏的免费 flash", a.length, 9);
+  eq("补齐项包含 glm-4.7-flash", a.includes("glm-4.7-flash"), true);
+  eq("补齐不产生重复", new Set(a.map((x) => x.toLowerCase())).size, a.length);
+  eq("其他渠道不补齐", mod.augmentProviderModels("google", "openai_compat", ["a"]), ["a"]);
+}
+
 console.log(`\n${fail === 0 ? "🎉 全部通过" : "❌ 存在失败"}：成功 ${pass}，失败 ${fail}`);
 process.exit(fail === 0 ? 0 : 1);

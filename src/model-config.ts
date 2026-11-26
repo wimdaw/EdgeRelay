@@ -15,6 +15,29 @@ import type { ModelPricingRecord, ModelRouteRecord } from "./types";
 export const UNIFIED_MODEL_PRIORITY = 10;
 
 /**
+ * BigModel 的免费 Flash 系列不会出现在 `/models` 目录里（2026-11 实测：目录只返回付费档），
+ * 但逐个调用均可用。这里维护显式白名单，避免「以上游目录为准」的同步把它们误删。
+ */
+export const BIGMODEL_FREE_MODELS = [
+  "glm-5.3-flash",
+  "glm-4.7-flash",
+  "glm-4.5-flash",
+  "glm-4-flash-250414",
+  "glm-z1-flash",
+  "glm-4.6v-flash",
+  "glm-4v-flash",
+  "glm-4.1v-thinking-flash",
+];
+
+/** 目录补齐：上游目录缺失但确实可用的模型（目前仅 bigmodel 需要） */
+export function augmentProviderModels(slug: string, _kind: string, models: string[]): string[] {
+  if (slug !== "bigmodel") return models;
+  const seen = new Set(models.map((m) => m.toLowerCase()));
+  const extra = BIGMODEL_FREE_MODELS.filter((m) => !seen.has(m.toLowerCase()));
+  return [...models, ...extra];
+}
+
+/**
  * 渠道级模型白名单：只上架可免费调用、且属于业务范围的模型。
  *  - cline：零扣费模型（`cline-free/` 前缀或 `:free` 后缀）；`~` 前缀是赠金通道，其余为付费
  *  - bigmodel：免费 Flash 系列（`-flash`），排除付费的 FlashX
