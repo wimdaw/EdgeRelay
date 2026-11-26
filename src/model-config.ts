@@ -15,9 +15,13 @@ import type { ModelPricingRecord, ModelRouteRecord } from "./types";
 export const UNIFIED_MODEL_PRIORITY = 10;
 
 /**
- * 渠道免费模型白名单：这些渠道只上架可免费调用的模型。
+ * 渠道级模型白名单：只上架可免费调用、且属于业务范围的模型。
  *  - cline：零扣费模型（`cline-free/` 前缀或 `:free` 后缀）；`~` 前缀是赠金通道，其余为付费
  *  - bigmodel：免费 Flash 系列（`-flash`），排除付费的 FlashX
+ *  - agnes：免费 Flash 系列（对话/视频/图片），排除 pro / sys 等付费档
+ *  - trae：排除手工追加的 `agnes/*` 自定义模型（不属于 Trae 自有目录）
+ *  - chatgpt-web：排除 `chatgpt_alpha_*` 内部灰度占位模型
+ *  - antigravity：排除 `*-disabled` 占位模型
  * 其余渠道原样返回。
  */
 export function filterProviderModels(slug: string, kind: string, models: string[]): string[] {
@@ -30,6 +34,18 @@ export function filterProviderModels(slug: string, kind: string, models: string[
       const s = m.toLowerCase();
       return s.includes("flash") && !s.includes("flashx");
     });
+  }
+  if (key === "agnes") {
+    return models.filter((m) => m.toLowerCase().includes("flash"));
+  }
+  if (key.startsWith("trae")) {
+    return models.filter((m) => !m.toLowerCase().startsWith("agnes/"));
+  }
+  if (key === "chatgpt-web" || kind === "web:chatgptweb") {
+    return models.filter((m) => !m.toLowerCase().startsWith("chatgpt_alpha_model_external_access_reserved_gate"));
+  }
+  if (key === "antigravity-oauth" || kind === "oauth:antigravity") {
+    return models.filter((m) => !m.toLowerCase().endsWith("-disabled"));
   }
   return models;
 }

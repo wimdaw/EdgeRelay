@@ -182,6 +182,26 @@ const idFactory = (prefix) => () => `${prefix}_${++seq}`;
     ["glm-5.3-flash"]
   );
   eq("其他渠道不做过滤", mod.filterProviderModels("google", "openai_compat", ["a", "b"]), ["a", "b"]);
+  eq(
+    "agnes 只保留 flash 免费档",
+    mod.filterProviderModels("agnes", "openai_compat", ["agnes-3.0-flash", "agnes-2.5-pro", "agnes-image-2.5-flash", "agnes-video-2.5"]),
+    ["agnes-3.0-flash", "agnes-image-2.5-flash"]
+  );
+  eq(
+    "trae 排除手工追加的 agnes 模型",
+    mod.filterProviderModels("trae-cn-oauth", "oauth:trae", ["deepseek-V3", "agnes/agnes-3.0-flash"]),
+    ["deepseek-V3"]
+  );
+  eq(
+    "chatgpt-web 排除灰度占位模型",
+    mod.filterProviderModels("chatgpt-web", "web:chatgptweb", ["gpt-6", "chatgpt_alpha_model_external_access_reserved_gate_12"]),
+    ["gpt-6"]
+  );
+  eq(
+    "antigravity 排除 disabled 占位模型",
+    mod.filterProviderModels("antigravity-oauth", "oauth:antigravity", ["gemini-4-hydrogen-high", "gemini-4-neon-disabled"]),
+    ["gemini-4-hydrogen-high"]
+  );
 }
 
 console.log(`\n${fail === 0 ? "🎉 全部通过" : "❌ 存在失败"}：成功 ${pass}，失败 ${fail}`);
